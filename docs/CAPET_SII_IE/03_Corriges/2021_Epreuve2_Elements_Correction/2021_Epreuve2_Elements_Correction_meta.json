@@ -1,0 +1,661 @@
+{
+  "table_of_contents": [
+    {
+      "title": "\u00c9tude d'un syst\u00e8me, d'un proc\u00e9d\u00e9 ou d'une organisation",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          108.6572265625,
+          48.9248046875
+        ],
+        [
+          489.58660888671875,
+          48.9248046875
+        ],
+        [
+          489.58660888671875,
+          65.81866455078125
+        ],
+        [
+          108.6572265625,
+          65.81866455078125
+        ]
+      ]
+    },
+    {
+      "title": "A. Pr\u00e9sentation de l'\u00e9preuve",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          72.05078125,
+          106.89453125
+        ],
+        [
+          237.9797821044922,
+          106.89453125
+        ],
+        [
+          237.9797821044922,
+          119.829345703125
+        ],
+        [
+          72.05078125,
+          119.829345703125
+        ]
+      ]
+    },
+    {
+      "title": "B. Sujet",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          73.50341796875,
+          247.501953125
+        ],
+        [
+          124.9620590209961,
+          247.501953125
+        ],
+        [
+          124.9620590209961,
+          260.74407958984375
+        ],
+        [
+          73.50341796875,
+          260.74407958984375
+        ]
+      ]
+    },
+    {
+      "title": "",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          253.04931640625,
+          537.76171875
+        ],
+        [
+          294.30419921875,
+          537.76171875
+        ],
+        [
+          294.30419921875,
+          547.62890625
+        ],
+        [
+          253.04931640625,
+          547.62890625
+        ]
+      ]
+    },
+    {
+      "title": "C. \u00c9l\u00e9ments de correction",
+      "heading_level": null,
+      "page_id": 1,
+      "polygon": [
+        [
+          72.68891687657431,
+          50.158203125
+        ],
+        [
+          225.56045340050377,
+          50.158203125
+        ],
+        [
+          225.56045340050377,
+          61.48174532502226
+        ],
+        [
+          72.68891687657431,
+          61.48174532502226
+        ]
+      ]
+    },
+    {
+      "title": "PARTIE A : pertinence du choix du proc\u00e9d\u00e9 de stockage de l'\u00e9nergie.",
+      "heading_level": null,
+      "page_id": 1,
+      "polygon": [
+        [
+          69.69143576826197,
+          69.72929652715939
+        ],
+        [
+          400.91309823677585,
+          69.72929652715939
+        ],
+        [
+          400.91309823677585,
+          79.759765625
+        ],
+        [
+          69.69143576826197,
+          79.759765625
+        ]
+      ]
+    },
+    {
+      "title": "Phase de turbinage",
+      "heading_level": null,
+      "page_id": 1,
+      "polygon": [
+        [
+          68.1926952141058,
+          321.505859375
+        ],
+        [
+          163.36272040302268,
+          321.505859375
+        ],
+        [
+          163.36272040302268,
+          331.40160284951025
+        ],
+        [
+          68.1926952141058,
+          331.40160284951025
+        ]
+      ]
+    },
+    {
+      "title": "Phase de pompage",
+      "heading_level": null,
+      "page_id": 1,
+      "polygon": [
+        [
+          68.1926952141058,
+          596.0730186999109
+        ],
+        [
+          162.61335012594458,
+          596.0730186999109
+        ],
+        [
+          162.61335012594458,
+          606.5699020480855
+        ],
+        [
+          68.1926952141058,
+          606.5699020480855
+        ]
+      ]
+    },
+    {
+      "title": "PARTIE B : validation du dimensionnement du syst\u00e8me de production de l'\u00e9nergie.",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          69.69143576826197,
+          272.9189670525378
+        ],
+        [
+          465.3589420654912,
+          272.9189670525378
+        ],
+        [
+          465.3589420654912,
+          283.4158504007124
+        ],
+        [
+          69.69143576826197,
+          283.4158504007124
+        ]
+      ]
+    },
+    {
+      "title": "PARTIE C: choix et mise en \u0153uvre du modulateur d'\u00e9nergie associ\u00e9 au groupe motopompe",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          69.43603515625,
+          66.603515625
+        ],
+        [
+          508.8224181360202,
+          66.603515625
+        ],
+        [
+          508.8224181360202,
+          76.47729296527159
+        ],
+        [
+          69.43603515625,
+          76.47729296527159
+        ]
+      ]
+    },
+    {
+      "title": "PARTIE D : validation du proc\u00e9d\u00e9 de mesure de la quantit\u00e9 d'\u00e9nergie stock\u00e9e.",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          69.69143576826197,
+          654.5234375
+        ],
+        [
+          440.6297229219144,
+          654.5234375
+        ],
+        [
+          440.6297229219144,
+          664.390625
+        ],
+        [
+          69.69143576826197,
+          664.390625
+        ]
+      ]
+    },
+    {
+      "title": "PARTIE E : validation du proc\u00e9d\u00e9 en termes de co\u00fbt \u00e9nerg\u00e9tique",
+      "heading_level": null,
+      "page_id": 4,
+      "polygon": [
+        [
+          68.94206549118388,
+          491.1041852181656
+        ],
+        [
+          377.6826196473552,
+          491.1041852181656
+        ],
+        [
+          377.6826196473552,
+          501.60106856634013
+        ],
+        [
+          68.94206549118388,
+          501.60106856634013
+        ]
+      ]
+    },
+    {
+      "title": "DOCUMENT R\u00c9PONSE DR1",
+      "heading_level": null,
+      "page_id": 6,
+      "polygon": [
+        [
+          203.07934508816123,
+          45.736420302760465
+        ],
+        [
+          391.1712846347607,
+          45.736420302760465
+        ],
+        [
+          391.1712846347607,
+          65.2306322350846
+        ],
+        [
+          203.07934508816123,
+          65.2306322350846
+        ]
+      ]
+    },
+    {
+      "title": "DOCUMENT R\u00c9PONSE DR2",
+      "heading_level": null,
+      "page_id": 7,
+      "polygon": [
+        [
+          203.07934508816123,
+          46.486197684772925
+        ],
+        [
+          391.1712846347607,
+          46.486197684772925
+        ],
+        [
+          391.1712846347607,
+          64.48085485307213
+        ],
+        [
+          203.07934508816123,
+          64.48085485307213
+        ]
+      ]
+    }
+  ],
+  "page_stats": [
+    {
+      "page_id": 0,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          79
+        ],
+        [
+          "Line",
+          25
+        ],
+        [
+          "ListItem",
+          10
+        ],
+        [
+          "Text",
+          7
+        ],
+        [
+          "SectionHeader",
+          4
+        ],
+        [
+          "Picture",
+          2
+        ],
+        [
+          "Caption",
+          2
+        ],
+        [
+          "PictureGroup",
+          2
+        ],
+        [
+          "ListGroup",
+          2
+        ],
+        [
+          "PageFooter",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 1,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          67
+        ],
+        [
+          "Span",
+          29
+        ],
+        [
+          "Text",
+          16
+        ],
+        [
+          "ListItem",
+          5
+        ],
+        [
+          "SectionHeader",
+          4
+        ],
+        [
+          "Equation",
+          2
+        ],
+        [
+          "PageFooter",
+          1
+        ],
+        [
+          "ListGroup",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 2,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          68
+        ],
+        [
+          "Span",
+          40
+        ],
+        [
+          "Text",
+          23
+        ],
+        [
+          "Equation",
+          1
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "PageFooter",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 3,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          63
+        ],
+        [
+          "Span",
+          26
+        ],
+        [
+          "Text",
+          15
+        ],
+        [
+          "ListItem",
+          3
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "Equation",
+          2
+        ],
+        [
+          "PageFooter",
+          1
+        ],
+        [
+          "ListGroup",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 4,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          53
+        ],
+        [
+          "Span",
+          25
+        ],
+        [
+          "Text",
+          13
+        ],
+        [
+          "Equation",
+          2
+        ],
+        [
+          "Figure",
+          1
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "PageFooter",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 5,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          51
+        ],
+        [
+          "Line",
+          18
+        ],
+        [
+          "Text",
+          10
+        ],
+        [
+          "ListItem",
+          2
+        ],
+        [
+          "PageFooter",
+          1
+        ],
+        [
+          "ListGroup",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 6,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          44
+        ],
+        [
+          "Span",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Figure",
+          1
+        ],
+        [
+          "PageFooter",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 7,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          77
+        ],
+        [
+          "Span",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Figure",
+          1
+        ],
+        [
+          "PageFooter",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    }
+  ],
+  "debug_data_path": "debug_data/2021_Epreuve2_Elements_Correction"
+}

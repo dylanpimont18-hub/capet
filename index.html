@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CAPET SII IE — Révision 2026</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="app/style.css">
+</head>
+<body>
+  <nav id="nav">
+    <span class="nav-brand">⚡ CAPET SII IE</span>
+    <a href="#/accueil"    class="nav-link">Accueil</a>
+    <a href="#/themes"     class="nav-link">Thèmes</a>
+    <a href="#/formulaire" class="nav-link">Formulaire</a>
+    <a href="#/progression"class="nav-link">Progression</a>
+    <button id="theme-toggle" onclick="Theme.toggle()">☀️ Jour</button>
+  </nav>
+  <main id="app">Chargement…</main>
+
+  <!-- KaTeX CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+          onload="if(window._pendingRender){window._pendingRender()}"></script>
+
+  <!-- App -->
+  <script src="app/data.js?v=2"></script>
+  <script src="app/storage.js?v=2"></script>
+  <script src="app/katex-render.js"></script>
+  <script src="app/theme.js"></script>
+  <script src="app/views/accueil.js"></script>
+  <script src="app/views/themes.js?v=2"></script>
+  <script src="app/views/theme.js"></script>
+  <script src="app/views/formulaire.js"></script>
+  <script src="app/views/progression.js?v=2"></script>
+  <script src="app/quiz/qcm.js"></script>
+  <script src="app/quiz/trous.js"></script>
+  <script src="app/router.js"></script>
+</body>
+</html>
