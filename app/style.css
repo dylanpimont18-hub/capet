@@ -83,6 +83,8 @@ a:hover {
   gap: 16px;
   height: 52px;
   padding: 0 24px;
+  padding-top: env(safe-area-inset-top);
+  height: calc(52px + env(safe-area-inset-top));
   background: var(--bg2);
   border-bottom: 1px solid var(--border);
 }
@@ -105,6 +107,9 @@ body.light #nav {
   font-weight: 500;
   transition: color 0.15s;
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }
 .nav-link:hover {
   color: var(--text);
@@ -216,13 +221,16 @@ body.light #nav {
    Boutons
    ---------------------------------------------------------- */
 .btn {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  padding: 8px 16px;
+  padding: 10px 16px;
+  min-height: 44px;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
   background: transparent;
   color: var(--text);
@@ -537,12 +545,60 @@ hr {
 }
 
 /* ----------------------------------------------------------
+   Bottom nav (mobile only)
+   ---------------------------------------------------------- */
+#bottom-nav {
+  display: none;
+}
+
+/* ----------------------------------------------------------
    Responsive
    ---------------------------------------------------------- */
 @media (max-width: 600px) {
-  #app { padding: 16px 12px; }
-  #nav { gap: 10px; padding: 0 12px; }
-  .nav-brand { font-size: 14px; }
-  .nav-link  { font-size: 13px; }
+  #app {
+    padding: 16px 12px;
+    padding-bottom: calc(64px + env(safe-area-inset-bottom) + 16px);
+  }
+
+  /* Top nav : brand + toggle uniquement */
+  #nav {
+    gap: 8px;
+    padding: 0 16px;
+    padding-top: env(safe-area-inset-top);
+    height: calc(48px + env(safe-area-inset-top));
+  }
+  #nav .nav-link { display: none; }
+  .nav-brand { font-size: 15px; }
+
+  /* Bottom tab bar */
+  #bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  #bottom-nav .nav-link {
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+    min-height: 56px;
+    font-size: 10px;
+    color: var(--text2);
+    text-decoration: none;
+    padding: 6px 0;
+  }
+  #bottom-nav .nav-link.active {
+    color: var(--bleu);
+  }
+  #bottom-nav .bnav-icon { font-size: 20px; line-height: 1; }
+  #bottom-nav .bnav-label { font-size: 10px; font-weight: 500; }
+
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
 }
