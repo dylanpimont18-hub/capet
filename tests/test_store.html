@@ -1,0 +1,34 @@
+<!-- tests/test_store.html -->
+<!doctype html><meta charset="utf-8"><title>Tests store</title>
+<body><pre id="out"></pre>
+<script type="module">
+import { charger, sauver, majCarte, exporter, importer, reinitialiser, CLE }
+  from "../app/js/store.js";
+
+const res = [];
+const ok = (n, c) => res.push((c ? "PASS " : "FAIL ") + n);
+
+reinitialiser();
+ok("charge vide apres reset", Object.keys(charger()).length === 0);
+
+majCarte("T01-f-001", { intervalle: 1, facilite: 2.4, repetitions: 1, du: 42 });
+ok("carte persistee", charger()["T01-f-001"].du === 42);
+
+sauver({ "T02-p-001": { intervalle: 3, facilite: 2.5, repetitions: 2, du: 99 } });
+ok("sauver remplace tout", charger()["T01-f-001"] === undefined);
+
+const dump = exporter();
+ok("export est du JSON valide", typeof JSON.parse(dump) === "object");
+ok("export porte une version", JSON.parse(dump).version === 1);
+
+reinitialiser();
+ok("import restaure", importer(dump) && charger()["T02-p-001"].du === 99);
+
+const avant = JSON.stringify(charger());
+ok("import refuse du JSON casse", importer("{pas du json") === false);
+ok("progression intacte apres refus", JSON.stringify(charger()) === avant);
+ok("import refuse une structure sans progression", importer('{"version":1}') === false);
+
+document.getElementById("out").textContent = res.join("\n") +
+  "\n\n" + res.filter(r => r.startsWith("FAIL")).length + " echec(s)";
+</script>
