@@ -88,3 +88,33 @@ Même installée, il n'y a **aucun serveur** derrière cette app :
 l'export JSON de l'écran Réglages reste la seule vraie sauvegarde. À
 faire avant tout changement d'appareil, réinstallation, ou refonte de
 fiche (voir section précédente).
+
+## Publication sur GitHub Pages
+
+L'app est publiée depuis un **second dépôt, public et dédié** :
+`dylanpimont18-hub/capet-revision` → https://dylanpimont18-hub.github.io/capet-revision/
+
+Ce dépôt-ci reste privé : il contient les PDF officiels, les fiches LaTeX et
+le pipeline. Seul le dossier `app/` est publié, allégé des polices KaTeX
+inutiles (woff2 seul — Safari et Chrome n'utilisent que celui-là).
+
+### Republier après une correction de fiche
+
+```bash
+python scripts/build_cards.py          # regenere cards.json + svg + sw-assets.js
+robocopy app ..\capet-revision /E /XD .git   # Windows ; rsync -a --exclude .git sous POSIX
+cd ../capet-revision
+rm -f vendor/katex/fonts/*.ttf vendor/katex/fonts/*.woff
+git add -A && git commit -m "maj du contenu" && git push
+```
+
+GitHub Pages redéploie en une à deux minutes.
+
+⚠ **Le `sw-assets.js` copié doit refléter les polices présentes.** Si tu
+recopies `app/` tel quel puis supprimes les .ttf/.woff, régénère la liste,
+sinon le service worker tentera de précacher des fichiers absents et le
+hors-ligne sera incomplet.
+
+⚠ **`CACHE_VERSION` change à chaque modification de contenu**, ce qui force
+le service worker à se réinstaller et purge l'ancien cache. C'est ce qui
+garantit qu'une correction atteint réellement le téléphone.
