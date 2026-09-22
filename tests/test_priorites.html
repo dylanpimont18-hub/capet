@@ -1,0 +1,34 @@
+<!doctype html><meta charset="utf-8"><title>Tests priorites</title>
+<body><pre id="out"></pre>
+<script type="module">
+import { calculerMaitrise, ordonnerThemes } from "../app/js/views/priorites.js";
+
+const res = [];
+const ok = (n, c) => res.push((c ? "PASS " : "FAIL ") + n);
+
+const cartes = [
+  { id: "a", theme: "T01" }, { id: "b", theme: "T01" },
+  { id: "c", theme: "T02" },
+];
+const prog = {
+  a: { repetitions: 3, facilite: 2.5, intervalle: 5, du: 0 },
+  b: { repetitions: 1, facilite: 2.4, intervalle: 1, du: 0 },
+};
+
+const m = calculerMaitrise(cartes, prog);
+ok("total par theme", m.get("T01").total === 2 && m.get("T02").total === 1);
+ok("vues comptees", m.get("T01").vues === 2);
+ok("maitrise partielle", Math.abs(m.get("T01").maitrise - 0.5) < 1e-9);
+ok("theme jamais vu a maitrise 0", m.get("T02").maitrise === 0);
+
+const themes = [
+  { code: "T01", poids: 0.3, titre: "A" },
+  { code: "T02", poids: 1.0, titre: "B" },
+];
+const ordre = ordonnerThemes(themes, m);
+ok("fort poids faible maitrise en tete", ordre[0].code === "T02");
+ok("urgence calculee", ordre[0].urgence > ordre[1].urgence);
+
+document.getElementById("out").textContent = res.join("\n") +
+  "\n\n" + res.filter(r => r.startsWith("FAIL")).length + " echec(s)";
+</script>

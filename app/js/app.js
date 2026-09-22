@@ -1,5 +1,7 @@
 // app/js/app.js
 import { vueReviser } from "./views/reviser.js";
+import { vuePriorites } from "./views/priorites.js";
+import { vueReglages } from "./views/reglages.js";
 
 const CLE_THEME = "capet.theme";
 
@@ -17,6 +19,8 @@ async function donnees() {
 
 const ROUTES = {
   "#/reviser": vueReviser,
+  "#/priorites": vuePriorites,
+  "#/reglages": vueReglages,
 };
 
 async function naviguer() {
