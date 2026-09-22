@@ -29,3 +29,8 @@ app/sw-assets.js
 # Rendus PNG d inspection visuelle (regenerables)
 exercices/_png/
 fiches/_png/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
