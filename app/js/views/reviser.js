@@ -66,6 +66,10 @@ export function vueReviser(racine, data) {
               progression[c.id] = { ...etat, du: Date.now() + JOUR_MS_VUE };
               majCarte(c.id, progression[c.id]);
             } else {
+              // Ratée de nouveau : elle repart en fin de file sans être
+              // repénalisée. Voulu — une carte ratée deux fois de suite doit
+              // revenir jusqu'à ce qu'elle passe. La session se termine quand
+              // l'utilisateur quitte l'écran ; le compteur `total` reste figé.
               file.push(c);
               reprises.add(c.id);
             }
