@@ -158,8 +158,19 @@ def ecrire_sw_assets(app_dir: pathlib.Path, nb_cartes: int = 0) -> int:
         chemins += sorted(f"./vendor/katex/fonts/{p.name}"
                           for p in fonts.glob("*.woff2"))
 
+    # Le hash couvre AUSSI le contenu de cards.json, pas seulement la liste
+    # des fichiers et le nombre de cartes : corriger le libellé d'une formule
+    # sans ajouter ni retirer de carte laisserait sinon la version inchangée,
+    # le service worker ne se réinstallerait pas, et la correction n'atteindrait
+    # jamais un appareil déjà installé — précisément le geste le plus fréquent.
+    cards = app_dir / "cards.json"
+    empreinte_cartes = (
+        hashlib.sha256(cards.read_bytes()).hexdigest() if cards.exists() else ""
+    )
+
     empreinte = hashlib.sha256(
-        ("\n".join(chemins) + f"\n#cartes={nb_cartes}").encode("utf-8")
+        ("\n".join(chemins) + f"\n#cartes={nb_cartes}\n{empreinte_cartes}")
+        .encode("utf-8")
     ).hexdigest()[:12]
 
     contenu = (
