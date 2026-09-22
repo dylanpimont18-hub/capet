@@ -1,12 +1,18 @@
 // app/sw.js
 // Cache-first : l'app doit fonctionner sans réseau (usage en transports).
-const CACHE = "capet-v1";
 
 // Liste générée par build_cards.py : tous les SVG de schémas + les polices
 // KaTeX réellement utilisées. Sans elle, un schéma jamais affiché avant la
 // coupure réseau donne une image cassée, et les formules tombent sur une
 // police de substitution.
-importScripts("./sw-assets.js");   // définit self.ASSETS = [...]
+importScripts("./sw-assets.js");   // définit self.ASSETS = [...] et self.CACHE_VERSION
+
+// Le nom du cache doit changer quand le contenu précaché change : c'est ce
+// changement de littéral qui fait détecter par le navigateur un nouveau
+// sw.js, réinstaller le service worker, et laisser `activate` purger
+// l'ancien cache. self.CACHE_VERSION vient de sw-assets.js (hash du
+// contenu) ; le repli "v1" ne sert qu'à l'absence accidentelle du fichier.
+const CACHE = "capet-" + (self.CACHE_VERSION || "v1");
 
 const SOCLE = [
   "./", "./index.html", "./cards.json",

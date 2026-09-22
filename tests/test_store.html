@@ -14,8 +14,11 @@ ok("charge vide apres reset", Object.keys(charger()).length === 0);
 majCarte("T01-f-001", { intervalle: 1, facilite: 2.4, repetitions: 1, du: 42 });
 ok("carte persistee", charger()["T01-f-001"].du === 42);
 
-sauver({ "T02-p-001": { intervalle: 3, facilite: 2.5, repetitions: 2, du: 99 } });
+ok("sauver retourne true en cas de succes",
+   sauver({ "T02-p-001": { intervalle: 3, facilite: 2.5, repetitions: 2, du: 99 } }) === true);
 ok("sauver remplace tout", charger()["T01-f-001"] === undefined);
+ok("majCarte propage le succes de sauver",
+   majCarte("T03-f-001", { intervalle: 1, facilite: 2.4, repetitions: 1, du: 1 }) === true);
 
 const dump = exporter();
 ok("export est du JSON valide", typeof JSON.parse(dump) === "object");

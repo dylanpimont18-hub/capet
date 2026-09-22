@@ -54,6 +54,7 @@ export function vueReviser(racine, data) {
         b.onclick = () => {
           const note = b.dataset.n;
           const estReprise = reprises.has(c.id);
+          let enregistre = true;  // sauver() peut échouer (quota, navigation privée)
 
           if (estReprise) {
             // Deuxième passage dans la même session : la carte a DÉJÀ été
@@ -64,7 +65,7 @@ export function vueReviser(racine, data) {
             if (note !== "rate") {
               const etat = progression[c.id] || etatInitial();
               progression[c.id] = { ...etat, du: Date.now() + JOUR_MS_VUE };
-              majCarte(c.id, progression[c.id]);
+              enregistre = majCarte(c.id, progression[c.id]);
             } else {
               // Ratée de nouveau : elle repart en fin de file sans être
               // repénalisée. Voulu — une carte ratée deux fois de suite doit
@@ -76,7 +77,7 @@ export function vueReviser(racine, data) {
           } else {
             const suivant = noter(progression[c.id] || etatInitial(), note);
             progression[c.id] = suivant;
-            majCarte(c.id, suivant);
+            enregistre = majCarte(c.id, suivant);
             notees += 1;
             // Une carte ratée revient en fin de file, dans la même session.
             if (note === "rate") {
@@ -86,6 +87,17 @@ export function vueReviser(racine, data) {
           }
           i += 1;
           afficher();
+          // L'échec ne doit jamais rester silencieux : sans ce bandeau,
+          // l'utilisateur croit sa session enregistrée alors que
+          // localStorage a refusé l'écriture (quota, navigation privée) —
+          // mieux vaut un bandeau moche qu'une heure de révision perdue.
+          if (!enregistre) {
+            racine.insertAdjacentHTML("afterbegin",
+              `<div class="carte alerte-stockage">
+                 <p class="consigne">⚠ Progression non enregistrée
+                   (stockage indisponible). Pensez à exporter depuis Réglages.</p>
+               </div>`);
+          }
         };
       });
     };

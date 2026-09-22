@@ -80,6 +80,15 @@ export function rendreVerso(c) {
     return `${maths(c.latex)}${u}${cond}`;
   }
   if (c.type === "piege") {
+    // 99 cartes/574 (source réelle) n'ont ni regle ni erreur_type : le corps
+    // de section 5 tenait en une seule phrase et _couper() a tout versé dans
+    // `piege`, laissant `regle` vide. Ce n'est pas un trou : l'énoncé du
+    // piège est déjà la règle, formulée en négatif. On l'affiche donc en
+    // position de réponse plutôt que de rendre un verso muet.
+    if (!c.regle && !c.erreur_type) {
+      return `<p class="consigne">L'erreur à éviter :</p>
+              <p class="regle">${texteAvecMaths(c.piege)}</p>`;
+    }
     const err = c.erreur_type
       ? `<p class="erreur-type">${texteAvecMaths(c.erreur_type)}</p>` : "";
     return `<p class="regle">${texteAvecMaths(c.regle)}</p>${err}`;

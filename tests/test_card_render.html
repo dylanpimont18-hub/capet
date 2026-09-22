@@ -39,6 +39,16 @@ ok("recto piege ne devoile pas la regle", !rendreRecto(p).includes("rendement"))
 ok("verso piege montre la regle", rendreVerso(p).includes("Diviser par le rendement"));
 ok("verso piege montre l'erreur type", rendreVerso(p).includes("sujet 2018"));
 
+// 99 cartes/574 (source réelle) n'ont ni regle ni erreur_type : le verso
+// doit rester informatif en repliant sur l'énoncé du piège (règle en négatif).
+const pVide = { type: "piege", titre: "ALI parfait",
+                piege: "oublier que i+ = i- = 0 en régime linéaire",
+                regle: "", erreur_type: "" };
+ok("verso piege sans regle ni erreur affiche quand meme du texte",
+   rendreVerso(pVide).includes("oublier que i+ = i- = 0"));
+ok("verso piege sans regle ni erreur n'est pas une carte muette",
+   !/<p class="regle"><\/p>/.test(rendreVerso(pVide)));
+
 const sr = { type: "schema", niveau: "reconnaissance",
              svg: "svg/abc.svg", label: "Schéma T19 n°1" };
 ok("recto schema reconnaissance affiche le svg", rendreRecto(sr).includes("svg/abc.svg"));

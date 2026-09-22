@@ -1,5 +1,6 @@
 // app/js/views/priorites.js
 import { charger } from "../store.js";
+import { echapper } from "../card-render.js";
 
 const SEUIL_REPET = 2;
 // 2,3 et non 2,4 : la facilité initiale VAUT 2,4, donc un unique « hésité »
@@ -45,8 +46,8 @@ export function vuePriorites(racine, data) {
   const lignes = ordonnerThemes(data.themes, m).map(t => `
     <tr>
       <td><span class="pastille" style="background:${couleur(t.urgence)}"></span></td>
-      <td>${t.code}</td>
-      <td>${t.titre}</td>
+      <td>${echapper(t.code)}</td>
+      <td>${echapper(t.titre)}</td>
       <td>${t.presence_n}/${t.presence_sur}</td>
       <td>${Math.round(t.maitrise * 100)} %</td>
       <td>${t.vues}/${t.total}</td>

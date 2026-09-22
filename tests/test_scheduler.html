@@ -75,6 +75,17 @@ ok("file remplie a la taille demandee", f3.length === 30);
 const f4 = fileDuJour([...gros.slice(0, 50), { id: "n0", poids: 0.5 }], pr, maintenant, 30);
 ok("places rendues aux revisions si peu de neuves", f4.length === 30);
 
+// État corrompu (du = NaN/undefined) : la carte doit rester joignable,
+// traitée comme nouvelle plutôt que de disparaitre de la rotation.
+const cartesCorrompues = [{ id: "x", poids: 1.0 }, { id: "y", poids: 1.0 }];
+const progCorrompue = {
+  x: { intervalle: 5, facilite: 2.4, repetitions: 2, du: NaN },
+  y: { intervalle: 5, facilite: 2.4, repetitions: 2, du: undefined },
+};
+const f5 = fileDuJour(cartesCorrompues, progCorrompue, maintenant, 30);
+ok("entree du=NaN retraitee comme nouvelle", f5.some(c => c.id === "x"));
+ok("entree du=undefined retraitee comme nouvelle", f5.some(c => c.id === "y"));
+
 document.getElementById("out").textContent = res.join("\n") +
   "\n\n" + res.filter(r => r.startsWith("FAIL")).length + " echec(s)";
 </script>

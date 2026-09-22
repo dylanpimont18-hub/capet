@@ -5,6 +5,7 @@ Usage : python scripts/build_cards.py [--sans-svg]
 
 import argparse
 import datetime
+import hashlib
 import json
 import pathlib
 import re
@@ -131,13 +132,19 @@ def construire(sans_svg: bool = False) -> dict:
     return assembler(themes, cartes)
 
 
-def ecrire_sw_assets(app_dir: pathlib.Path) -> int:
+def ecrire_sw_assets(app_dir: pathlib.Path, nb_cartes: int = 0) -> int:
     """Génère app/sw-assets.js : la liste des fichiers à précacher.
 
     Le service worker doit connaître les SVG de schémas et les polices
     KaTeX. Sans cela, un schéma jamais affiché avant la coupure réseau
     donne une image cassée, et les formules tombent sur une police de
     substitution au premier lancement hors-ligne.
+
+    Écrit aussi `self.CACHE_VERSION`, un hash court dérivé des chemins
+    listés et du nombre de cartes. sw.js compose son nom de cache à partir
+    de cette valeur : sans elle (nom de cache figé), `activate` ne purge
+    jamais rien et un rebuild n'atteint plus jamais un appareil déjà
+    installé. Le hash doit donc changer dès que le contenu précaché change.
     """
     chemins: list[str] = []
 
@@ -151,9 +158,14 @@ def ecrire_sw_assets(app_dir: pathlib.Path) -> int:
         chemins += sorted(f"./vendor/katex/fonts/{p.name}"
                           for p in fonts.glob("*.woff2"))
 
+    empreinte = hashlib.sha256(
+        ("\n".join(chemins) + f"\n#cartes={nb_cartes}").encode("utf-8")
+    ).hexdigest()[:12]
+
     contenu = (
         "// Généré par build_cards.py — ne pas modifier à la main.\n"
         "self.ASSETS = " + json.dumps(chemins, indent=1) + ";\n"
+        f'self.CACHE_VERSION = "{empreinte}";\n'
     )
     (app_dir / "sw-assets.js").write_text(contenu, encoding="utf-8")
     return len(chemins)
@@ -173,12 +185,24 @@ def main() -> None:
     sortie.write_text(
         json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8"
     )
-    ecrire_sw_assets(RACINE / "app")
+    ecrire_sw_assets(RACINE / "app", nb_cartes=len(data["cards"]))
     par_type: dict[str, int] = {}
     for c in data["cards"]:
         par_type[c["type"]] = par_type.get(c["type"], 0) + 1
     print(f"{len(data['themes'])} themes, {len(data['cards'])} cartes -> {sortie}")
     print("  detail :", par_type)
+
+    # Garde-fou : une carte piège sans regle ni erreur_type a un verso vide
+    # côté rendu (voir card-render.js::rendreVerso). Ce n'est pas bloquant
+    # (rendreVerso retombe sur `piege` en position de réponse), mais doit
+    # rester visible pour que la source (parse_pieges._couper) puisse être
+    # améliorée au fil de l'eau.
+    vides = sum(
+        1 for c in data["cards"]
+        if c["type"] == "piege" and not c.get("regle") and not c.get("erreur_type")
+    )
+    if vides:
+        print(f"! {vides} carte(s) piege sans regle ni erreur type", file=sys.stderr)
 
 
 if __name__ == "__main__":

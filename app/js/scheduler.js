@@ -54,7 +54,12 @@ export function fileDuJour(cartes, progression, maintenant = Date.now(), taille 
 
   for (const c of cartes) {
     const p = progression[c.id];
-    if (!p) nouvelles.push(c);
+    // Un état corrompu (du = NaN/undefined — import retouché à la main, ou
+    // noter() lui-même si facilite est corrompue) ne doit jamais rendre une
+    // carte injoignable : ni échue ni nouvelle, elle disparaîtrait sinon
+    // silencieusement et définitivement de la rotation. On la retraite
+    // comme nouvelle : l'app se répare d'elle-même.
+    if (!p || !Number.isFinite(p.du)) nouvelles.push(c);
     else if (p.du <= maintenant) enRetard.push(c);
   }
 

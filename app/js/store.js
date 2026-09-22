@@ -12,14 +12,24 @@ export function charger() {
   }
 }
 
+// Navigation privée Safari (quota à 0) ou quota dépassé : setItem lève.
+// Ne jamais avaler l'échec en silence — l'appelant doit pouvoir prévenir
+// l'utilisateur, sans quoi une session de révision se perd sans message
+// (voir reviser.js). true/false plutôt qu'une exception : le flux normal
+// de noter()/majCarte() ne doit pas devenir un try/catch à chaque appel.
 export function sauver(progression) {
-  localStorage.setItem(CLE, JSON.stringify(progression));
+  try {
+    localStorage.setItem(CLE, JSON.stringify(progression));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function majCarte(id, etat) {
   const p = charger();
   p[id] = etat;
-  sauver(p);
+  return sauver(p);
 }
 
 export function reinitialiser() {
