@@ -384,7 +384,7 @@ def parse_table_formulas(section_text: str, theme_id: str) -> list[dict]:
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `python -m pytest tests/test_parse_formules.py -v`
-Expected: PASS (5 tests)
+Expected: PASS (14 tests)
 
 - [ ] **Step 5: Vérifier sur les données réelles — les DEUX schémas de colonnes**
 
@@ -1041,7 +1041,7 @@ def parse_pieges(texte_fiche: str, theme_id: str) -> list[dict]:
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `python -m pytest tests/test_parse_pieges.py -v`
-Expected: PASS (9 tests)
+Expected: PASS (18 tests)
 
 - [ ] **Step 5: Vérifier le volume réel sur les 30 fiches**
 
@@ -1671,7 +1671,7 @@ def compile_tikz(code: str, env: str, dest: pathlib.Path) -> bool:
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `python -m pytest tests/test_build_svg.py -v`
-Expected: PASS (4 tests)
+Expected: PASS (7 tests)
 
 - [ ] **Step 5: Compiler un schéma réel de bout en bout**
 
@@ -1697,8 +1697,12 @@ Cette étape vient ici, et non en fin de plan : c'est la première task qui
 écrit dans `app/svg/`. Plus tard, les `git add app/...` des Tasks 7, 11 et 13
 auraient committé des centaines de SVG régénérables, à désindexer ensuite.
 
+Les entrées peuvent déjà exister (posées lors de la mise en place de la
+branche). L'ajout est donc conditionnel — ne jamais dupliquer des lignes
+dans `.gitignore`.
+
 ```bash
-cat >> .gitignore <<'EOF'
+grep -q '^app/svg/$' .gitignore || cat >> .gitignore <<'EOF'
 
 # App de révision — artefacts régénérables (cf. scripts/build_cards.py)
 app/svg/
@@ -1707,7 +1711,8 @@ app/sw-assets.js
 EOF
 git check-ignore -v app/svg/test.svg app/cards.json app/sw-assets.js
 ```
-Expected: les trois chemins sont listés comme ignorés par `.gitignore`.
+Expected: les trois chemins sont listés comme ignorés par `.gitignore`, et
+`grep -c '^app/svg/$' .gitignore` vaut exactement `1`.
 
 - [ ] **Step 7: Commit**
 
@@ -2017,7 +2022,7 @@ if __name__ == "__main__":
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `python -m pytest tests/test_build_cards.py -v`
-Expected: PASS (5 tests)
+Expected: PASS (14 tests)
 
 - [ ] **Step 5: Build réel sans SVG (rapide)**
 
@@ -3297,7 +3302,7 @@ git commit -m "feat(app): PWA installable et fonctionnelle hors-ligne"
 - Create: `app/README.md`
 - Modify: `CODEBASE_MAP.md`
 - Modify: `CLAUDE.md`
-- Create: `.gitignore` (entrées app)
+- Vérifier seulement : `.gitignore` (ses entrées app sont posées en Task 6, avant le premier build — ne pas le recréer ici)
 
 **Interfaces:** aucune (task de clôture).
 
