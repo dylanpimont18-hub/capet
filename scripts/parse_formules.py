@@ -135,7 +135,6 @@ def parse_table_formulas(section_text: str, theme_id: str) -> list[dict]:
 
 
 _HEADING = re.compile(r"^###\s+(?:\d+\.\d+\s+)?(?P<titre>.+?)\s*$")
-_BLOCK = re.compile(r"^\$\$(?P<latex>.*?)\$\$\s*$", re.S)
 
 # « pour » est VOLONTAIREMENT absent : mesuré sur le corpus, il capture à lui
 # seul 97 lignes de prose sur 138 (« Pour une installation comportant… »,

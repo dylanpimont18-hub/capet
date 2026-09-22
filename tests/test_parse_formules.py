@@ -101,15 +101,15 @@ def test_cellule_a_segments_math_multiples_non_tronquee():
 
 from scripts.parse_formules import parse_block_formulas
 
-BLOCS = """## 1. FORMULES ET COURS
+BLOCS = r"""## 1. FORMULES ET COURS
 
 ### 1.2 Montage inverseur
-$$\\frac{V_s}{V_e} = -\\frac{R_2}{R_1}$$
+$$\frac{V_s}{V_e} = -\frac{R_2}{R_1}$$
 
 Gain en tension : inversion de phase.
 
 ### 1.5 Montage soustracteur
-$$V_s = \\frac{R_2}{R_1}(V_2 - V_1)$$
+$$V_s = \frac{R_2}{R_1}(V_2 - V_1)$$
 
 Valable si les quatre résistances sont appariées.
 
@@ -150,7 +150,7 @@ Utilisé pour amplifier une tension différentielle issue d'un capteur de tempé
 def test_le_marqueur_pour_ne_capture_rien():
     assert parse_block_formulas(PROSE_POUR, "T19")[0]["conditions"] == ""
 
-AMORCE = """## 1. FORMULES ET COURS
+AMORCE = r"""## 1. FORMULES ET COURS
 
 ### 1.1 AOP idéal
 $$\varepsilon = 0$$
@@ -177,7 +177,7 @@ def test_bloc_sans_condition_a_conditions_vide():
     c = parse_block_formulas(BLOCS, "T19")[0]
     assert c["conditions"] == ""
 
-GRAS = """## 1. FORMULES ET COURS
+GRAS = r"""## 1. FORMULES ET COURS
 
 ### 1.1 AOP idéal
 $$\varepsilon = 0$$
