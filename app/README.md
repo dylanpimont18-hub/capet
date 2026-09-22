@@ -118,3 +118,32 @@ hors-ligne sera incomplet.
 ⚠ **`CACHE_VERSION` change à chaque modification de contenu**, ce qui force
 le service worker à se réinstaller et purge l'ancien cache. C'est ce qui
 garantit qu'une correction atteint réellement le téléphone.
+
+## Direction visuelle
+
+Minimalism & Swiss Style, **sombre par défaut** (la révision se fait le soir
+et dans les transports). Le système de design est figé dans
+`design-system/revision-capet/MASTER.md`.
+
+Trois règles qui expliquent la plupart des choix :
+
+1. **Aucune police à télécharger.** `-apple-system` donne San Francisco sur
+   iPhone, dessinée par Apple pour ses écrans. Le système de design proposait
+   Inter via Google Fonts : incompatible avec le hors-ligne, et Inter s'inspire
+   de toute façon de San Francisco.
+2. **La couleur ne porte jamais seule une information.** Les pastilles de
+   l'écran Priorités sont doublées d'un `aria-label` textuel, les boutons de
+   notation ont leur libellé.
+3. **Un seul accent.** Tout le reste est encre et surface. Une interface
+   qu'on regarde 20 minutes par jour pendant six mois ne doit pas fatiguer.
+
+`tests/test_contraste.py` vérifie les ratios WCAG des deux thèmes à chaque
+exécution de la suite : un jeton retouché à la main qui ferait passer un texte
+sous 4,5:1 fait échouer le test.
+
+## Geste de balayage
+
+Sur écran tactile : glisser la carte à **gauche** = raté, à **droite** = su,
+vers le **haut** = hésité. Les boutons restent la voie principale ; le geste
+les double pour l'usage à une main. Il ne s'active que sur pointeur grossier
+(`pointer: coarse`) et laisse le défilement vertical au navigateur.

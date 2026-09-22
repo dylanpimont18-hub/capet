@@ -628,3 +628,20 @@ Notice d'usage de l'app : régénération du contenu, lancement local, tests, pi
 
 ## tests/test_scheduler.html, test_store.html, test_card_render.html, test_priorites.html
 4 harnais de test HTML pour les modules JS de `app/js/` (aucun framework — à ouvrir via le serveur local, voir `app/README.md`).
+
+## app/css/style.css
+Feuille de style unique de l'app. Direction Minimalism & Swiss Style, sombre par défaut.
+- jetons `:root` / `:root[data-theme="clair"]` — surfaces, encres, accent, sémantique de notation
+- échelle d'espacement `--e1`..`--e7` (rythme 4/8), deux durées de transition, une courbe
+- `.jauge`, `.zone-swipe`, `.indice-swipe` — progression de session et geste de balayage
+- `.sr-only` — visible des lecteurs d'écran, invisible à l'œil
+
+## tests/test_contraste.py
+Non-régression des contrastes WCAG de la feuille de style.
+- luminance(hex) / ratio(a, b) — formules WCAG
+- jetons(entete) — collecte les variables d'un bloc CSS
+- evaluer(verbeux) — retourne les couples sous leur seuil
+- test_contrastes_wcag() — échoue si un seul couple passe sous son seuil
+
+## design-system/revision-capet/MASTER.md
+Système de design persisté par le skill ui-ux-pro-max (source de vérité visuelle).
