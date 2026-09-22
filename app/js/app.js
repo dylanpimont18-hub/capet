@@ -53,4 +53,8 @@ window.addEventListener("DOMContentLoaded", () => {
     appliquerTheme(document.documentElement.dataset.theme === "sombre" ? "clair" : "sombre");
   if (!location.hash) location.hash = "#/reviser";
   naviguer();
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").catch(() => { /* hors https/localhost */ });
+  }
 });
