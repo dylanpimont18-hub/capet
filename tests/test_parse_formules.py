@@ -98,3 +98,97 @@ def test_cellule_a_segments_math_multiples_non_tronquee():
     from scripts.parse_formules import _strip_math
     s = r"$R = U^2/P$ (charge purement résistive)"
     assert _strip_math(s) == s
+
+from scripts.parse_formules import parse_block_formulas
+
+BLOCS = """## 1. FORMULES ET COURS
+
+### 1.2 Montage inverseur
+$$\\frac{V_s}{V_e} = -\\frac{R_2}{R_1}$$
+
+Gain en tension : inversion de phase.
+
+### 1.5 Montage soustracteur
+$$V_s = \\frac{R_2}{R_1}(V_2 - V_1)$$
+
+Valable si les quatre résistances sont appariées.
+
+Utilisé pour un capteur de température.
+"""
+
+def test_extrait_deux_blocs():
+    assert len(parse_block_formulas(BLOCS, "T19")) == 2
+
+def test_label_vient_du_heading_sans_numerotation():
+    c = parse_block_formulas(BLOCS, "T19")[0]
+    assert c["label"] == "Montage inverseur"
+    assert c["source_format"] == "bloc"
+
+def test_latex_sans_delimiteurs():
+    c = parse_block_formulas(BLOCS, "T19")[0]
+    assert c["latex"] == r"\frac{V_s}{V_e} = -\frac{R_2}{R_1}"
+
+def test_condition_capturee_quand_marqueur_present():
+    c = parse_block_formulas(BLOCS, "T19")[1]
+    assert "quatre résistances sont appariées" in c["conditions"]
+
+def test_prose_descriptive_ignoree():
+    # Cas réel T19 : « Utilisé pour amplifier… issue d'un capteur de
+    # température » NE doit pas être capturé. C'est précisément la raison
+    # pour laquelle « pour » est absent des marqueurs.
+    c = parse_block_formulas(BLOCS, "T19")[1]
+    assert "capteur de température" not in c["conditions"]
+
+PROSE_POUR = """## 1. FORMULES ET COURS
+
+### 1.5 Montage soustracteur
+$$V_s = R_2 (V_2 - V_1)$$
+
+Utilisé pour amplifier une tension différentielle issue d'un capteur de température.
+"""
+
+def test_le_marqueur_pour_ne_capture_rien():
+    assert parse_block_formulas(PROSE_POUR, "T19")[0]["conditions"] == ""
+
+AMORCE = """## 1. FORMULES ET COURS
+
+### 1.1 AOP idéal
+$$\varepsilon = 0$$
+
+Un AOP parfait en régime linéaire vérifie les trois hypothèses :
+"""
+
+def test_amorce_de_paragraphe_rejetee():
+    # Se termine par « : » : c'est une introduction, pas une condition.
+    assert parse_block_formulas(AMORCE, "T19")[0]["conditions"] == ""
+
+METADONNEE = """## 1. FORMULES ET COURS
+
+### 1.2 Énergie
+$$E = P t$$
+
+Source : E2_Sujet_2021 (Q5) : « déterminer l'énergie lorsque le niveau est bas ».
+"""
+
+def test_ligne_de_source_rejetee():
+    assert parse_block_formulas(METADONNEE, "T19")[0]["conditions"] == ""
+
+def test_bloc_sans_condition_a_conditions_vide():
+    c = parse_block_formulas(BLOCS, "T19")[0]
+    assert c["conditions"] == ""
+
+GRAS = """## 1. FORMULES ET COURS
+
+### 1.1 AOP idéal
+$$\varepsilon = 0$$
+
+**Condition de fonctionnement linéaire :** la sortie est rebouclée sur l'entrée.
+"""
+
+def test_marques_de_gras_retirees_des_conditions():
+    c = parse_block_formulas(GRAS, "T19")[0]
+    assert "**" not in c["conditions"]
+    assert "rebouclée" in c["conditions"]
+
+def test_frequence_vide_pour_les_blocs():
+    assert parse_block_formulas(BLOCS, "T19")[0]["frequence"] == ""
