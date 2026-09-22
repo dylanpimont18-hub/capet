@@ -1,0 +1,55 @@
+<!-- tests/test_card_render.html -->
+<!doctype html><meta charset="utf-8"><title>Tests rendu</title>
+<body><pre id="out"></pre>
+<script type="module">
+import { rendreRecto, rendreVerso, echapper, texteAvecMaths }
+  from "../app/js/card-render.js";
+
+const res = [];
+const ok = (n, c) => res.push((c ? "PASS " : "FAIL ") + n);
+
+ok("echappe les chevrons", echapper("a<b>&c") === "a&lt;b&gt;&amp;c");
+
+// 26 labels réels contiennent du LaTeX inline : « Phase $t \in [0;\alpha T[$ »
+ok("texte sans maths reste echappe",
+   texteAvecMaths("a<b>") === "a&lt;b&gt;");
+ok("segment math non affiche en source brute",
+   !texteAvecMaths("Phase $t \\in [0;T[$").includes("$t"));
+ok("texte hors maths conserve",
+   texteAvecMaths("Phase $x$").includes("Phase"));
+ok("chevrons hors maths toujours echappes",
+   texteAvecMaths("a<b> $x$").includes("&lt;b&gt;"));
+
+const f = { type: "formule", label: "Loi d'Ohm", latex: "u = R i",
+            unites: "V, Ω, A", conditions: "régime continu" };
+ok("recto formule cite le label", rendreRecto(f).includes("Loi d&#039;Ohm") ||
+                                   rendreRecto(f).includes("Loi d'Ohm"));
+ok("recto formule ne devoile pas la formule", !rendreRecto(f).includes("u = R i"));
+ok("verso formule montre les unites", rendreVerso(f).includes("V, Ω, A"));
+ok("verso formule montre les conditions", rendreVerso(f).includes("régime continu"));
+
+const fsc = { type: "formule", label: "X", latex: "a", unites: "", conditions: "" };
+ok("verso sans conditions n'affiche pas le bloc",
+   !rendreVerso(fsc).includes("Conditions"));
+
+const p = { type: "piege", titre: "Confusion FP", piege: "On écrit I=P/U",
+            regle: "Diviser par le rendement", erreur_type: "sujet 2018" };
+ok("recto piege pose la question", rendreRecto(p).includes("Légitime"));
+ok("recto piege ne devoile pas la regle", !rendreRecto(p).includes("rendement"));
+ok("verso piege montre la regle", rendreVerso(p).includes("Diviser par le rendement"));
+ok("verso piege montre l'erreur type", rendreVerso(p).includes("sujet 2018"));
+
+const sr = { type: "schema", niveau: "reconnaissance",
+             svg: "svg/abc.svg", label: "Schéma T19 n°1" };
+ok("recto schema reconnaissance affiche le svg", rendreRecto(sr).includes("svg/abc.svg"));
+ok("recto schema reconnaissance cache le label", !rendreRecto(sr).includes("T19 n°1"));
+ok("verso schema reconnaissance montre le label", rendreVerso(sr).includes("T19 n°1"));
+
+const st = { type: "schema", niveau: "trace", svg: "svg/abc.svg", label: "Pont de Graetz" };
+ok("recto trace montre le label", rendreRecto(st).includes("Pont de Graetz"));
+ok("recto trace cache le svg", !rendreRecto(st).includes("svg/abc.svg"));
+ok("verso trace montre le svg", rendreVerso(st).includes("svg/abc.svg"));
+
+document.getElementById("out").textContent = res.join("\n") +
+  "\n\n" + res.filter(r => r.startsWith("FAIL")).length + " echec(s)";
+</script>
