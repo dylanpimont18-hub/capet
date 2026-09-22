@@ -168,8 +168,25 @@ def ecrire_sw_assets(app_dir: pathlib.Path, nb_cartes: int = 0) -> int:
         hashlib.sha256(cards.read_bytes()).hexdigest() if cards.exists() else ""
     )
 
+    # Le hash couvre aussi le CODE de l'app, pas seulement les données : une
+    # refonte du CSS ou d'une vue ne touche ni cards.json ni la liste des
+    # fichiers, donc sans cela la version resterait identique, sw.js ne
+    # changerait pas, le navigateur ne verrait aucune mise à jour et
+    # continuerait à servir l'ancienne interface depuis son cache.
+    sources = sorted(
+        p for p in app_dir.rglob("*")
+        if p.is_file()
+        and p.suffix in {".html", ".css", ".js", ".webmanifest"}
+        and "vendor" not in p.parts
+        and p.name != "sw-assets.js"      # se réécrit lui-même : exclu
+    )
+    empreinte_code = hashlib.sha256(
+        b"".join(p.read_bytes() for p in sources)
+    ).hexdigest()
+
     empreinte = hashlib.sha256(
-        ("\n".join(chemins) + f"\n#cartes={nb_cartes}\n{empreinte_cartes}")
+        ("\n".join(chemins)
+         + f"\n#cartes={nb_cartes}\n{empreinte_cartes}\n{empreinte_code}")
         .encode("utf-8")
     ).hexdigest()[:12]
 
