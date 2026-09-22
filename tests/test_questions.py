@@ -89,6 +89,27 @@ def test_la_question_ne_livre_pas_sa_reponse():
     assert not fuites, f"la question reproduit la structure de sa formule : {fuites[:5]}"
 
 
+def test_pas_de_contresens_inverseur():
+    """Confondre inverseur et non-inverseur est la faute classique sur l'ALI.
+
+    Le contrôle porte sur le signe de la relation : un gain négatif est
+    celui d'un montage inverseur, un gain positif celui d'un non-inverseur.
+    Le mot « non inverseur » s'écrit avec ou sans trait d'union — on teste
+    donc la négation, pas la sous-chaîne « inverseur ».
+    """
+    q, cartes = charger()
+    fautes = []
+    for k, question in q.items():
+        c = cartes[k]
+        if "inverseur" not in (c.get("label") or "").lower():
+            continue
+        est_non_inv = re.search(r"non[\s-]?inverseur", (c["label"] or ""), re.I)
+        dit_non_inv = re.search(r"non[\s-]?inverseur", question, re.I)
+        if bool(est_non_inv) != bool(dit_non_inv):
+            fautes.append(k)
+    assert not fautes, f"inverseur/non-inverseur confondus : {fautes}"
+
+
 def test_couverture_complete_des_formules():
     """Toute carte formule doit avoir sa question rédigée."""
     q, cartes = charger()
