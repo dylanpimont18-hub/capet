@@ -1,0 +1,80 @@
+<!-- tests/test_scheduler.html -->
+<!doctype html><meta charset="utf-8"><title>Tests scheduler</title>
+<body><pre id="out"></pre>
+<script type="module">
+import { noter, fileDuJour, etatInitial } from "../app/js/scheduler.js";
+
+const res = [];
+const ok = (nom, cond) => res.push((cond ? "PASS " : "FAIL ") + nom);
+
+// noter()
+let e = etatInitial();
+ok("facilite initiale 2,4", e.facilite === 2.4);
+ok("intervalle initial 0", e.intervalle === 0);
+
+let s = noter(etatInitial(), "su");
+ok("su depuis zero -> 1 jour", s.intervalle === 1);
+ok("su incremente repetitions", s.repetitions === 1);
+
+let s2 = noter(s, "su");
+ok("2e su -> 3 jours", s2.intervalle === 3);
+
+let r = noter(s2, "rate");
+ok("rate remet intervalle a 0", r.intervalle === 0);
+ok("rate remet repetitions a 0", r.repetitions === 0);
+ok("rate baisse la facilite", r.facilite < s2.facilite);
+
+let plancher = { intervalle: 1, facilite: 1.3, repetitions: 1, du: 0 };
+ok("facilite plancher 1,3", noter(plancher, "rate").facilite === 1.3);
+
+let plafond = { intervalle: 1, facilite: 2.8, repetitions: 5, du: 0 };
+ok("facilite plafond 2,8", noter(plafond, "su").facilite === 2.8);
+
+let h = noter({ intervalle: 10, facilite: 2.4, repetitions: 3, du: 0 }, "hesite");
+ok("hesite allonge peu", h.intervalle === 12);
+
+// fileDuJour()
+const cartes = [
+  { id: "a", poids: 0.3 }, { id: "b", poids: 1.0 }, { id: "c", poids: 0.5 },
+];
+const maintenant = 1000000;
+const vide = {};
+const f = fileDuJour(cartes, vide, maintenant, 3);
+ok("nouvelles cartes triees par poids", f[0].id === "b" && f[1].id === "c");
+ok("taille de file respectee", fileDuJour(cartes, vide, maintenant, 2).length === 2);
+
+const prog = {
+  a: { intervalle: 1, facilite: 2.4, repetitions: 1, du: maintenant - 1 },
+  b: { intervalle: 5, facilite: 2.4, repetitions: 2, du: maintenant + 999999 },
+};
+const f2 = fileDuJour(cartes, prog, maintenant, 3);
+ok("carte non echue exclue", !f2.some(c => c.id === "b"));
+ok("carte en retard incluse", f2.some(c => c.id === "a"));
+ok("carte en retard avant nouvelle", f2[0].id === "a");
+
+// Plafond d'intervalle : l'écrit est en mars, rien ne doit dépasser 60 jours.
+let acquise = { intervalle: 40, facilite: 2.8, repetitions: 5, du: 0 };
+ok("intervalle plafonne a 60 jours", noter(acquise, "su").intervalle === 60);
+let long = etatInitial();
+for (let i = 0; i < 12; i++) long = noter(long, "su");
+ok("aucune derive apres 12 reussites", long.intervalle === 60);
+
+// Famine des cartes neuves : 50 cartes échues ne doivent pas tout saturer.
+const gros = [], pr = {};
+for (let i = 0; i < 50; i++) {
+  gros.push({ id: "r" + i, poids: 1.0 });
+  pr["r" + i] = { intervalle: 5, facilite: 2.4, repetitions: 2, du: maintenant - 1 };
+}
+for (let i = 0; i < 20; i++) gros.push({ id: "n" + i, poids: 0.5 });
+const f3 = fileDuJour(gros, pr, maintenant, 30);
+ok("quota de nouvelles respecte malgre 50 echues",
+   f3.filter(c => c.id.startsWith("n")).length === 8);
+ok("file remplie a la taille demandee", f3.length === 30);
+
+// Peu de cartes neuves : les places inutilisées reviennent aux révisions.
+const f4 = fileDuJour([...gros.slice(0, 50), { id: "n0", poids: 0.5 }], pr, maintenant, 30);
+ok("places rendues aux revisions si peu de neuves", f4.length === 30);
+
+document.getElementById("out").textContent = res.join("\n") +
+  "\n\n" + res.filter(r => r.startsWith("FAIL")).length + " echec(s)";
+</script>
