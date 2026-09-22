@@ -136,6 +136,13 @@ def parse_table_formulas(section_text: str, theme_id: str) -> list[dict]:
 
 _HEADING = re.compile(r"^###\s+(?:\d+\.\d+\s+)?(?P<titre>.+?)\s*$")
 
+# Certaines formules ne sont pas précédées d'un heading `###` mais d'une
+# ligne en gras qui joue le même rôle d'intitulé :
+#   **Modèle électrique de la MCC à excitation séparée :**
+#   $$U = R_a I_a + ...$$
+# Sans cela, ces cartes affichent « Énoncez la relation : (sans titre) ».
+_INTITULE_GRAS = re.compile(r"^\*\*(?P<titre>[^*]{6,120}?)\s*:?\*\*\s*:?\s*$")
+
 # « pour » est VOLONTAIREMENT absent : mesuré sur le corpus, il capture à lui
 # seul 97 lignes de prose sur 138 (« Pour une installation comportant… »,
 # « pour $f = 50$ Hz », « pour diminuer le courant ») et fait passer le bruit
@@ -196,6 +203,14 @@ def parse_block_formulas(section_text: str, theme_id: str) -> list[dict]:
         h = _HEADING.match(ligne)
         if h:
             label_courant = h.group("titre").strip()
+            i += 1
+            continue
+
+        # Un intitulé en gras précise le label sans remplacer la section :
+        # il vaut pour les blocs qui le suivent immédiatement.
+        g = _INTITULE_GRAS.match(ligne.strip())
+        if g:
+            label_courant = g.group("titre").strip().rstrip(":").strip()
             i += 1
             continue
 
