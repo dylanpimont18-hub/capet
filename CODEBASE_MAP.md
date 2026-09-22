@@ -534,9 +534,97 @@ Intercalaires de partie du manuel.
 
 ## docs/superpowers/plans/2026-09-21-app-revision-capet.md
 Plan d'implémentation (14 tasks) de l'app de révision : entraîneur formules /
-schémas / conditions d'application. Non encore implémenté.
+schémas / conditions d'application. Implémenté (14/14 tasks, cf. section
+suivante).
 - Décisions de cadrage verrouillées (écrit mars 2026, révélation + auto-notation,
   extraction auto depuis les sources, pas d'encadrés jury en v1)
 - Tableau des 16 défauts trouvés en revue adverse et corrigés avant publication
 - Invariants de non-régression : 191 formules tableau, 153 formules bloc,
   199 pièges, 31 schémas — tout écart signale un parseur cassé
+
+---
+
+## App de révision (`app/`, `scripts/`) — ajoutée le 2026-09-21
+
+PWA hors-ligne de rappel actif générée depuis `fiches/`. Détail du principe,
+des sources d'extraction et des pièges dans `CLAUDE.md` et `app/README.md`.
+574 cartes (344 formules, 199 pièges, 31 schémas) sur 30 thèmes.
+
+## scripts/parse_formules.py
+Extraction des cartes formule depuis les fiches Markdown (`T{nn}_contenu.md` § 1).
+- parse_table_formulas(section_text, theme_id) — formules en tableau Markdown
+- parse_block_formulas(section_text, theme_id) — formules en blocs $$ avec conditions
+
+## scripts/parse_pieges.py
+Extraction des conditions d'application depuis la section 5 des fiches (deux formats de source tolérés).
+- parse_pieges(texte_fiche, theme_id) — items « piège / règle / erreur type », dispatch vers les deux formats
+
+## scripts/parse_meta.py
+Métadonnées de thème depuis les .tex (appels `\ficheEntete`).
+- parse_meta(texte_tex) — code, titre, domaine, présence n/13, poids
+
+## scripts/extract_tikz.py
+Isolation des schémas TikZ/circuitikz des fiches .tex.
+- extract_tikz_envs(texte_tex) — environnements tikzpicture/circuitikz + hash stable (nom de fichier SVG)
+
+## scripts/build_svg.py
+Compilation des schémas en SVG thémables.
+- themify(svg) — couleurs codées en dur vers currentColor/var(--svg-bg)
+- compile_tikz(code, env, dest) — latex + dvisvgm vers un fichier SVG
+
+## scripts/build_cards.py
+Orchestrateur de génération du contenu de l'app — `python scripts/build_cards.py [--sans-svg]`.
+- faire_id(theme, type_carte, n) — identifiant stable de carte (positionnel, voir CLAUDE.md)
+- _poids_final(poids_theme, frequence) — poids de thème × bonus de fréquence de la formule
+- assembler(themes, cartes) — attribue ids/poids, structure finale de cards.json
+- construire(sans_svg) — parcourt fiches/, appelle les parseurs, produit la structure
+- ecrire_sw_assets(app_dir) — génère app/sw-assets.js (SVG + polices KaTeX à précacher)
+
+## app/js/scheduler.js
+Ordonnancement SM-2 pondéré par la fréquence au concours.
+- etatInitial() — état d'une carte jamais vue
+- noter(etat, note, maintenant) — met à jour intervalle, facilité, échéance
+- fileDuJour(cartes, progression, maintenant, taille) — file triée du jour
+
+## app/js/store.js
+Persistance localStorage de la progression (clé `capet.progression.v1`).
+- charger() / sauver(progression) / majCarte(id, etat) — lecture-écriture
+- exporter() / importer(texte) / reinitialiser() — sauvegarde manuelle (seule vraie sauvegarde, pas de serveur)
+
+## app/js/card-render.js
+Rendu HTML des cartes, recto et verso, avec rendu KaTeX inline.
+- echapper(s) — échappement HTML
+- texteAvecMaths(s) — repère et rend les segments `$...$`/`$$...$$` via KaTeX
+- rendreRecto(c) / rendreVerso(c) — selon type (formule/piège/schema) et niveau
+
+## app/js/views/reviser.js
+Écran de révision : file du jour, révélation, auto-notation.
+- vueReviser(racine, data) — monte l'écran
+
+## app/js/views/priorites.js
+Écran de priorisation fréquence × maîtrise.
+- calculerMaitrise(cartes, progression) — taux d'acquisition par thème
+- ordonnerThemes(themes, maitrises) — tri par urgence décroissante (poids × (1 − maîtrise))
+- vuePriorites(racine, data) — monte l'écran
+
+## app/js/views/reglages.js
+Écran export/import/réinitialisation de la progression.
+- vueReglages(racine, data) — monte l'écran
+
+## app/js/app.js
+Routeur hash (#/reviser, #/priorites, #/reglages), thème clair/sombre persisté, chargement de cards.json.
+
+## app/sw.js
+Service worker cache-first pour le fonctionnement hors-ligne ; importe `app/sw-assets.js` (généré, non versionné) pour la liste des SVG/polices à précacher.
+
+## app/index.html
+Coquille de la PWA : en-têtes iOS (apple-mobile-web-app-*, sans quoi l'app installée s'ouvre avec la barre Safari), manifeste, montage du routeur.
+
+## app/README.md
+Notice d'usage de l'app : régénération du contenu, lancement local, tests, piège des ids positionnels, non-extraction du Bloc 4 jury, installation iPhone.
+
+## tests/test_build_cards.py, test_build_svg.py, test_extract_tikz.py, test_parse_formules.py, test_parse_meta.py, test_parse_pieges.py
+74 tests pytest au total, couvrent les 6 modules de `scripts/` (parseurs, extraction TikZ, compilation SVG, orchestrateur).
+
+## tests/test_scheduler.html, test_store.html, test_card_render.html, test_priorites.html
+4 harnais de test HTML pour les modules JS de `app/js/` (aucun framework — à ouvrir via le serveur local, voir `app/README.md`).

@@ -352,6 +352,89 @@ les 30 compilations avec « no legal \end found ».
 **Critère de vérification** : le nombre de corrigés rendus en annexe doit égaler le nombre
 d'exercices du corpus, et aucun renvoi ne doit afficher « p. ?? ».
 
+## App de révision (`app/`)
+
+PWA hors-ligne d'entraînement au rappel actif, créée le 2026-09-21.
+Trois types de cartes : **formule**, **piège** (conditions d'application),
+**schéma** (3 niveaux : reconnaissance / calcul / tracé). État courant :
+574 cartes (344 formules — 191 en tableau Markdown, 153 en bloc `$$` —, 199
+pièges, 31 schémas) sur 30 thèmes, poids de 0,231 à 1,3. Notice d'usage
+complète : `app/README.md`.
+
+### Principe : l'app est un artefact régénérable
+
+`app/cards.json` et `app/svg/` sont **générés** par `scripts/build_cards.py`
+depuis `fiches/`. Ne jamais éditer de contenu pédagogique dans `app/` :
+la prochaine génération l'écraserait. Les sources LaTeX/Markdown restent
+l'unique source de vérité. Ces artefacts (`cards.json`, `svg/`,
+`sw-assets.js`) sont exclus du dépôt (`.gitignore`) car entièrement
+dérivés : quiconque clone lance `python scripts/build_cards.py`.
+
+### Sources d'extraction
+
+| Type de carte | Source | Volume |
+|---|---|---|
+| formule | `T{nn}_contenu.md` § 1 (tableau MD **et** blocs `$$`) | 344 |
+| piège | `T{nn}_contenu.md` § 5 « Lacunes et pièges » | 199 |
+| schéma | environnements TikZ des `T{nn}_*.tex` → SVG | 31 |
+
+⚠ La section `## 3. ATTENTES DU JURY` n'est **pas** extraite, et ne doit pas
+l'être : l'audit de véracité du 2026-09-20 a établi que 54 % des citations
+jury étaient défectueuses, dont 27 sans aucun support textuel. Importer ces
+encadrés propagerait des citations fabriquées dans l'outil de révision.
+
+### Pondération par la fréquence au concours
+
+La pondération a **deux niveaux**, et les deux viennent des sources :
+
+1. **Niveau thème** — le `\ficheEntete` de chaque fiche porte
+   `Présence : n/13 sujets`. Ce ratio est le poids de base de toutes les
+   cartes du thème.
+2. **Niveau formule** — les formules dont la colonne `Fréquence` est
+   renseignée (`Systématique`, `Très fréquent`, `Présent`…) voient ce poids
+   de base multiplié par un bonus (0,9 à 1,3, cf. `_BONUS_FREQUENCE` dans
+   `scripts/build_cards.py`). Une formule systématique d'un thème fréquent
+   passe ainsi devant une formule anecdotique du même thème.
+
+Le poids final pilote l'ordre de la file quotidienne et le calcul d'urgence
+de l'écran Priorités (`urgence = poids × (1 − maîtrise)`).
+
+### Piège : les identifiants de carte sont positionnels
+
+Un id vaut `T19-f-003` (3ᵉ formule de T19 dans l'ordre du fichier). Insérer
+une formule **au milieu** d'une section décale tous les ids suivants de ce
+thème et désaligne la progression enregistrée (stockée par id dans
+`localStorage`, cf. `app/js/store.js`). Ajouter en fin de section est sans
+effet. Exporter la progression (écran Réglages) avant une refonte de fiche.
+
+### Chaîne SVG
+
+`latex` → `.dvi` → `dvisvgm --no-fonts --exact` → post-traitement des couleurs.
+Le `--no-fonts` convertit le texte en tracés (aucune police à charger) ; le
+post-traitement remplace `#000`/`#fff` par `currentColor`/`var(--svg-bg)`,
+sans quoi les schémas sont invisibles en thème sombre.
+
+### Lancer l'app et ses tests en local
+
+Un seul serveur depuis la **racine** du dépôt (jamais `--directory app`,
+sinon les harnais `tests/*.html` sortent de la racine servie) :
+
+```bash
+python -m http.server 8765 --directory .
+# app : http://localhost:8765/app/
+# tests : http://localhost:8765/tests/*.html
+```
+
+### Installation iPhone : condition de survie de la progression
+
+Safari purge les données (`localStorage` compris) d'un site simplement
+visité au bout de 7 jours d'inactivité (ITP), mais pas celles d'une PWA
+ajoutée à l'écran d'accueil (Safari → Partager → « Ajouter à l'écran
+d'accueil »). Sans cette installation, la progression ne survit pas à deux
+semaines sans révision. Même installée, il n'y a aucun serveur derrière
+cette app : l'export JSON de l'écran Réglages reste la seule vraie
+sauvegarde.
+
 ## Conventions de contenu
 
 - **Formules** : notation LaTeX inline (`$...$`) dans les tableaux Markdown
