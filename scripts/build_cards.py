@@ -59,6 +59,24 @@ def _poids_final(poids_theme: float, frequence: str) -> float:
     return round(poids_theme, 4)
 
 
+# Questions rédigées à la main, indexées par identifiant de carte.
+# C'est le SEUL contenu de l'app qui ne provienne pas des fiches : il est
+# donc isolé dans son propre fichier, corrigeable sans toucher au code ni
+# aux sources LaTeX. Une carte sans entrée ici garde une formulation
+# générique — le fichier peut rester partiel sans rien casser.
+_QUESTIONS_PATH = RACINE / "scripts" / "questions.json"
+
+
+def _charger_questions() -> dict[str, str]:
+    if not _QUESTIONS_PATH.exists():
+        return {}
+    data = json.loads(_QUESTIONS_PATH.read_text(encoding="utf-8"))
+    return {k: v for k, v in data.items() if isinstance(v, str) and v.strip()}
+
+
+QUESTIONS = _charger_questions()
+
+
 def assembler(themes: list[dict], cartes: list[dict]) -> dict:
     """Assemble la structure finale, en attribuant ids et poids."""
     poids_par_theme = {t["code"]: t["poids"] for t in themes}
@@ -74,6 +92,22 @@ def assembler(themes: list[dict], cartes: list[dict]) -> dict:
         carte = dict(c)
         carte["id"] = faire_id(theme, c["type"], compteurs[cle])
         carte["poids"] = _poids_final(poids_par_theme[theme], c.get("frequence", ""))
+
+        # Question rédigée, si elle existe pour cet identifiant. Absente,
+        # le rendu retombe sur une formulation générique : aucune carte ne
+        # se retrouve sans énoncé.
+        q = QUESTIONS.get(carte["id"])
+        if q:
+            carte["question"] = q
+
+        # Fréquence d'apparition du thème, affichée au recto pour situer
+        # l'enjeu (« Tombe dans 12 sujets sur 13 »).
+        t = next((x for x in themes if x["code"] == theme), None)
+        if t and t.get("presence_n"):
+            carte["presence"] = (
+                f"Tombe dans {t['presence_n']} sujets sur {t['presence_sur']}"
+            )
+
         sorties.append(carte)
 
     return {
