@@ -1,0 +1,27 @@
+% parties_rectoverso.tex — intercalaires (variante RECTO VERSO) de partie du manuel de revision.
+% \CAPETPARTIE{numero}{titre}{sous-titre}{couleur} : page de garde de partie.
+% Les sauts de page vivent ICI et dans main.tex, JAMAIS dans les fiches
+% (regle CLAUDE.md : aucun \newpage/\clearpage dans fiches/T*.tex).
+
+\newcommand{\CAPETPARTIE}[4]{%
+  \cleardoublepage
+  \thispagestyle{empty}%
+  \null\vspace*{3.2cm}%
+  \begin{center}
+    \begin{tcolorbox}[enhanced, width=\textwidth,
+      colback=#4, colframe=#4, arc=2.5mm,
+      left=14pt, right=14pt, top=16pt, bottom=16pt]
+      \centering
+      {\color{white}\sffamily\bfseries\large PARTIE #1}\\[8pt]
+      {\color{white}\sffamily\bfseries\LARGE #2}
+    \end{tcolorbox}
+    \vspace{1.6cm}
+
+    \begin{minipage}{0.82\textwidth}
+      \centering
+      {\color{colSlate}\sffamily\large #3}
+    \end{minipage}
+  \end{center}
+  \vfill
+  \cleardoublepage
+}

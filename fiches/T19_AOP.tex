@@ -1,0 +1,387 @@
+%% Correction audit de veracite - 2026-09-20 : citations de rapport de jury sans
+%% support textuel dans le corpus (rapports 2018-2025) remplacees par des verbatims
+%% verifies ou supprimees. Detail ci-dessous.
+%% l.328 (ex) : seul le noyau chiffre est authentique (RJ2024 l.509 : 70 %% / 47 %%, mais
+%%   la partie n'y est pas nommee "partie E (AOP)"). Les ajouts ("montages complexes
+%%   (conversion T/I, decalage)", "calculs encadres avec des unites") sont INTROUVABLES
+%%   -> citation reduite au verbatim RJ2024 l.509.
+%% l.329 (ex) : citation "jury 2024" sur les trois conditions de l'AOP ideal :
+%%   INTROUVABLE (aucun commentaire de jury sur l'AOP dans le corpus) -> remplacee par
+%%   le verbatim RJ2024 l.515 sur l'exigence de justification.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ficheHeaders{T19}{Amplificateur opérationnel}{colElec}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TETE
+% -----------------------------------------------------------------------
+
+\ficheEntete{T19}{AOP (amplificateur opérationnel)}{colElec}%
+  {électronique - Conditionnement du signal}%
+  {\textbf{Présence :} \textbf{4/13} sujets (2013-2026) - thème \emph{régulier depuis 2019}}%
+  {montages inverseur - non-inverseur - suiveur - soustracteur - intégrateur - comparateur - hystérésis - conversion tension-courant 4-20\,mA - théorème de Millman}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Hypotheses AOP ideal -----------------------------------------
+\textbf{1.1 Hypothèses de l'AOP idéal - régime linéaire}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{ll}
+\toprule
+\textbf{Hypothèse} & \textbf{Conséquence} \\
+\midrule
+Courants d'entrée nuls & $I_+ = I_- = 0$ \\
+Gain différentiel infini & $\varepsilon = V_+ - V_- = 0 \;\Rightarrow\; V_+ = V_-$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\textbf{Condition de validité :} contre-réaction négative (sortie rebouclée sur $V_-$). En comparateur (boucle ouverte ou contre-réaction positive), $V_+ \neq V_-$.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 Montages fondamentaux ----------------------------------------
+\textbf{1.2 Montages fondamentaux}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{llll}
+\toprule
+\textbf{Montage} & \textbf{Gain $V_s/V_e$} & \textbf{$Z_e$} & \textbf{Usage} \\
+\midrule
+Inverseur & $-R_2/R_1$ & $R_1$ & Amplification + inversion \\
+Non-inverseur & $1 + R_2/R_1$ & $\to \infty$ & Amplification sans inversion \\
+Suiveur (buffer) & $1$ & $\to \infty$ & Adaptation d'impédance \\
+Soustracteur (1 AOP) & $\dfrac{R_2}{R_1}(V_2 - V_1)$ & - & Signal différentiel (capteur) \\
+Intégrateur & $-\dfrac{1}{RCp}$ & $R_1$ & Filtre passe-bas, correcteur I \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\textbf{Attention - deux topologies différentielles distinctes.} Le soustracteur ci-dessus (1 seul AOP, quatre résistances appariées) donne $V_s = (R_2/R_1)(V_2 - V_1)$. L'\emph{étage d'entrée d'un amplificateur d'instrumentation} (2 AOP rebouclés par $R_2$ entre les deux entrées inverseuses) a un gain différent : $G_1 = \dfrac{2R_1 + R_2}{R_2}$ (structure du sujet 2024, cf.\ QT1). Ne pas mélanger les deux formules.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 Comparateur - hysteresis -------------------------------------
+\textbf{1.3 Comparateur à hystérésis - contre-réaction positive}
+
+\smallskip
+Contre-réaction sur $V_+$ (résistances $R_1$ sur sortie, $R_2$ sur $V_{ref}$) :
+\[
+  V_+ = \frac{R_2\,V_{ref} + R_1\,V_s}{R_1 + R_2}
+\]
+Deux seuils de basculement (avec $V_s = \pm V_{sat}$) :
+\[
+  V_H = \frac{R_2\,V_{ref} + R_1\,V_{sat}}{R_1 + R_2}
+  \qquad;\qquad
+  V_B = \frac{R_2\,V_{ref} - R_1\,V_{sat}}{R_1 + R_2}
+\]
+
+\smallskip
+\textbf{Cycle d'hystérésis :}
+\begin{center}
+\begin{tikzpicture}[scale=0.9, font=\footnotesize]
+  \draw[->] (0,0) -- (5.5,0) node[right] {$V_+$};
+  \draw[->] (0,-1.8) -- (0,1.8) node[above] {$V_s$};
+  \draw[thick, colElec] (0.3,-1.3) -- (3.0,-1.3);
+  \draw[thick, colElec, ->] (3.0,-1.3) -- (3.0,1.3);
+  \draw[thick, colElec] (3.0,1.3) -- (4.8,1.3);
+  \draw[thick, colElec!55] (1.3,1.3) -- (3.0,1.3);
+  \draw[thick, colElec!55, ->] (1.3,1.3) -- (1.3,-1.3);
+  \draw[thick, colElec!55] (0.3,-1.3) -- (1.3,-1.3);
+  \draw[dashed] (1.3,0) -- (1.3,-1.3);
+  \node[below] at (1.3,0) {\scriptsize $V_B$};
+  \draw[dashed] (3.0,0) -- (3.0,1.3);
+  \node[below] at (3.0,0) {\scriptsize $V_H$};
+  \node[left] at (0,1.3) {\scriptsize $+V_{sat}$};
+  \node[left] at (0,-1.3) {\scriptsize $-V_{sat}$};
+\end{tikzpicture}
+\end{center}
+Trajet foncé : $V_+$ croissant, basculement à $V_H$. Trajet clair : $V_+$ décroissant, basculement à $V_B$. L'écart $V_H - V_B$ évite les oscillations parasites au voisinage du seuil.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 Conversion tension-courant -----------------------------------
+\textbf{1.4 Conversion tension→courant 4-20\,mA (transmetteur normalisé)}
+
+\smallskip
+\[
+  I_s = \frac{V_{entree}}{R_5}
+\]
+Pour $V_{entree} \in [1\,;\,5]\,\mathrm{V}$ et $R_5 = 250\,\Omega$ : $I_s \in [4\,;\,20]\,\mathrm{mA}$.\\
+$I_s$ est indépendant de la charge $R_{ana}$ car la boucle de contre-réaction maintient $\varepsilon = 0$.
+
+\textbf{Théorème de Millman} (pour un nœud à $n$ admittances) :
+\[
+  V_{noeud} = \frac{\sum_k V_k/R_k}{\sum_k 1/R_k}
+\]
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHETIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthétique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Montages linéaires}} \\
+$V_s/V_e = -R_2/R_1$ & Inverseur & - \\
+$V_s/V_e = 1+R_2/R_1$ & Non-inv. & - \\
+$V_s = V_e$ & Suiveur & - \\
+$V_s = (R_2/R_1)(V_2-V_1)$ & Soustr. 1 AOP & - \\
+$G_1 = (2R_1+R_2)/R_2$ & Instrum. 2 AOP & - \\
+$H(p) = -1/(RCp)$ & Intégr. & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Hypothèses}} \\
+$V_+ = V_-$ & Lin. & - \\
+$I_+ = I_- = 0$ & Lin. & - \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Hystérésis}} \\
+$V_+ = (R_2 V_{ref}+R_1 V_s)/(R_1+R_2)$ & Seuil & V \\
+$V_H = (R_2 V_{ref}+R_1 V_{sat})/(R_1+R_2)$ & Haut & V \\
+$V_B = (R_2 V_{ref}-R_1 V_{sat})/(R_1+R_2)$ & Bas & V \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{T/I et Millman}} \\
+$I_s = V_e/R_5$ & Transm. & A \\
+$V_n = \sum(V_k/R_k)/\sum(1/R_k)$ & Millman & V \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Données 2024}} \\
+$G_{total} = 340$ & Transmetteur & - \\
+Plage : 4-20\,mA, $R_5 = 250\,\Omega$ & Normalisé & - \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets réels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Étage différentiel d'instrumentation - calcul du gain $G_1$ (transmetteur de température) \hfill\normalfont\footnotesize E2 disc. 2024 (E1-E3)}
+]
+\textbf{Énoncé.}
+Un étage d'entrée différentiel à 2 AOP (structure d'amplificateur d'instrumentation, distincte du soustracteur à 1 AOP du cours 1.2) amplifie la tension $e_{AB}$ d'un capteur PT100. Données : $R_1 = 1\,\mathrm{k\Omega}$, $R_2 = 834{,}4\,\Omega$. Exprimer le gain $G_1$ et calculer sa valeur. Le 2\textsuperscript{e} étage a $G_2 = -100$, le 3\textsuperscript{e} a $G_3 = -1$. Calculer le gain global.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Gain du 1er étage.} Par la loi des mailles (AOP idéaux, $V_+ = V_-$, courant commun dans $R_1$--$R_2$--$R_1$), le gain de l'étage d'entrée à 2 AOP vaut :
+\[
+  G_1 = \frac{2R_1 + R_2}{R_2} = \frac{2 \times 1000 + 834{,}4}{834{,}4} = \frac{2834{,}4}{834{,}4} \approx \mathbf{3{,}4}
+\]
+
+\textbf{Étape 2 — Gain global.}
+\[
+  G = G_1 \times G_2 \times G_3 = 3{,}4 \times (-100) \times (-1) = \mathbf{340}
+\]
+
+\textbf{Conclusion.} $V_3 = 340 \times e_{AB}$ : les deux inversions de $G_2$ et $G_3$ se compensent, le signal final reste en phase avec $e_{AB}$, ce qui simplifie l'exploitation en aval (pas de correction de signe nécessaire).
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Comparateur à hystérésis - seuils de basculement \hfill\normalfont\footnotesize E2 disc. 2023 (F6-F8)}
+]
+\textbf{Énoncé.}
+Comparateur à hystérésis : $V_{ref} = 2{,}42\,\mathrm{V}$, $V_{sat} = 15\,\mathrm{V}$, $R_1 = 1\,\mathrm{k\Omega}$, $R_2 = 150\,\mathrm{k\Omega}$.
+(a) Exprimer $V_+$ en fonction de $V_{ref}$, $R_1$, $R_2$, $V_s$.
+(b) Calculer $V_H$ et $V_B$.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 (a) — Diviseur de tension entre $V_s$ et $V_{ref}$.}
+\[
+  V_+ = \frac{R_2\,V_{ref} + R_1\,V_s}{R_1 + R_2} = \frac{150 \times 10^3 \times V_{ref} + 1 \times 10^3 \times V_s}{151 \times 10^3}
+\]
+
+\textbf{Étape 2 (b) — Seuil haut} ($V_s = +V_{sat} = +15\,\mathrm{V}$).
+\[
+  V_H = \frac{150\,000 \times 2{,}42 + 1\,000 \times 15}{151\,000} = \frac{363\,000 + 15\,000}{151\,000} = \frac{378\,000}{151\,000} \approx \mathbf{2{,}50\,\mathrm{V}}
+\]
+
+Seuil bas ($V_s = -V_{sat} = -15\,\mathrm{V}$) :
+\[
+  V_B = \frac{150\,000 \times 2{,}42 - 1\,000 \times 15}{151\,000} = \frac{363\,000 - 15\,000}{151\,000} = \frac{348\,000}{151\,000} \approx \mathbf{2{,}30\,\mathrm{V}}
+\]
+
+\textbf{Conclusion.} L'hystérésis $\Delta V = V_H - V_B = 0{,}20\,\mathrm{V}$ crée une zone morte autour du seuil nominal : c'est cette marge, et non un seuil unique, qui protège le montage contre les basculements intempestifs dus au bruit de mesure.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Conversion tension→courant - indépendance vis-à-vis de la charge \hfill\normalfont\footnotesize E2 disc. 2024 (E9)}
+]
+\textbf{Énoncé.}
+Montage AOP en boucle fermée avec résistance de mesure $R_5 = 250\,\Omega$ dans la boucle. Tension en entrée $V_4 \in [1\,;\,5]\,\mathrm{V}$. Montrer que le courant $I_s$ est indépendant de la charge $R_{ana}$ et calculer la plage.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Loi des nœuds au nœud A} (entrée $V_-$ de l'AOP, hypothèse $I_- = 0$) :
+\[
+  \frac{V_A - V_4}{R_5} + \frac{V_A - V_s}{R_{ana}} = I_- = 0
+\]
+Avec $V_+ = V_- = V_A$ (contre-réaction), et en appliquant la règle d'entrée $V_- = V_4$ :
+\[
+  I_s = \frac{V_4 - 0}{R_5} = \frac{V_4}{R_5}
+\]
+$I_s$ est bien \textbf{indépendant de $R_{ana}$} (la boucle de contre-réaction ajuste $V_s$ pour maintenir $\varepsilon = 0$ quelle que soit la charge).
+
+\textbf{Étape 2 — Plage de courant.}
+\[
+  V_4 = 1\,\mathrm{V} \;\Rightarrow\; I_s = \frac{1}{250} = 4\,\mathrm{mA}
+  \qquad;\qquad
+  V_4 = 5\,\mathrm{V} \;\Rightarrow\; I_s = \frac{5}{250} = 20\,\mathrm{mA}
+\]
+
+\textbf{Conclusion.} La plage obtenue (4-20\,mA) correspond exactement au standard industriel normalisé : ce montage est directement exploitable comme sortie de transmetteur, sans étage de conversion supplémentaire.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs récurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Vérifier la contre-réaction avant d'appliquer $V_+ = V_-$.}
+  En mode comparateur (boucle ouverte ou contre-réaction positive), $V_+ \neq V_-$ - ne pas appliquer l'égalité. Identifier d'abord le mode de fonctionnement.
+
+  \item \textbf{Signe du gain inverseur.}
+  $G = -R_2/R_1$ : le signe moins est fondamental. L'oubli conduit à conclure à une amplification non-inverseuse.
+
+  \item \textbf{Courants d'entrée AOP nuls.}
+  $I_+ = I_- = 0$ : appliquer les lois de nœuds uniquement sur les résistances externes. Ne jamais écrire un courant passant par l'entrée de l'AOP.
+
+  \item \textbf{Théorème de Millman méconnu.}
+  Appliqué en 2024 (E4 : montage de décalage), il simplifie considérablement le calcul des nœuds à plusieurs branches.
+
+  \item \textbf{Hystérésis : ne pas inverser les seuils.}
+  $V_H > V_B$ toujours. $V_H$ correspond à $V_s = +V_{sat}$, $V_B$ à $V_s = -V_{sat}$. Confondre les deux donne une hystérésis négative physiquement impossible.
+
+  \item \textbf{Suiveur = adaptation d'impédance, pas amplification.}
+  Gain = 1 mais impédance d'entrée quasi infinie et impédance de sortie quasi nulle. Rôle : isoler deux étages sans atténuation.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2024, sur la partie du sujet consacrée à l'électronique analogique : «~la cinquième et dernière partie a été abordée par 70\,\% des candidats et 47\,\% d'entre eux l'ont traitée correctement.~»\\
+Rapport jury 2024 : «~Le jury attend des réponses détaillées et argumentées. Des résultats donnés directement, sans calcul et sans justification ne répondent pas aux attendus de l'épreuve.~»
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PRESENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colPresence,
+  title={Présence dans les sujets analysés (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Année} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & - & - & - & - & - & - & - & - & - & - & $\checkmark$ & - \\
+E2 discipl. IE & - & - & - & - & - & - & $\checkmark$ & - & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & - \\
+E2 appl. comm. & - & - & - & - & - & - & - & - & - & - & - & - & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-thèmes fréquents :}
+montage inverseur/non-inverseur (6/13) - montage soustracteur (4/13) - comparateur à hystérésis (3/13) - conversion tension-courant 4-20\,mA (2/13) - intégrateur/correcteur PI (3/13)
+
+\medskip
+\textbf{Ordres de grandeur (repères rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Réseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, fréquence \SI{50}{\hertz}.
+  \item Courants d'étude fréquents en sujet : de quelques \si{\ampere} à quelques dizaines de \si{\ampere}.
+  \item En conversion d'énergie, un rendement attendu reste généralement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthèse express (à refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypothèses du modèle et les conventions de signe.
+  \item Écrire 2 à 4 relations clés avec unités.
+  \item Réaliser un calcul numérique complet et vérifier l'ordre de grandeur.
+  \item Justifier le résultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE

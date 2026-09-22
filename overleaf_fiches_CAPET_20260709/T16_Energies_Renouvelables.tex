@@ -1,0 +1,371 @@
+﻿\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colElec}{T16}} - energies renouvelables : photovoltaeque, hydraulique, eolien}
+\fancyhead[R]{\small\textit{CAPET SII IE - Session 2026}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TeTE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colElec,
+  colframe=colElec,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T16 \quad energies renouvelables : photovoltaeque, hydraulique, eolien}\\[2pt]
+  {\color{colElec!30!white}\small
+    \textbf{Domaine :} electrotechnique - Systemes energetiques \quad
+    \textbf{Presence :} \textbf{7/13} sujets (2013-2026) - theme \emph{frequent}
+  }\\[1pt]
+  {\color{colElec!20!white}\footnotesize
+    Sous-themes : modele panneau PV ($I_{sc}$, $V_{oc}$, MPP) - nombre de panneaux et superficie - MPPT algorithme P\&O - hacheur elevateur - micro-hydraulique (STEP) - eolien (loi de Betz, DFIG)
+  }
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Panneau photovoltaeque ----------------------------------------
+\textbf{1.1 Modele electrique d'un panneau PV (STC : $1000\,\mathrm{W\,m^{-2}}$, $25^\circ\mathrm{C}$)}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lllll}
+\toprule
+\textbf{Parametre} & \textbf{Notation} & \textbf{Valeur typ.} & \textbf{En serie} & \textbf{En parallele} \\
+\midrule
+Puissance crete & $P_{crete}$ & 320\,W & - & - \\
+Courant court-circuit & $I_{sc}$ & 9{,}76\,A & $I_{sc}$ inchange & additionne \\
+Tension circuit ouvert & $V_{oc}$ & 40{,}96\,V & additionnee & $V_{oc}$ inchange \\
+Courant MPP & $I_{MPP}$ & 9{,}34\,A & idem & additionne \\
+Tension MPP & $V_{MPP}$ & 34{,}32\,V & additionnee & idem \\
+\bottomrule
+\end{tabular}
+\end{center}
+\textbf{Correction en temperature :} $+1^\circ\mathrm{C} \to -0{,}4\,\%$ de $P_{crete}$ (Si-mono). A $50^\circ\mathrm{C}$ (STC + $25^\circ\mathrm{C}$) : $-10\,\%$ de puissance.
+
+Puissance du champ : $P_{champ} = N_{panneaux} \times P_{crete} \times G/G_0$ avec $G_0 = 1000\,\mathrm{W\!\cdot\!m^{-2}}$.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 MPPT ---------------------------------------------------------
+\textbf{1.2 MPPT - Maximum Power Point Tracking}
+
+\smallskip
+Commande ajustant le rapport cyclique $\alpha$ du hacheur elevateur pour maintenir le panneau au point de puissance maximale ($V_{MPP}$, $I_{MPP}$).
+
+\textbf{Algorithme perturbation et observation (P\&O) :}
+\begin{itemize}[itemsep=1pt]
+  \item Imposer $U + \Delta U$ au panneau
+  \item Si $\Delta P > 0$ : on se rapproche du MPP - continuer dans le meme sens
+  \item Si $\Delta P < 0$ : on s'eloigne - inverser le sens de perturbation
+  \item Repeter jusqu'a $\Delta P \approx 0$ (convergence vers le MPP)
+\end{itemize}
+
+Rapport cyclique hacheur elevateur : $f_m = V_{PV} / E_b$ (rapport de la tension PV - la tension du bus continu de sortie).
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 Connexion sur onduleur ----------------------------------------
+\textbf{1.3 Dimensionnement de la connexion sur onduleur}
+
+\smallskip
+\[
+  N_{serie/entree} = \frac{V_{MPP\,max\,onduleur}}{V_{MPP\,panneau}}
+  \qquad;\qquad
+  N_{onduleurs} = \frac{N_{panneaux\,total}}{N_{entrees/onduleur} \times N_{serie/entree}}
+\]
+Verifier que $V_{MPP}$ et $I_{MPP}$ calcules sont dans les plages minemax de l'onduleur.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 eolien -------------------------------------------------------
+\textbf{1.4 eolien - loi de Betz}
+
+\smallskip
+\[
+  P_{extrait} = C_p \cdot \frac{1}{2}\,\rho_{air}\,A_{rotor}\,v^3
+  \qquad;\qquad
+  C_p^{max} = \frac{16}{27} \approx 0{,}593 \quad \text{(limite de Betz)}
+\]
+$A_{rotor} = \pi R^2$, $v$ = vitesse du vent. Si $v$ double, $P$ est multipliee par \textbf{8}.
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHeTIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthetique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Champ PV}} \\
+$P_{champ} = N \cdot P_{crete} \cdot G/G_0$ & Puissance & W \\
+$N = P_{souhaitee}/P_{crete}$ & Nb panneaux & - \\
+$V_{MPP,chaine} = N_s V_{MPP}$ & Tension serie & V \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{MPPT}} \\
+$f_m = V_{PV}/E_b$ & Rapp. cyclique & - \\
+P\&O : si $\Delta P>0$ - meme sens & - & - \\
+P\&O : si $\Delta P<0$ - inverser & - & - \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Hydraulique}} \\
+$E_p = \rho V g h$ & energie pot. & J \\
+$E_{elec} = E_p\cdot\eta_{turb}$ & Turbinage & Weh \\
+$T = V/Q$ & Duree pomp. & h \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{eolien}} \\
+$P = C_p \cdot \frac{1}{2}\rho A v^3$ & Puissance & W \\
+$C_p^{max} = 16/27$ & Betz & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Donnees 2021}} \\
+$N = 782$, $S = 1300\,\mathrm{m^2}$ & PV 250\,kW & - \\
+$N_s = 26$ panneaux/entree & Onduleur & - \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets reels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+% Mini-procedure de resolution type copie concours
+\begin{tcolorbox}[questiontype,title={Procedure type copie concours (5 etapes)}]
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Qualifier le modele} : hypotheses, domaine de validite, grandeurs d'entree/sortie.
+  \item \textbf{Ecrire les lois} : equations de base avec symboles et unites SI.
+  \item \textbf{Isoler l'inconnue} : expression litterale, puis application numerique tracee.
+  \item \textbf{Controler l'ordre de grandeur} : coherence physique et unite finale.
+  \item \textbf{Conclure concours} : phrase courte orientee decision technique.
+\end{enumerate}
+\end{tcolorbox}
+
+% Visuel de methode : chemin de resolution CAPET
+\begin{center}
+\begin{tikzpicture}[font=\small, node distance=7mm and 6mm, >=Stealth]
+  \node[draw, rounded corners, fill=colElec!8, inner sep=4pt] (n1) {Notions};
+  \node[draw, rounded corners, fill=colElec!8, right=of n1, inner sep=4pt] (n2) {Methode};
+  \node[draw, rounded corners, fill=colElec!8, right=of n2, inner sep=4pt] (n3) {Application annale};
+  \node[draw, rounded corners, fill=colElec!8, right=of n3, inner sep=4pt] (n4) {Verification jury};
+  \draw[->, thick, colElec] (n1) -- (n2);
+  \draw[->, thick, colElec] (n2) -- (n3);
+  \draw[->, thick, colElec] (n3) -- (n4);
+\end{tikzpicture}
+\end{center}
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Nombre de panneaux et parametrage cellule \hfill\normalfont\footnotesize E2 disc. 2021 (Q11-Q12)}
+]
+\textbf{enonce.}
+Panneau DMH320M6 : $P_{crete} = 320\,\mathrm{W}$, 60 cellules en serie, $I_{sc} = 9{,}76\,\mathrm{A}$, $V_{oc} = 40{,}96\,\mathrm{V}$, surface 1{,}66\,me. Puissance crete souhaitee : 250\,kW.
+(a) Calculer le nombre de panneaux et la superficie. (b) Indiquer $I_{sc,cell}$ et $V_{oc,cell}$ pour une cellule.
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{(a)} $N = 250\,000 / 320 = 782\,\text{panneaux}$ ; superficie $= 782 \times 1{,}66 = \mathbf{1298\,\mathrm{m^2}} \approx 1300\,\mathrm{m^2}$.
+
+\textbf{(b)} Cellules en serie - courant identique - $I_{sc,cell} = I_{sc,panneau} = \mathbf{9{,}76\,\mathrm{A}}$.\\
+Tensions s'ajoutent - $V_{oc,cell} = V_{oc,panneau}/60 = 40{,}96/60 = \mathbf{0{,}683\,\mathrm{V}}$.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Dimensionnement entrees onduleur et verification \hfill\normalfont\footnotesize E2 disc. 2021 (Q13), Rapport jury 2021}
+]
+\textbf{enonce.}
+5 onduleurs - 6 entrees MPPT = 30 groupes. Repartir 782 panneaux. Calculer $V_{MPP}$, $I_{MPP}$ et $P_{MPP}$ par entree. Verifier la compatibilite avec l'onduleur.
+
+\tcbline
+
+\textbf{Corrige.}
+\[
+  N_{s/groupe} = \frac{782}{30} \approx 26\,\text{panneaux par entree}
+\]
+\[
+  V_{MPP,entree} = 26 \times 34{,}32 = \mathbf{892\,\mathrm{V}}
+  \qquad;\qquad
+  I_{MPP,entree} = 9{,}34\,\mathrm{A}
+  \qquad;\qquad
+  P_{MPP,entree} = 26 \times 320 = \mathbf{8320\,\mathrm{W}}
+\]
+\textbf{Verification :} les valeurs calculees ($V_{MPP} = 892\,\mathrm{V}$, $I_{MPP} = 9{,}34\,\mathrm{A}$) doivent etre dans les plages minemax de l'onduleur (verifier sur datasheet constructeur). Le jury insiste sur cette verification explicite.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Algorithme MPPT - perturbation et observation \hfill\normalfont\footnotesize E2 disc. 2025 (Q17-Q18), Rapport jury 2025}
+]
+\textbf{enonce.}
+Sur la courbe $P = f(U)$ d'un champ PV, le point MPP est - $U_{MPP} = 317\,\mathrm{V}$.\\
+\textbf{Cas P1 :} $U_1 = 195\,\mathrm{V}$, on impose $\Delta U > 0$. Quel est le signe de $\Delta P$ - Que fait le regulateur MPPT --\\
+\textbf{Cas P2 :} $U_2 = 340\,\mathrm{V}$, on impose $\Delta U > 0$. Meme question.
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{Cas P1 ($U_1 = 195\,\mathrm{V} < U_{MPP}$) :} on est - gauche du MPP. En augmentant $U$, on se rapproche du MPP - $\mathbf{\Delta P > 0}$.
+Reponse du regulateur : continuer dans le meme sens (augmenter le rapport cyclique du hacheur pour augmenter $U$).
+
+\textbf{Cas P2 ($U_2 = 340\,\mathrm{V} > U_{MPP}$) :} on est - droite du MPP. En augmentant $U$, on s'eloigne - $\mathbf{\Delta P < 0}$.
+Reponse du regulateur : inverser le sens (reduire le rapport cyclique pour diminuer $U$).
+
+Le processus converge quand $\Delta P \approx 0$, c'est--dire au voisinage de $U_{MPP} = 317\,\mathrm{V}$.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs recurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Correction en temperature obligatoire.}
+  Rapport jury 2021 : "les candidats se sont contentes de lire les valeurs sur les courbes sans effectuer la correction en temperature". A $50^\circ\mathrm{C}$, multiplier la puissance STC par $1 - 0{,}004 \times (50 - 25) = 0{,}90$.
+
+  \item \textbf{Verifier la compatibilite avec l'onduleur.}
+  Apres avoir calcule $V_{MPP}$ et $I_{MPP}$, verifier explicitement que ces valeurs sont dans les plages admissibles de l'onduleur. Omission signalee comme lacune frequente.
+
+  \item \textbf{Cellules en serie dans un panneau $\neq$ panneaux en serie.}
+  Pour une cellule dans un panneau de 60 cellules serie : $I_{sc,cell} = I_{sc,panneau}$ mais $V_{oc,cell} = V_{oc,panneau}/60$. Ne pas confondre avec l'association de panneaux.
+
+  \item \textbf{MPPT : sens de la perturbation.}
+  Si $\Delta P > 0$ apres $+\Delta U$ - continuer dans le meme sens. Si $\Delta P < 0$ - inverser. Beaucoup de candidats inversent la logique.
+
+  \item \textbf{Puissance eolienne $\propto v^3$.}
+  Si la vitesse du vent double, la puissance est multipliee par $2^3 = 8$, pas par 2. Erreur frequente.
+
+  \item \textbf{Rendement STEP : conclure sur l'interet contextuel.}
+  Citer le chiffre numerique (58\,\%) ET la conclusion : "peu performant, mais ecologique, preferable - des batteries supplementaires, exploitable geographiquement".
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2021 : "Le jury insiste sur la necessite de justifier le choix de l'onduleur en verifiant que les valeurs de tension et de courant calculees sont bien dans les plages admissibles de l'onduleur."\\
+Rapport jury 2025 : "MPPT : cette commande permet d'extraire le maximum de puissance. Le rapport cyclique augmente ou diminue en fonction de l'evolution de dP jusqu'a obtenir le point maximum (dP = 0)."
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PReSENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colGrayLight,
+  colframe=colSeparator,
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+  before skip=4pt, after skip=0pt,
+  fonttitle=\small\bfseries,
+  title={Presence dans les sujets analyses (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Annee} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & - & - & - & - & - & - & - & - & - & - & - & - \\
+E2 discipl. IE & - & - & - & $\checkmark$ & - & - & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & - & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-themes frequents :}
+panneau PV - nombre et superficie (4/13) - MPPT algorithme P\&O (3/13) - dimensionnement onduleur (3/13) - micro-hydraulique energie pot. (2/13) - comparaison filieres renouvelables (2/13)
+
+\medskip
+\textbf{Ordres de grandeur (reperes rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Reseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, frequence \SI{50}{\hertz}.
+  \item Courants d'etude frequents en sujet : de quelques \si{\ampere} a quelques dizaines de \si{\ampere}.
+  \item En conversion d'energie, un rendement attendu reste generalement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthese express (a refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypotheses du modele et les conventions de signe.
+  \item Ecrire 2 a 4 relations cles avec unites.
+  \item Realiser un calcul numerique complet et verifier l'ordre de grandeur.
+  \item Justifier le resultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE
+
+
+
+
+
+
+
+
+

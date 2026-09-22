@@ -1,0 +1,384 @@
+% Sources verifiees pour les valeurs numeriques non triviales de ce fichier :
+%
+% NOTE DE COMPLEMENTARITE (2026-09-02) : ce fichier a ete revu pour ne plus dupliquer les
+% Questions Types de la fiche fiches/T12_Machine_Synchrone.tex. Les QT de la fiche sont :
+%   QT1 = 2024 E2 appl. Q44-46 (f0 = 185,6 Hz + couplage triangle, Urbanloop)
+%   QT2 = 2025 E2 appl. Q18 (definition du servomoteur, KUKA)
+%   QT3 = 2023 E2 disc. (rendement de la chaine de puissance, Bakus)
+% Aucun exercice de ce fichier ne reprend ces trois questions.
+%
+% - Ex1 (docTech, choix du servomoteur brushless d'axe 6 KUKA) : CAPET 2025, Epreuve ecrite
+%   disciplinaire appliquee, questions 11, 12 et 13.
+%   * VIENT DU SUJET (textuellement present dans la conversion Markdown) :
+%     - "Pour les questions suivantes, Jeq = 0,0118 kg.m2 et le couple resistif Cr est neglige"
+%       (E2_Appliquee_Commune_2025.md, l.310) ;
+%     - le contenu du DT2 "Extrait de la gamme des robots KUKA" (l.776-784, texte de l'image
+%       extrait par Marker) : KR 300 2700 -> masse maximale 370 kg, Cm max = 8,21 N.m ;
+%       KR 210 R3100 -> masse maximale 210 kg, Cm max = 3,83 N.m ;
+%     - l'acceleration angulaire a = 431,1 rad/s2 et la masse de 181 kg de l'ensemble
+%       "structure + ecrans" (Rapport_Jury_2025.md, l.~ Q10, Q12 et Q16 : "a=517,31/1,2 donc
+%       a = 431,1 rad.s-2", "Le couple necessaire pour mouvoir la masse de 181 kg est de
+%       5,086 N.m", "Cm = 5,086 N.m") ;
+%     - Q13 corrige officiel : mmax = 329,9 kg (Rapport_Jury_2025.md, Q13).
+%   * RECONSTITUE : la mise en forme tabulaire de l'extrait DT2 (le DT original est une image
+%     "picture [448 x 619] intentionally omitted" ; seules les valeurs listees ci-dessus sont
+%     reprises, aucune valeur ajoutee). La ligne "figure 12" donnant a = 431,1 rad/s2 est
+%     fournie directement en donnee d'enonce, la courbe n'etant pas convertie.
+% - Ex2 (quadrants de fonctionnement de la MS sur le profil de vitesse) : CAPET 2024, Epreuve
+%   ecrite disciplinaire appliquee, question 44 -- V0 = 60 km/h, deceleration aC = -1,4 m/s2
+%   (E2_Appliquee_Commune_2024.md, l.470-472). Le corrige officiel de Q44 est une image omise
+%   par la conversion (Rapport_Jury_2024.md, "Q44." l.~880) : le raisonnement quadrant par
+%   quadrant est ici reconstruit a partir du seul profil de vitesse, sans citation attribuee.
+% - Ex3 (resolveur + chaine d'acquisition de position) : CAPET 2025, Epreuve ecrite
+%   disciplinaire appliquee, questions 25, 26 et 27 -- toutes les donnees (resolveur, plage
+%   [-5 V ; +5 V], debattement 288 deg code sur 24 bits, critere q = dv/10) sont dans le sujet
+%   (E2_Appliquee_Commune_2025.md, l.374-394) et les resultats (dtheta = 1,72e-5 deg,
+%   q ~ 6e-8 V, N ~ 1,6e8, 28 bits) dans le corrige officiel (Rapport_Jury_2025.md, Q23, Q27).
+% - Ex4 (reversibilite pont PD2 + dimensionnement supercondensateurs + VERIFICATION du
+%   dimensionnement) : CAPET 2024, questions 48, 49, 51, 52 et 53 -- Nsc=5, Ceq=13 F,
+%   UCeqmax=81 V, formulation "unidirectionnel en courant et en tension", energie recuperee
+%   -139 kJ a 80 % et conclusion "L'agencement propose a la question 51 ne convient pas car
+%   UCeqf < UCeqmax" avec ses trois solutions : tous du corrige officiel
+%   (Rapport_Jury_2024.md, Q48-Q53) ; 65 F / 16,2 V et U0 = 72 V du sujet
+%   (E2_Appliquee_Commune_2024.md, l.602-608 et l.510).
+% - Ex5 (diagramme de Kapp) : exercice inedit, theorie generale de la machine synchrone (non
+%   controversee), aucune verification web necessaire.
+%
+% ANCIEN Ex3 (chaine de puissance Bakus 2023) SUPPRIME car doublon de la QT3 de la fiche.
+% Rappel pour toute reecriture future : le sujet 2023 ne donne QUE le rendement global de
+% 63 % ; il n'existe AUCUNE decomposition officielle en etaCS/etaMS/etaRed, et le facteur
+% 98 % du sujet concerne l'onduleur du hangar, pas la chaine de traction. Ne jamais
+% reintroduire un produit "0,98 x 0,80 x 0,80" presente comme venant du sujet.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+% Macro locale : numero de phase entoure (profil de vitesse de l'exercice 2).
+\providecommand{\circled}[1]{\tikz[baseline=(c.base)]{\node[draw, circle, inner sep=1pt, minimum size=1.3em, line width=0.4pt] (c) {\footnotesize #1};}}
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T12}} - Exercices - Machine synchrone et brushless (PMSM / BLDC)}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T12 \quad Machine synchrone et brushless (PMSM / BLDC)}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 5 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2025, \'Epreuve \'ecrite disciplinaire appliqu\'ee (Sc\`ene robotis\'ee KUKA), questions 11, 12 et 13 -- \textbf{lecture de document technique}}
+]
+\CAPETSHOW{
+Une soci\'et\'e de production souhaite suspendre une structure porteuse d'\'ecrans g\'eants \`a l'axe~6 d'un robot industriel KUKA. Cet axe est entra\^in\'e par un \textbf{servomoteur brushless}. Il faut choisir, dans la gamme du constructeur, le robot dont le moteur d'axe~6 fournit le couple n\'ecessaire.
+
+Le moment d'inertie \'equivalent ramen\'e \`a l'arbre du moteur d'axe~6 vaut $J_{eq} = \SI{0,0118}{\kilogram\meter\squared}$ et le couple r\'esistif $C_r$ est n\'eglig\'e. Le relev\'e de la vitesse du moteur de l'axe~6 donne une acc\'el\'eration angulaire $a = \SI{431,1}{\radian\per\second\squared}$. L'ensemble \guillemotleft\ structure $+$ \'ecrans \guillemotright{} \`a embarquer a une masse de $\SI{181}{\kilogram}$.
+
+\begin{tcolorbox}[docTech, title={Document technique DT2 -- Extrait de la gamme des robots KUKA}]
+\centering\small
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{D\'esignation} & \textbf{Masse maximale} & \textbf{Couple max.\ moteur d'axe 6} \\
+ & (charge admissible) & $C_{m\,max}$ \\
+\midrule
+KR 300 R2700  & \SI{370}{\kilogram} & \SI{8,21}{\newton\meter} \\
+KR 210 R3100  & \SI{210}{\kilogram} & \SI{3,83}{\newton\meter} \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\raggedright\footnotesize\itshape Le diagramme de charge associ\'e \`a chaque r\'ef\'erence donne, pour un robot donn\'e, la masse maximale admissible en fonction de la position du centre de gravit\'e de la charge ($L_{xy}$, $L_z$) par rapport \`a la bride outil.
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever dans le document technique DT2} les couples maximaux disponibles sur le moteur d'axe~6 de chacune des deux r\'ef\'erences propos\'ees, ainsi que les masses maximales admissibles associ\'ees.
+  \item Le principe fondamental de la dynamique appliqu\'e \`a un syst\`eme en rotation autour d'un axe fixe s'\'ecrit $\sum C = J_{eq}\cdot a$. Calculer le couple moteur $C_m$ n\'ecessaire pour mouvoir la structure embarqu\'ee.
+  \item \`A partir du DT2, choisir en le justifiant le robot r\'epondant \`a ce contexte d'utilisation.
+  \item Pour le robot retenu, le moment d'inertie \'equivalent s'exprime $J_{eq} = J_{mot6} + 1{,}32\,m_{max}\,r^2$ avec $J_{mot6} = \SI{0,003}{\kilogram\meter\squared}$ et $r = 0{,}006\,07$ (rapport de r\'eduction). D\'eterminer la masse maximale $m_{max}$ que le robot peut r\'eellement embarquer en tenant compte des effets dynamiques, et conclure.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Extraction directe du DT2 :
+  \begin{itemize}[leftmargin=1.5em]
+    \item KR 300 R2700 : $C_{m\,max} = \SI{8,21}{\newton\meter}$, masse maximale $\SI{370}{\kilogram}$ ;
+    \item KR 210 R3100 : $C_{m\,max} = \SI{3,83}{\newton\meter}$, masse maximale $\SI{210}{\kilogram}$.
+  \end{itemize}
+  Les deux r\'ef\'erences admettent une masse sup\'erieure aux $\SI{181}{\kilogram}$ de la charge : le crit\`ere statique de masse ne suffit donc pas \`a d\'epartager, c'est le \emph{couple} d'axe~6 qui va trancher.
+
+  \item Le couple r\'esistif \'etant n\'eglig\'e, le PFD en rotation se r\'eduit \`a $C_m = J_{eq}\cdot a$ :
+  \[ C_m = 0{,}011\,8 \times 431{,}1 \approx \SI{5,086}{\newton\meter} \]
+
+  \item Comparaison au DT2 :
+  \begin{itemize}[leftmargin=1.5em]
+    \item KR 210 R3100 : $C_{m\,max} = \SI{3,83}{\newton\meter} < \SI{5,086}{\newton\meter}$ $\rightarrow$ \textbf{sous-dimensionn\'e}, le servomoteur ne pourrait pas fournir l'acc\'el\'eration demand\'ee ;
+    \item KR 300 R2700 : $C_{m\,max} = \SI{8,21}{\newton\meter} > \SI{5,086}{\newton\meter}$ $\rightarrow$ \textbf{convient}.
+  \end{itemize}
+  Le choix se porte donc sur le \textbf{KUKA KR 300 R2700}.
+
+  \item On \'ecrit la condition limite $C_{m\,max} = J_{eq}\cdot a$, soit $J_{eq} = C_{m\,max}/a$ :
+  \[ 0{,}003 + 1{,}32\,m_{max}\,(0{,}006\,07)^2 = \dfrac{8{,}21}{431{,}1} = \SI{0,019\,04}{\kilogram\meter\squared} \]
+  \[ 1{,}32\,m_{max}\times 3{,}684\times10^{-5} = 0{,}019\,04 - 0{,}003 = 0{,}016\,04 \]
+  \[ m_{max} = \dfrac{0{,}016\,04}{4{,}863\times10^{-5}} \approx \SI{330}{\kilogram} \]
+  (le corrig\'e officiel donne $m_{max} = \SI{329,9}{\kilogram}$.)
+\end{enumerate}
+
+\textbf{Conclusion.} La masse maximale r\'eellement embarquable sur l'axe~6 du KR 300 R2700, $\SI{330}{\kilogram}$, est fix\'ee par le \emph{couple} du servomoteur brushless et non par la charge nominale $\SI{370}{\kilogram}$ affich\'ee au catalogue : c'est bien le crit\`ere dynamique qui dimensionne. Avec $\SI{181}{\kilogram}$ embarqu\'es, la marge est de $(330-181)/181 \approx \SI{82}{\percent}$, ce qui valide largement l'exigence. Attention toutefois : ce calcul ne valide que l'axe~6, suppos\'e le plus p\'enalisant -- le diagramme de charge du DT2 doit \^etre utilis\'e pour v\'erifier tous les axes en fonction de la position du centre de gravit\'e de la charge.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{1} \hfill\normalfont\footnotesize 2024, \'Epreuve \'ecrite disciplinaire appliqu\'ee (Urbanloop), question 44}
+]
+\CAPETSHOW{
+Chaque roue de la capsule Urbanloop est motoris\'ee par une machine synchrone \`a aimants permanents entra\^inant directement la roue. Sur une portion horizontale et rectiligne du parcours, le profil de vitesse d'une capsule entre deux stations est le suivant : d\'emarrage depuis l'arr\^et, phase d'acc\'el\'eration jusqu'\`a la vitesse de croisi\`ere $V_0 = \SI{60}{\kilo\meter\per\hour}$, palier \`a vitesse constante, puis phase de d\'ec\'el\'eration ($a_C = \SI{-1,4}{\meter\per\second\squared}$) jusqu'\`a l'arr\^et en station. La capsule circule toujours dans le m\^eme sens.
+
+\begin{center}
+\begin{tikzpicture}[scale=1.0, >=Stealth]
+  \draw[-latex] (0,0) -- (8.5,0) node[right]{$t$};
+  \draw[-latex] (0,0) -- (0,2.4) node[above]{$v$};
+  \draw[dashed, gray] (0,1.8) -- (6.2,1.8); \node[left] at (0,1.8) {\small $V_0$};
+  \draw[very thick, colExo] (0,0) -- (2.0,1.8) -- (5.0,1.8) -- (6.2,0);
+  \node[below] at (1.0,0) {\small \circled{1}};
+  \node[below] at (3.5,0) {\small \circled{2}};
+  \node[below] at (5.6,0) {\small \circled{3}};
+\end{tikzpicture}
+
+{\footnotesize Profil de vitesse entre deux stations : \circled{1} acc\'el\'eration, \circled{2} vitesse constante, \circled{3} freinage.}
+\end{center}
+
+Le plan couple-vitesse $(\Omega, C)$ de la machine est d\'ecoup\'e en quatre quadrants, la vitesse $\Omega$ en abscisse et le couple $C$ en ordonn\'ee.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Pour chacune des trois phases du trajet, pr\'eciser le signe de la vitesse de rotation $\Omega$ de la machine et le signe du couple $C$ qu'elle d\'eveloppe.
+  \item En d\'eduire, pour chaque phase, le quadrant de fonctionnement occup\'e et le mode de fonctionnement de la machine synchrone (moteur ou g\'en\'erateur).
+  \item En d\'eduire l'exigence que ce profil impose au convertisseur qui alimente la machine synchrone.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item La capsule circule toujours dans le m\^eme sens : la vitesse de rotation des moteurs-roues est donc \textbf{toujours positive} sur tout le trajet ($\Omega > 0$, et $\Omega = 0$ aux deux extr\'emit\'es).
+  \begin{itemize}[leftmargin=1.5em]
+    \item \circled{1} \emph{Acc\'el\'eration} : la machine doit fournir le couple qui acc\'el\`ere la capsule et vaincre les frottements $\rightarrow$ $C > 0$.
+    \item \circled{2} \emph{Vitesse constante} : le couple compense exactement la r\'esistance a\'erodynamique $\rightarrow$ $C > 0$ (plus faible qu'en phase \circled{1}).
+    \item \circled{3} \emph{Freinage} : la machine doit s'opposer au mouvement pour imposer $a_C = \SI{-1,4}{\meter\per\second\squared}$ $\rightarrow$ le couple change de signe, $C < 0$.
+  \end{itemize}
+
+  \item Avec $\Omega > 0$ dans tous les cas, seuls deux quadrants sont parcourus :
+  \begin{center}
+  \begin{tabular}{@{}llll@{}}
+  \toprule
+  \textbf{Phase} & $\Omega$ & $C$ & \textbf{Quadrant / mode} \\
+  \midrule
+  \circled{1} Acc\'el\'eration      & $>0$ & $>0$ & Quadrant 1 -- \textbf{moteur} \\
+  \circled{2} Vitesse constante     & $>0$ & $>0$ & Quadrant 1 -- \textbf{moteur} \\
+  \circled{3} Freinage              & $>0$ & $<0$ & Quadrant 4 -- \textbf{g\'en\'erateur} \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  Le produit $P = C\,\Omega$ est positif en \circled{1} et \circled{2} (la machine \emph{re\c coit} de la puissance \'electrique : fonctionnement moteur) et n\'egatif en \circled{3} (la machine \emph{fournit} de la puissance \'electrique : fonctionnement g\'en\'eratrice, c'est le freinage r\'ecup\'eratif).
+
+  \item Le fonctionnement occupant les quadrants 1 et 4, la machine change de signe de couple sans changer de sens de rotation : c\^ot\'e continu, le courant doit pouvoir \textbf{s'inverser} alors que la tension du bus reste positive. Le convertisseur doit donc \^etre \textbf{r\'eversible en courant} (deux quadrants), ce que r\'ealise nativement l'onduleur de tension \`a transistors et diodes antiparall\`eles.
+\end{enumerate}
+
+\textbf{Conclusion.} Le trajet entre deux stations n'exige que deux quadrants sur quatre, mais le quadrant~4 (freinage) impose imp\'erativement une r\'eversibilit\'e en courant de la cha\^ine d'alimentation. C'est pr\'ecis\'ement ce point qui va poser probl\`eme en amont de l'onduleur (voir exercice~4) : si l'\'etage qui alimente le bus continu n'est pas lui-m\^eme r\'eversible, l'\'energie de freinage n'a nulle part o\`u aller.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize 2025, \'Epreuve \'ecrite disciplinaire appliqu\'ee (Sc\`ene robotis\'ee KUKA), questions 25, 26 et 27}
+]
+\CAPETSHOW{
+Le servomoteur brushless de l'axe~3 d'un robot KUKA KR QUANTEC est asservi en position gr\^ace \`a un capteur de position angulaire de type \textbf{r\'esolveur}, dont les deux signaux de sortie correspondent au cosinus et au sinus de la position angulaire de l'axe du moteur.
+
+L'axe en sortie du servomoteur dispose d'un d\'ebattement angulaire de $288^\circ$ et re\c coit des commandes de position cod\'ees sur $24$ bits, le d\'ebattement \'etant enti\`erement parcouru entre les deux positions extr\^emes.
+
+Un circuit de traitement convertit l'information de position angulaire en une tension image valant $\SI{-5}{\volt}$ lorsque l'axe est en $\theta_{min}$ et $\SI{+5}{\volt}$ lorsqu'il est en $\theta_{max}$. On note $\delta v$ la variation de cette tension image lorsque le moteur tourne d'un angle $\delta\theta$ (le pas angulaire commandable). Cette tension est num\'eris\'ee par un convertisseur analogique-num\'erique de plage d'entr\'ee $[\SI{-5}{\volt}\,;\,\SI{+5}{\volt}]$.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Rappeler le principe de fonctionnement d'un r\'esolveur. Expliquer, \`a l'aide d'un sch\'ema, pourquoi ce capteur d\'elivre le cosinus et le sinus de la position angulaire du moteur, et pr\'eciser ce qui le distingue d'un codeur incr\'emental.
+  \item Montrer que le pas angulaire commandable vaut $\delta\theta = 1{,}72\cdot10^{-5}\,^\circ$, puis \'etablir la valeur de $\delta v$.
+  \item Le capteur est consid\'er\'e comme suffisamment pr\'ecis si le pas de quantification $q$ du CAN est dix fois plus petit que $\delta v$. D\'eterminer le nombre de bits de codage n\'ecessaire au CAN.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Un r\'esolveur est un petit transformateur tournant. Un enroulement port\'e par le rotor est excit\'e ; le flux qu'il cr\'ee est capt\'e par \textbf{deux enroulements statoriques dispos\'es \`a $90^\circ$ l'un de l'autre}. Le champ magn\'etique du rotor \'etant inclin\'e de l'angle $\theta$ par rapport aux axes du stator, sa projection sur chacun des deux axes perpendiculaires fait appara\^itre naturellement un $\cos\theta$ et un $\sin\theta$ :
+
+\begin{center}
+\begin{tikzpicture}[scale=1.25, >=Stealth]
+  % stator : deux axes perpendiculaires
+  \draw[gray!60] (-1.5,0) -- (1.5,0);
+  \draw[gray!60] (0,-1.5) -- (0,1.5);
+  \node[gray!70, right] at (1.5,0) {\footnotesize bobine $\cos$};
+  \node[gray!70, above] at (0,1.5) {\footnotesize bobine $\sin$};
+  \draw[gray!40] (0,0) circle (1.3);
+  % rotor incline
+  \draw[-latex, very thick, colExo] (0,0) -- (55:1.15) node[above right]{\small $\vec{B}$ (rotor)};
+  % projections
+  \draw[dashed, red!70] (55:1.15) -- (0.6596,0);
+  \draw[dashed, red!70] (55:1.15) -- (0,0.9420);
+  \draw[-latex, thick, red!80] (0,0) -- (0.6596,0) node[below, pos=0.55]{\footnotesize $\propto\cos\theta$};
+  \draw[-latex, thick, red!80] (0,0) -- (0,0.9420) node[left, pos=0.6]{\footnotesize $\propto\sin\theta$};
+  \draw (0.42,0) arc (0:55:0.42);
+  \node at (0.40,0.20) {\small $\theta$};
+\end{tikzpicture}
+\end{center}
+
+  Le rapport des deux tensions donne $\tan\theta$, dont l'arc-tangente restitue $\theta$ sans ambigu\"it\'e sur un tour. Contrairement \`a un codeur incr\'emental, qui ne compte que des impulsions et exige une prise d'origine \`a chaque mise sous tension, le r\'esolveur est un capteur \textbf{absolu} : la position est connue d\`es la mise sous tension. Il est en outre purement \'electromagn\'etique (pas d'\'electronique ni d'optique dans le capteur), donc robuste aux vibrations, \`a la temp\'erature et aux perturbations \'electromagn\'etiques -- d'o\`u son emploi syst\'ematique sur les servomoteurs brushless industriels, o\`u l'autopilotage exige de conna\^itre la position du rotor \`a tout instant.
+
+  \item Le mot de commande est cod\'e sur $24$ bits, soit $N = 2^{24}$ valeurs possibles r\'eparties sur le d\'ebattement de $288^\circ$ :
+  \[ \delta\theta = \dfrac{288}{2^{24}} = \dfrac{288}{16\,777\,216} \approx 1{,}72\cdot10^{-5}\,^\circ \]
+  La tension image \'evolue lin\'eairement de $\SI{-5}{\volt}$ \`a $\SI{+5}{\volt}$, soit une excursion de $\SI{10}{\volt}$ pour les $288^\circ$ de d\'ebattement. La variation de tension correspondant \`a un pas angulaire est donc :
+  \[ \delta v = \dfrac{10}{288}\times\delta\theta = \dfrac{10}{288}\times 1{,}72\cdot10^{-5} \approx \SI{5,96e-7}{\volt} \]
+  soit environ $\SI{0,6}{\micro\volt}$ -- autrement dit $\delta v = 10/2^{24}$, ce qui \'etait pr\'evisible : les $24$ bits de commande d\'ecoupent directement l'excursion de $\SI{10}{\volt}$.
+
+  \item Le crit\`ere impose $q = \delta v/10 \approx 6\cdot10^{-8}\,\si{\volt}$. Le nombre de segments \`a distinguer sur la plage $[\SI{-5}{\volt}\,;\,\SI{+5}{\volt}]$ vaut :
+  \[ N_{seg} = \dfrac{10}{q} = \dfrac{10}{6\cdot10^{-8}} \approx 1{,}6\cdot10^{8} \]
+  \[ N_{bits} = \left\lceil \log_2\left(1{,}6\cdot10^{8}\right)\right\rceil = \lceil 27{,}25 \rceil = \textbf{28 bits} \]
+\end{enumerate}
+
+\textbf{Conclusion.} Il faudrait un CAN de $28$ bits pour que la cha\^ine d'acquisition du r\'esolveur ne d\'egrade pas la r\'esolution de commande de $24$ bits : c'est bien au-del\`a des CAN industriels courants ($12$ \`a $16$ bits, $24$ bits pour les convertisseurs $\Sigma\Delta$ de mesure lente). Le maillon limitant de l'asservissement de position n'est donc pas le servomoteur brushless ni le r\'esolveur, mais la \textbf{num\'erisation de la mesure} -- il faut soit r\'eduire la plage de tension \`a num\'eriser autour du point de fonctionnement, soit accepter une pr\'ecision de positionnement moindre que le pas de commande th\'eorique.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{3} \hfill\normalfont\footnotesize 2024, \'Epreuve \'ecrite disciplinaire appliqu\'ee (Urbanloop), questions 48, 49, 51, 52 et 53}
+]
+\CAPETSHOW{
+Le bo\^itier d'alimentation qui alimente le bus continu $\SI{72}{\volt}$ des capsules Urbanloop repose sur un pont redresseur PD2 (pont de Gr\ae tz, 4 diodes suppos\'ees parfaites), aliment\'e par le r\'eseau EDF monophas\'e $v_1(t)$ et d\'elivrant une tension $u_S(t)$ c\^ot\'e continu sur une charge $R_{ch}$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.8]
+\draw
+(0,2) node[circ]{} to[sV, l=$v_1$] (5,2) node[circ]{}
+;
+\draw (0,2) to[D, l_=$D_1$] (2.5,4.5) node[circ]{};
+\draw (5,2) to[D, l_=$D_2$] (2.5,4.5);
+\draw (2.5,-0.5) node[circ]{} to[D, l_=$D_3$] (0,2);
+\draw (2.5,-0.5) to[D, l_=$D_4$] (5,2);
+\draw (2.5,4.5) to[short] (2.5,5.3) -- (8,5.3) to[R, l_=$R_{ch}$] (8,-1.3) -- (2.5,-1.3) to[short] (2.5,-0.5);
+\node[above right] at (2.6,5.15) {$+$};
+\node[below right] at (2.6,-1.15) {$-$};
+\draw[-latex] (9.5,5.3) -- (9.5,-1.3) node[midway,right]{$u_S(t)$};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Indiquer si le bo\^itier d'alimentation (pont PD2) est r\'eversible en tension et en courant, du point de vue du bus continu. Justifier \`a l'aide du sch\'ema.
+  \item Lors du freinage de la capsule, la machine synchrone fonctionne en g\'en\'eratrice et cherche \`a renvoyer de l'\'energie vers le bo\^itier d'alimentation. Conclure sur les risques encourus si aucune solution n'est pr\'evue pour absorber cette \'energie.
+  \item Pour stocker cette \'energie de freinage, on utilise des supercondensateurs de caract\'eristiques $\SI{65}{\farad}$, $\SI{16,2}{\volt}$. D\'eterminer l'agencement \`a retenir et le nombre minimal $N_{sc}$ de supercondensateurs pour supporter la tension du bus continu de $\SI{72}{\volt}$, puis la capacit\'e \'equivalente $C_{eq}$ et la tension maximale $U_{Ceq,max}$ de l'association.
+  \item L'\'energie cin\'etique r\'ecup\'erable lors d'un freinage complet depuis $V_0$ vaut $\Delta E_C = \SI{-139}{\kilo\joule}$, dont $\SI{80}{\percent}$ seulement sont effectivement r\'ecup\'er\'es. Au d\'ebut du freinage, la tension aux bornes du condensateur \'equivalent vaut $U_{Ceq}(t_c) = U_0 = \SI{72}{\volt}$. Calculer la tension $U_{Ceq,f}$ atteinte \`a la fin de la phase de freinage.
+  \item Conclure sur l'agencement propos\'e \`a la question~3. Proposer, le cas \'ech\'eant, des solutions pour \'eviter la destruction des supercondensateurs.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item D'apr\`es le sch\'ema, quel que soit le signe de $v_1(t)$, le courant dans $R_{ch}$ ne peut circuler que dans un seul sens (impos\'e par l'orientation des diodes $D_1$ \`a $D_4$) et la tension $u_S(t)$ ne peut \^etre que positive (ou nulle). Le pont PD2, non command\'e, ne fonctionne donc que dans un seul quadrant du plan $(u_S, i_S)$~: il est \textbf{unidirectionnel en courant et en tension}, donc non r\'eversible, ce que confirme le corrig\'e officiel (\guillemotleft\ comme le pont PD2 est unidirectionnel en courant et en tension, les bo\^itiers sont unidirectionnels en courant et en tension \guillemotright).
+
+  \item Pendant le freinage, de l'\'energie est renvoy\'ee vers les bo\^itiers d'alimentation. Le pont PD2 ne pouvant pas absorber un courant invers\'e, cette \'energie ne peut pas transiter vers le r\'eseau~: si elle est trop importante et que rien n'est pr\'evu pour l'absorber, elle risque d'endommager les bo\^itiers d'alimentation, voire d'entra\^iner leur destruction.
+
+  \item Pour supporter une tension sup\'erieure \`a leur tension nominale, les supercondensateurs doivent \^etre associ\'es \textbf{en s\'erie}. Pour que les $\SI{72}{\volt}$ se r\'epartissent \'equitablement sur $N_{sc}$ \'el\'ements de $\SI{16,2}{\volt}$ :
+  \[ 16{,}2 \times N_{sc} \geq 72 \;\Longrightarrow\; N_{sc} \geq 4{,}4 \;\Longrightarrow\; N_{sc} = 5 \text{ (minimum)} \]
+  \[ C_{eq} = \dfrac{65}{5} = \SI{13}{\farad} \qquad\text{et}\qquad U_{Ceq,max} = 5 \times 16{,}2 = \SI{81}{\volt} \]
+
+  \item L'\'energie effectivement stock\'ee dans le condensateur \'equivalent est $\Delta E_{Cond} = -0{,}8\,\Delta E_C = 0{,}8\times 139 = \SI{111,2}{\kilo\joule}$. Or, pour un condensateur :
+  \[ \Delta E_{Cond} = \tfrac{1}{2}C_{eq}\left(U_{Ceq,f}^2 - U_0^2\right) \;\Longrightarrow\; U_{Ceq,f} = \sqrt{U_0^2 + \dfrac{2\,\Delta E_{Cond}}{C_{eq}}} \]
+  \[ U_{Ceq,f} = \sqrt{72^2 + \dfrac{2\times 111\,200}{13}} = \sqrt{5\,184 + 17\,108} = \sqrt{22\,292} \approx \SI{149}{\volt} \]
+
+  \item L'agencement propos\'e \`a la question~3 \textbf{ne convient pas}~: on aurait $U_{Ceq,f} \approx \SI{149}{\volt} > U_{Ceq,max} = \SI{81}{\volt}$, chaque cellule voyant alors $149/5 \approx \SI{29,8}{\volt}$, soit pr\`es du double de sa tension nominale de $\SI{16,2}{\volt}$ -- destruction assur\'ee. Les solutions possibles sont :
+  \begin{itemize}[leftmargin=1.5em]
+    \item associer \textbf{dix} supercondensateurs $\SI{65}{\farad}$ / $\SI{16,2}{\volt}$ en s\'erie ($U_{Ceq,max} = \SI{162}{\volt}$) ;
+    \item prendre des supercondensateurs de caract\'eristiques diff\'erentes (capacit\'e ou tension nominale plus \'elev\'ee) ;
+    \item mettre en place un syst\`eme de dissipation d'\'energie \`a base de r\'esistances (\emph{rh\'eostat de freinage}) pour \'evacuer l'exc\'edent.
+  \end{itemize}
+\end{enumerate}
+
+\textbf{Conclusion.} Le pi\`ege de cette partie est de s'arr\^eter \`a la question~3 : $N_{sc} = 5$ satisfait bien le crit\`ere de \emph{tension de bus} ($\SI{81}{\volt} > \SI{72}{\volt}$), mais pas le crit\`ere \emph{\'energ\'etique}. Dimensionner un stockage de freinage impose de v\'erifier les deux : la tension maximale support\'ee \emph{et} l'\'energie \`a absorber. Ici c'est l'\'energie qui commande, et elle exige de doubler le nombre d'\'el\'ements.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Une machine synchrone triphas\'ee \`a rotor bobin\'e (mod\`ele de Behn-Eschenburg, r\'esistance statorique n\'eglig\'ee) fonctionne en moteur, aliment\'ee sous tension simple efficace $V_s = \SI{230}{\volt}$. Elle absorbe un courant de ligne $I_s = \SI{100}{\ampere}$ avec un facteur de puissance $\cos\varphi = 0{,}85$ inductif ($\varphi > 0$, courant en retard sur la tension). La r\'eactance synchrone est $X_s = \SI{2}{\ohm}$.
+
+\begin{center}
+\begin{tikzpicture}[scale=1.15, >=Stealth]
+
+  \coordinate (O)  at (0,0);
+  \coordinate (Vs) at (2.30,0);
+  \coordinate (Is) at (0.893,-0.553);
+  \coordinate (E)  at (1.246,-1.700);
+
+  \draw[-latex, thick, blue]    (O)  -- (Vs) node[above right]{$\underline{V}_s$};
+  \draw[-latex, thick, red]     (O)  -- (Is) node[below]{$\underline{I}_s$};
+  \draw[-latex, thick, teal]    (O)  -- (E)  node[below]{$\underline{E}$};
+  \draw[-latex, dashed, orange] (Vs) -- (E)  node[midway, right]{$-jX_s\underline{I}_s$};
+
+  % parallele a I_s issue de la pointe de V_s : materialise l'angle droit du triangle de Kapp
+  \draw[dotted, gray] (Vs) -- (2.938,-0.395);
+  \draw[gray] (2.487,-0.116) -- (2.371,-0.303) -- (2.184,-0.187);
+
+  \draw (0.85,0) arc (0:-31.8:0.85);
+  \node at (0.980,-0.281) {\small $\varphi$};
+
+  \draw (1.60,0) arc (0:-53.8:1.60);
+  \node at (1.378,-0.343) {\small $\delta$};
+
+\end{tikzpicture}
+
+{\footnotesize Diagramme de Kapp en convention moteur~: m\^eme \'echelle de tension pour $\underline{V}_s$, $\underline{E}$ et $X_s\underline{I}_s$~; $-jX_s\underline{I}_s$ est perpendiculaire \`a $\underline{I}_s$.}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Rappeler l'\'equation vectorielle du diagramme de Kapp reliant $\underline{V}_s$, $\underline{E}$, $X_s$ et $\underline{I}_s$ (r\'esistance statorique n\'eglig\'ee), en convention moteur.
+  \item En projetant cette \'equation sur les axes horizontal et vertical (axe horizontal port\'e par $\underline{V}_s$), calculer la force \'electromotrice $E$ et l'angle de charge $\delta$.
+  \item Rappeler la signification physique de l'angle $\delta$ et la condition de d\'ecrochage de la machine synchrone \`a vitesse impos\'ee par le r\'eseau.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item En convention moteur, r\'esistance statorique n\'eglig\'ee :
+  \[ \underline{V}_s = \underline{E} + jX_s\underline{I}_s \quad\Longleftrightarrow\quad \underline{E} = \underline{V}_s - jX_s\underline{I}_s \]
+  \item Avec $\underline{V}_s$ pris comme origine des phases ($\underline{V}_s = V_s$) et $\underline{I}_s = I_s(\cos\varphi - j\sin\varphi)$ ($\varphi$ en retard) :
+  \[ jX_s\underline{I}_s = jX_sI_s\cos\varphi + X_sI_s\sin\varphi \]
+  \[ \underline{E} = V_s - X_sI_s\sin\varphi - jX_sI_s\cos\varphi \]
+  Calcul de $\varphi$ : $\varphi = \arccos(0{,}85) = 31{,}8^\circ$, donc $\sin\varphi = 0{,}527$.
+  \[ E_x = V_s - X_sI_s\sin\varphi = 230 - 2\times100\times0{,}527 = 230 - 105{,}4 = \SI{124,6}{\volt} \]
+  \[ E_y = -X_sI_s\cos\varphi = -2\times100\times0{,}85 = \SI{-170}{\volt} \]
+  \[ E = \sqrt{E_x^2 + E_y^2} = \sqrt{124{,}6^2 + 170^2} = \sqrt{15\,525 + 28\,900} = \sqrt{44\,425} \approx \SI{210,8}{\volt} \]
+  \[ \delta = \arctan\left(\dfrac{|E_y|}{E_x}\right) = \arctan\left(\dfrac{170}{124{,}6}\right) \approx 53{,}8^\circ \]
+  Le signe \textbf{n\'egatif} de $E_y$ signifie que la phase de $\underline{E}$ est n\'egative ($\underline{V}_s$ \'etant l'origine des phases)~: $\underline{E}$ -- donc le rotor -- est \textbf{en retard} de $53{,}8^\circ$ sur $\underline{V}_s$, ce qui est bien le sens attendu en fonctionnement moteur. Dans le diagramme de Kapp, $\underline{E}$ se place donc \emph{sous} l'axe de $\underline{V}_s$~; l'angle de charge est compt\'e en valeur absolue, $\delta = 53{,}8^\circ > 0$.
+  \item L'angle de charge $\delta$ repr\'esente le d\'ephasage entre la f.\'e.m.\ $\underline{E}$ (li\'ee \`a la position du rotor) et la tension statorique $\underline{V}_s$ (li\'ee au champ tournant)~: en \textbf{moteur}, c'est le champ tournant statorique qui entra\^ine le rotor, lequel est donc \textbf{en retard} sur lui -- $\underline{E}$ est en retard sur $\underline{V}_s$, ce que traduit ici $E_y < 0$~; en \textbf{g\'en\'eratrice} (alternateur), c'est au contraire la machine d'entra\^inement qui pousse le rotor, qui prend alors de l'\textbf{avance} sur le champ tournant, et $\underline{E}$ passe en avance sur $\underline{V}_s$. Le signe de $\delta$ change donc avec le sens du transfert de puissance. La puissance \'electromagn\'etique s'\'ecrit $P_{em} = 3\dfrac{V_sE}{X_s}\sin\delta$ ($\delta$ pris en valeur absolue), maximale pour $\delta = 90^\circ$. Si la charge impose un couple sup\'erieur au couple maximal $C_{max} = 3V_sE/(X_s\Omega)$ atteint pour $\delta = 90^\circ$, la machine \textbf{d\'ecroche}~: elle perd le synchronisme et s'arr\^ete. Ce risque est \'elimin\'e en autopilotage (PMSM), o\`u la fr\'equence d'alimentation est asservie \`a la position du rotor.
+\end{enumerate}
+
+\textbf{Conclusion.} Au point de fonctionnement \'etudi\'e, $\delta = 53{,}8^\circ$ repr\'esente d\'ej\`a $\SI{60}{\percent}$ de l'angle de d\'ecrochage ($90^\circ$)~: la r\'eserve de couple avant perte de synchronisme n'est que de $1/\sin(53{,}8^\circ) \approx 1{,}24$, soit $\SI{24}{\percent}$. C'est une marge faible pour une machine \`a fr\'equence impos\'ee par le r\'eseau~; c'est pr\'ecis\'ement ce risque que supprime l'autopilotage des PMSM de traction, o\`u $\delta$ est maintenu \`a sa valeur de consigne quelle que soit la charge.
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

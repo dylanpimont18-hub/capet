@@ -1,0 +1,363 @@
+% Exercice 2 : donnees et resultats repris tels quels du corrige officiel
+% E1_Corrige_2014_commun_SII (questions 22 a 24) : CMElu = 1479,7 N.m, N' = 980 tr/min,
+% eta = 94,4 %, cos phi = 0,86, U = 400 V, Pu = 151,9 kW, I = 270,1 A,
+% variateur DT6 = ATV71EXS5C16N4 (Pu max = 160 kW, I = 314 A).
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ifdefined\var\else\DeclareSIUnit{\var}{var}\fi
+\ifdefined\vad\else\DeclareSIUnit{\vad}{VAD}\fi
+\ifdefined\tr\else\DeclareSIUnit{\tr}{tr}\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T02}} - Exercices - Puissance en r\'egime alternatif sinuso\"idal}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T02 \quad Puissance en r\'egime alternatif sinuso\"idal}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 5 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Un r\'ecepteur monophas\'e est constitu\'e d'une r\'esistance $R = \SI{30}{\ohm}$ en s\'erie avec une inductance $L = \SI{100}{\milli\henry}$, aliment\'e par une tension sinuso\"idale $u(t)$ de valeur efficace $U = \SI{230}{\volt}$ et de fr\'equence $f = \SI{50}{\hertz}$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw
+(0,0) to[sV, l=$u(t)$] (0,3)
+to[R, l=$R$] (3,3)
+to[cute inductor, l=$L$] (5,3)
+-- (5,0) -- (0,0);
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Exprimer l'imp\'edance complexe $\underline{Z} = R + jL\omega$, puis calculer son module $Z$ et son argument $\varphi$.
+  \item En d\'eduire le courant efficace $I$ et le facteur de puissance $\cos\varphi$ du r\'ecepteur.
+  \item Calculer les puissances active $P$, r\'eactive $Q$ et apparente $S$, et v\'erifier la relation $S^2 = P^2 + Q^2$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item $L\omega = 2\pi \times 50 \times 0{,}1 = \SI{31,42}{\ohm}$. Module :
+  \[ Z = \sqrt{R^2 + (L\omega)^2} = \sqrt{30^2 + 31{,}42^2} = \sqrt{1\,887} \approx \SI{43,44}{\ohm} \]
+  Argument : $\varphi = \arctan(L\omega/R) = \arctan(31{,}42/30) \approx 46{,}3\,\text{\textdegree}$.
+  \item $I = U/Z = 230/43{,}44 \approx \SI{5,30}{\ampere}$. $\cos\varphi = R/Z = 30/43{,}44 \approx 0{,}691$.
+  \item $P = R \cdot I^2 = 30 \times 5{,}30^2 \approx \SI{841}{\watt}$ ; $Q = L\omega \cdot I^2 = 31{,}42 \times 5{,}30^2 \approx \SI{881}{\var}$ ; $S = U \cdot I = 230 \times 5{,}30 \approx \SI[group-minimum-digits=4]{1218}{\volt\ampere}$.
+  V\'erification : $\sqrt{P^2+Q^2} = \sqrt{841^2+881^2} = \sqrt{1\,483\,442} \approx \SI[group-minimum-digits=4]{1218}{\volt\ampere} = S$ \checkmark
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Avec $\cos\varphi = 0{,}691$, le r\'ecepteur appelle $I = \SI{5,30}{\ampere}$ alors que la m\^eme puissance active sous $\cos\varphi = 1$ n'exigerait que $841/230 \approx \SI{3,66}{\ampere}$, soit $45\,\%$ de courant en plus et des pertes Joule en ligne multipli\'ees par $1{,}45^2 \approx 2{,}1$. De plus $\tan\varphi = Q/P = 881/841 \approx 1{,}05$ d\'epasse tr\`es largement le seuil contractuel $\tan\varphi = 0{,}4$ ($\cos\varphi \approx 0{,}93$) au-del\`a duquel le distributeur facture l'\'energie r\'eactive : une compensation par condensateur en parall\`ele sur le r\'ecepteur est \`a pr\'evoir.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{2} \hfill\normalfont\footnotesize d'apr\`es 2014, \'Epreuve 1 (tronc commun), corrig\'e, questions 22 \`a 24 (pont Chaban-Delmas)}
+]
+\CAPETSHOW{
+La trav\'ee levante du pont Chaban-Delmas (Bordeaux) est entra\^in\'ee par un moteur asynchrone triphas\'e WEG de $\SI{132}{\kilo\watt}$ (document technique DT5), \`a $p = 3$ paires de p\^oles, aliment\'e sous $U = \SI{400}{\volt}$ -- $\SI{50}{\hertz}$ au travers d'un variateur de vitesse. Ses caract\'eristiques nominales sont $\cos\varphi = 0{,}86$, rendement $\eta = 94{,}4\,\%$ et fr\'equence de rotation $N' = \SI{980}{\tr\per\minute}$.
+
+Le couple de charge maximal support\'e par le moteur correspond \`a l'\'etat de vent descendant limite ultime (ELU) : $C_{\text{MElu}} = \SI[group-minimum-digits=4]{1479,7}{\newton\metre}$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.9, every node/.style={scale=0.9}]
+  % arrivee reseau triphase
+  \draw (0,0) node[left, align=right, font=\scriptsize]{R\'eseau triphas\'e\\$U = \SI{400}{\volt}$ ; $\SI{50}{\hertz}$} -- (1.3,0);
+  \draw (0.65,0.3) -- (0.95,-0.3);
+  \node[font=\scriptsize] at (1.1,0.38) {3};
+  % disjoncteur de depart
+  \draw (1.3,0) to[ncs] (2.7,0);
+  \node[font=\scriptsize, align=center] at (2.0,0.95) {Disjoncteur\\de d\'epart};
+  % variateur de vitesse
+  \node[draw, minimum width=1.9cm, minimum height=1.0cm, align=center, font=\scriptsize] (var) at (3.85,0) {Variateur\\de vitesse\\(DT6)};
+  \draw (2.7,0) -- (var.west);
+  % moteur asynchrone triphase
+  \node[draw, circle, minimum size=1.05cm, inner sep=0pt, align=center, font=\scriptsize] (mot) at (6.8,0) {$M$\\$3\sim$};
+  \draw (var.east) -- (mot.west);
+  \draw[-latex] (5.4,0.5) -- (6.2,0.5) node[midway, above, font=\scriptsize]{$I_n$};
+  \node[right, align=left, font=\scriptsize] at (7.5,0) {Moteur WEG $\SI{132}{\kilo\watt}$\\$\cos\varphi = 0{,}86$ ; $\eta = 94{,}4\,\%$\\$N' = \SI{980}{\tr\per\minute}$};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Calculer la fr\'equence de rotation $N_s$ du champ tournant, puis le glissement $g$ du moteur \`a $N' = \SI{980}{\tr\per\minute}$.
+  \item \`A partir du couple de charge maximal $C_{\text{MElu}}$, calculer la puissance utile $P_u$ que devra fournir ce moteur.
+  \item Exprimer litt\'eralement le courant $I_n$ absorb\'e par le moteur en fonction de $P_u$, $\eta$, $U$ et $\cos\varphi$, puis le calculer.
+  \item Le document technique DT6 propose le variateur Altivar 71 r\'ef. ATV71EXS5C16N4, caract\'eris\'e par $P_u$ max $= \SI{160}{\kilo\watt}$ et un courant fourni $I = \SI{314}{\ampere}$. Le cahier des charges pr\'ecise que \guillemotleft\ ce courant devra \^etre au moins \'egal au courant n\'ecessaire au moteur au moment du couple de charge maximum \guillemotright. Conclure quant au choix du variateur.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item
+  \[ N_s = \frac{f \times 60}{p} = \frac{50 \times 60}{3} = \SI[group-minimum-digits=4]{1000}{\tr\per\minute} \]
+  \[ g = \frac{N_s - N'}{N_s} = \frac{1\,000 - 980}{1\,000} = 0{,}02 = 2\,\% \]
+  \item La puissance utile est le produit du couple par la vitesse angulaire $\Omega = 2\pi N'/60$ :
+  \[ P_u = C_{\text{MElu}} \cdot \frac{2\pi N'}{60} = 1\,479{,}7 \times \frac{2\pi \times 980}{60} \approx \SI{151,9}{\kilo\watt} \]
+  Cette puissance d\'epasse la puissance nominale de plaque ($\SI{132}{\kilo\watt}$) : le point ELU est un r\'egime de surcharge transitoire, ce qui est admissible pour un moteur dont le rapport $C_m/C_n$ vaut $200\,\%$.
+  \item La puissance absorb\'ee au r\'eseau v\'erifie $P_{absorb\acute{e}e} = P_u/\eta = \sqrt{3}\,U\,I_n\,\cos\varphi$, d'o\`u :
+  \[ I_n = \frac{P_u}{\eta \cdot \sqrt{3} \cdot U \cdot \cos\varphi} \]
+  \[ I_n = \frac{151{,}9 \times 10^3}{0{,}944 \times \sqrt{3} \times 400 \times 0{,}86} = \frac{151\,900}{562{,}4} \approx \SI{270,1}{\ampere} \]
+  \item Le variateur ATV71EXS5C16N4 fournit $I = \SI{314}{\ampere}$, sup\'erieur au courant $I_n = \SI{270,1}{\ampere}$ n\'ecessaire au moteur au couple de charge maximal ; sa puissance $\SI{160}{\kilo\watt}$ couvre \'egalement les $\SI{151,9}{\kilo\watt}$ demand\'es.
+
+  \textbf{Conclusion.} Avec une marge de $16\,\%$ sur le courant ($314/270{,}1 \approx 1{,}16$), le variateur ATV71EXS5C16N4 satisfait l'exigence du cahier des charges m\^eme dans l'\'etat de vent descendant limite ultime : le choix du constructeur est valid\'e.
+\end{enumerate}
+
+\smallskip
+\textit{Point de vigilance jury (rapport de jury CAPET 2018, commentaires sur la quatri\`eme partie de l'\'epreuve d'admissibilit\'e) : \guillemotleft\ La notion de rendement est parfois mal utilis\'ee. \guillemotright\ \textbf{Conseil de m\'ethode :} partir de la puissance \textbf{utile} $P_u$ et placer explicitement $\eta$ au \textbf{d\'enominateur} ($P_{absorb\acute{e}e} = P_u/\eta > P_u$) ; oublier le rendement sous-estime $I_n$ et conduit \`a sous-dimensionner le variateur et les protections.}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize d'apr\`es 2017, \'Epreuve 2, corrig\'e, questions B1.3, B2.2 et B2.3 (installation SPA)}
+]
+\CAPETSHOW{
+Un SPA est aliment\'e par un r\'eseau triphas\'e $\SI{400}{\volt}$ (tension simple $V = \SI{230}{\volt}$). Il comporte trois r\'ecepteurs monophas\'es r\'epartis sur les trois phases :
+\begin{itemize}[leftmargin=1.5em]
+  \item un r\'echauffeur sur la phase 1 : $P_R = \SI{3}{\kilo\watt}$, $\cos\varphi_R = 1$ ;
+  \item deux pompes d'hydromassage, une sur la phase 2 et une sur la phase 3 : $P_{PH} = \SI{2,25}{\kilo\watt}$ chacune, $\cos\varphi_{PH} = 0{,}86$ ;
+  \item une pompe de circulation sur la phase 1 : $P_{PC} = \SI{0,26}{\kilo\watt}$, $\cos\varphi_{PC} = 0{,}8$.
+\end{itemize}
+L'installation dispose d'un abonnement triphas\'e actuel de $\SI{18}{\kilo\volt\ampere}$, pour une consommation existante (hors SPA) de $\SI{16}{\kilo\watt}$ suppos\'ee \'equilibr\'ee sur les trois phases.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.72, every node/.style={scale=0.8}]
+  % rails de phase
+  \draw (0,5.8) node[above]{$L_1$} -- (0,5.0);
+  \draw (0,5.0) -- (2.9,5.0);
+  \node[circ] at (0,5.0) {};
+  \draw (6.0,5.8) node[above]{$L_2$} -- (6.0,5.0);
+  \draw (9.1,5.8) node[above]{$L_3$} -- (9.1,5.0);
+  % conducteur neutre
+  \draw (-1.4,0) -- (10.4,0) node[right]{$N$};
+  % tension simple entre L1 et N
+  \draw[-latex] (-1.1,0.15) -- (-1.1,4.85);
+  \node[left, font=\scriptsize] at (-1.2,2.5) {$V = \SI{230}{\volt}$};
+  % phase 1 : rechauffeur, resistif pur
+  \draw (0,5.0) -- (0,4.4) to[R, l=$P_R$] (0,2.4) -- (0,0);
+  \draw[-latex] (-0.3,4.75) -- (-0.3,4.15);
+  \node[left, font=\scriptsize] at (-0.34,4.45) {$I_R$};
+  \node[circ] at (0,0) {};
+  \node[right, font=\scriptsize] at (0.35,1.6) {$\cos\varphi_R = 1$};
+  % phase 1 : pompe de circulation, dipole R-L
+  \draw (2.9,5.0) -- (2.9,4.4) to[R] (2.9,3.1) to[cute inductor] (2.9,1.7) -- (2.9,0);
+  \draw[-latex] (2.6,4.75) -- (2.6,4.15);
+  \node[left, font=\scriptsize] at (2.56,4.45) {$I_{PC}$};
+  \node[circ] at (2.9,0) {};
+  \node[right, font=\scriptsize, align=left] at (3.25,2.4) {$P_{PC}$\\$\cos\varphi_{PC} = 0{,}8$};
+  % phase 2 : pompe d'hydromassage, dipole R-L
+  \draw (6.0,5.0) -- (6.0,4.4) to[R] (6.0,3.1) to[cute inductor] (6.0,1.7) -- (6.0,0);
+  \draw[-latex] (5.7,4.75) -- (5.7,4.15);
+  \node[left, font=\scriptsize] at (5.66,4.45) {$I_{PH}$};
+  \node[circ] at (6.0,0) {};
+  \node[right, font=\scriptsize, align=left] at (6.35,2.4) {$P_{PH}$\\$\cos\varphi_{PH} = 0{,}86$};
+  % phase 3 : pompe d'hydromassage, dipole R-L
+  \draw (9.1,5.0) -- (9.1,4.4) to[R] (9.1,3.1) to[cute inductor] (9.1,1.7) -- (9.1,0);
+  \draw[-latex] (8.8,4.75) -- (8.8,4.15);
+  \node[left, font=\scriptsize] at (8.76,4.45) {$I_{PH}$};
+  \node[circ] at (9.1,0) {};
+  \node[right, font=\scriptsize, align=left] at (9.45,2.4) {$P_{PH}$\\$\cos\varphi_{PH} = 0{,}86$};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Calculer le courant efficace absorb\'e par chacun des trois r\'ecepteurs.
+  \item Identifier la configuration de fonctionnement simultan\'e la plus contraignante en termes de puissance sur une phase, et calculer la puissance mise en jeu sur cette phase.
+  \item Un abonnement triphas\'e est n\'ecessairement \'equilibr\'e sur les trois phases. En d\'eduire la puissance suppl\'ementaire \`a souscrire, la nouvelle puissance totale, puis le nouvel abonnement n\'ecessaire (paliers disponibles : 6, 9, 12, 18, 24, 30, 36 kVA).
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Sous tension simple $V = \SI{230}{\volt}$ :
+  \[ I_R = \frac{P_R}{V \cdot \cos\varphi_R} = \frac{3\,000}{230 \times 1} \approx \SI{13,05}{\ampere} \]
+  \[ I_{PH} = \frac{P_{PH}}{V \cdot \cos\varphi_{PH}} = \frac{2\,250}{230 \times 0{,}86} \approx \SI{11,37}{\ampere} \]
+  \[ I_{PC} = \frac{P_{PC}}{V \cdot \cos\varphi_{PC}} = \frac{260}{230 \times 0{,}8} \approx \SI{1,41}{\ampere} \]
+  \item Le r\'echauffeur et la pompe de circulation sont tous deux sur la phase 1 : leur fonctionnement simultan\'e est le cas le plus contraignant.
+  \[ P_{phase\,1} = P_R + P_{PC} = 3\,000 + 260 = \SI[group-minimum-digits=4]{3260}{\watt} = \SI{3,26}{\kilo\watt} \]
+  \item Un abonnement triphas\'e \'etant \'equilibr\'e, la puissance suppl\'ementaire \`a pr\'evoir sur les trois phases correspond \`a trois fois la puissance de la phase la plus charg\'ee :
+  \[ P_{suppl\acute{e}mentaire} = 3 \times P_{phase\,1} = 3 \times 3{,}26 = \SI{9,78}{\kilo\watt} \]
+  \[ P_{totale} = P_{actuelle} + P_{suppl\acute{e}mentaire} = 16 + 9{,}78 = \SI{25,78}{\kilo\watt} \]
+  En arrondissant au palier disponible imm\'ediatement sup\'erieur : nouvel abonnement de \textbf{30 kVA} (l'abonnement actuel de 18 kVA est insuffisant, et le palier 24 kVA ne couvrirait pas les 25,78 kW).
+\end{enumerate}
+
+\smallskip
+\textit{\textbf{Conseil de m\'ethode :} un abonnement triphas\'e est souscrit en kVA \'equilibr\'e ; pour int\'egrer une charge monophas\'ee d\'es\'equilibr\'ee, il faut convertir la puissance de la phase la plus charg\'ee en \'equivalent triphas\'e (multiplication par 3), et non l'ajouter directement \`a la puissance existante sans ce facteur.}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize d'apr\`es 2018, \'Epreuve 2 et rapport de jury, questions 7 \`a 9 (r\'egulateurs d'\'eclairage public)}
+]
+\CAPETSHOW{
+Deux r\'egulateurs d'\'eclairage public, LUBIO\textregistered\ et COMPACTO~II\textregistered, sont compar\'es en mode nominal. Les mesures donnent, pour le LUBIO\textregistered : $P = \SI[group-minimum-digits=4]{1930}{\watt}$, $S = \SI[group-minimum-digits=4]{2720}{\volt\ampere}$, $\cos\varphi = 0{,}75$ (facteur de d\'eplacement) ; pour le COMPACTO~II\textregistered\ : $P = \SI[group-minimum-digits=4]{1900}{\watt}$, $S = \SI[group-minimum-digits=4]{1980}{\volt\ampere}$, $\cos\varphi = 1$.
+
+\begin{center}
+\begin{tikzpicture}[scale=0.85, >=Stealth]
+  \draw[-latex] (0,0) -- (8.5,0) node[right]{$t$};
+  \draw[-latex] (0,-1.8) -- (0,1.8) node[above]{$i(t)$};
+  \draw[dashed, gray] plot[smooth] coordinates {(0,0) (1,1.3) (2,0) (3,-1.3) (4,0) (5,1.3) (6,0) (7,-1.3) (8,0)};
+  \node[gray] at (1.6,1.55) {\footnotesize sinuso\"ide pure};
+  \draw[thick] (0,0) -- (0.4,1.1) -- (1.6,1.1) -- (2,0) -- (2.4,-1.1) -- (3.6,-1.1) -- (4,0) -- (4.4,1.1) -- (5.6,1.1) -- (6,0) -- (6.4,-1.1) -- (7.6,-1.1) -- (8,0);
+  \node[anchor=east] at (8.4,-1.6) {\footnotesize courant d\'eform\'e (riche en harmoniques)};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Rappeler la d\'efinition du facteur de puissance $F_P$ et celle du facteur de d\'eplacement $\cos\varphi$ (d\'ephasage du fondamental). Expliquer pourquoi $\cos\varphi = 1$ pour le COMPACTO~II\textregistered\ n'implique pas n\'ecessairement $F_P = 1$.
+  \item Pour le LUBIO\textregistered, calculer la puissance r\'eactive du fondamental $Q_1 = P\tan\varphi$, puis la puissance d\'eformante $D = \sqrt{S^2 - P^2 - Q_1^2}$.
+  \item Faire de m\^eme pour le COMPACTO~II\textregistered\ (avec $\cos\varphi = 1$), puis calculer son facteur de puissance $F_P = P/S$.
+  \item Conclure sur la qualit\'e de l'\'energie absorb\'ee par chacun des deux r\'egulateurs.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item $F_P = P/S$ tient compte de \textbf{toute} la puissance apparente, y compris la contribution des harmoniques (puissance d\'eformante $D$). $\cos\varphi$ ne caract\'erise que le d\'ephasage entre le fondamental de $i(t)$ et $u(t)$. En pr\'esence d'harmoniques, $S > S_1$ (puissance apparente du seul fondamental), donc m\^eme si $\cos\varphi = 1$ (fondamental en phase avec la tension, $Q_1 = 0$), $F_P$ peut rester inf\'erieur \`a 1 \`a cause de $D \neq 0$.
+  \item $\varphi = \arccos(0{,}75) \approx 41{,}4\,\text{\textdegree}$, $\tan\varphi \approx 0{,}882$.
+  \[ Q_1 = 1\,930 \times 0{,}882 \approx \SI[group-minimum-digits=4]{1702}{\var} \]
+  \[ D = \sqrt{2\,720^2 - 1\,930^2 - 1\,702^2} = \sqrt{776\,696} \approx \SI{881}{\vad} \]
+  \item Pour le COMPACTO~II\textregistered, $\cos\varphi = 1 \Rightarrow \varphi = 0 \Rightarrow Q_1 = 0$.
+  \[ D = \sqrt{1\,980^2 - 1\,900^2 - 0^2} = \sqrt{310\,400} \approx \SI{557}{\vad} \]
+  \[ F_P = \frac{P}{S} = \frac{1\,900}{1\,980} \approx 0{,}96 \]
+  \item Bien que le COMPACTO~II\textregistered\ ait un facteur de d\'eplacement id\'eal ($\cos\varphi = 1$), sa puissance d\'eformante $D = \SI{557}{\vad}$ (li\'ee au THD) fait chuter son $F_P$ \`a $0{,}96$ seulement. Il reste n\'eanmoins nettement meilleur que le LUBIO\textregistered\ ($F_P = 1\,930/2\,720 \approx 0{,}71$), qui cumule un mauvais facteur de d\'eplacement \textbf{et} une puissance d\'eformante importante : il absorbe davantage de courant pour une m\^eme puissance active consomm\'ee.
+\end{enumerate}
+
+\smallskip
+\textit{Point de vigilance jury (rapport de jury CAPET 2018, \'el\'ements de correction de la question 9, option ing\'enierie \'electrique) : \guillemotleft\ Le COMPACTO~II\textregistered\ poss\`ede un facteur de puissance et un facteur de d\'eplacement (cos $\varphi$) nettement meilleurs que le LUBIO\textregistered. Il absorbe moins de courant pour une m\^eme puissance consomm\'ee \guillemotright\ -- la confusion entre les deux grandeurs $F_P$ et $\cos\varphi$ est un pi\`ege classique relev\'e par le jury.}
+}
+\end{tcolorbox}
+
+% Exercice 5 : lecture de document technique.
+% SOURCE SUJET (E2_Sujet_2018.md) : l.251 "ampoules SHP SON T PIA Plus 150 W, facteur de
+%   puissance 0,84, amorceurs Pa = 50 W" ; l.246 "46 luminaires repartis de maniere equilibree
+%   sur les 3 regulateurs" ; l.240 "reseau triphase 3P+N 400 V 50 Hz" ; l.255-259 questions
+%   13, 14 et 15 (libelles exacts) ; DRS 4 l.660-672 table "Tensions et Puissances pour le
+%   COMPACTO II" (3/4/6/9/12 kVA mono ; 14/17/26/40/53 A) ; DRS 4 l.734-740 designations
+%   VEMC / VETC / VETCS et codes de puissance 003/012/036...
+% SOURCE CORRIGE (Rapport_Jury_2018.md) : l.2212 "15 luminaires consomment 3020 W, donc
+%   1 luminaire consomme 3020/15 = 201,3 W" (valeur du releve DRS 5, dont l'image est omise
+%   par la conversion Markdown) ; l.2222-2224 "Le modele : VETC ... La puissance de 12 kVA
+%   ... realisee a partir de 3 COMPACTO II mono 4 kVA" ; l.2506 citation jury verbatim.
+% RECONSTITUE : la mise en forme tabulaire de l'extrait DRS 5 (l'image du releve n'est pas
+%   convertie) ; seule la valeur 3020 W pour 15 luminaires, textuellement presente dans le
+%   corrige officiel, y est portee. Les colonnes de la table DRS 4 sont recopiees telles quelles.
+% ECART ASSUME : le corrige officiel calcule Q1L avec cos phi = 0,86 alors que l'enonce du
+%   sujet impose 0,84 (incoherence interne du sujet). On retient 0,84, valeur de l'enonce ;
+%   le choix final (VETC 012, 3 x 4 kVA) est inchange.
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize d'apr\`es 2018, \'Epreuve 2, questions 13 \`a 15 (\'eclairage public, rue des f\^etes)}
+]
+\CAPETSHOW{
+La r\'enovation de l'\'eclairage public de la rue des f\^etes doit \^etre \'equip\'ee d'un r\'egulateur abaisseur de tension de la gamme COMPACTO~II\textregistered. Le cahier des charges pr\'ecise :
+\begin{itemize}[leftmargin=1.5em]
+  \item r\'eseau \'electrique d'alimentation triphas\'e 3~P~+~N $\SI{400}{\volt}$ -- $\SI{50}{\hertz}$ ;
+  \item \textbf{46 luminaires} r\'epartis de mani\`ere \'equilibr\'ee sur les 3 r\'egulateurs assurant l'alimentation triphas\'ee des cand\'elabres ;
+  \item ampoules de type SHP SON~T~PIA~Plus $\SI{150}{\watt}$ avec un facteur de puissance de $0{,}84$, associ\'ees \`a des amorceurs (un par ampoule) d'une puissance $P_a = \SI{50}{\watt}$.
+\end{itemize}
+
+\begin{tcolorbox}[docTech, title={Document technique DRS 5 -- rel\'ev\'e de la consommation sur 15 luminaires (ensemble lampe + amorceur)}]
+\centering\small
+\begin{tabular}{@{}lc@{}}
+\toprule
+\textbf{Grandeur relev\'ee au r\'eseau} & \textbf{Valeur} \\
+\midrule
+Nombre de luminaires du banc de mesure & 15 \\
+Puissance active totale absorb\'ee $P_{15}$ & $\SI[group-minimum-digits=4]{3020}{\watt}$ \\
+\bottomrule
+\end{tabular}
+\end{tcolorbox}
+
+\begin{tcolorbox}[docTech, title={Document technique DRS 4 -- gamme COMPACTO~II\textregistered\ : tensions, puissances et d\'esignation}]
+\centering\small
+\begin{tabular}{@{}llccccc@{}}
+\toprule
+\textbf{Monophas\'e} & (kVA) & 3 & 4 & 6 & 9 & 12 \\
+230--240 V & (A) & 14 & 17 & 26 & 40 & 53 \\
+\midrule
+\textbf{Triphas\'e} & (kVA) & 9 & 12 & 18 & 27 & 36 \\
+400--410 V & (A) & 14 & 17 & 26 & 40 & 53 \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\raggedright\footnotesize
+\textbf{Informations de commande} \quad \texttt{V E M C - 0 0 3 - A - 1 A 1 A - 230 - S}
+
+\textbf{Mod\`ele} \quad \texttt{VEMC} : Variateur \'Electronique Monophas\'e Compacto. \quad
+\texttt{VETC} : Variateur \'Electronique Triphas\'e Compacto (pour 4,5 \& 6 kVA -- 120/210 V \emph{ou} 9 \& 12 kVA -- 230/400 V). \quad
+\texttt{VETCS} : Variateur \'Electronique Triphas\'e Compacto S\'erie (pour puissances $\geq \SI{54}{\kilo\volt\ampere}$).
+
+\textbf{Puissances} \quad \texttt{003} : $1\times\SI{3}{\kilo\volt\ampere}$ sur une phase \quad
+\texttt{006} : $1\times\SI{6}{\kilo\volt\ampere}$ \quad
+\texttt{012} : $1\times\SI{12}{\kilo\volt\ampere}$ \quad
+\texttt{018} : $3\times\SI{6}{\kilo\volt\ampere}$ par phase \quad
+\texttt{027} : $3\times\SI{9}{\kilo\volt\ampere}$ par phase \quad
+\texttt{036} : $3\times\SI{12}{\kilo\volt\ampere}$ par phase.
+
+\textbf{Couplage} \quad \texttt{S} : \'etoile (montage entre le neutre et une phase). \quad
+\texttt{D} : triangle (absence de neutre -- montage entre 2 phases).
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever sur le document technique DRS 5} la puissance active absorb\'ee par le banc de mesure et le nombre de luminaires correspondant ; en d\'eduire la puissance active $P_{1L}$ d'\emph{un} luminaire. Confronter cette valeur aux donn\'ees th\'eoriques du cahier des charges (lampe + amorceur).
+  \item D\'eterminer la puissance r\'eactive $Q_{1L}$ puis la puissance apparente $S_{1L}$ d'un luminaire.
+  \item Calculer la puissance apparente $S_{TL}$ qui caract\'erise la totalit\'e des luminaires de la zone, puis la puissance apparente vue par \emph{chaque} r\'egulateur monophas\'e.
+  \item \`A l'aide du document DRS 4, choisir le \textbf{mod\`ele} et la \textbf{puissance} du variateur \'electronique. Justifier les deux choix, et v\'erifier la compatibilit\'e en courant.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Extraction du DRS 5} : le rel\'ev\'e porte sur $15$ luminaires et indique $P_{15} = \SI[group-minimum-digits=4]{3020}{\watt}$. D'o\`u, par luminaire :
+  \[ P_{1L} = \frac{P_{15}}{15} = \frac{3\,020}{15} \approx \SI{201,3}{\watt} \]
+  Confrontation aux donn\'ees th\'eoriques : lampe $\SI{150}{\watt}$ + amorceur $P_a = \SI{50}{\watt}$, soit $\SI{200}{\watt}$ attendus. L'\'ecart est de $1{,}3/200 \approx 0{,}7\,\%$ : le rel\'ev\'e \textbf{confirme} la valeur de plaque, le dimensionnement peut se poursuivre sur la valeur mesur\'ee.
+  \item Le facteur de puissance impos\'e par le cahier des charges vaut $\cos\varphi = 0{,}84$, d'o\`u $\tan\varphi = \sqrt{1-0{,}84^2}/0{,}84 \approx 0{,}646$ :
+  \[ Q_{1L} = P_{1L}\tan\varphi = 201{,}3 \times 0{,}646 \approx \SI{130,0}{\var} \]
+  \[ S_{1L} = \sqrt{P_{1L}^2 + Q_{1L}^2} = \sqrt{201{,}3^2 + 130{,}0^2} = \sqrt{57\,422} \approx \SI{239,7}{\volt\ampere} \]
+  (contr\^ole imm\'ediat : $S_{1L} = P_{1L}/\cos\varphi = 201{,}3/0{,}84 \approx \SI{239,7}{\volt\ampere}$ \checkmark).
+  \item Les 46 luminaires sont identiques et r\'epartis de mani\`ere \'equilibr\'ee ; leurs $\cos\varphi$ \'etant tous \'egaux, leurs puissances apparentes s'ajoutent ici directement :
+  \[ S_{TL} = 46 \times S_{1L} = 46 \times 239{,}7 \approx \SI[group-minimum-digits=4]{11025}{\volt\ampere} \approx \SI{11,03}{\kilo\volt\ampere} \]
+  R\'epartition \'equilibr\'ee sur les 3 r\'egulateurs monophas\'es :
+  \[ S_{1\varphi} = \frac{S_{TL}}{3} = \frac{11\,025}{3} \approx \SI{3,68}{\kilo\volt\ampere} \text{ par phase} \]
+  \item \textbf{Mod\`ele} : les cand\'elabres sont aliment\'es par un r\'eseau \textbf{triphas\'e} $\SI{400}{\volt}$ ; d'apr\`es les informations de commande du DRS 4, le mod\`ele est donc un \texttt{VETC} (Variateur \'Electronique Triphas\'e Compacto), et non un \texttt{VEMC} monophas\'e. La puissance restant tr\`es inf\'erieure \`a $\SI{54}{\kilo\volt\ampere}$, le \texttt{VETCS} s\'erie est \'ecart\'e.
+
+  \textbf{Puissance} : chaque phase demande $\SI{3,68}{\kilo\volt\ampere}$ ; dans la ligne monophas\'ee du tableau, le palier de $\SI{3}{\kilo\volt\ampere}$ est insuffisant, le palier retenu est donc $\SI{4}{\kilo\volt\ampere}$ par phase. L'ensemble triphas\'e vaut $3 \times 4 = \SI{12}{\kilo\volt\ampere} > S_{TL} = \SI{11,03}{\kilo\volt\ampere}$, ce qui correspond \`a un \texttt{VETC} de $\SI{12}{\kilo\volt\ampere}$ (couplage \texttt{S}, \'etoile, le neutre \'etant distribu\'e).
+
+  \textbf{V\'erification en courant} : chaque module monophas\'e $\SI{4}{\kilo\volt\ampere}$ admet $\SI{17}{\ampere}$ (DRS 4), alors que le courant r\'eellement appel\'e par phase vaut
+  \[ I_{1\varphi} = \frac{S_{1\varphi}}{V} = \frac{3\,675}{230} \approx \SI{15,98}{\ampere} < \SI{17}{\ampere} \quad\checkmark \]
+
+  \textbf{Conclusion.} Le r\'egulateur \texttt{VETC} de $\SI{12}{\kilo\volt\ampere}$, r\'ealis\'e \`a partir de trois COMPACTO~II\textregistered\ monophas\'es de $\SI{4}{\kilo\volt\ampere}$, couvre les $\SI{11,03}{\kilo\volt\ampere}$ demand\'es avec une marge de $9\,\%$ en puissance et de $6\,\%$ en courant : il satisfait l'exigence du cahier des charges sur l'alimentation des 46 luminaires de la rue des f\^etes.
+\end{enumerate}
+
+\smallskip
+\textit{Point de vigilance jury (rapport de jury CAPET 2018, commentaires sur la partie C -- choix des mat\'eriels, questions 13 \`a 15) : \guillemotleft\ Pour les questions 13, 14 et 15 consacr\'ees au choix du r\'egulateur, un nombre important de candidats ne fait pas le lien entre ces questions, travaille sur 15 luminaires au lieu de 1 comme demand\'e et confond les facteurs de puissance et de d\'eplacement. Le type de r\'egulateur (VETC) est rarement identifi\'e. \guillemotright\ \textbf{Conseil de m\'ethode :} redescendre imm\'ediatement au \textbf{luminaire unitaire} d\`es la lecture du document technique, puis remonter par $\times 46$ ; et lire la \emph{d\'esignation} du produit (VEMC/VETC) autant que sa puissance -- le jury pr\'ecise par ailleurs que \guillemotleft\ les r\'ef\'erences compl\`etes ne justifient pas le choix \guillemotright, c'est le crit\`ere (r\'eseau triphas\'e, $S_{TL}$, courant admissible) qui doit appara\^itre.}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

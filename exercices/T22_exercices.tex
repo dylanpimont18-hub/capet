@@ -1,0 +1,804 @@
+% T22 -- CAN/CNA, num\'erisation et \'echantillonnage -- banque d'exercices
+%
+% COMPL\'EMENTARIT\'E AVEC LA FICHE fiches/T22_CAN_CNA_Numerisation.tex
+% Les trois Questions Types de la fiche sont :
+%   QT1 = 2013 E1 (tour de laboratoire), questions 42 et 43 : plage -50/+50 degC,
+%         pr\'ecision 0,1 degC, 0-10 V, nombre de bits + mot hexa 732_16 pour theta = -5 degC.
+%         (\'Enonc\'e authentique : 2013/E1_Sujet_2013_commun_SII.md l.507-509.)
+%   QT2 = 2026 E2 (BAC+3), question B11 : sensibilit\'e S = 2,684 LSB/degC du CAN 8 bits
+%         ADS7029-Q1 et mot num\'erique N_C pour T_C = 55 degC.
+%         C'est la QT explicitement signal\'ee par le CLAUDE.md du projet comme ayant \'et\'e
+%         corrig\'ee lors de l'audit 2026-08-24 : elle N'EST PAS reprise ici.
+%   QT3 = 2026 E2 (BAC+3), question B17 : th\'eor\`eme de Shannon + r\^ole et fr\'equence de
+%         coupure du filtre anti-repliement.
+% AUCUN des exercices ci-dessous ne refait ce travail intellectuel :
+%   - le sujet 2013 n'est pas utilis\'e du tout ;
+%   - du sujet 2026 on n'exploite QUE les questions B10, B12 (lecture datasheet + erreur de
+%     quantification) et B13/B15/B16 (p\'eriode d'\'echantillonnage, E/B, temps de conversion) ;
+%     la sensibilit\'e S et l'\'enonc\'e de Shannon ne sont jamais redemand\'es ;
+%   - le raisonnement "Shannon -> f_c = f_e/2" de la QT3 n'appara\^it nulle part : l'exercice 4
+%     porte sur le crit\`ere de dynamique de boucle (10 \'echantillons dans le r\'egime
+%     transitoire), qui est un crit\`ere DIFF\'ERENT et ind\'ependant de Shannon.
+%
+% SOURCES (toutes relues dans les .md de conversion Marker, chemin racine
+%  docs/CAPET_Markdown-20260629T134311Z-3-001/CAPET_Markdown/docs/CAPET_SII_IE/06_PDFs_Originaux) :
+%
+%   - Ex. 1 : 2022, "\'EPREUVE \'ECRITE DISCIPLINAIRE" (E2_Disciplinaire_IE_2022.md l.20 pour
+%     le libell\'e exact de l'\'epreuve), questions 23 et 24.
+%     \'Enonc\'e : l.453-457 (PIC, ADC0/ADC1/ADC2, seuil diodes 0,6 V), l.455 ("La tension de
+%     r\'ef\'erence du Convertisseur Analogique Num\'erique est \'egale \`a 3,5 V"),
+%     l.458-468 (questions 23 et 24 mot pour mot), l.522 ("CAN 12 bits et sa tension de
+%     r\'ef\'erence de 3,5V" -- confirme la r\'esolution, le document DT D3 \'etant une image).
+%     CORRIG\'E OFFICIEL : Rapport_Jury_2022.md l.303-319 :
+%       * "C'est un convertisseur 12 bits", 16 entr\'ees AN0..AN15, multiplexage par CHS3:CHS0 ;
+%       * "Quantum = (vREF+ - vREF-)/(2^12 - 1) = (3,5-0)/4095 = 0,85 mV / LSB" ;
+%       * U_Peltier = 2 V -> ADC2 = 1 V (pont diviseur R4/R5) -> N = 1/q = 1170 ;
+%       * N = 175 -> ADC2 = 175*3,5/4095 = 0,15 V -> U_Peltier = 0,3 V, "donc inf\'erieure au
+%         0,4V minimum impos\'e sur le diagramme des exigences".
+%     RECALCUL\'E : 3,5/4095 = 0,854 7 mV ; 1/0,000 854 7 = 1 170,0 ; 175*3,5/4095 = 0,149 6 V ;
+%     x2 = 0,299 V. Tout concorde avec le rapport.
+%     CONVENTION : le corrig\'e officiel 2022 utilise explicitement 2^n - 1.
+%
+%   - Ex. 2 : 2023, "\'EPREUVE \'ECRITE DSICIPLINAIRE" [sic, coquille du sujet lui-m\^eme,
+%     E1_Sujet_2023.md l.11], questions D2 et D3. \'Enonc\'e : l.361-369 (codeur incr\'emental
+%     0,15 mm/impulsion, excursion 680 mm, compteur \`a 0 v\'erin rentr\'e, pr\'ecision requise
+%     5 mm, "ne retenant que les 8 bits de poids fort").
+%     PAS de corrig\'e officiel disponible (aucun Rapport_Jury_2023 dans le corpus) :
+%     TOUT EST RECALCUL\'E ICI, deux fois.
+%       680/0,15 = 4 533,3 -> code max entier 4 533 ; 2^12 = 4 096 < 4 534 donc n = 13 bits ;
+%       4 533 = 1 0001 1011 0101_2 ; garder les 8 MSB d'un mot de 13 bits = supprimer 5 LSB,
+%       soit un facteur 2^5 = 32 -> pr\'ecision 0,15 x 32 = 4,8 mm < 5 mm (exigence satisfaite) ;
+%       octet = 4533 >> 5 = 141 = 1000 1101_2 = 8D_16 ; 141 x 32 x 0,15 = 676,8 mm.
+%
+%   - Ex. 3 (docTech) : 2026, "ADMISSIBILIT\'E : \'EPREUVE 2" du CAPET (BAC + 3), option
+%     Ing\'enierie \'electrique (E2_Sujet_2026_BAC3.md l.16-20 pour le libell\'e exact),
+%     questions B10 et B12. \'Enonc\'e : l.417 (CAN ADS7029-Q1, documentation DTB4),
+%     l.419-425 (question B10 : grandeur pleine \'echelle, r\'esolution, quantum),
+%     l.429 (question B12 : erreur de quantification maximale -> erreur de mesure de T),
+%     l.395 (plage de tension de 3 V, v_A = c.T), l.339-345 (cahier des charges :
+%     \'etendue -5 degC \`a 90 degC, erreur de mesure < 1 degC),
+%     l.636-644 (DTB5 : courbe en escalier, quantification centr\'ee, erreur en dents de scie
+%     "comprise entre - q/2 et q/2").
+%     ATTENTION : le document technique DTB4 est une IMAGE dans le PDF source, son texte n'est
+%     pas dans la conversion Marker. L'encadr\'e docTech de l'exercice 3 est donc reconstitu\'e
+%     \`a partir de la DATASHEET CONSTRUCTEUR R\'EELLE, v\'erifi\'ee par t\'el\'echargement :
+%     Texas Instruments SBAS811 (janvier 2017), "ADS7029-Q1 Small-Size, Low-Power, 8-Bit,
+%     2-MSPS, SAR ADC", https://www.ti.com/lit/ds/symlink/ads7029-q1.pdf
+%       * titre p.1 : "8-Bit, 2-MSPS, SAR ADC" ; features : "+/-0.2 LSB DNL; +/-0.25 LSB INL" ;
+%       * \S6.5 Electrical Characteristics : Resolution 8 Bits ; Full-scale input voltage span
+%         0 \`a AVDD ; AVDD 2,35 V \`a 3,6 V ; INL typ +/-0,25 LSB max +/-0,5 LSB ;
+%         DNL typ +/-0,2 LSB max +/-0,4 LSB ; offset error +/-0,5 LSB ; gain error +/-0,2 %FS ;
+%         t_ACQ 120 ns ; throughput 2 MHz ;
+%       * \S6.7 Switching Characteristics : throughput 2 MSPS, cycle time 0,5 us ;
+%       * \S8.3.3 ADC Transfer Function : "1 LSB = VREF / 2^N", VREF = AVDD, N = 8.
+%     -> LA DATASHEET ELLE-M\^EME RETIENT LA CONVENTION 2^n. C'est celle qu'on adopte dans
+%     l'exercice 3, en signalant explicitement l'\'ecart avec 2^n - 1 (et donc avec la valeur
+%     S = 2,684 LSB/degC de la question B11, qui n'est pas redemand\'ee ici).
+%     Aucun Rapport_Jury_2026 n'existe dans le corpus : pas de corrig\'e officiel, tout recalcul\'e.
+%
+%   - Ex. 4 : 2026, m\^eme \'epreuve, questions B13, B14, B15 et B16. \'Enonc\'e : l.447-451
+%     (syst\`eme du 1er ordre tau = 0,9 s, K = 4 degC/V, capteur K_c = 0,0316 V/degC),
+%     l.458-472 ("Le constructeur d\'esire obtenir au moins 10 \'echantillons au cours du
+%     r\'egime transitoire", B13 ; B14 r\^ole de l'E/B + sch\'ema d'un bloqueur d'ordre z\'ero ;
+%     "la p\'eriode d'\'echantillonnage retenue par la suite est donn\'ee par T2 = 0,25 s" ;
+%     B15 allures de u_R*(t) et u_RB(t) ; B16 temps de conversion maximal).
+%     Le document r\'eponse DRB1 (l.694-700) gradue u_R de 0 \`a 0,126 4 V par pas de
+%     0,031 6 V sur 0 \`a 4,5 s -- coh\'erent avec un premier ordre de gain statique 0,126 4 V
+%     (= 4 degC x 0,031 6 V/degC) et de constante de temps 0,9 s.
+%     RECALCUL\'E : t_R5% = 3.tau = 2,7 s ; T_e <= 2,7/10 = 0,27 s ; f_min = 1/0,27 = 3,7 Hz ;
+%     avec T_2 = 0,25 s, T_conv <= 0,25 s ; le CAN convertit en 0,5 us (2 MSPS), soit un
+%     rapport de 5.10^5.
+%     \'Echantillons du chronogramme (u_R(k.T_2) = 0,1264.(1 - exp(-k.0,25/0,9)), en mV) :
+%       k=1..11 -> 30,7 / 53,9 / 71,5 / 84,8 / 94,9 / 102,5 / 108,3 / 112,7 / 116,0 / 118,5 / 120,5
+%     (une premi\`ere r\'edaction portait 32,0 / 56,3 / 74,7 ... : valeurs FAUSSES, correspondant
+%      \`a tau = 0,8 s. Corrig\'ees dans le tableau ET dans les coordonn\'ees du trac\'e TikZ.)
+%
+%   - Ex. 5 : 2025, "\'EPREUVE \'ECRITE DISCIPLINAIRE APPLIQU\'EE" (E2_Appliquee_Commune_2025.md
+%     l.19 pour le libell\'e exact), questions 23, 26 et 27. \'Enonc\'e : l.376 (d\'ebattement
+%     288 deg, commandes cod\'ees sur 24 bits, "Montrer que la pr\'ecision du positionnement
+%     angulaire du bras delta-theta est \'egale \`a 1.72.10^-5 deg"), l.390-394 (tension image
+%     -5 V / +5 V, d\'efinition de delta-v, "Le capteur est consid\'er\'e comme suffisamment
+%     pr\'ecis si son erreur de quantification q est 10 fois plus petite que la variation de
+%     tension entre deux positions angulaires commandables du moteur delta-v", question 27).
+%     CORRIG\'E OFFICIEL : Rapport_Jury_2025.md l.680-688 :
+%       * Q23 : "delta-theta = 288/2^24 = 1.72.10^-5 deg" ;
+%       * Q27 : "q = delta-v/10 ~= 6.10^-8 V. On peut d\'ecouper l'intervalle -5V,5V en N
+%         segments de largeur q o\`u N v\'erifie N = 10/q ~= 1.6.10^8 ce que l'on peut coder sur
+%         Nbits = [log2(1.6.10^8)] arrondi \`a l'entier sup\'erieur soit 28 bits."
+%     RECALCUL\'E : 288/2^24 = 1,716 6.10^-5 deg ; delta-v = 10/2^24 = 5,960 5.10^-7 V ;
+%     q = 5,960 5.10^-8 V ; N = 10/q = 1,677 7.10^8 ; log2 = 27,32 -> 28 bits. Tout concorde.
+%     CONVENTION : le corrig\'e officiel 2025 utilise 2^n (N segments de largeur q sur la plage).
+%
+%   - Ex. 6 : EXERCICE IN\'EDIT (CNA R-2R). Aucune r\'ef\'erence de sujet ne lui est attribu\'ee.
+%     Les seuls faits math\'ematiques utilis\'es (loi de sortie d'un R-2R en contre-r\'eaction,
+%     erreur de mono\-tonicit\'e li\'ee \`a la tol\'erance des r\'esistances) sont recalcul\'es
+%     int\'egralement dans le corrig\'e.
+%
+%   - Citation jury (exercice 3) : verbatim EXACT de Rapport_Jury_2020.md l.2386 :
+%     "Le jury d\'eplore que la majeure partie des candidats ne sache pas d\'eterminer la
+%     r\'esolution d'un capteur."
+%     (La fiche T22 cite une version diff\'erente, augment\'ee d'une phrase sur l'encadrement des
+%     r\'esultats qui ne figure PAS \`a cet endroit du rapport : on s'en tient ici au verbatim.)
+%   - Citation jury (exercice 5) : verbatim EXACT de Rapport_Jury_2022.md l.837 (extrait) :
+%     "Le jury recommande aux candidats d'apporter un soin particulier aux questions de
+%     conclusion de chacune des parties. Les \'ecarts \'evalu\'es doivent \^etre clairement mis
+%     en \'evidence et comment\'es."
+%
+% CONVENTION DE QUANTUM RETENUE DANS CE FICHIER
+%   Il n'existe pas de convention unique dans les sujets CAPET eux-m\^emes :
+%     - 2022 (corrig\'e officiel du jury)     -> q = V_ref / (2^n - 1)
+%     - 2023 (formule impos\'ee par l'\'enonc\'e) -> q = V_ref / 2^n
+%     - 2025 (corrig\'e officiel du jury)     -> q = plage / 2^n
+%     - datasheet ADS7029-Q1 (\S8.3.3)        -> 1 LSB = V_REF / 2^N
+%   R\`egle appliqu\'ee ici : ON SUIT LA CONVENTION DE LA SOURCE, et chaque corrig\'e l'\'enonce
+%   explicitement avant de calculer. L'exercice 3 compare chiffre \`a chiffre les deux
+%   conventions pour montrer que l'\'ecart (0,4 % \`a n = 8) est n\'egligeable devant les
+%   erreurs de lin\'earit\'e du composant -- ce qui est l'argument attendu au CAPET.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+% Accolades du schema de troncature binaire (exercice 2) : la bibliotheque
+% decorations.pathreplacing n'est pas charge par ../fiches/preamble.tex.
+% Symbole triangulaire de l'ALI (exercices 4 et 6) : shapes.geometric.
+\usetikzlibrary{decorations.pathreplacing, shapes.geometric}
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T22}} - Exercices - CAN/CNA et numerisation}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T22 \quad CAN/CNA, num\'erisation et \'echantillonnage}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 1 -- 2022, questions 23 et 24
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2022, \'epreuve \'ecrite disciplinaire (option IE), questions 23 et 24}
+]
+\CAPETSHOW{
+Le module de t\'el\'etransmission TRT~200 d'un poste de purge de r\'eseau de gaz surveille en permanence son alimentation \'electrique. Trois grandeurs analogiques sont appliqu\'ees sur les entr\'ees \textbf{ADC0}, \textbf{ADC1} et \textbf{ADC2} du convertisseur analogique-num\'erique int\'egr\'e au microcontr\^oleur PIC.
+
+Le sujet pr\'ecise que ce CAN est un convertisseur \textbf{12 bits} et que sa \textbf{tension de r\'ef\'erence vaut $V_{REF+} = \SI{3,5}{\volt}$} (avec $V_{REF-} = \SI{0}{\volt}$). L'entr\'ee \textbf{ADC2} surveille la tension $U_{Peltier}$ d\'elivr\'ee par le module thermo\'electrique~; elle lui est reli\'ee par un \textbf{pont diviseur de rapport $1/2$} form\'e de deux r\'esistances \'egales $R_4$ et $R_5$.
+
+Le diagramme des exigences impose que la tension du module Peltier ne descende \textbf{jamais en dessous de \SI{0,4}{\volt}} : en de\c{c}\`a, une alarme doit \^etre t\'el\'etransmise.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.9, every node/.style={scale=0.9}]
+  % source Peltier
+  \draw (0,0) to[V, l=$U_{Peltier}$, invert] (0,3);
+  \draw (0,3) -- (2,3) node[circ]{};
+  % pont diviseur
+  \draw (2,3) to[R, l=$R_5$] (2,1.7);
+  \draw (2,1.7) node[circ]{} to[R, l=$R_4$] (2,0);
+  \draw (0,0) -- (2,0);
+  % point milieu vers CAN
+  \draw (2,1.7) -- (4.2,1.7) node[midway,above,font=\scriptsize]{ADC2};
+  % bloc CAN
+  \node[draw, minimum width=2.3cm, minimum height=1.5cm, align=center, font=\scriptsize] (can) at (5.4,1.7) {CAN\\12 bits\\$V_{REF+}{=}\SI{3,5}{\volt}$};
+  \draw[-latex] (can.east) -- ++(1.3,0) node[right,font=\scriptsize]{$N$};
+  \draw (2,0) -- (5.4,0) -- (can.south);
+  \node[ground] at (3.6,0) {};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Pr\'eciser la r\'esolution de ce convertisseur, puis \textbf{calculer son quantum} $q$ en \si{\milli\volt\per\text{LSB}}. On adoptera la convention retenue par le corrig\'e officiel du jury, $q = (V_{REF+} - V_{REF-})/(2^n - 1)$, et l'on justifiera qu'\`a cette r\'esolution le choix de la convention est sans cons\'equence pratique.
+  \item En d\'eduire la valeur \textbf{d\'ecimale} $N$ d\'elivr\'ee en sortie du CAN lorsque la tension aux bornes du module Peltier vaut $U_{Peltier} = \SI{2}{\volt}$.
+  \item Lors d'une num\'erisation, la sortie du CAN vaut $\mathtt{0xAF}$. \textbf{Justifier} l'alarme t\'el\'etransmise par le module.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{R\'esolution.} La r\'esolution est le \textbf{nombre de bits} du mot de sortie, ici $n = \textbf{12 bits}$, soit $2^{12} = 4\,096$ codes distincts (de $0$ \`a $4\,095$).
+
+  \emph{Attention} : la r\'esolution est un \textbf{nombre de bits}, pas une tension -- c'est la confusion la plus sanctionn\'ee sur ce type de question. La tension associ\'ee \`a un pas de code est le \textbf{quantum} :
+  \[ q = \frac{V_{REF+} - V_{REF-}}{2^n - 1} = \frac{3{,}5 - 0}{4\,095} = \SI{8,547e-4}{\volt} \approx \boldsymbol{\SI{0,855}{\milli\volt\per\text{LSB}}} \]
+
+  \emph{Choix de la convention.} Avec l'autre convention usuelle, $q = V_{REF}/2^n = 3{,}5/4\,096 = \SI{0,8545}{\milli\volt}$. L'\'ecart relatif entre les deux vaut $1/(2^n-1) = 1/4\,095 \approx \SI{0,024}{\percent}$ : totalement n\'egligeable devant les erreurs de lin\'earit\'e et d'offset d'un CAN r\'eel. Le choix de la convention n'a de cons\'equence pratique que pour les tr\`es faibles r\'esolutions ($n \leq 4$). Ce qui compte en revanche, c'est de \textbf{l'annoncer} avant de calculer.
+  \item Le pont diviseur \'etant de rapport $1/2$, la tension r\'eellement pr\'esent\'ee \`a l'entr\'ee du CAN vaut :
+  \[ V_{ADC2} = \frac{U_{Peltier}}{2} = \frac{2}{2} = \SI{1}{\volt} \]
+  \[ N = \frac{V_{ADC2}}{q} = \frac{1}{8{,}547\times 10^{-4}} = \boldsymbol{1\,170} \]
+  \emph{V\'erification de coh\'erence} : $1\,170 \times 0{,}8547\times 10^{-3} = \SI{1,000}{\volt}$ -- on retrouve bien la tension de d\'epart. Le code $1\,170$ occupe environ \SI{29}{\percent} de la dynamique du convertisseur.
+  \item Conversion du code hexad\'ecimal en d\'ecimal :
+  \[ \mathtt{0xAF} = \mathrm{A}_{16}\times 16 + \mathrm{F}_{16} = 10\times 16 + 15 = 175_{10} \qquad (= 1010\,1111_2) \]
+  On \textbf{remonte} la cha\^ine, du code vers la grandeur physique :
+  \[ V_{ADC2} = N\cdot q = 175\times 8{,}547\times 10^{-4} = \SI{0,1496}{\volt} \approx \SI{0,15}{\volt} \]
+  \[ U_{Peltier} = 2\times V_{ADC2} = 2\times 0{,}1496 = \boldsymbol{\SI{0,299}{\volt}} \approx \SI{0,3}{\volt} \]
+
+  \smallskip
+  \textbf{Conclusion.} La tension reconstitu\'ee aux bornes du module Peltier, $U_{Peltier} \approx \SI{0,30}{\volt}$, est \textbf{inf\'erieure au seuil de \SI{0,4}{\volt}} impos\'e par le diagramme des exigences : le module Peltier ne fournit plus une tension suffisante pour alimenter la carte \'electronique du TRT~200. L'alarme t\'el\'etransmise est donc \textbf{justifi\'ee}, et l'installation doit basculer sur les accumulateurs de secours. Le code d'alarme correspondant est $N_{seuil} = 0{,}4/2/q \approx 234$, soit $\mathtt{0xEA}$ : tout code inf\'erieur \`a $234$ doit d\'eclencher l'alarme.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 2 -- 2023, questions D2 et D3
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{1} \hfill\normalfont\footnotesize 2023, \'epreuve \'ecrite disciplinaire (option IE), questions D2 et D3}
+]
+\CAPETSHOW{
+La perche porte-outils d'un enjambeur viticole autonome est d\'eplac\'ee par deux v\'erins \'electriques. La position de la tige de v\'erin est mesur\'ee par un \textbf{codeur incr\'emental} dont la r\'esolution est de \textbf{\SI{0,15}{\milli\meter} par impulsion}.
+
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item l'excursion maximale de la tige du v\'erin est de \textbf{\SI{680}{\milli\meter}} ;
+  \item lorsque le v\'erin est compl\`etement rentr\'e, la valeur d\'ecimale du compteur d'impulsions est \textbf{0} ;
+  \item la \textbf{pr\'ecision requise} pour contr\^oler la position de la perche est de \textbf{\SI{5}{\milli\meter}}.
+\end{itemize}
+
+La carte d'asservissement, pour all\'eger son calcul, ne conserve que les \textbf{8 bits de poids fort} du mot de position.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.92, font=\footnotesize]
+  % mot de 13 bits
+  \foreach \i in {0,...,12} {
+    \draw (\i*0.62,0) rectangle ++(0.62,0.62);
+  }
+  % 8 MSB surlignes
+  \fill[colExo!25] (0,0) rectangle (8*0.62,0.62);
+  \foreach \i in {0,...,12} {
+    \draw (\i*0.62,0) rectangle ++(0.62,0.62);
+  }
+  \node[font=\scriptsize] at (0.31,0.31) {$b_{12}$};
+  \node[font=\scriptsize] at (0.93,0.31) {$b_{11}$};
+  \node[font=\scriptsize] at (1.55,0.31) {$\cdots$};
+  \node[font=\scriptsize] at (4.65,0.31) {$b_{5}$};
+  \node[font=\scriptsize] at (5.27,0.31) {$b_{4}$};
+  \node[font=\scriptsize] at (5.89,0.31) {$\cdots$};
+  \node[font=\scriptsize] at (7.75,0.31) {$b_{0}$};
+  % accolades
+  \draw[decorate, decoration={brace, amplitude=4pt}] (0,0.72) -- (8*0.62,0.72)
+    node[midway, above, font=\scriptsize, yshift=2pt]{8 bits de poids fort \emph{conserv\'es}};
+  \draw[decorate, decoration={brace, mirror, amplitude=4pt}] (8*0.62,-0.1) -- (13*0.62,-0.1)
+    node[midway, below, font=\scriptsize, yshift=-2pt]{5 bits \emph{supprim\'es}};
+  \node[left, font=\scriptsize] at (-0.15,0.31) {MSB};
+  \node[right, font=\scriptsize] at (13*0.62+0.15,0.31) {LSB};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{D\'eterminer} le nombre de bits n\'ecessaires pour coder en binaire la position de la tige du v\'erin sur toute son excursion. \textbf{Indiquer} le code de la position maximale, en binaire.
+  \item \textbf{D\'eterminer} la pr\'ecision de mesure, en \si{\milli\meter}, obtenue en ne retenant que les 8 bits de poids fort. \textbf{Justifier} que ce choix est compatible avec la mise en \oe uvre de l'asservissement.
+  \item \textbf{Donner} l'octet correspondant \`a la position maximale, en binaire et en hexad\'ecimal.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Nombre d'impulsions \`a coder.} Le codeur d\'elivre une impulsion tous les \SI{0,15}{\milli\meter} ; sur l'excursion compl\`ete :
+  \[ N_{imp} = \frac{680}{0{,}15} = 4\,533{,}3 \quad\Longrightarrow\quad \text{code maximal} = 4\,533 \]
+  \textbf{Nombre de bits.} Il faut pouvoir coder toutes les valeurs de $0$ \`a $4\,533$, soit $4\,534$ valeurs distinctes :
+  \[ 2^{12} = 4\,096 < 4\,534 \leq 8\,192 = 2^{13} \quad\Longrightarrow\quad \boldsymbol{n = 13\ \text{bits}} \]
+  \emph{Pi\`ege classique} : $\log_2(4\,533) = 12{,}15$, ce qui incite \`a r\'epondre « 12 bits » par troncature. Il faut \textbf{arrondir \`a l'entier sup\'erieur} : avec 12 bits on ne coderait que jusqu'\`a $4\,095$, soit \SI{614}{\milli\meter}, et les \SI{66}{\milli\meter} de fin de course seraient inaccessibles.
+
+  \textbf{Code de la position maximale} sur 13 bits :
+  \[ 4\,533_{10} = \boldsymbol{1\,0001\,1011\,0101_2} \]
+  \emph{V\'erification} : $4\,096 + 256 + 128 + 32 + 16 + 4 + 1 = 4\,533$. \checkmark
+  \item Ne conserver que les \textbf{8 bits de poids fort} d'un mot de \textbf{13 bits}, c'est \textbf{supprimer les $13 - 8 = 5$ bits de poids faible}, donc diviser le code par $2^5 = 32$. Chaque incr\'ement du mot tronqu\'e correspond alors \`a 32 impulsions du codeur :
+  \[ \delta = 32 \times 0{,}15 = \boldsymbol{\SI{4,8}{\milli\meter}} \]
+  \textbf{Justification.} La pr\'ecision requise \'etant de \SI{5}{\milli\meter} :
+  \[ \delta = \SI{4,8}{\milli\meter} \;<\; \SI{5}{\milli\meter} \quad\checkmark \]
+  Le choix est donc \textbf{compatible}, mais avec une marge tr\`es faible (\SI{4}{\percent}). L'int\'er\^et de la troncature est de ramener la mesure de position sur un \textbf{unique octet}, directement manipulable par le microcontr\^oleur 8 bits de la carte de contr\^ole : un seul registre \`a lire, aucune op\'eration multi-octets dans la boucle d'asservissement, donc un temps de cycle plus court. Conserver les 13 bits n'apporterait qu'une r\'esolution inutile au regard de l'exigence.
+
+  \emph{Remarque} : c'est bien le \textbf{poids fort} qu'il faut conserver. Garder les 8 bits de poids \emph{faible} reviendrait \`a perdre toute information sur la position absolue (le mot repasserait par z\'ero tous les \SI{38,4}{\milli\meter}).
+  \item On d\'ecale le mot de 13 bits de 5 rangs vers la droite :
+  \[ \underbrace{1\,0001\,101}_{8\ \text{MSB}}\underbrace{1\,0101}_{\text{supprim\'es}} \quad\Longrightarrow\quad \text{octet} = 1000\,1101_2 \]
+  \[ 1000\,1101_2 = 128 + 8 + 4 + 1 = 141_{10} = \boldsymbol{\mathtt{8D}_{16}} \]
+  \emph{V\'erification de coh\'erence} : $141 \times 32 \times 0{,}15 = \SI{676,8}{\milli\meter}$, \`a comparer \`a l'excursion r\'eelle de \SI{680}{\milli\meter}. L'\'ecart de \SI{3,2}{\milli\meter} est bien inf\'erieur au pas de \SI{4,8}{\milli\meter} : c'est simplement l'effet de la troncature, qui arrondit toujours \textbf{par d\'efaut}.
+
+  \smallskip
+  \textbf{Conclusion.} Le codage sur \textbf{13 bits} couvre l'int\'egralit\'e de la course de \SI{680}{\milli\meter}, et la troncature aux \textbf{8 bits de poids fort} ram\`ene la position sur un octet unique ($\mathtt{8D}_{16}$ en but\'ee haute) avec une pr\'ecision de \SI{4,8}{\milli\meter}, \textbf{conforme \`a l'exigence de \SI{5}{\milli\meter}} du cahier des charges. La marge \'etant faible, cette troncature ne pourra pas \^etre reconduite telle quelle si l'exigence de pr\'ecision \'etait resserr\'ee : il faudrait alors conserver 9 bits (pas de \SI{2,4}{\milli\meter}).
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 3 -- docTech -- 2026, questions B10 et B12
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize 2026, \'epreuve 2 d'admissibilit\'e (BAC + 3, option IE), questions B10 et B12}
+]
+\CAPETSHOW{
+La temp\'erature de fonctionnement d'une pile \`a combustible embarqu\'ee dans un autobus est mesur\'ee par une cha\^ine d'acquisition compl\`ete : capteur Jumo, conditionneur, amplificateur, puis convertisseur analogique-num\'erique.
+
+Le \textbf{cahier des charges de la mesure} est le suivant :
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\'Etendue de mesure & $-5\,^\circ$C \`a $+90\,^\circ$C \\
+Erreur de mesure & $< 1\,^\circ$C \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+L'ensemble \{amplificateur + conditionneur\} d\'elivre une tension $v_A$ \textbf{directement proportionnelle \`a la temp\'erature}, $v_A = c\cdot T$, \'evoluant sur une \textbf{plage de tension de \SI{3}{\volt}} pour couvrir toute l'\'etendue de mesure. Le CAN choisi par le constructeur est le \textbf{Texas Instruments ADS7029-Q1}, aliment\'e sous $AVDD = \SI{3}{\volt}$.
+
+\begin{tcolorbox}[docTech, title={Document technique -- Extrait de la notice constructeur ADS7029-Q1 (Texas Instruments, SBAS811)}]
+\footnotesize
+\textbf{ADS7029-Q1 -- Small-Size, Low-Power, 8-Bit, 2-MSPS, SAR ADC}
+
+\smallskip
+\textbf{Caract\'eristiques \'electriques} ($T_A = -40$ \`a $+125\,^\circ$C, $AVDD = \SI{3}{\volt}$, $f_{SAMPLE} = 2$~MSPS) :
+
+\begin{center}
+\begin{tabular}{@{}llcccl@{}}
+\toprule
+& Param\`etre & Min & Typ & Max & Unit\'e \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{Entr\'ee analogique}} \\
+& \emph{Full-scale input voltage span} & $0$ & & $AVDD$ & V \\
+& \emph{Reference voltage} $V_{REF} = AVDD$ & $2{,}35$ & & $3{,}6$ & V \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{Performances syst\`eme}} \\
+& \emph{Resolution} & & 8 & & bits \\
+& \emph{No missing codes} (NMC) & 8 & & & bits \\
+INL & \emph{Integral nonlinearity} & $-0{,}5$ & $\pm 0{,}25$ & $+0{,}5$ & LSB \\
+DNL & \emph{Differential nonlinearity} & $-0{,}4$ & $\pm 0{,}2$ & $+0{,}4$ & LSB \\
+$E_O$ & \emph{Offset error} & & $\pm 0{,}5$ & & LSB \\
+$E_G$ & \emph{Gain error} & & $\pm 0{,}2$ & & \%FS \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{Dynamique d'\'echantillonnage}} \\
+$t_{ACQ}$ & \emph{Acquisition time} & 120 & & & ns \\
+$t_{CYCLE}$ & \emph{Cycle time} & & $0{,}5$ & & \si{\micro\second} \\
+$f_{THROUGHPUT}$ & \emph{Maximum throughput rate} & & 2 & & MSPS \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\textbf{\S8.3.3 -- ADC Transfer Function.} \emph{The device output is in straight binary format. The device resolution for a single-ended input can be computed by Equation 2 :}
+\[ 1\ \mathrm{LSB} = V_{REF} / 2^N \qquad \text{avec } V_{REF} = AVDD \text{ et } N = 8 \]
+
+\smallskip
+\textbf{Rappel du document DTB5 du sujet.} \emph{La courbe de transfert th\'eorique donnant le mot binaire de sortie $N_{(2)}$ en fonction de la tension d'entr\'ee $V_E$ est une courbe en escalier, dans le cas d'une quantification centr\'ee. On peut lui associer l'erreur de conversion ou erreur de quantification, en dents de scie. Celle-ci est comprise entre $-q/2$ et $+q/2$.}
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever} dans le document technique les trois caract\'eristiques du CAN n\'ecessaires \`a la suite de l'\'etude : la \textbf{grandeur pleine \'echelle}, la \textbf{r\'esolution} et la \textbf{formule de d\'efinition du quantum} retenue par le constructeur. En d\'eduire la valeur num\'erique du \textbf{quantum} $q$.
+  \item La litt\'erature emploie aussi la convention $q = V_{REF}/(2^n - 1)$. \textbf{Calculer} le quantum avec cette seconde convention et \textbf{quantifier} l'\'ecart relatif entre les deux. Conclure sur la convention \`a retenir ici.
+  \item \textbf{D\'eterminer} l'erreur de quantification maximale du CAN, en volt.
+  \item Sachant que la plage de \SI{3}{\volt} couvre exactement l'\'etendue de mesure $[-5\,;\,90]\,^\circ$C, \textbf{d\'eterminer} le coefficient $c$ de la cha\^ine, puis \textbf{en d\'eduire} l'erreur de mesure de la temp\'erature $T$ due \`a la seule quantification. \textbf{Conclure} vis-\`a-vis du cahier des charges.
+  \item Le calcul pr\'ec\'edent ne retient que l'erreur de quantification. \`A l'aide du document technique, \textbf{citer} deux autres sources d'erreur du convertisseur et \textbf{estimer} l'erreur totale de la cha\^ine dans le pire cas.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\textbf{\'Etape 1 -- Extraction des donn\'ees du document technique.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Lecture directe de la notice :
+  \begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+    \item \textbf{Grandeur pleine \'echelle} : la ligne \emph{Full-scale input voltage span} donne $[0\,;\,AVDD]$. Le CAN \'etant aliment\'e sous $AVDD = \SI{3}{\volt}$, la pleine \'echelle vaut $PE = \boldsymbol{\SI{3}{\volt}}$ -- ce qui co\"incide exactement avec la plage de \SI{3}{\volt} impos\'ee \`a l'ensemble \{amplificateur + conditionneur\} : la cha\^ine exploite bien \textbf{toute} la dynamique du convertisseur.
+    \item \textbf{R\'esolution} : $\boldsymbol{n = 8\ \text{bits}}$ (titre de la notice et ligne \emph{Resolution}), soit $2^8 = 256$ codes. La ligne \emph{No missing codes} = 8 bits garantit qu'aucun de ces 256 codes n'est manquant.
+    \item \textbf{Convention du constructeur} : le \S8.3.3 impose $1\ \mathrm{LSB} = V_{REF}/2^N$, donc la convention en $\boldsymbol{2^n}$.
+  \end{itemize}
+  \[ q = \frac{V_{REF}}{2^n} = \frac{3}{256} = \SI{1,1719e-2}{\volt} \approx \boldsymbol{\SI{11,72}{\milli\volt}} \]
+  \item Avec la seconde convention :
+  \[ q' = \frac{V_{REF}}{2^n - 1} = \frac{3}{255} \approx \SI{11,76}{\milli\volt} \]
+  \[ \frac{q' - q}{q} = \frac{1}{2^n - 1} = \frac{1}{255} \approx \SI{0,39}{\percent} \]
+  L'\'ecart de \SI{0,39}{\percent} est \textbf{n\'egligeable devant les erreurs propres du composant} relev\'ees dans la notice (INL jusqu'\`a $\pm 0{,}5$~LSB, soit \SI{50}{\percent} d'un quantum, et erreur de gain $\pm 0{,}2$~\%FS). On retient donc ici la convention \textbf{du constructeur}, $q = V_{REF}/2^n$ : lorsqu'un document technique impose une d\'efinition, c'est elle qui fait foi. Dans tous les cas, la convention retenue doit \^etre \textbf{annonc\'ee avant le calcul}.
+
+  \emph{Origine de l'\'ecart} : $2^n - 1$ compte le nombre d'\emph{intervalles} entre les $2^n$ codes (la derni\`ere transition a lieu \`a $V_{REF} - 1\,\mathrm{LSB}$), tandis que $2^n$ d\'ecoupe la pleine \'echelle en $2^n$ plages de largeur \'egale. Les deux lectures sont d\'efendables ; seule l'incoh\'erence entre l'annonce et le calcul est sanctionn\'ee.
+  \item Le document DTB5 pr\'ecise que la quantification est \textbf{centr\'ee} : la caract\'eristique en escalier est d\'ecal\'ee d'un demi-quantum, si bien que l'erreur de conversion est born\'ee sym\'etriquement :
+  \[ \varepsilon_{max} = \pm\frac{q}{2} = \pm\frac{11{,}72}{2} = \boldsymbol{\pm\SI{5,86}{\milli\volt}} \]
+
+  \begin{center}
+  \begin{tikzpicture}[scale=0.95, font=\footnotesize]
+    % --- caracteristique en escalier ---
+    \draw[->] (0,0) -- (7.4,0) node[right] {$V_E$};
+    \draw[->] (0,0) -- (0,3.5) node[above] {$N$};
+    % droite ideale
+    \draw[thick, colExo!40] (0,0) -- (7,3.0);
+    % escalier (quantification centree : premiere marche de largeur q/2)
+    \draw[thick, colExo]
+      (0,0) -- (0.5,0) -- (0.5,0.5) -- (1.5,0.5) -- (1.5,1.0) -- (2.5,1.0)
+      -- (2.5,1.5) -- (3.5,1.5) -- (3.5,2.0) -- (4.5,2.0) -- (4.5,2.5)
+      -- (5.5,2.5) -- (5.5,3.0) -- (6.5,3.0);
+    % quantum
+    \draw[<->] (6.8,2.5) -- (6.8,3.0);
+    \node[right, font=\scriptsize] at (6.85,2.75) {$q$};
+    \draw[dotted] (2.5,0) -- (2.5,1.5);
+    \draw[dotted] (3.5,0) -- (3.5,2.0);
+    \draw[<->] (2.5,-0.32) -- (3.5,-0.32) node[midway, below, font=\scriptsize]{$q$};
+    \node[below, font=\scriptsize] at (0.25,-0.05) {$0$};
+    % --- erreur en dents de scie ---
+    \begin{scope}[yshift=-2.55cm]
+      \draw[->] (0,0) -- (7.4,0) node[right] {$V_E$};
+      \draw[->] (0,-0.75) -- (0,0.9) node[above, font=\scriptsize] {$\varepsilon$};
+      \draw[dashed, colSlate] (0,0.5) -- (7,0.5) node[right, font=\scriptsize]{$+q/2$};
+      \draw[dashed, colSlate] (0,-0.5) -- (7,-0.5) node[right, font=\scriptsize]{$-q/2$};
+      \draw[thick, colTherm]
+        (0,0) -- (0.5,0.5) -- (0.5,-0.5) -- (1.5,0.5) -- (1.5,-0.5)
+        -- (2.5,0.5) -- (2.5,-0.5) -- (3.5,0.5) -- (3.5,-0.5)
+        -- (4.5,0.5) -- (4.5,-0.5) -- (5.5,0.5) -- (5.5,-0.5) -- (6.5,0.5);
+    \end{scope}
+  \end{tikzpicture}
+  \end{center}
+  Caract\'eristique en escalier (haut) et erreur de quantification en dents de scie (bas), born\'ee \`a $\pm q/2$.
+  \item La plage de \SI{3}{\volt} couvre l'\'etendue $[-5\,;\,90]\,^\circ$C, soit $\Delta T = 90 - (-5) = 95\,^\circ$C :
+  \[ c = \frac{PE}{\Delta T} = \frac{3}{95} \approx \boldsymbol{\SI{0,0316}{\volt\per\degreeCelsius}} \]
+  L'erreur en temp\'erature s'obtient en \textbf{divisant} l'erreur en tension par la sensibilit\'e de la cha\^ine (op\'eration inverse de la conversion temp\'erature $\rightarrow$ tension) :
+  \[ \varepsilon_T = \frac{q/2}{c} = \frac{5{,}86\times 10^{-3}}{0{,}0316} \approx \boldsymbol{\pm\SI{0,19}{\degreeCelsius}} \]
+  \emph{V\'erification par une autre voie} : l'\'etendue de $95\,^\circ$C est d\'ecoup\'ee en $256$ pas, soit $95/256 = 0{,}371\,^\circ$C par pas ; la moiti\'e vaut $0{,}186\,^\circ$C. \checkmark
+
+  \smallskip
+  \textbf{Conclusion.} L'erreur de mesure due \`a la quantification, $\pm\SI{0,19}{\degreeCelsius}$, est \textbf{cinq fois plus petite} que l'erreur de mesure maximale de $1\,^\circ$C impos\'ee par le cahier des charges : le \textbf{choix d'un CAN 8 bits est suffisant} et laisse une marge confortable pour les autres sources d'erreur de la cha\^ine (capteur, conditionneur, d\'erives). Monter en r\'esolution serait ici une d\'epense inutile.
+  \item \textbf{Autres sources d'erreur relev\'ees dans la notice.}
+  \begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+    \item l'\textbf{INL} (non-lin\'earit\'e int\'egrale), jusqu'\`a $\pm 0{,}5$~LSB au pire cas, soit $\pm\SI{5,86}{\milli\volt}$ : \'ecart entre la caract\'eristique r\'eelle et la droite id\'eale ;
+    \item l'\textbf{erreur d'offset} $E_O = \pm 0{,}5$~LSB, soit encore $\pm\SI{5,86}{\milli\volt}$ ;
+    \item (accessoirement l'\textbf{erreur de gain} $E_G = \pm 0{,}2$~\%FS $= \pm\SI{6}{\milli\volt}$ sur la pleine \'echelle).
+  \end{itemize}
+  Dans le \textbf{pire cas}, en sommant arithm\'etiquement quantification, INL et offset :
+  \[ \varepsilon_{tot} \approx 5{,}86 + 5{,}86 + 5{,}86 = \SI{17,6}{\milli\volt} \quad\Longrightarrow\quad \varepsilon_{T,tot} = \frac{17{,}6\times 10^{-3}}{0{,}0316} \approx \SI{0,56}{\degreeCelsius} \]
+  \textbf{Conclusion compl\'ementaire.} M\^eme en cumulant les trois d\'efauts au pire cas, l'erreur reste inf\'erieure \`a $1\,^\circ$C : le convertisseur \textbf{satisfait seul} l'exigence, et le budget d'erreur restant ($1 - 0{,}56 = 0{,}44\,^\circ$C) est disponible pour le capteur et le conditionneur. C'est ce raisonnement de \textbf{budget d'erreur} -- et non le seul calcul du quantum -- qui est attendu \`a ce niveau.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2020, cinqui\`eme partie) : \guillemotleft\ Le jury d\'eplore que la majeure partie des candidats ne sache pas d\'eterminer la r\'esolution d'un capteur. \guillemotright\ Rappelons la distinction : la \textbf{r\'esolution} du CAN est un nombre de \textbf{bits} (8 ici) ; le \textbf{quantum} est la tension d'un pas (\SI{11,72}{\milli\volt}) ; la \textbf{r\'esolution de la cha\^ine} ramen\'ee \`a la grandeur physique est $q/c = \SI{0,37}{\degreeCelsius}$ ; la \textbf{pr\'ecision} enfin est la borne d'erreur totale, ici $\pm\SI{0,56}{\degreeCelsius}$. Les quatre notions ne se confondent pas.}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 4 -- 2026, questions B13, B14, B15 et B16
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize 2026, \'epreuve 2 d'admissibilit\'e (BAC + 3, option IE), questions B13 \`a B16}
+]
+\CAPETSHOW{
+On s'int\'eresse d\'esormais \`a l'\textbf{asservissement num\'erique} de la temp\'erature de la m\^eme pile \`a combustible. La cha\^ine directe comporte un correcteur num\'erique, un \textbf{CNA}, puis le syst\`eme de refroidissement ; la cha\^ine de retour comporte le capteur, un \textbf{filtre anti-repliement}, un \textbf{\'echantillonneur-bloqueur (E/B)} et le \textbf{CAN}.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.9, every node/.style={scale=0.9}, font=\scriptsize]
+  \node[draw, circle, minimum size=0.5cm, inner sep=0pt] (som) at (0.9,1.9) {};
+  \node[font=\scriptsize] at (0.62,2.18) {$+$};
+  \node[font=\scriptsize] at (0.62,1.55) {$-$};
+  \draw[->] (-0.3,1.9) -- (som.west) node[midway,above,font=\scriptsize]{$T_{cons}$};
+  \node[draw, minimum width=1.5cm, minimum height=0.8cm, align=center] (cor) at (2.5,1.9) {Correcteur\\num\'erique};
+  \node[draw, minimum width=0.9cm, minimum height=0.8cm] (cna) at (4.4,1.9) {CNA};
+  \node[draw, minimum width=1.7cm, minimum height=0.8cm, align=center] (sys) at (6.7,1.9) {Syst\`eme de\\refroidissement};
+  \draw[->] (som.east) -- (cor.west) node[midway,above,font=\scriptsize]{$\varepsilon_k$};
+  \draw[->] (cor.east) -- (cna.west) node[midway,above,font=\scriptsize]{$u_k$};
+  \draw[->] (cna.east) -- (sys.west) node[midway,above,font=\scriptsize]{$u_C(t)$};
+  \draw[->] (sys.east) -- (8.6,1.9) node[right,font=\scriptsize]{$T(t)$};
+  % retour
+  \node[draw, minimum width=1.0cm, minimum height=0.7cm] (cap) at (6.9,0.35) {Capteur};
+  \node[draw, minimum width=1.6cm, minimum height=0.7cm, align=center] (far) at (4.3,0.35) {Filtre anti-\\repliement + E/B};
+  \node[draw, minimum width=0.9cm, minimum height=0.7cm] (can) at (2.0,0.35) {CAN};
+  \draw (8.2,1.9) node[circ]{} -- (8.2,0.35) -- (cap.east);
+  \draw[->] (cap.west) -- (far.east) node[midway,above,font=\scriptsize]{$u_R(t)$};
+  \draw[->] (far.west) -- (can.east);
+  \draw[->] (can.west) -- (0.9,0.35) -- (som.south) node[pos=0.75,left,font=\scriptsize]{$N_k$};
+\end{tikzpicture}
+\end{center}
+
+Le syst\`eme de refroidissement est mod\'elis\'e par un \textbf{premier ordre} de constante de temps $\tau = \SI{0,9}{\second}$ et de gain statique $K = \SI{4}{\degreeCelsius\per\volt}$ ; le capteur est assimil\'e \`a un gain pur $K_c = \SI{0,0316}{\volt\per\degreeCelsius}$. La r\'eponse de $u_R(t)$ \`a un \'echelon de commande $u_C(t)$ de \SI{1}{\volt} est donc celle d'un premier ordre de valeur finale $K\cdot K_c = \SI{0,1264}{\volt}$.
+
+Le constructeur d\'esire obtenir \textbf{au moins 10 \'echantillons au cours du r\'egime transitoire}.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{D\'eterminer} la dur\'ee du r\'egime transitoire, de $t = 0$ \`a $t_{R5\%}$. \textbf{\'Etablir} l'in\'egalit\'e que doit respecter la p\'eriode d'\'echantillonnage $T_e$, puis \textbf{en d\'eduire} la fr\'equence d'\'echantillonnage minimale $f_{min}$.
+  \item \textbf{D\'efinir} le r\^ole de l'\'echantillonneur-bloqueur. \textbf{Donner} le sch\'ema \'electrique d'un \'echantillonneur-bloqueur d'ordre z\'ero.
+  \item La p\'eriode d'\'echantillonnage finalement retenue est $T_2 = \SI{0,25}{\second}$. \textbf{Repr\'esenter} sur un m\^eme graphe les allures du signal $u_R(t)$, du signal \'echantillonn\'e $u_R^*(t)$ et du signal \'echantillonn\'e-bloqu\'e $u_{RB}(t)$.
+  \item \textbf{D\'eterminer} le temps de conversion $T_{conv}$ maximal que doit respecter le convertisseur. \textbf{Conclure} \`a partir du document technique de l'exercice 3 sur la capacit\'e du CAN \`a convertir suffisamment rapidement.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Dur\'ee du r\'egime transitoire.} Pour un syst\`eme du premier ordre, le temps de r\'eponse \`a \SI{5}{\percent} vaut trois constantes de temps :
+  \[ t_{R5\%} = 3\,\tau = 3\times 0{,}9 = \boldsymbol{\SI{2,7}{\second}} \]
+  \emph{V\'erification} : $u_R(3\tau) = 0{,}1264\times(1 - e^{-3}) = 0{,}1264\times 0{,}9502 = \SI{0,1201}{\volt}$, soit bien \SI{95}{\percent} de la valeur finale. \checkmark
+
+  \textbf{In\'egalit\'e sur $T_e$.} Obtenir au moins 10 \'echantillons pendant le r\'egime transitoire impose que 10 p\'eriodes d'\'echantillonnage tiennent dans $t_{R5\%}$ :
+  \[ 10\,T_e \leq t_{R5\%} \qquad\Longleftrightarrow\qquad \boxed{\;T_e \leq \frac{t_{R5\%}}{10} = \frac{2{,}7}{10} = \SI{0,27}{\second}\;} \]
+  \[ f_{min} = \frac{1}{T_{e,max}} = \frac{1}{0{,}27} \approx \boldsymbol{\SI{3,7}{\hertz}} \]
+
+  \emph{Attention \`a ne pas confondre les deux crit\`eres.} Celui-ci est un crit\`ere de \textbf{dynamique de boucle} : il garantit que le correcteur num\'erique « voit » suffisamment de points pour reconstruire la dynamique du proc\'ed\'e et r\'eagir avant la fin du transitoire. Le crit\`ere de Shannon, lui, porte sur le \textbf{contenu spectral} du signal \`a num\'eriser et donne une borne inf\'erieure ind\'ependante. En asservissement num\'erique, c'est presque toujours le crit\`ere de dynamique de boucle qui est \textbf{le plus contraignant} des deux -- d'o\`u la r\`egle pratique $T_e \leq T_{syst}/10$.
+  \item \textbf{R\^ole de l'\'echantillonneur-bloqueur.} La conversion analogique-num\'erique n'est pas instantan\'ee : elle dure $T_{conv}$. Si la tension d'entr\'ee variait pendant cette dur\'ee, le CAN convertirait une valeur \textbf{ind\'etermin\'ee}, comprise entre celle du d\'ebut et celle de la fin de conversion. L'\'echantillonneur-bloqueur \textbf{pr\'el\`eve} la valeur du signal \`a l'instant $k\,T_e$ (phase d'\'echantillonnage) puis la \textbf{maintient constante} pendant toute la conversion (phase de blocage). Il fige ainsi l'entr\'ee du CAN et garantit que le code obtenu correspond bien \`a un instant d'\'echantillonnage pr\'ecis.
+
+  \textbf{Sch\'ema d'un bloqueur d'ordre z\'ero} : un interrupteur command\'e (transistor MOS) charge une capacit\'e de maintien $C_H$, isol\'ee de la charge par un suiveur de tension \`a tr\`es forte imp\'edance d'entr\'ee.
+
+  \begin{center}
+  \begin{circuitikz}[european, scale=0.95, every node/.style={scale=0.95}]
+    % entree + resistance serie
+    \draw (0,2.6) node[left,font=\scriptsize]{$v_e(t)$} to[short, o-] (0.8,2.6);
+    \draw (0.8,2.6) to[R, l=$R$] (2.4,2.6);
+    % interrupteur commande K
+    \draw (2.4,2.6) to[cspst, l=$K$] (4.0,2.6);
+    \node[font=\scriptsize, align=center] at (3.2,3.75) {commande\\d'\'echantillonnage};
+    \draw[-latex, dashed] (3.2,3.35) -- (3.2,2.95);
+    % noeud de maintien
+    \draw (4.0,2.6) node[circ]{} -- (4.9,2.6);
+    % capacite de maintien
+    \draw (4.0,2.6) to[C, l_=$C_H$] (4.0,0.7);
+    \draw (4.0,0.7) -- (7.6,0.7);
+    \node[ground] at (4.0,0.7) {};
+    % ALI suiveur : entree + en haut, entree - bouclee sur la sortie
+    \node[op amp, anchor=+, scale=0.95] (ao) at (4.9,2.6) {};
+    \draw (ao.out) -- (7.9,2.6) node[right,font=\scriptsize]{$v_s(t)$};
+    % contre-reaction totale (gain unite)
+    \draw (ao.-) -- ++(-0.30,0) |- (6.1,1.75) -- (7.55,1.75) -- (7.55,2.6) node[circ]{};
+  \end{circuitikz}
+  \end{center}
+  Lorsque $K$ est ferm\'e, $C_H$ se charge \`a la valeur instantan\'ee de $v_e$ (phase \emph{sample}) ; lorsque $K$ s'ouvre, $C_H$ conserve cette tension (phase \emph{hold}), le suiveur emp\^echant toute d\'echarge vers la sortie. La sortie est ainsi une suite de \textbf{paliers constants} : c'est le bloqueur d'ordre \textbf{z\'ero} (interpolation d'ordre 0).
+  \item Avec $T_2 = \SI{0,25}{\second}$, les \'echantillons sont pr\'elev\'es \`a $t = 0\,;\,0{,}25\,;\,0{,}50\,;\,\dots$ s. On calcule $u_R(k\,T_2) = 0{,}1264\,(1 - e^{-k\,T_2/0{,}9})$ :
+
+  \begin{center}
+  \footnotesize
+  \begin{tabular}{@{}lccccccc@{}}
+  \toprule
+  $t$ (s) & 0 & 0{,}25 & 0{,}50 & 0{,}75 & 1{,}00 & 1{,}50 & 2{,}00 \\
+  \midrule
+  $u_R$ (mV) & 0 & 30{,}7 & 53{,}9 & 71{,}5 & 84{,}8 & 102{,}5 & 112{,}7 \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+
+  \begin{center}
+  \begin{tikzpicture}[scale=1.0, font=\footnotesize]
+    % axes : 1 unite x = 1 s (echelle 2.5), y : 0.1264 V -> 2.6 cm
+    \def\sx{2.45}
+    \def\sy{20.0}
+    \draw[->] (0,0) -- (7.9,0) node[right] {$t$ (s)};
+    \draw[->] (0,-0.15) -- (0,3.25) node[above] {$u_R$ (V)};
+    % graduations x
+    \foreach \t in {0.5,1,1.5,2,2.5,3} {
+      \draw (\t*\sx,0.06) -- (\t*\sx,-0.06) node[below, font=\scriptsize] {\t};
+    }
+    % graduations y
+    \foreach \v/\lb in {0.0316/0{,}0316, 0.0632/0{,}0632, 0.0948/0{,}0948, 0.1264/0{,}1264} {
+      \draw (0.06,\v*\sy) -- (-0.06,\v*\sy) node[left, font=\scriptsize] {\lb};
+      \draw[dotted, colRule] (0,\v*\sy) -- (7.6,\v*\sy);
+    }
+    % signal analogique (1er ordre tau=0.9, Vf=0.1264)
+    \draw[thick, colExo!45, domain=0:3.1, samples=80, smooth]
+      plot (\x*\sx, {0.1264*(1-exp(-\x/0.9))*\sy});
+    \node[colExo!60, font=\scriptsize, right] at (3.15*\sx,0.118*\sy) {$u_R(t)$};
+    % signal bloque (escalier, Te=0.25)
+    \draw[thick, colTherm]
+      (0,0) -- (0.25*\sx,0)
+      -- (0.25*\sx,{0.03066*\sy}) -- (0.5*\sx,{0.03066*\sy})
+      -- (0.5*\sx,{0.05388*\sy}) -- (0.75*\sx,{0.05388*\sy})
+      -- (0.75*\sx,{0.07147*\sy}) -- (1.0*\sx,{0.07147*\sy})
+      -- (1.0*\sx,{0.08479*\sy}) -- (1.25*\sx,{0.08479*\sy})
+      -- (1.25*\sx,{0.09488*\sy}) -- (1.5*\sx,{0.09488*\sy})
+      -- (1.5*\sx,{0.10253*\sy}) -- (1.75*\sx,{0.10253*\sy})
+      -- (1.75*\sx,{0.10832*\sy}) -- (2.0*\sx,{0.10832*\sy})
+      -- (2.0*\sx,{0.11270*\sy}) -- (2.25*\sx,{0.11270*\sy})
+      -- (2.25*\sx,{0.11602*\sy}) -- (2.5*\sx,{0.11602*\sy})
+      -- (2.5*\sx,{0.11854*\sy}) -- (2.75*\sx,{0.11854*\sy})
+      -- (2.75*\sx,{0.12045*\sy}) -- (3.0*\sx,{0.12045*\sy});
+    \node[colTherm, font=\scriptsize, right] at (3.05*\sx,{0.100*\sy}) {$u_{RB}(t)$};
+    % impulsions echantillonnees
+    \foreach \k/\v in {1/0.03066, 2/0.05388, 3/0.07147, 4/0.08479, 5/0.09488, 6/0.10253, 7/0.10832, 8/0.11270, 9/0.11602, 10/0.11854, 11/0.12045} {
+      \draw[colAuto, thick, -latex] (\k*0.25*\sx,0) -- (\k*0.25*\sx,{\v*\sy});
+      \fill[colAuto] (\k*0.25*\sx,{\v*\sy}) circle (1.5pt);
+    }
+    \node[colAuto, font=\scriptsize] at (1.55*\sx,{0.0335*\sy}) {$u_R^*(t)$};
+    % Te
+    \draw[<->] (2.0*\sx,-0.62) -- (2.25*\sx,-0.62);
+    \node[font=\scriptsize, right] at (2.3*\sx,-0.62) {$T_2 = \SI{0,25}{\second}$};
+  \end{tikzpicture}
+  \end{center}
+  Le signal \'echantillonn\'e $u_R^*(t)$ (vert) est une suite d'impulsions aux instants $k\,T_2$ ; le signal \'echantillonn\'e-bloqu\'e $u_{RB}(t)$ (rouge) est l'escalier obtenu en maintenant chaque valeur jusqu'\`a l'\'echantillon suivant. On observe le \textbf{retard} introduit par le blocage : l'escalier est en permanence « en retard » d'environ $T_2/2$ sur le signal analogique, retard qui d\'egrade la marge de phase de la boucle.
+  \item \textbf{Temps de conversion maximal.} Le CAN doit avoir termin\'e sa conversion avant l'arriv\'ee de l'\'echantillon suivant : la conversion doit tenir enti\`erement dans une p\'eriode d'\'echantillonnage.
+  \[ T_{conv} \leq T_2 = \boldsymbol{\SI{0,25}{\second}} \]
+  \textbf{Comparaison \`a la notice.} L'ADS7029-Q1 affiche un d\'ebit maximal de 2~MSPS, soit un temps de cycle (acquisition + conversion) :
+  \[ t_{CYCLE} = \frac{1}{2\times 10^6} = \SI{0,5}{\micro\second} = \SI{5e-7}{\second} \]
+  \[ \frac{T_2}{t_{CYCLE}} = \frac{0{,}25}{5\times 10^{-7}} = \boldsymbol{5\times 10^{5}} \]
+
+  \smallskip
+  \textbf{Conclusion.} Le CAN convertit \textbf{500\,000 fois plus vite} que ne l'exige la boucle de r\'egulation : la capacit\'e du convertisseur \`a suivre la grandeur analogique est \textbf{tr\`es largement satisfaite}, et le temps de conversion peut \^etre consid\'er\'e comme nul devant $T_2$ dans la mod\'elisation de l'asservissement. Cet \'ecart consid\'erable s'explique par la nature du proc\'ed\'e : une r\'egulation thermique est un syst\`eme \textbf{lent} ($\tau = \SI{0,9}{\second}$), alors que le composant a \'et\'e con\c{c}u pour des applications automobiles rapides. Le choix du CAN n'est donc pas ici dict\'e par sa vitesse, mais par sa r\'esolution, sa consommation et sa qualification automobile.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 5 -- 2025, questions 23, 26 et 27
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize 2025, \'epreuve \'ecrite disciplinaire appliqu\'ee, questions 23, 26 et 27}
+]
+\CAPETSHOW{
+Un robot manipulateur KUKA positionne un \'ecran d'affichage sc\'enique. On \'etudie l'\textbf{axe 3} du robot :
+
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item l'axe en sortie du servomoteur dispose d'un \textbf{d\'ebattement angulaire de $288^\circ$} ;
+  \item il re\c{c}oit des consignes de position cod\'ees sur \textbf{24 bits} : le d\'ebattement complet est parcouru lorsque le mot de consigne passe de sa valeur minimale \`a sa valeur maximale ;
+  \item on note $\delta\theta$ la \textbf{pr\'ecision de positionnement angulaire}, c'est-\`a-dire l'\'ecart angulaire entre deux consignes cons\'ecutives.
+\end{itemize}
+
+La position angulaire r\'eelle du moteur est mesur\'ee par un \textbf{r\'esolveur}. Un circuit de traitement convertit cette information en une \textbf{tension image} valant $\SI{-5}{\volt}$ \`a la but\'ee $\theta_{min}$ et $\SI{+5}{\volt}$ \`a la but\'ee $\theta_{max}$, de mani\`ere lin\'eaire. Cette tension est num\'eris\'ee par un CAN de plage d'entr\'ee $[\SI{-5}{\volt}\,;\,\SI{+5}{\volt}]$.
+
+On note $\delta v$ la variation de la tension image lorsque la position angulaire du moteur tourne de l'angle $\delta\theta$.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.9, every node/.style={scale=0.9}, font=\scriptsize]
+  \node[draw, minimum width=1.7cm, minimum height=0.85cm, align=center] (cmd) at (0,0) {Consigne\\24 bits};
+  \node[draw, minimum width=1.5cm, minimum height=0.85cm, align=center] (mot) at (2.9,0) {Servomoteur\\axe 3};
+  \node[draw, minimum width=1.3cm, minimum height=0.85cm, align=center] (res) at (5.5,0) {R\'esolveur};
+  \node[draw, minimum width=1.7cm, minimum height=0.85cm, align=center] (tr) at (5.5,-1.7) {Traitement\\$\pm\SI{5}{\volt}$};
+  \node[draw, minimum width=1.5cm, minimum height=0.85cm, align=center] (can) at (2.5,-1.7) {CAN\\$n$ bits ?};
+  \draw[->] (cmd.east) -- (mot.west);
+  \draw[->] (mot.east) -- (res.west) node[midway,above,font=\scriptsize]{$\theta$};
+  \draw[->] (res.south) -- (tr.north);
+  \draw[->] (tr.west) -- (can.east) node[midway,above,font=\scriptsize]{$\delta v$};
+  \draw[->] (can.west) -- (-0.2,-1.7) -- (cmd.south) node[pos=0.8,left,font=\scriptsize]{$N$};
+  \draw[->] (mot.north) -- ++(0,0.55) node[above,font=\scriptsize]{$288^\circ$ de d\'ebattement};
+\end{tikzpicture}
+\end{center}
+
+Le capteur est consid\'er\'e comme \textbf{suffisamment pr\'ecis si son erreur de quantification $q$ est 10 fois plus petite} que la variation de tension $\delta v$ entre deux positions angulaires commandables du moteur.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Montrer} que la pr\'ecision de positionnement angulaire vaut $\delta\theta = 1{,}72\times 10^{-5}\ {}^\circ$.
+  \item \textbf{\'Etablir} la valeur de $\delta v$.
+  \item \textbf{D\'eterminer} le nombre de bits de codage $n$ n\'ecessaire au CAN pour que sa pr\'ecision soit suffisante. \textbf{Conclure} sur la r\'ealisabilit\'e technique de ce convertisseur.
+  \item Cette conclusion sur les caract\'eristiques du servomoteur de l'axe 3 suffit-elle \`a garantir la pr\'ecision du positionnement de l'\'ecran ? \textbf{Justifier}.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Pr\'ecision angulaire.} Le mot de consigne sur 24 bits prend $2^{24}$ valeurs ; le d\'ebattement de $288^\circ$ est d\'ecoup\'e en autant de pas :
+  \[ \delta\theta = \frac{288}{2^{24}} = \frac{288}{16\,777\,216} = \boldsymbol{1{,}72\times 10^{-5}\ {}^\circ} \]
+  \emph{Valeur exacte} : $1{,}716\,6\times 10^{-5}\ {}^\circ$, soit environ $\SI{0,062}{\arcsecond}$ d'arc -- une pr\'ecision de commande extr\^emement fine.
+
+  \emph{Convention retenue} : on d\'ecoupe ici le d\'ebattement en $2^{24}$ \textbf{intervalles} (convention $2^n$), comme le fait le corrig\'e officiel du jury. Avec la convention $2^n - 1$ (nombre d'intervalles entre $2^n$ valeurs cod\'ees), on obtiendrait $288/(2^{24}-1) = 1{,}716\,6\times 10^{-5}$ : les deux r\'esultats sont \textbf{identiques aux trois chiffres significatifs} affich\'es, l'\'ecart relatif \'etant de $1/2^{24} \approx 6\times 10^{-8}$. \`A cette r\'esolution, le d\'ebat sur la convention n'a plus aucun sens physique.
+  \item \textbf{Variation de tension.} La tension image est lin\'eaire sur le d\'ebattement : $\SI{10}{\volt}$ d'\'etendue ($-5$ \`a $+5$~V) pour $288^\circ$. La sensibilit\'e du capteur vaut donc $10/288 = \SI{0,03472}{\volt\per\degree}$, et pour une rotation de $\delta\theta$ :
+  \[ \delta v = \frac{10}{288}\times\delta\theta = \frac{10}{288}\times\frac{288}{2^{24}} = \frac{10}{2^{24}} = \boldsymbol{\SI{5,96e-7}{\volt}} \approx \SI{0,596}{\micro\volt} \]
+  \emph{Le d\'ebattement de $288^\circ$ se simplifie} : $\delta v$ ne d\'epend que de l'\'etendue de tension et du nombre de bits de la \textbf{consigne}. C'est logique : la cha\^ine de mesure doit distinguer autant de niveaux de tension qu'il existe de positions commandables.
+  \item \textbf{Crit\`ere de pr\'ecision.} L'\'enonc\'e impose $q \leq \delta v/10$ :
+  \[ q = \frac{\delta v}{10} = \frac{5{,}96\times 10^{-7}}{10} = \boldsymbol{\SI{5,96e-8}{\volt}} \approx \SI{6e-8}{\volt} \]
+  \textbf{Nombre de bits.} La plage $[-5\,;\,+5]\,\si{\volt}$, d'\'etendue $\SI{10}{\volt}$, doit \^etre d\'ecoup\'ee en $N$ pas de largeur $q$ :
+  \[ N = \frac{10}{q} = \frac{10}{5{,}96\times 10^{-8}} = 1{,}678\times 10^{8} \]
+  \[ n \geq \log_2\!\left(1{,}678\times 10^{8}\right) = \frac{\ln(1{,}678\times 10^{8})}{\ln 2} = 27{,}32 \quad\Longrightarrow\quad \boldsymbol{n = 28\ \text{bits}} \]
+  \emph{Arrondi \`a l'entier sup\'erieur imp\'eratif} : avec 27 bits, $2^{27} = 1{,}342\times 10^{8} < 1{,}678\times 10^{8}$, le crit\`ere ne serait pas tenu.
+
+  \emph{Chemin de v\'erification direct} : le crit\`ere impose $2^n \geq 10\times 2^{24}$, soit $n \geq 24 + \log_2 10 = 24 + 3{,}32 = 27{,}32$. \checkmark\ On retrouve bien 28 bits, et l'on voit d'o\`u vient le r\'esultat : le facteur 10 exig\'e co\^ute $\log_2 10 \approx 3{,}32$, donc \textbf{4 bits suppl\'ementaires} par rapport aux 24 bits de la consigne.
+
+  \smallskip
+  \textbf{Conclusion sur la r\'ealisabilit\'e.} Un CAN de \textbf{28 bits} sur une plage de \SI{10}{\volt} suppose un quantum de $\SI{6e-8}{\volt} = \SI{60}{\nano\volt}$. Or ce niveau est \textbf{inf\'erieur au bruit thermique} d'une r\'esistance de quelques \si{\kilo\ohm} \`a temp\'erature ambiante sur une bande passante usuelle (quelques centaines de \si{\nano\volt} efficaces) : aucun convertisseur du commerce ne tient cette sp\'ecification en conversion rapide -- les meilleurs CAN $\Sigma\Delta$ de mesure plafonnent autour de 24 bits utiles, et encore \`a tr\`es faible d\'ebit. \textbf{L'exigence n'est donc pas r\'ealisable en l'\'etat} : c'est le crit\`ere lui-m\^eme (facteur 10 sur une consigne d\'ej\`a cod\'ee sur 24 bits) qui est irr\'ealiste, et non le choix du composant. La voie de mesure doit \^etre repens\'ee -- par exemple par un capteur incr\'emental de position \`a comptage, qui ne subit pas cette limite de dynamique analogique.
+  \item \textbf{Non, cette conclusion ne suffit pas}, pour deux raisons ind\'ependantes :
+  \begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+    \item \textbf{les autres axes} : le robot comporte 6 axes, et l'\'etude n'a port\'e que sur l'axe 3. Les erreurs de positionnement de chaque axe se \textbf{cumulent} au niveau de l'effecteur ; il faudrait v\'erifier que leur somme reste inf\'erieure \`a la tol\'erance globale ;
+    \item \textbf{les autres sources d'erreur} : on n'a consid\'er\'e ici que l'erreur de \textbf{quantification} des angles de consigne. Il resterait \`a v\'erifier que la commande de chaque axe conduit \`a une \textbf{erreur statique nulle} (pr\'ecision de l'asservissement lui-m\^eme), et \`a prendre en compte les jeux m\'ecaniques, les d\'eformations \'elastiques des bras et les d\'erives thermiques.
+  \end{itemize}
+
+  \smallskip
+  \textbf{Conclusion.} La v\'erification men\'ee ne valide qu'une \textbf{condition n\'ecessaire, non suffisante} : la r\'esolution de codage de l'axe 3 pourrait th\'eoriquement suffire \`a la pr\'ecision demand\'ee, mais la faisabilit\'e du CAN associ\'e n'est pas acquise et le budget d'erreur global du robot reste \`a \'etablir. C'est exactement le type de conclusion attendu au CAPET : \textbf{qualifier la port\'ee du r\'esultat} au lieu de conclure globalement sur un calcul partiel.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2022, conseils aux candidats pour l'\'epreuve \'ecrite) : \guillemotleft\ Le jury recommande aux candidats d'apporter un soin particulier aux questions de conclusion de chacune des parties. Les \'ecarts \'evalu\'es doivent \^etre clairement mis en \'evidence et comment\'es. \guillemotright}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 6 -- exercice inedit (CNA R-2R)
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+En sortie d'un correcteur num\'erique, la commande $u_k$ cod\'ee sur $n$ bits doit \^etre reconvertie en tension analogique. On utilise pour cela un \textbf{convertisseur num\'erique-analogique \`a r\'eseau R-2R} en configuration \emph{courant}, suivi d'un amplificateur transimp\'edance.
+
+Le mot d'entr\'ee est $N = b_{n-1}b_{n-2}\dots b_1 b_0$ (codage binaire naturel, $b_{n-1}$ = MSB). Chaque bit $b_i$ commande un interrupteur qui aiguille le courant de sa branche soit vers la masse, soit vers l'entr\'ee inverseuse de l'ALI (masse virtuelle).
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.92, every node/.style={scale=0.92}]
+  % ---- trois bus horizontaux ----
+  %  y = 4.3 : bus de sortie vers la masse virtuelle de l'ALI
+  %  y = 3.0 : echelle R-2R
+  %  y = 0.0 : bus de masse
+  % ---- echelle R-2R (bus du haut) ----
+  \draw (0.0,3.0) to[R, l=$R$] (1.9,3.0);
+  \draw (1.9,3.0) node[circ]{} to[R, l=$R$] (3.8,3.0);
+  \draw (3.8,3.0) node[circ]{} to[R, l=$R$] (5.7,3.0);
+  \node[circ] at (5.7,3.0) {};
+  % terminaison 2R a gauche
+  \draw (0.0,3.0) node[circ]{} to[R, l_=$2R$] (0.0,0.0);
+  % ---- branches 2R + interrupteurs d'aiguillage ----
+  % chaque interrupteur bascule entre le bus de masse (y=0) et le bus de sortie (y=4.3)
+  \foreach \x/\lb in {1.9/$b_0$, 3.8/$b_1$, 5.7/$b_{n-1}$} {
+    \draw (\x,3.0) to[R, l_=$2R$] (\x,1.75);
+    % contact commun
+    \draw (\x,1.75) -- (\x,1.45);
+    % lame de l'interrupteur (position basse = vers la masse)
+    \draw[thick] (\x,1.45) -- (\x-0.42,0.75);
+    \node[font=\scriptsize] at (\x+0.3,1.15) {\lb};
+    % contact "masse"
+    \draw (\x-0.42,0.65) node[circ]{} -- (\x-0.42,0.0);
+    % contact "sortie" (renvoye vers le bus de masse virtuelle, sous le montage)
+    \node[circ] at (\x+0.42,0.65) {};
+    \draw (\x+0.42,0.65) -- (\x+0.42,-1.15);
+  }
+  % bus de renvoi vers la masse virtuelle de l'ALI (sous le bus de masse)
+  \draw (2.32,-1.15) -- (9.1,-1.15) -- (9.1,5.2);
+  \node[circ] at (4.22,-1.15) {};
+  \node[circ] at (6.12,-1.15) {};
+  % ---- bus de masse ----
+  \draw (0.0,0.0) -- (7.0,0.0);
+  \node[ground] at (3.35,0.0) {};
+  % ---- source de reference ----
+  \draw (5.7,3.0) to[R, l=$R$] (7.0,3.0);
+  \draw (7.0,3.0) to[V, l=$V_{ref}$] (7.0,0.0);
+  % ---- ALI transimpedance (masse virtuelle sur l'entree inverseuse) ----
+  \node[op amp, anchor=-, scale=1.0] (ao) at (9.1,5.2) {};
+  \draw (ao.+) -- ++(-0.5,0) node[ground, rotate=-90]{};
+  \draw (ao.out) -- (11.9,5.2) node[right,font=\scriptsize]{$V_S$};
+  % contre-reaction Rf
+  \draw (9.1,5.2) node[circ]{} -- (9.1,6.5);
+  \draw (9.1,6.5) to[R, l=$R_f$] (11.4,6.5);
+  \draw (11.4,6.5) -- (11.4,5.2) node[circ]{};
+\end{circuitikz}
+\end{center}
+
+On donne $V_{ref} = \SI{5,00}{\volt}$, $R = \SI{10}{\kilo\ohm}$, $R_f = R$ et $n = 12$ bits. La loi de sortie d'un tel montage est :
+\[ V_S = -\,V_{ref}\,\frac{R_f}{R}\cdot\frac{N}{2^n} \]
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Justifier} qualitativement la structure du r\'eseau R-2R : pourquoi la r\'esistance vue depuis chaque n\oe ud vers la gauche vaut-elle toujours $R$, et quelle cons\'equence cela a-t-il sur les courants de branche ?
+  \item \textbf{Calculer} le quantum du CNA, ainsi que la tension de sortie pour $N = 2\,048$ puis pour $N = 4\,095$. \textbf{Commenter} l'\'ecart entre la tension obtenue \`a $N = 4\,095$ et la pleine \'echelle $V_{ref}$.
+  \item Les r\'esistances du r\'eseau sont r\'ealis\'ees avec une tol\'erance relative $\epsilon$. On montre que la condition de \textbf{monotonicit\'e} du convertisseur (aucune inversion de la sortie lorsque le code cro\^it) est la plus contraignante \`a la transition du bit de poids fort, o\`u elle s'\'ecrit $\epsilon \leq 2^{-n}$. \textbf{D\'eterminer} la tol\'erance maximale admissible pour $n = 12$ bits, et \textbf{conclure} sur la technologie de fabrication \`a mettre en \oe uvre.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Propri\'et\'e fondamentale du r\'eseau R-2R.} Tous les interrupteurs aiguillent leur branche soit vers la masse r\'eelle, soit vers la \textbf{masse virtuelle} de l'entr\'ee inverseuse de l'ALI : dans les deux cas, le bas de chaque r\'esistance $2R$ est \textbf{au potentiel z\'ero}. Le r\'eseau voit donc toujours la m\^eme topologie, quel que soit le mot d'entr\'ee.
+
+  On raisonne alors de proche en proche depuis l'extr\'emit\'e gauche :
+  \begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+    \item la terminaison est un $2R$ \`a la masse, en parall\`ele avec le $2R$ du premier bit : $2R\parallel 2R = R$ ;
+    \item cette r\'esistance $R$ en s\'erie avec le $R$ horizontal suivant donne $2R$, de nouveau en parall\`ele avec le $2R$ du bit suivant : $2R\parallel 2R = R$ ;
+    \item le motif se \textbf{reproduit \`a l'identique} \`a chaque \'etage.
+  \end{itemize}
+  \textbf{Cons\'equence sur les courants.} \`A chaque n\oe ud, le courant arrivant se partage entre deux branches de m\^eme r\'esistance \'equivalente ($2R$ vers le bas, $2R$ vers la gauche) : il se \textbf{divise exactement par deux}. Le courant de branche du bit $b_i$ vaut donc
+  \[ I_i = \frac{V_{ref}}{2R}\cdot\frac{1}{2^{\,n-1-i}} \]
+  c'est-\`a-dire une progression en \textbf{puissances de 2} strictement conforme aux poids binaires -- et ce avec \textbf{seulement deux valeurs de r\'esistance}, $R$ et $2R$. C'est tout l'int\'er\^et de la structure : un convertisseur \`a r\'esistances pond\'er\'ees ($R, 2R, 4R,\dots, 2^{n-1}R$) exigerait pour $n = 12$ un rapport de $2\,048$ entre les valeurs extr\^emes, impossible \`a appairer avec pr\'ecision sur un m\^eme substrat.
+  \item \textbf{Quantum du CNA.} Avec $R_f = R$, la loi de sortie se r\'eduit \`a $V_S = -V_{ref}\,N/2^n$. Le quantum est la variation de sortie pour $\Delta N = 1$ :
+  \[ q = \frac{V_{ref}}{2^n} = \frac{5{,}00}{4\,096} = \SI{1,2207e-3}{\volt} \approx \boldsymbol{\SI{1,22}{\milli\volt}} \]
+  \emph{Convention} : le CNA, contrairement au CAN, ne laisse ici \textbf{aucune ambigu\"it\'e} -- le diviseur est physiquement en $2^n$, impos\'e par la structure du r\'eseau (le courant du MSB vaut exactement $V_{ref}/2R$, soit la moiti\'e du courant total possible). La convention $2^n - 1$ n'a pas lieu d'\^etre pour ce montage.
+
+  \textbf{Tensions de sortie.}
+  \[ N = 2\,048 = 2^{11} \;:\; V_S = -5{,}00\times\frac{2\,048}{4\,096} = \boldsymbol{\SI{-2,50}{\volt}} \]
+  \[ N = 4\,095 \;:\; V_S = -5{,}00\times\frac{4\,095}{4\,096} = -4{,}998\,78 \approx \boldsymbol{\SI{-5,00}{\volt}} \]
+  \textbf{Commentaire.} La sortie n'atteint \textbf{jamais} $-V_{ref}$ : le code maximal $4\,095$ donne $V_{ref} - q$, soit un d\'efaut de $\SI{1,22}{\milli\volt}$. C'est structurel : le mot $N = 4\,096$ n'existe pas sur 12 bits. La \textbf{dynamique r\'eelle} du CNA est donc $[0\,;\,V_{ref} - q]$, et non $[0\,;\,V_{ref}]$ -- point \`a ne pas oublier lors du dimensionnement d'un \'etage de puissance plac\'e en aval, sous peine de sous-estimer la commande maximale disponible de $1$~LSB. Le signe n\'egatif traduit simplement le montage inverseur ; un \'etage inverseur de gain $-1$ le r\'etablit si la commande doit \^etre positive.
+  \item \textbf{Tolérance maximale.}
+  \[ \epsilon \leq 2^{-n} = 2^{-12} = \frac{1}{4\,096} = 2{,}441\times 10^{-4} \approx \boldsymbol{\SI{0,024}{\percent}} \]
+  \emph{Interpr\'etation physique de ce crit\`ere.} \`A la transition $N = 2\,047 \rightarrow 2\,048$ (passage de $0111\,1111\,1111_2$ \`a $1000\,0000\,0000_2$), \textbf{tous} les interrupteurs basculent simultan\'ement : le MSB s'active pendant que les 11 autres bits se d\'esactivent. La sortie doit cro\^itre d'exactement $1$~LSB, alors que deux contributions de taille $2\,048\,q$ et $2\,047\,q$ se compensent presque enti\`erement. Une erreur relative de $\epsilon$ sur la r\'esistance du MSB produit une erreur absolue de $\epsilon\times 2\,048\,q$ ; pour qu'elle reste inf\'erieure au pas de $1$~LSB, il faut $\epsilon\times 2^{n-1} \leq 1/2$, soit bien $\epsilon \leq 2^{-n}$. Si la condition est viol\'ee, la sortie \textbf{recule} alors que le code avance : le convertisseur devient \textbf{non monotone}, ce qui est r\'edhibitoire dans une boucle d'asservissement (inversion locale du signe du gain, donc risque d'instabilit\'e ou de cycle limite).
+
+  \smallskip
+  \textbf{Conclusion.} Une tol\'erance de \SI{0,024}{\percent} est \textbf{hors de port\'ee des r\'esistances discr\`etes} du commerce (les s\'eries courantes offrent \SI{1}{\percent}, les pr\'ecisions m\'etal \SI{0,1}{\percent} \`a co\^ut \'elev\'e, soit encore \textbf{quatre fois trop} pour ce crit\`ere). Un CNA 12 bits monotone ne peut donc \^etre r\'ealis\'e qu'en \textbf{circuit int\'egr\'e} : r\'esistances diffus\'ees sur un m\^eme substrat, \textbf{appari\'ees} par dessin (\emph{matching} obtenu par des motifs en centro\"ide commun) et ajust\'ees par \emph{laser trimming}. C'est ce qui explique qu'on n'\'etudie ce r\'eseau que comme mod\`ele de compr\'ehension et qu'on utilise en pratique un composant int\'egr\'e : ce n'est pas la loi de conversion qui est difficile \`a obtenir, mais l'\textbf{appariement} des r\'esistances. Noter enfin que seule la monotonicit\'e est ici garantie -- la pr\'ecision absolue d\'epend en outre de la stabilit\'e de $V_{ref}$ et de l'offset de l'ALI.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

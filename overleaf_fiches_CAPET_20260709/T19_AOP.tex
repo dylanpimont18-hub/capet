@@ -1,0 +1,399 @@
+﻿\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colElec}{T19}} - AOP (amplificateur operationnel)}
+\fancyhead[R]{\small\textit{CAPET SII IE - Session 2026}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TeTE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colElec,
+  colframe=colElec,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T19 \quad AOP (amplificateur operationnel)}\\[2pt]
+  {\color{colElec!30!white}\small
+    \textbf{Domaine :} electronique - Conditionnement du signal \quad
+    \textbf{Presence :} \textbf{8/13} sujets (2013-2026) - theme \emph{tres frequent}
+  }\\[1pt]
+  {\color{colElec!20!white}\footnotesize
+    Sous-themes : montages inverseur - non-inverseur - suiveur - soustracteur - integrateur - comparateur - hysteresis - conversion tension-courant 4-20\,mA - theoreme de Millman
+  }
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Hypotheses AOP ideal -----------------------------------------
+\textbf{1.1 Hypotheses de l'AOP ideal - regime lineaire}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{ll}
+\toprule
+\textbf{Hypothese} & \textbf{Consequence} \\
+\midrule
+Courants d'entree nuls & $I_+ = I_- = 0$ \\
+Gain differentiel infini & $\varepsilon = V_+ - V_- = 0 \;\Rightarrow\; V_+ = V_-$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\textbf{Condition de validite :} contre-reaction negative (sortie rebouclee sur $V_-$). En comparateur (boucle ouverte ou contre-reaction positive), $V_+ \neq V_-$.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 Montages fondamentaux ----------------------------------------
+\textbf{1.2 Montages fondamentaux}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{llll}
+\toprule
+\textbf{Montage} & \textbf{Gain $V_s/V_e$} & \textbf{$Z_e$} & \textbf{Usage} \\
+\midrule
+Inverseur & $-R_2/R_1$ & $R_1$ & Amplification + inversion \\
+Non-inverseur & $1 + R_2/R_1$ & $\to \infty$ & Amplification sans inversion \\
+Suiveur (buffer) & $1$ & $\to \infty$ & Adaptation d'impedance \\
+Soustracteur & $\dfrac{R_2}{R_1}(V_2 - V_1)$ & - & Signal differentiel (capteur) \\
+Integrateur & $-\dfrac{1}{RCp}$ & $R_1$ & Filtre passe-bas, correcteur I \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 Comparateur - hysteresis -------------------------------------
+\textbf{1.3 Comparateur - hysteresis - contre-reaction positive}
+
+\smallskip
+Contre-reaction sur $V_+$ (resistances $R_1$ sur sortie, $R_2$ sur $V_{ref}$) :
+\[
+  V_+ = \frac{R_2\,V_{ref} + R_1\,V_s}{R_1 + R_2}
+\]
+Deux seuils de basculement (avec $V_s = \pm V_{sat}$) :
+\[
+  V_H = \frac{R_2\,V_{ref} + R_1\,V_{sat}}{R_1 + R_2}
+  \qquad;\qquad
+  V_B = \frac{R_2\,V_{ref} - R_1\,V_{sat}}{R_1 + R_2}
+\]
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 Conversion tension-courant -----------------------------------
+\textbf{1.4 Conversion tensionecourant 4-20\,mA (transmetteur normalise)}
+
+\smallskip
+\[
+  I_s = \frac{V_{entree}}{R_5}
+\]
+Pour $V_{entree} \in [1\,;\,5]\,\mathrm{V}$ et $R_5 = 250\,\Omega$ : $I_s \in [4\,;\,20]\,\mathrm{mA}$.\\
+$I_s$ est independant de la charge $R_{ana}$ car la boucle de contre-reaction maintient $\varepsilon = 0$.
+
+\textbf{Theoreme de Millman} (pour un neud - $n$ admittances) :
+\[
+  V_{neud} = \frac{\sum_k V_k/R_k}{\sum_k 1/R_k}
+\]
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHeTIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthetique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Montages lineaires}} \\
+$V_s/V_e = -R_2/R_1$ & Inverseur & - \\
+$V_s/V_e = 1+R_2/R_1$ & Non-inv. & - \\
+$V_s = V_e$ & Suiveur & - \\
+$V_s = (R_2/R_1)(V_2-V_1)$ & Soustr. & - \\
+$H(p) = -1/(RCp)$ & Integr. & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Hypotheses}} \\
+$V_+ = V_-$ & Lin. & - \\
+$I_+ = I_- = 0$ & Lin. & - \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Hysteresis}} \\
+$V_+ = (R_2 V_{ref}+R_1 V_s)/(R_1+R_2)$ & Seuil & V \\
+$V_H = (R_2 V_{ref}+R_1 V_{sat})/(R_1+R_2)$ & Haut & V \\
+$V_B = (R_2 V_{ref}-R_1 V_{sat})/(R_1+R_2)$ & Bas & V \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{T/I et Millman}} \\
+$I_s = V_e/R_5$ & Transm. & A \\
+$V_n = \sum(V_k/R_k)/\sum(1/R_k)$ & Millman & V \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Donnees 2024}} \\
+$G_{total} = 340$ & Transmetteur & - \\
+Plage : 4-20\,mA, $R_5 = 250\,\Omega$ & Normalise & - \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets reels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+% Mini-procedure de resolution type copie concours
+\begin{tcolorbox}[questiontype,title={Procedure type copie concours (5 etapes)}]
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Qualifier le modele} : hypotheses, domaine de validite, grandeurs d'entree/sortie.
+  \item \textbf{Ecrire les lois} : equations de base avec symboles et unites SI.
+  \item \textbf{Isoler l'inconnue} : expression litterale, puis application numerique tracee.
+  \item \textbf{Controler l'ordre de grandeur} : coherence physique et unite finale.
+  \item \textbf{Conclure concours} : phrase courte orientee decision technique.
+\end{enumerate}
+\end{tcolorbox}
+
+% Visuel de methode : chemin de resolution CAPET
+\begin{center}
+\begin{tikzpicture}[font=\small, node distance=7mm and 6mm, >=Stealth]
+  \node[draw, rounded corners, fill=colElec!8, inner sep=4pt] (n1) {Notions};
+  \node[draw, rounded corners, fill=colElec!8, right=of n1, inner sep=4pt] (n2) {Methode};
+  \node[draw, rounded corners, fill=colElec!8, right=of n2, inner sep=4pt] (n3) {Application annale};
+  \node[draw, rounded corners, fill=colElec!8, right=of n3, inner sep=4pt] (n4) {Verification jury};
+  \draw[->, thick, colElec] (n1) -- (n2);
+  \draw[->, thick, colElec] (n2) -- (n3);
+  \draw[->, thick, colElec] (n3) -- (n4);
+\end{tikzpicture}
+\end{center}
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Montage differentiel - calcul du gain $G_1$ (transmetteur de temperature) \hfill\normalfont\footnotesize E2 disc. 2024 (E1-E3)}
+]
+\textbf{enonce.}
+Un montage AOP differentiel (soustracteur) amplifie la tension $e_{AB}$ d'un capteur PT100. Donnees : $R_1 = 1\,\mathrm{k\Omega}$, $R_2 = 834{,}4\,\Omega$. Exprimer le gain $G_1$ et calculer sa valeur. Le 2\textsuperscript{e} etage a $G_2 = -100$, le 3\textsuperscript{e} a $G_3 = -1$. Calculer le gain global.
+
+\tcbline
+
+\textbf{Corrige.}
+
+Par la loi des mailles (AOP ideal, $V_+ = V_-$) :
+\[
+  G_1 = \frac{2R_1 + R_2}{R_2} = \frac{2 \times 1000 + 834{,}4}{834{,}4} = \frac{2834{,}4}{834{,}4} \approx \mathbf{3{,}4}
+\]
+Gain global :
+\[
+  G = G_1 \times G_2 \times G_3 = 3{,}4 \times (-100) \times (-1) = \mathbf{340}
+\]
+$V_3 = 340 \times e_{AB}$ - les deux inversions de $G_2$ et $G_3$ se compensent, le signal reste en phase avec $e_{AB}$.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Comparateur - hysteresis - seuils de basculement \hfill\normalfont\footnotesize E2 disc. 2023 (F6-F8)}
+]
+\textbf{enonce.}
+Comparateur - hysteresis : $V_{ref} = 2{,}42\,\mathrm{V}$, $V_{sat} = 15\,\mathrm{V}$, $R_1 = 1\,\mathrm{k\Omega}$, $R_2 = 150\,\mathrm{k\Omega}$.
+(a) Exprimer $V_+$ en fonction de $V_{ref}$, $R_1$, $R_2$, $V_s$.
+(b) Calculer $V_H$ et $V_B$.
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{(a)} Diviseur de tension entre $V_s$ et $V_{ref}$ :
+\[
+  V_+ = \frac{R_2\,V_{ref} + R_1\,V_s}{R_1 + R_2} = \frac{150 \times 10^3 \times V_{ref} + 1 \times 10^3 \times V_s}{151 \times 10^3}
+\]
+
+\textbf{(b)} Seuil haut ($V_s = +V_{sat} = +15\,\mathrm{V}$) :
+\[
+  V_H = \frac{150\,000 \times 2{,}42 + 1\,000 \times 15}{151\,000} = \frac{363\,000 + 15\,000}{151\,000} = \frac{378\,000}{151\,000} \approx \mathbf{2{,}50\,\mathrm{V}}
+\]
+
+Seuil bas ($V_s = -V_{sat} = -15\,\mathrm{V}$) :
+\[
+  V_B = \frac{150\,000 \times 2{,}42 - 1\,000 \times 15}{151\,000} = \frac{363\,000 - 15\,000}{151\,000} = \frac{348\,000}{151\,000} \approx \mathbf{2{,}30\,\mathrm{V}}
+\]
+
+Hysteresis : $\Delta V = V_H - V_B = 2{,}50 - 2{,}30 = 0{,}20\,\mathrm{V}$ - protection contre les oscillations au voisinage du seuil.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Conversion tensionecourant - independance vis--vis de la charge \hfill\normalfont\footnotesize E2 disc. 2024 (E9)}
+]
+\textbf{enonce.}
+Montage AOP en boucle fermee avec resistance de mesure $R_5 = 250\,\Omega$ dans la boucle. Tension en entree $V_4 \in [1\,;\,5]\,\mathrm{V}$. Montrer que le courant $I_s$ est independant de la charge $R_{ana}$ et calculer la plage.
+
+\tcbline
+
+\textbf{Corrige.}
+
+Par la loi des neuds au neud A (entree $V_-$ de l'AOP, hypothese $I_- = 0$) :
+\[
+  \frac{V_A - V_4}{R_5} + \frac{V_A - V_s}{R_{ana}} = I_- = 0
+\]
+Avec $V_+ = V_- = V_A$ (contre-reaction), et en appliquant la regle d'entree $V_- = V_4$ :
+\[
+  I_s = \frac{V_4 - 0}{R_5} = \frac{V_4}{R_5}
+\]
+$I_s$ est bien \textbf{independant de $R_{ana}$} (la boucle de contre-reaction ajuste $V_s$ pour maintenir $\varepsilon = 0$ quelle que soit la charge).
+
+\textbf{Plage de courant :}
+\[
+  V_4 = 1\,\mathrm{V} \;\Rightarrow\; I_s = \frac{1}{250} = 4\,\mathrm{mA}
+  \qquad;\qquad
+  V_4 = 5\,\mathrm{V} \;\Rightarrow\; I_s = \frac{5}{250} = 20\,\mathrm{mA}
+\]
+Standard industriel normalise 4-20\,mA.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs recurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Verifier la contre-reaction avant d'appliquer $V_+ = V_-$.}
+  En mode comparateur (boucle ouverte ou contre-reaction positive), $V_+ \neq V_-$ - ne pas appliquer l'egalite. Identifier d'abord le mode de fonctionnement.
+
+  \item \textbf{Signe du gain inverseur.}
+  $G = -R_2/R_1$ : le signe moins est fondamental. L'oubli conduit - conclure - une amplification non-inverseuse.
+
+  \item \textbf{Courants d'entree AOP nuls.}
+  $I_+ = I_- = 0$ : appliquer les lois de neuds uniquement sur les resistances externes. Ne jamais ecrire un courant passant par l'entree de l'AOP.
+
+  \item \textbf{Theoreme de Millman meconnu.}
+  Applique en 2024 (E4 : montage de decalage), il simplifie considerablement le calcul des neuds - plusieurs branches.
+
+  \item \textbf{Hysteresis : ne pas inverser les seuils.}
+  $V_H > V_B$ toujours. $V_H$ correspond - $V_s = +V_{sat}$, $V_B$ - $V_s = -V_{sat}$. Confondre les deux donne une hysteresis negative physiquement impossible.
+
+  \item \textbf{Suiveur = adaptation d'impedance, pas amplification.}
+  Gain = 1 mais impedance d'entree quasi infinie et impedance de sortie quasi nulle. Rele : isoler deux etages sans attenuation.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2024 : "La partie E (AOP) a ete abordee par 70\,\% des candidats et traitee correctement par seulement 47\,\%. Le jury observe un manque de maetrise des montages complexes (conversion T/I, decalage). Les calculs numeriques doivent etre encadres avec des unites."\\
+Rapport jury 2024 : "Connaetre les trois conditions de l'AOP ideal et les appliquer systematiquement sans les redemontrer ($V_+ = V_-$, $I_+ = I_- = 0$). Justifier le montage choisi parmi les montages standards."
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PReSENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colGrayLight,
+  colframe=colSeparator,
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+  before skip=4pt, after skip=0pt,
+  fonttitle=\small\bfseries,
+  title={Presence dans les sujets analyses (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Annee} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & - & - & - & - & - & - & - & - & - & - & $\checkmark$ & - \\
+E2 discipl. IE & - & - & - & - & - & - & $\checkmark$ & - & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & - \\
+E2 appl. comm. & - & - & - & - & - & - & - & - & - & - & - & - & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-themes frequents :}
+montage inverseur/non-inverseur (6/13) - montage soustracteur (4/13) - comparateur - hysteresis (3/13) - conversion tension-courant 4-20\,mA (2/13) - integrateur/correcteur PI (3/13)
+
+\medskip
+\textbf{Ordres de grandeur (reperes rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Reseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, frequence \SI{50}{\hertz}.
+  \item Courants d'etude frequents en sujet : de quelques \si{\ampere} a quelques dizaines de \si{\ampere}.
+  \item En conversion d'energie, un rendement attendu reste generalement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthese express (a refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypotheses du modele et les conventions de signe.
+  \item Ecrire 2 a 4 relations cles avec unites.
+  \item Realiser un calcul numerique complet et verifier l'ordre de grandeur.
+  \item Justifier le resultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE
+
+
+
+
+
+
+
+
+

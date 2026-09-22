@@ -1,0 +1,356 @@
+% Sources verifiees WebSearch 2026-07-15 : Rth,jc TO-220 ~2-5 K/W (ROHM, fscdn.rohm.com applinote),
+% Tj,max composants de puissance silicium ~150C (Renesas, STMicroelectronics datasheets IGBT),
+% pont de Wheatstone quart de pont PT100 100 ohm standard (instrumexpert.com, ecotherm-mesures.fr)
+% Correction 2026-08-25 (audit AUDIT_EXERCICES_2026.md) :
+% - ex. 5 (ancien ex. 1) : donnees authentiques du sujet E2 2019 "Transformation d'une rame de metro"
+%   (Fe1 = 14,9 kN, Fe2 = 9,2 kN EFFORTS, de = 0,86 m, rho = 0,17, eta_red = 97 %, T = 2 048 s,
+%   somme = 558e6, moteurs Alsthom 96 kW / 1 035 tr/min) - questions 25 a 27 puis 28.
+% - ex. 1 (ancien ex. 2) : reference corrigee "partie E" -> question D4 (E2 Disciplinaire IE 2024,
+%   figure 14 et document reponse DR4).
+% - ex. 3 (ancien ex. 5) : citation jury remplacee par le verbatim des elements de correction D1 du
+%   Rapport_Jury_2024 ; plage -30/700 C et tolerance +/-1,5 C rattachees a la figure 13 du SUJET.
+%
+% Correction 2026-09-02 (complementarite fiches/exercices, protocole PROTOCOLE_COMPLEMENTARITE) :
+% - ex. 1 REMPLACE : l'ancien enonce (transfert lineaire Is = f(T), -20/200 C -> 4/20 mA, application
+%   T = 120 C, question D4) etait un doublon strict de la QT2 de la fiche T05
+%   (fiches/T05_Phenomenes_Thermiques.tex, "QT2 - Transmetteur 4-20 mA", memes bornes, meme A.N.).
+%   Le nouvel ex. 1 porte sur la SUITE de la meme partie D du meme sujet, non traitee par la fiche :
+%   numerisation par le module AI 8xU/I/RTD/TC ST et mise a l'echelle PIW8 -> MW8 (questions D6 a D11).
+%   Il est en outre converti en exercice docTech (encadre "Document technique -- DT10 et DT8"),
+%   comblant l'absence d'exercice de lecture de document technique relevee par l'audit (§2.5).
+%   Tracabilite des donnees du nouvel encadre docTech :
+%     * DT10, table "Points caracteristiques maximaux" (-20 C / 200 C ; eAB mini = -1 mV /
+%       eAB maxi = 10,8 mV) : VERBATIM du sujet E2_Disciplinaire_IE_2024.md, l. 942 et l. 946-949.
+%     * DT10, profil du courant 4-20 mA sur -20/200 C : VERBATIM du sujet, l. 953-963 et figure 14
+%       (l. 494).
+%     * DT8, "2 octets par entree analogique" et "16 bits signe, signe sur le bit de poids fort" :
+%       enonce du sujet l. 515 et l. 523 + elements de correction D6 du Rapport_Jury_2024.md, l. 331.
+%     * DT8, ligne des courants 1,185 / 4 / 20 / 22,81 mA : VERBATIM du document reponse DR4,
+%       question D7 (sujet, l. 1056-1059) ; la ligne des valeurs decimales de PIW8 y est VIDE
+%       (a completer par le candidat) et le DT8 lui-meme est une image omise par la conversion.
+%       La ligne PIW8 (-4 864 / 0 / 27 648 / 32 511) est donc RECONSTITUEE : la valeur pivot
+%       PIW8max = 27 648 est textuellement dans le sujet (l. 539, l. 567) et dans le rapport de jury
+%       (l. 373-377) ; les trois autres sont les valeurs standard de la table Siemens "Representation
+%       of analog values in the current measuring ranges" pour le calibre 4-20 mA, verifiees
+%       WebSearch 2026-09-02 (manuel SIMATIC S7-1500 Analog Input AI 8xU/I, p. 52 ;
+%       cache.industry.siemens.com / manualslib.com).
+%     * Corrige des questions 2 a 4 (a = 220/27 648 ~ 0,0080 ; b = -20 ; E = 220 ;
+%       PIW8(CB=35 C) = 6 912 ; PIW8(CH=50 C) = 8 797) : VERBATIM des elements de correction
+%       D9, D10 et D11 du Rapport_Jury_2024.md, l. 363-377. Consignes CB = 35 C / CH = 50 C :
+%       sujet l. 545-549.
+% - ex. 3 : reference du titre precisee ("epreuve ecrite disciplinaire", nom exact lu dans le sujet
+%   l. 11), l'ancienne mention "Extracteur d'air" n'etant pas le nom de l'epreuve.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ifdefined\tr\else\DeclareSIUnit{\tr}{tr}\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T05}} - Exercices - Ph\'enom\`enes thermiques}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T05 \quad Ph\'enom\`enes thermiques}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 5 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2024, \'epreuve \'ecrite disciplinaire, questions D6 \`a D11}
+]
+\CAPETSHOW{
+Dans l'armoire \'electrique d'un extracteur d'air, la temp\'erature $T_{ARM}$ est mesur\'ee par un thermocouple de type J, mis en forme par un transmetteur \guillemotleft\ TT~\guillemotright\ (r\'ef\'erence KOS~839) dont la sortie attaque le module d'entr\'ees analogiques \emph{AI 8xU/I/RTD/TC ST} d'un automate S7-1500. Le module recopie le courant re\c cu dans le mot d'entr\'ee $PIW8$ ; un programme de \guillemotleft\ mise \`a l'\'echelle~\guillemotright\ en d\'eduit le mot interne $MW8$, image de la temp\'erature en \si{\celsius}.
+
+\begin{tcolorbox}[docTech, title={Document technique -- DT10 (profils capteur / transmetteur) et DT8 (module d'entr\'ees analogiques)}]
+\textbf{DT10 -- Profil de la tension fournie par le capteur (thermocouple type J).}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Points caract\'eristiques maximaux} & & \\
+\midrule
+Temp\'erature mesur\'ee (\si{\celsius}) & $-20$ & $200$ \\
+Tension d\'elivr\'ee par le capteur (\si{\milli\volt}) & $e_{AB\,mini} = -1$ & $e_{AB\,maxi} = 10{,}8$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{DT10 -- Profil du courant d\'elivr\'e par le transmetteur TT} : $I_s$ varie lin\'eairement de $I_{s\,mini} = \SI{4}{\milli\ampere}$ \`a $I_{s\,maxi} = \SI{20}{\milli\ampere}$ lorsque $T_{ARM}$ varie de $-20$ \`a $\SI{200}{\celsius}$.
+
+\smallskip
+\textbf{DT8 -- R\'esolution des valeurs analogiques ($PIW_i$).} Une entr\'ee analogique occupe une adresse m\'emoire de 2 octets. Repr\'esentation des valeurs analogiques dans les calibres de mesure en courant :
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lcccc}
+\toprule
+Courant mesur\'e (\si{\milli\ampere}) & $1{,}185$ & $4$ & $20$ & $22{,}81$ \\
+Valeur d\'ecimale du mot $PIW8$ & $-4\,864$ & $0$ & $27\,648$ & $32\,511$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever} dans le document technique DT8 le nombre d'octets sur lequel est cod\'ee une entr\'ee analogique, en d\'eduire le nombre de bits, puis \textbf{pr\'eciser} le r\^ole du bit de poids fort. \textbf{Relever} \'egalement les valeurs d\'ecimales de $PIW8$ associ\'ees \`a $I_s = \SI{4}{\milli\ampere}$ et $I_s = \SI{20}{\milli\ampere}$.
+  \item Le mot $MW8$ doit contenir la temp\'erature en \si{\celsius}. \'Etablir l'\'equation de la droite $MW8 = f(PIW8)$ sous la forme $MW8 = a\cdot PIW8 + b$, en exprimant $a$ et $b$ \`a l'aide de $MW8_{min}$, $MW8_{max}$ et $PIW8_{max}$. Faire l'application num\'erique.
+  \item On note $E$ l'\'etendue de mesure du transmetteur. Donner sa valeur et \textbf{montrer} que l'\'equation de mise \`a l'\'echelle s'\'ecrit
+  \[ MW8 = \dfrac{E}{27\,648}\cdot PIW8 - 20 \]
+  \item La ventilation de l'armoire est command\'ee par deux consignes de temp\'erature : $C_B = \SI{35}{\celsius}$ (petite vitesse) et $C_H = \SI{50}{\celsius}$ (grande vitesse). Ces seuils doivent \^etre compar\'es \emph{dans l'automate} \`a la valeur brute $PIW8$. Calculer les deux valeurs de $PIW8$ correspondantes.
+  \item En exploitant la premi\`ere ligne du tableau DT8, indiquer ce que traduit une valeur $PIW8$ n\'egative et l'usage que le programme peut en faire.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Extraction.} DT8 indique 2 octets par entr\'ee analogique, soit $2\times8 = 16$ bits. Le codage \'etant sign\'e, le bit de poids fort porte le signe : la r\'esolution utile n'est donc que de 15 bits. Le tableau DT8 donne directement $PIW8_{min} = 0$ pour $I_s = \SI{4}{\milli\ampere}$ et $PIW8_{max} = 27\,648$ pour $I_s = \SI{20}{\milli\ampere}$.
+  \item Aux extr\'emit\'es de la plage : $(PIW8 = 0 \Rightarrow MW8_{min} = -20)$ et $(PIW8 = 27\,648 \Rightarrow MW8_{max} = 200)$. L'ordonn\'ee \`a l'origine se lit imm\'ediatement : $b = MW8_{min} = -20$. La pente s'obtient avec le second point :
+  \[ a = \dfrac{MW8_{max} - MW8_{min}}{PIW8_{max}} = \dfrac{200 - (-20)}{27\,648} = \dfrac{220}{27\,648} \approx 0{,}0080 \]
+  \[ MW8 = \dfrac{220}{27\,648}\cdot PIW8 - 20 \]
+  \item L'\'etendue de mesure est l'\'ecart entre les temp\'eratures extr\^emes du transmetteur :
+  \[ E = T_{max} - T_{min} = 200 - (-20) = \SI{220}{\celsius} \]
+  En rempla\c cant le num\'erateur $220$ par $E$ dans le r\'esultat de la question pr\'ec\'edente, on obtient bien la forme demand\'ee $MW8 = \dfrac{E}{27\,648}\cdot PIW8 - 20$. \'Ecrite ainsi, l'\'equation reste valable si l'on rechange l'\'etalonnage du transmetteur : seule la constante $E$ est \`a mettre \`a jour dans le programme.
+  \item On isole $PIW8$ :
+  \[ MW8 = \dfrac{E}{27\,648}\cdot PIW8 - 20 \iff PIW8 = \dfrac{27\,648}{E}\,(MW8 + 20) \]
+  \[ PIW8(C_B) = \dfrac{27\,648}{220}\,(35+20) = 125{,}67\times55 = 6\,912 \]
+  \[ PIW8(C_H) = \dfrac{27\,648}{220}\,(50+20) = 125{,}67\times70 \approx 8\,797 \]
+  \item Le tableau DT8 associe $I_s = \SI{1,185}{\milli\ampere}$ \`a $PIW8 = -4\,864$ : le module code en n\'egatif les courants inf\'erieurs \`a \SI{4}{\milli\ampere}, c'est-\`a-dire hors de la plage normalis\'ee. Un $PIW8$ n\'egatif ne correspond donc pas \`a une temp\'erature inf\'erieure \`a $\SI{-20}{\celsius}$, mais \`a une rupture de la boucle de courant (capteur d\'ebranch\'e, fil coup\'e, transmetteur hors service). Le programme peut tester $PIW8 < 0$ (et sym\'etriquement $PIW8 > 27\,648$) pour lever un bit \texttt{defaut\_mesure} avant tout calcul de mise \`a l'\'echelle.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Comparer directement $PIW8$ aux seuils $6\,912$ et $8\,797$ \'evite \`a l'automate toute division en ligne : la commande du ventilateur se r\'eduit \`a deux comparaisons d'entiers, plus rapides et exemptes d'erreur d'arrondi que le calcul de $MW8$. Surtout, l'exigence de s\^uret\'e est port\'ee par le codage lui-m\^eme : la plage $[-4\,864\,;\,32\,511]$ plus large que $[0\,;\,27\,648]$ est ce qui rend le d\'efaut de mesure \emph{d\'etectable}, l\`a o\`u une plage born\'ee \`a $[0\,;\,27\,648]$ confondrait une rupture de boucle avec une temp\'erature basse.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{2} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Un transistor de puissance en bo\^itier TO-220 dissipe une puissance $P = \SI{8}{\watt}$ en r\'egime permanent. Il est mont\'e sur un dissipateur (radiateur) refroidi par convection naturelle. Les r\'esistances thermiques du montage sont : jonction-bo\^itier $R_{th,jc} = \SI{2}{\kelvin\per\watt}$, bo\^itier-dissipateur (interface, pastille isolante) $R_{th,cs} = \SI{0,5}{\kelvin\per\watt}$, dissipateur-ambiant $R_{th,sa} = \SI{5}{\kelvin\per\watt}$. La temp\'erature ambiante est $T_{amb} = \SI{35}{\celsius}$ et le fabricant sp\'ecifie une temp\'erature de jonction maximale $T_{j,max} = \SI{150}{\celsius}$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw
+(0,0) to[R, l=$R_{th,jc}$] (2.5,0)
+to[R, l=$R_{th,cs}$] (5,0)
+to[R, l=$R_{th,sa}$] (7.5,0)
+;
+\draw (0,-1.3) to[I, l=$P$] (0,0);
+\draw[-latex] (0,-1.8) -- (7.5,-1.8);
+\node at (0,-2.1) {$T_j$};
+\node at (2.5,-2.1) {$T_c$};
+\node at (5,-2.1) {$T_s$};
+\node at (7.5,-2.1) {$T_{amb}$};
+\draw[dotted] (0,0) -- (0,-1.8);
+\draw[dotted] (2.5,0) -- (2.5,-1.8);
+\draw[dotted] (5,0) -- (5,-1.8);
+\draw[dotted] (7.5,0) -- (7.5,-1.8);
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Justifier l'analogie entre ce sch\'ema thermique (source de puissance $P$, r\'esistances thermiques en s\'erie, temp\'eratures aux n\oe uds) et un circuit \'electrique.
+  \item Calculer la r\'esistance thermique totale jonction-ambiant $R_{th,ja}$, puis la temp\'erature de jonction $T_j$ en r\'egime permanent.
+  \item Conclure quant au respect de $T_{j,max}$, et proposer une action si la marge est insuffisante.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item L'analogie \'electrique-thermique associe la puissance dissip\'ee $P$ (source) au courant $I$, la temp\'erature $T$ au potentiel $V$, et la r\'esistance thermique $R_{th}$ (en $\si{\kelvin\per\watt}$) \`a la r\'esistance \'electrique (en $\si{\ohm}$). La loi $\Delta T = R_{th}\cdot P$ est l'analogue direct de la loi d'Ohm $\Delta V = R\cdot I$ ; des r\'esistances thermiques travers\'ees par le m\^eme flux se comportent comme des r\'esistances \'electriques en s\'erie.
+  \item Les trois r\'esistances thermiques sont travers\'ees par le m\^eme flux $P$ (m\^eme chemin d'\'evacuation de la chaleur), donc en s\'erie :
+  \[ R_{th,ja} = R_{th,jc} + R_{th,cs} + R_{th,sa} = 2 + 0{,}5 + 5 = \SI{7,5}{\kelvin\per\watt} \]
+  \[ T_j = T_{amb} + R_{th,ja} \cdot P = 35 + 7{,}5 \times 8 = 35 + 60 = \SI{95}{\celsius} \]
+  \item $T_j = \SI{95}{\celsius} < T_{j,max} = \SI{150}{\celsius}$ : la marge est de $\SI{55}{\celsius}$, le point de fonctionnement est s\^ur. Si la marge \'etait insuffisante, on r\'eduirait $R_{th,sa}$ (dissipateur plus grand ou ventilation forc\'ee) ou $R_{th,cs}$ (meilleure interface thermique), ces deux termes \'etant les plus facilement modifiables sans changer le composant.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Le crit\`ere de dimensionnement thermique $T_j \leq T_{j,max}$ est v\'erifi\'e avec $\SI{55}{\celsius}$ de marge ; comme $R_{th,sa}$ repr\'esente \`a elle seule $5/7{,}5 = 67\,\%$ de la r\'esistance totale, c'est le choix du dissipateur qui pilote la temp\'erature de jonction et donc la dur\'ee de vie du composant.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize d'apr\`es 2024, \'epreuve \'ecrite disciplinaire, question D1}
+]
+\CAPETSHOW{
+Un thermocouple de type J (couple Fer/Constantan) surveille la temp\'erature d'un moteur \'electrique. Sa jonction chaude (jonction de mesure) est plong\'ee dans le bobinage \`a temp\'erature $T_{mes}$, et sa jonction froide (jonction de r\'ef\'erence, au niveau du conditionneur) est \`a temp\'erature $T_{ref}$, non n\'ecessairement nulle. Le coefficient de Seebeck moyen du couple, relev\'e dans la documentation constructeur (il n'est pas fourni par le sujet), vaut $k_S \approx \SI{51}{\micro\volt\per\kelvin}$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw (0,3) to[short, *-] (2,3);
+\draw (0,0) to[short, *-] (2,0);
+\draw (2,3) to[cute inductor, l=fer] (5,1.5) to[cute inductor, l=constantan] (2,0);
+\node[circ] at (5,1.5) {};
+\node[right] at (5,1.5) {jonction chaude, $T_{mes}$};
+\draw (0,3) to[voltmeter] (0,0);
+\node[left] at (-0.5,1.5) {jonction froide, $T_{ref}$};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Nommer le ph\'enom\`ene physique exploit\'e par le thermocouple, et donner l'expression de la f.\'e.m. $e_{AB}$ g\'en\'er\'ee.
+  \item La jonction froide n'est pas maintenue \`a $\SI{0}{\celsius}$ mais \`a $T_{ref} = \SI{22}{\celsius}$ (temp\'erature ambiante du bo\^itier). Expliquer pourquoi une mesure directe de $e_{AB}$ sans compensation fausserait la lecture de $T_{mes}$, et proposer une solution.
+  \item Calculer la f.\'e.m. mesur\'ee pour $T_{mes} = \SI{180}{\celsius}$ et $T_{ref} = \SI{22}{\celsius}$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item C'est l'effet Seebeck : la jonction de deux m\'etaux diff\'erents ($A$ = fer, $B$ = constantan) port\'ee \`a deux temp\'eratures distinctes g\'en\`ere une f.\'e.m. proportionnelle \`a l'\'ecart de temp\'erature :
+  \[ e_{AB} = k_S \cdot (T_{mes} - T_{ref}) \]
+  \item Si l'on suppose \`a tort $T_{ref} = \SI{0}{\celsius}$ alors que la jonction froide est en r\'ealit\'e \`a $\SI{22}{\celsius}$, la f.\'e.m. mesur\'ee correspond \`a un \'ecart $(T_{mes}-22)$ et non $(T_{mes}-0)$ : la temp\'erature d\'eduite serait sous-estim\'ee de $\SI{22}{\celsius}$. La solution classique est la compensation de soudure froide : un capteur local (souvent \`a semi-conducteur) mesure $T_{ref}$ et le conditionneur ajoute \'electroniquement le terme correctif $k_S \cdot T_{ref}$.
+  \item $e_{AB} = 51\times10^{-6}\times(180-22) = 51\times10^{-6}\times158 \approx \SI{8,06}{\milli\volt}$.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Pour un \'ecart de $\SI{158}{\celsius}$, la f.\'e.m. utile ne vaut que $\SI{8,06}{\milli\volt}$ : elle est bien \guillemotleft\ de l'ordre du millivolt~\guillemotright, donc inexploitable directement par l'entr\'ee analogique de l'automate. Elle impose la cha\^ine de conditionnement d\'ecrite par le sujet -- compensation de soudure froide, amplification, puis conversion tension $\rightarrow$ courant $4$--$\SI{20}{\milli\ampere}$ assur\'ee par le transmetteur KOS 839.
+
+\smallskip
+\textbf{Conseil de m\'ethode.} Le choix d'un type de thermocouple se justifie en confrontant la grandeur \`a mesurer \`a la plage conseill\'ee et \`a la tol\'erance publi\'ees par le constructeur : la figure 13 du sujet 2024 annonce, pour le type J (Fer/Constantan), une plage de $-30$ \`a $\SI{700}{\celsius}$ et une tol\'erance de $\pm\SI{1,5}{\celsius}$, puis fait arbitrer sur le prix et le milieu d'utilisation.
+
+\smallskip
+\textit{Point de vigilance jury (rapport de jury CAPET 2024, \'el\'ements de correction de la question D1) : \guillemotleft\ Le type T est le capteur avec une meilleure tol\'erance et une r\'ep\'etitivit\'e remarquable mais c'est aussi le plus cher. Utilis\'e dans un milieu non humide, comme notre cas, le capteur J convient car moins cher \guillemotright\ -- la justification attendue croise donc trois crit\`eres (plage, tol\'erance, co\^ut et milieu), et non le seul crit\`ere de plage.}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Une sonde PT100 est ins\'er\'ee dans le bras d'un pont de Wheatstone en montage quart de pont : trois r\'esistances fixes $R = \SI{100}{\ohm}$ et la PT100 $R_T$, aliment\'ees par une tension continue $E = \SI{5}{\volt}$. Le point $B$ est pris comme r\'ef\'erence de potentiel ($V_B = 0$) et le point $A$ est port\'e au potentiel $E$. La caract\'eristique lin\'earis\'ee de la sonde est $R_T = R_0(1+\alpha T)$ avec $R_0 = \SI{100}{\ohm}$ et $\alpha = 3{,}85\times10^{-3}\ \si{\per\kelvin}$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw
+(0,4) node[above]{$A$}
+to[R, l=$R$] (-3,2) node[left]{$V_+$}
+to[R, l=$R$] (0,0) node[above right]{$B$}
+;
+\draw
+(0,4) to[R, l=$R$] (3,2) node[right]{$V_-$}
+to[R, l=$R_T$] (0,0)
+;
+\draw (-3,2) to[voltmeter] (3,2);
+\draw (0,4) -- (-5,4) to[V, l=$E$] (-5,0) -- (0,0);
+\draw (0,0) -- (0,-0.7) node[ground]{};
+\node at (0,-2.3) {$U_{pont} = V_+ - V_-$};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \`A $T = \SI{0}{\celsius}$, montrer que le pont est \'equilibr\'e ($U_{pont} = 0$).
+  \item \'Etablir l'expression \emph{exacte} de $U_{pont}$ en fonction de $E$, $R$ et $R_T$, puis la lin\'eariser dans l'approximation $\Delta R = R_T - R \ll R$. Pr\'eciser le signe obtenu et l'interpr\'eter.
+  \item Calculer $U_{pont}$ pour $T = \SI{80}{\celsius}$ avec les deux expressions (exacte puis lin\'earis\'ee), et commenter l'\'ecart.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \`A $T=\SI{0}{\celsius}$, $R_T = R_0(1+0) = R_0 = \SI{100}{\ohm} = R$ : les quatre branches du pont sont identiques deux \`a deux, le pont est \'equilibr\'e et $U_{pont}=0$. C'est la configuration de r\'ef\'erence du montage.
+  \item Les deux branches sont deux diviseurs de tension aliment\'es sous $E$ :
+  \[ V_+ = E\cdot\dfrac{R}{R+R} = \dfrac{E}{2}, \qquad V_- = E\cdot\dfrac{R_T}{R+R_T} \]
+  D'o\`u, apr\`es mise au m\^eme d\'enominateur, l'expression exacte :
+  \[ U_{pont} = V_+ - V_- = E\cdot\dfrac{(R+R_T) - 2R_T}{2(R+R_T)} = E\cdot\dfrac{R - R_T}{2\,(R+R_T)} = -\,E\cdot\dfrac{\Delta R}{2\,(2R+\Delta R)} \]
+  Pour $\Delta R \ll R$, on n\'eglige $\Delta R$ devant $2R$ au d\'enominateur :
+  \[ U_{pont} \approx -\,E\cdot\dfrac{\Delta R}{4R} = -\,E\cdot\dfrac{R_0\,\alpha\,T}{4R} \quad\text{soit, avec } R = R_0,\quad U_{pont} \approx -\,\dfrac{E\,\alpha\,T}{4} \]
+  Le signe est \textbf{n\'egatif} pour $T > \SI{0}{\celsius}$ : la r\'esistance de la sonde augmente avec la temp\'erature, donc $V_-$ (diviseur $R/R_T$) d\'epasse $V_+ = E/2$, qui reste fixe. La sensibilit\'e du pont vaut $\mathrm{d}U_{pont}/\mathrm{d}T = -E\alpha/4 = -\SI{4,81}{\milli\volt\per\kelvin}$.
+  \item \`A $T = \SI{80}{\celsius}$ : $\Delta R = R_0\,\alpha\,T = 100\times3{,}85\times10^{-3}\times80 = \SI{30,8}{\ohm}$, soit $R_T = \SI{130,8}{\ohm}$.
+
+  \emph{Expression exacte} : $V_+ = \SI{2,5}{\volt}$ et $V_- = 5\times\dfrac{130{,}8}{230{,}8} = \SI{2,834}{\volt}$, donc
+  \[ U_{pont} = 2{,}500 - 2{,}834 = \SI{-0,334}{\volt} \]
+
+  \emph{Expression lin\'earis\'ee} : $U_{pont} \approx -\dfrac{5 \times 3{,}85\times10^{-3}\times 80}{4} = -\dfrac{1{,}54}{4} = \SI{-0,385}{\volt}$.
+
+  L'\'ecart relatif atteint $(0{,}385-0{,}334)/0{,}334 \approx 15\,\%$ : \`a $\SI{80}{\celsius}$, $\alpha T = 0{,}308$, donc $\Delta R/R \approx 31\,\%$ et l'hypoth\`ese $\Delta R \ll R$ n'est plus l\'egitime.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Avec une sensibilit\'e de $\SI{4,81}{\milli\volt\per\kelvin}$, le pont d\'elivre au plus quelques centaines de millivolts sur l'\'etendue de mesure : le signal doit \^etre amplifi\'e (amplificateur d'instrumentation) avant num\'erisation. Surtout, l'erreur de lin\'earisation de $15\,\%$ \`a $\SI{80}{\celsius}$ est sans commune mesure avec la classe de pr\'ecision vis\'ee par une cha\^ine de mesure industrielle (typiquement $0{,}5\,\%$) : au-del\`a de quelques dizaines de degr\'es, c'est l'expression exacte -- ou une lin\'earisation par morceaux dans le conditionneur -- qu'il faut retenir.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize 2019, sujet E2 -- rame de m\'etro, questions 25 \`a 28}
+]
+\CAPETSHOW{
+Une rame de m\'etro de maintenance est tract\'ee par des moteurs \`a courant continu. Chaque moteur entra\^ine un essieu par l'interm\'ediaire d'un r\'educteur de rapport de r\'eduction $\rho = 0{,}17$ et de rendement $\eta_{red} = 97\,\%$ ; deux roues de diam\`etre $d_e = \SI{0,86}{\meter}$ sont solidaires de l'essieu.
+
+L'effort de traction $F_e$ que doit produire un moteur n'est pas constant sur le trajet : le trajet aller-retour, phase sur chantier comprise, se d\'ecompose en 18 phases \`a effort constant, pour une dur\'ee totale $T = 2\,048\ \si{\second}$. On donne $F_{e1} = \SI{14,9}{\kilo\newton}$ pendant $\Delta t_1 = \SI{42}{\second}$, puis $F_{e2} = \SI{9,2}{\kilo\newton}$ pendant $\Delta t_2 = \SI{51}{\second}$ ; les seize phases restantes contribuent pour un terme cumul\'e $\displaystyle\sum_{i=3}^{18} C_{mi}^2 \cdot \Delta t_i = 558\times10^{6}\ \si{\newton\squared\meter\squared\second}$.
+
+Le couple thermique \'equivalent $C_{th}$ est le couple constant qui provoquerait le m\^eme \'echauffement du moteur sur le cycle :
+\[ C_{th} = \sqrt{\dfrac{1}{T}\left( C_{m1}^2\,\Delta t_1 + C_{m2}^2\,\Delta t_2 + \sum_{i=3}^{18} C_{mi}^2\,\Delta t_i \right)} \]
+
+\begin{center}
+\begin{tikzpicture}[scale=0.85, >=Stealth]
+  \draw[-latex] (0,0) -- (8.7,0) node[right]{$t$};
+  \draw[-latex] (0,0) -- (0,2.6) node[above]{$F_e(t)$};
+  \draw[dashed, gray] (0,2) -- (2.4,2); \node[left] at (0,2) {$F_{e1}$};
+  \draw[dashed, gray] (0,1.2) -- (5.5,1.2); \node[left] at (0,1.2) {$F_{e2}$};
+  \draw[thick]
+    (0,2) -- (2.4,2) -- (2.4,1.2) -- (5.5,1.2) -- (5.5,0.5);
+  \draw[thick, dotted] (5.5,0.5) -- (8,0.5);
+  \draw[dotted] (2.4,0) -- (2.4,2);
+  \node[below] at (2.4,0) {$\Delta t_1$};
+  \draw[dotted] (5.5,0) -- (5.5,1.2);
+  \node[below] at (5.5,0) {$\Delta t_1{+}\Delta t_2$};
+  \node at (7,1.9) {\footnotesize phases 3 \`a 18};
+  \node[below] at (0,0) {$0$};
+  \draw[dotted] (8,0) -- (8,0.5);
+  \node[below] at (8,0) {$T$};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Exprimer le couple $C_e$ au niveau des roues d'un essieu en fonction de $F_e$ et de $d_e$. Calculer $C_{e1}$ et $C_{e2}$.
+  \item En raisonnant sur les puissances et en tenant compte du rendement $\eta_{red}$, exprimer le couple moteur $C_m$ en fonction de $C_e$, $\eta_{red}$ et $\rho$. Calculer $C_{m1}$ et $C_{m2}$.
+  \item En d\'eduire le couple thermique \'equivalent $C_{th}$ sur le cycle de fonctionnement.
+  \item Les moteurs \`a courant continu install\'es sont donn\'es pour une puissance nominale $P_{nom} = \SI{96}{\kilo\watt}$ \`a la vitesse nominale $n_{nom} = 1\,035\ \si{\tr\per\minute}$. Conclure sur leur aptitude \`a assurer ce cycle.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item L'effort de traction $F_e$ s'exerce au contact roue/rail, \`a la distance $d_e/2$ de l'axe de l'essieu :
+  \[ C_e = F_e \cdot \dfrac{d_e}{2} = F_e \times 0{,}43 \]
+  \[ C_{e1} = 14{,}9\times10^{3}\times0{,}43 = 6\,407\ \si{\newton\meter}, \qquad C_{e2} = 9{,}2\times10^{3}\times0{,}43 = 3\,956\ \si{\newton\meter} \]
+  \item Le r\'educteur transmet la puissance moteur $P_m = C_m\,\Omega_m$ vers l'essieu avec le rendement $\eta_{red}$ : $C_e\,\Omega_e = \eta_{red}\cdot C_m\,\Omega_m$. Le rapport de r\'eduction \'etant $\rho = \Omega_e/\Omega_m$, il vient
+  \[ C_m = \dfrac{C_e \cdot \rho}{\eta_{red}} \]
+  \[ C_{m1} = \dfrac{6\,407 \times 0{,}17}{0{,}97} \approx 1\,122{,}9\ \si{\newton\meter}, \qquad C_{m2} = \dfrac{3\,956 \times 0{,}17}{0{,}97} \approx 693{,}3\ \si{\newton\meter} \]
+  \item Contributions des deux premi\`eres phases :
+  \[ C_{m1}^2\,\Delta t_1 = (1\,122{,}9)^2 \times 42 = 1{,}261\times10^{6}\times42 \approx 52{,}96\times10^{6}\ \si{\newton\squared\meter\squared\second} \]
+  \[ C_{m2}^2\,\Delta t_2 = (693{,}3)^2 \times 51 = 0{,}4807\times10^{6}\times51 \approx 24{,}52\times10^{6}\ \si{\newton\squared\meter\squared\second} \]
+  Somme sur le cycle complet :
+  \[ \sum_i C_{mi}^2\,\Delta t_i = (52{,}96 + 24{,}52 + 558)\times10^{6} \approx 635{,}5\times10^{6}\ \si{\newton\squared\meter\squared\second} \]
+  \[ C_{th} = \sqrt{\dfrac{635{,}5\times10^{6}}{2\,048}} = \sqrt{310{,}3\times10^{3}} \approx 557\ \si{\newton\meter} \]
+  On note que le terme cumul\'e des seize phases restantes ($558\times10^{6}$) domine largement les deux premi\`eres phases, malgr\'e leurs couples \'elev\'es : ce sont les longues phases de roulage, et non les pointes d'effort, qui d\'eterminent l'\'echauffement.
+  \item Couple nominal des moteurs :
+  \[ \Omega_{nom} = 1\,035 \times \dfrac{2\pi}{60} \approx \SI{108,4}{\radian\per\second}, \qquad C_{nom} = \dfrac{P_{nom}}{\Omega_{nom}} = \dfrac{96\times10^{3}}{108{,}4} \approx 886\ \si{\newton\meter} \]
+  $C_{th} \approx 557\ \si{\newton\meter} < C_{nom} \approx 886\ \si{\newton\meter}$ : les moteurs conviennent du point de vue thermique.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Le couple thermique \'equivalent $C_{th} \approx 557\ \si{\newton\meter}$ repr\'esente $63\,\%$ du couple nominal $C_{nom} \approx 886\ \si{\newton\meter}$ : le crit\`ere de dimensionnement en service intermittent ($C_{th} \leq C_{nom}$, service $S1$ \'equivalent) est satisfait avec une marge de $37\,\%$. C'est bien $C_{th}$, et non le couple de pointe $C_{m1} \approx 1\,123\ \si{\newton\meter}$ -- pourtant sup\'erieur \`a $C_{nom}$ --, qui gouverne l'\'echauffement du bobinage : le d\'epassement de couple sur les $\SI{42}{\second}$ de la phase 1 est thermiquement admissible parce qu'il est bref devant la constante de temps thermique du moteur.
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

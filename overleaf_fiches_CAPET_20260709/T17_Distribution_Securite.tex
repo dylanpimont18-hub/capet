@@ -1,0 +1,376 @@
+﻿\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colElec}{T17}} - Distribution et securite electrique, regimes de neutre}
+\fancyhead[R]{\small\textit{CAPET SII IE - Session 2026}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TeTE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colElec,
+  colframe=colElec,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T17 \quad Distribution et securite electrique, regimes de neutre}\\[2pt]
+  {\color{colElec!30!white}\small
+    \textbf{Domaine :} electrotechnique - Distribution BT \quad
+    \textbf{Presence :} \textbf{8/13} sujets (2013-2026) - theme \emph{tres frequent}
+  }\\[1pt]
+  {\color{colElec!20!white}\footnotesize
+    Sous-themes : SLT (TT / TN-S / TN-C / IT) - DDR et selectivite differentielle - disjoncteur MA devant variateur - chute de tension NF C 15-100 - parafoudres types 1/2/3 - bilan de puissance et abonnement
+  }
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Schemas de liaison - la terre --------------------------------
+\textbf{1.1 Schemas de liaison - la terre (SLT) - NF C 15-100}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{lllll}
+\toprule
+\textbf{Regime} & \textbf{Neutre source} & \textbf{Masses recepteurs} & \textbf{Protection contacts indirects} & \textbf{Application} \\
+\midrule
+TT & Terre directe & Terre independante & \textbf{DDR obligatoire} & Residentiel, tertiaire \\
+TN-S & Terre directe & Reliees au neutre (PE separe) & Disjoncteur ($I_{cc}$ eleve) & Industriel, scolaire \\
+TN-C & Terre directe & Reliees au neutre (PEN) & Disjoncteur (DDR \emph{interdit}) & Anciens reseaux \\
+IT & Impedant & Terre & CPI + coupure au 2\textsuperscript{e} defaut & Medical, industrie critique \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 DDR et selectivite -------------------------------------------
+\textbf{1.2 Dispositifs differentiels residuels (DDR) - sensibilites normalisees}
+
+\smallskip
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Sensibilite} & \textbf{Usage} & \textbf{Norme} \\
+\midrule
+30\,mA (haute sensibilite) & Protection des personnes & NF C 15-100 - obligatoire en TT \\
+300\,mA ou 500\,mA & Protection incendie, selectivite & - \\
+1\,A et plus & Protection de tete (selectivite amont) & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+\textbf{Selectivite differentielle :} rapport des sensibilites DDR amont/aval $\geq 3$ (ex : DDR 30\,mA aval + DDR 300\,mA amont ou DDR temporise de type S en amont).
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 Chute de tension ---------------------------------------------
+\textbf{1.3 Chute de tension - NF C 15-100}
+
+\smallskip
+\[
+  \Delta U\,\% = \frac{\sqrt{3}\,I\,L\,(R_u\cos\varphi + X_u\sin\varphi)}{U_D} \times 100
+\]
+Valeurs limites : domaine public eclairage = \textbf{3\,\%} ; domaine public autres usages = \textbf{5\,\%}.\\
+Si $\Delta U > 5\,\%$ : \textbf{augmenter la section} du ceble pour reduire $R_u = \rho/S$.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 Disjoncteur amont variateur ----------------------------------
+\textbf{1.4 Disjoncteur magnetique (MA) en amont d'un variateur}
+
+\smallskip
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Critere} & \textbf{Valeur/Type} & \textbf{Justification} \\
+\midrule
+Type de declencheur & MA (magnetique seul) & Variateur assure la protection thermique \\
+Seuil magnetique $I_{rm}$ & Ex : 2860\,A (NSX250N MA220) & Court-circuit uniquement \\
+Pouvoir de coupure $I_{cu}$ & 50\,kA & Courant de court-circuit reseau \\
+\bottomrule
+\end{tabular}
+\end{center}
+Un disjoncteur magneto-thermique (MA+thermique) en amont creerait une double protection thermique - risque de decoordination avec le variateur.
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHeTIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthetique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Puissances}} \\
+$P = U I\cos\varphi$ & Mono & W \\
+$P = \sqrt{3}\,U_D I\cos\varphi$ & Tri & W \\
+$S = \sqrt{3}\,U_D\,I$ & App. & VA \\
+$I = P/(U\cos\varphi)$ & Mono & A \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Chute de tension}} \\
+$\Delta U\% = \sqrt{3}IL(R_u c\varphi+X_u s\varphi)/U_D$ & Triphase & \% \\
+$\Delta U \leq 5\,\%$ & Dom. public & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Ceble}} \\
+$R_u = \rho/S$ & Res. lin. & \si{\ohm/m} \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{DDR}} \\
+Sel. : $\Delta I_{amont}/\Delta I_{aval} \geq 3$ & Select. & - \\
+30\,mA - protection personnes & Obligat. & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Donnees typiques}} \\
+$\rho_{Cu} = 1{,}7 \times 10^{-8}\,\Omega\!\cdot\!\mathrm{m}$ & Cuivre & - \\
+$L = 850\,\mathrm{m}$ & Extracteur & m \\
+$I_{cu} = 50\,\mathrm{kA}$ & NSX250N & - \\
+$I_{rm} = 2860\,\mathrm{A}$ & MA220 & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Parafoudres}} \\
+Type 1 - entree installation & Impuls. & - \\
+Type 2 - aval TGBT & Normal & - \\
+TN-C : mode commun seulement & - & - \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets reels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+% Mini-procedure de resolution type copie concours
+\begin{tcolorbox}[questiontype,title={Procedure type copie concours (5 etapes)}]
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Qualifier le modele} : hypotheses, domaine de validite, grandeurs d'entree/sortie.
+  \item \textbf{Ecrire les lois} : equations de base avec symboles et unites SI.
+  \item \textbf{Isoler l'inconnue} : expression litterale, puis application numerique tracee.
+  \item \textbf{Controler l'ordre de grandeur} : coherence physique et unite finale.
+  \item \textbf{Conclure concours} : phrase courte orientee decision technique.
+\end{enumerate}
+\end{tcolorbox}
+
+% Visuel de methode : chemin de resolution CAPET
+\begin{center}
+\begin{tikzpicture}[font=\small, node distance=7mm and 6mm, >=Stealth]
+  \node[draw, rounded corners, fill=colElec!8, inner sep=4pt] (n1) {Notions};
+  \node[draw, rounded corners, fill=colElec!8, right=of n1, inner sep=4pt] (n2) {Methode};
+  \node[draw, rounded corners, fill=colElec!8, right=of n2, inner sep=4pt] (n3) {Application annale};
+  \node[draw, rounded corners, fill=colElec!8, right=of n3, inner sep=4pt] (n4) {Verification jury};
+  \draw[->, thick, colElec] (n1) -- (n2);
+  \draw[->, thick, colElec] (n2) -- (n3);
+  \draw[->, thick, colElec] (n3) -- (n4);
+\end{tikzpicture}
+\end{center}
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Identification du SLT et choix du DDR \hfill\normalfont\footnotesize E2 disc. 2021 (Q19) + E2 disc. 2017 (B1.3)}
+]
+\textbf{enonce.}
+L'installation est en regime TT. Justifier la presence d'un interrupteur differentiel et indiquer la sensibilite pour la protection des personnes.
+
+\tcbline
+
+\textbf{Corrige.}
+
+En regime \textbf{TT}, la prise de terre de l'installation (cete utilisateur) est independante de celle de la source. En cas de defaut d'isolement, le courant de defaut est limite par les resistances de prise de terre (typiquement quelques dizaines d'ohms) :
+\[
+  I_{defaut} = \frac{230}{R_{source} + R_{utilisateur}} \sim \text{quelques A} \ll I_{declenchement\,disjoncteur}
+\]
+Un disjoncteur seul ne peut pas detecter ce courant - le \textbf{DDR est obligatoire} selon NF C 15-100. Il mesure le courant differentiel $I_{diff} = \sum i_{conducteurs}$ et declenche des \textbf{30\,mA} pour la protection des personnes.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Calcul de la chute de tension et conformite NF C 15-100 \hfill\normalfont\footnotesize E1 disc. 2024 (B5-B9), Rapport jury 2024}
+]
+\textbf{enonce.}
+Ligne triphasee : $I = 258\,\mathrm{A}$, $\cos\varphi = 0{,}85$, $\sin\varphi = 0{,}527$, $L = 850\,\mathrm{m}$, $R_u = 0{,}0424\,\mathrm{m\Omega\!\cdot\!m^{-1}}$, $X_u = 0{,}0902\,\mathrm{m\Omega\!\cdot\!m^{-1}}$. Calculer $\Delta U\,\%$ et conclure vis--vis de la norme (domaine public, autre usage). Proposer une solution si necessaire.
+
+\tcbline
+
+\textbf{Corrige.}
+\[
+  \Delta U = \sqrt{3} \times 258 \times 850 \times (42{,}4 \times 10^{-6} \times 0{,}85 + 90{,}2 \times 10^{-6} \times 0{,}527)
+\]
+\[
+  = \sqrt{3} \times 258 \times 850 \times (36{,}0 + 47{,}5) \times 10^{-6} = 1{,}732 \times 258 \times 850 \times 83{,}5 \times 10^{-6} \approx 31{,}7\,\mathrm{V}
+\]
+\[
+  \Delta U\,\% = \frac{31{,}7}{400} \times 100 = \mathbf{7{,}9\,\%}
+\]
+\textbf{Conclusion :} 7,9\,\% > 5\,\% - \textbf{non conforme} - la norme NF C 15-100. Solution : \textbf{augmenter la section} du ceble pour reduire $R_u$ (et $X_u$).
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Choix du disjoncteur associe - un variateur de frequence \hfill\normalfont\footnotesize Rapport jury 2021 (Q17)}
+]
+\textbf{enonce.}
+Choisir et justifier le disjoncteur - associer au variateur ATV630C11N4. Le courant de court-circuit reseau est $I_{cc} = 50\,\mathrm{kA}$.
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{Reference :} NSX250\textbf{N} MA220.
+
+\textbf{Lettre N} - $I_{cu} = 50\,\mathrm{kA}$ : pouvoir de coupure adapte au courant de court-circuit du reseau.
+
+\textbf{Declencheur MA} (magnetique seul, seuil $I_{rm} = 2860\,\mathrm{A}$) : assure \emph{uniquement} la protection contre les courts-circuits. La protection thermique du moteur est prise en charge par le variateur (parametre $I_{th}$ reglable de 0{,}2 - 1{,}1$\,I_n$).
+
+\textbf{Justification du choix MA :} si l'on utilise un disjoncteur magneto-thermique, deux protections thermiques operent en parallele - risque de decoordination (le disjoncteur declenche avant le variateur au premier defaut thermique - arret intempestif). La norme impose MA en amont d'un variateur.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs recurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{DDR obligatoire en TT - ne pas l'omettre.}
+  En TT, le courant de defaut est trop faible pour declencher un disjoncteur seul. Le DDR 30\,mA est obligatoire et la justification physique (resistances de prise de terre) doit etre fournie.
+
+  \item \textbf{TN-C : DDR interdit sur ce troneon.}
+  Le conducteur PEN confond N et PE - pas de courant differentiel mesurable - DDR inefficace et interdit sur le troneon TN-C. Ne pas proposer le meme equipement qu'en TN-S.
+
+  \item \textbf{Partie reactive dans la chute de tension.}
+  Si $X_u$ est fourni et $\sin\varphi \neq 0$, negliger $X_u \sin\varphi$ sous-estime $\Delta U$ de 10 - 20\,\%. Rapport jury 2024 : "ne pas omettre la partie reactive".
+
+  \item \textbf{Conclure par rapport - la valeur normative.}
+  Toujours comparer la valeur calculee - la limite (5\,\% pour autre usage, 3\,\% pour eclairage) et proposer une solution si non conforme.
+
+  \item \textbf{Selectivite differentielle : rapport $\geq 3$.}
+  DDR 30\,mA aval - DDR amont $\geq 90\,\mathrm{mA}$ (soit 300\,mA en pratique). Ou utiliser un DDR de type S (temporise) en amont.
+
+  \item \textbf{Parafoudre TN-C.}
+  En TN-C, seule la protection en mode commun est possible (N et PE confondus). Proposer uniquement mode commun ; la protection differentielle est impossible.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2024 : "La chute de tension n'est pas respectee. La norme NFC 15-100 impose 5\,\% pour un autre usage (domaine public). Pour diminuer la chute de tension, il est possible de modifier les valeurs de $R_u$ et $L_u$ en augmentant la section du ceble."\\
+Rapport jury 2021 : "Le jury constate que beaucoup de candidats ne sont pas - l'aise dans le choix du materiel de protection. Il est imperatif de justifier le choix du disjoncteur en citant le pouvoir de coupure, le type de declencheur et le reglage."\\
+Rapport jury 2020 : "Une critique - la fois qualitative et quantitative etait attendue. Le jury deplore des reponses trop evasives sans lien avec les documents techniques."
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PReSENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colGrayLight,
+  colframe=colSeparator,
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+  before skip=4pt, after skip=0pt,
+  fonttitle=\small\bfseries,
+  title={Presence dans les sujets analyses (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Annee} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & - & - & - & - & - & - & - & - & - & - & $\checkmark$ & - \\
+E2 discipl. IE & - & - & - & - & $\checkmark$ & $\checkmark$ & - & $\checkmark$ & $\checkmark$ & - & - & $\checkmark$ & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-themes frequents :}
+SLT TT et DDR 30\,mA (6/13) - chute de tension NF C 15-100 (4/13) - disjoncteur MA amont variateur (4/13) - selectivite differentielle (3/13) - parafoudres TT/TN/IT (2/13)
+
+\medskip
+\textbf{Ordres de grandeur (reperes rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Reseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, frequence \SI{50}{\hertz}.
+  \item Courants d'etude frequents en sujet : de quelques \si{\ampere} a quelques dizaines de \si{\ampere}.
+  \item En conversion d'energie, un rendement attendu reste generalement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthese express (a refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypotheses du modele et les conventions de signe.
+  \item Ecrire 2 a 4 relations cles avec unites.
+  \item Realiser un calcul numerique complet et verifier l'ordre de grandeur.
+  \item Justifier le resultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE
+
+
+
+
+
+
+
+
+

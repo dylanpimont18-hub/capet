@@ -1,0 +1,281 @@
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T01}} - Exercices - Grandeurs \'electriques et \'electrocin\'etique}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T01 \quad Grandeurs \'electriques fondamentales et \'electrocin\'etique}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 5 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+On consid\`ere un pont diviseur de tension constitu\'e de deux r\'esistances $R_1 = \SI{2,2}{\kilo\ohm}$ et $R_2 = \SI{4,7}{\kilo\ohm}$ mont\'ees en s\'erie, aliment\'e par une source id\'eale de tension $E = \SI{12}{\volt}$. La sortie $V_s$ est pr\'elev\'ee aux bornes de $R_2$, \`a vide (aucun courant pr\'elev\'e en sortie).
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw
+(0,0) to[V, l=$E$] (0,3)
+to[R, l=$R_1$] (3,3)
+to[R, l=$R_2$, *-*] (3,0) node[right]{$V_s$}
+-- (0,0);
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Exprimer $V_s$ en fonction de $E$, $R_1$ et $R_2$.
+  \item Calculer num\'eriquement $V_s$.
+  \item On branche d\'esormais en sortie une charge $R_L = \SI{4,7}{\kilo\ohm}$ en parall\`ele avec $R_2$. Calculer la nouvelle valeur de $V_s$ et commenter l'\'ecart avec la question 2.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Loi du diviseur de tension (\`a vide, m\^eme courant $i$ dans $R_1$ et $R_2$) :
+  \[ V_s = E \cdot \dfrac{R_2}{R_1 + R_2} \]
+  \item $V_s = 12 \cdot \dfrac{4{,}7}{2{,}2 + 4{,}7} = 12 \cdot 0{,}681 = \SI{8,17}{\volt}$.
+  \item En charge, $R_2$ et $R_L$ identiques en parall\`ele donnent $R_{2L} = R_2/2 = \SI{2,35}{\kilo\ohm}$. La formule du diviseur s'applique alors avec $R_{2L}$ \`a la place de $R_2$ :
+  \[ V_s' = 12 \cdot \dfrac{2{,}35}{2{,}2 + 2{,}35} = 12 \cdot 0{,}5165 = \SI{6,20}{\volt} \]
+  L'\'ecart ($\SI{8,17}{\volt} \to \SI{6,20}{\volt}$) illustre l'effet de charge : pr\'elever du courant en sortie d'un diviseur r\'esistif fait chuter $V_s$, car $R_L$ modifie l'imp\'edance vue par la source. C'est pourquoi un diviseur r\'esistif seul n'est adapt\'e qu'\`a des charges de tr\`es forte imp\'edance (ou un \'etage tampon, ex. suiveur \`a AOP, est n\'ecessaire sinon).
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{1} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Une tension $u(t)$ p\'eriodique de p\'eriode $T$ est un cr\'eneau bipolaire : $u(t) = +U_0$ pendant une dur\'ee $\alpha T$ (avec $0 < \alpha < 1$), puis $u(t) = -U_0$ pendant le reste de la p\'eriode, soit $(1-\alpha)T$.
+
+\begin{center}
+\begin{tikzpicture}[scale=0.85, >=Stealth]
+  \draw[-latex] (0,0) -- (8.5,0) node[right]{$t$};
+  \draw[-latex] (0,-1.6) -- (0,1.8) node[above]{$u(t)$};
+  \draw[dashed, gray] (0,1) -- (8,1); \node[left] at (0,1) {$U_0$};
+  \draw[dashed, gray] (0,-1) -- (8,-1); \node[left] at (0,-1) {$-U_0$};
+  \draw[thick]
+    (0,1) -- (1.2,1) -- (1.2,-1) -- (4,-1) -- (4,1) -- (5.2,1) -- (5.2,-1) -- (8,-1);
+  \draw[dotted] (1.2,-1) -- (1.2,-1.4) node[below]{$\alpha T$};
+  \draw[dotted] (4,-1) -- (4,-1.4) node[below]{$T$};
+  \draw[dotted] (5.2,-1) -- (5.2,-1.4) node[below]{$T+\alpha T$};
+  \draw[dotted] (8,-1) -- (8,-1.4) node[below]{$2T$};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Exprimer la valeur moyenne $\langle u \rangle$ en fonction de $U_0$ et $\alpha$.
+  \item Exprimer la valeur efficace $U_{eff}$ en fonction de $U_0$, et justifier qu'elle ne d\'epend pas de $\alpha$.
+  \item Application num\'erique : $U_0 = \SI{15}{\volt}$, $\alpha = 0{,}3$. Calculer $\langle u \rangle$ et $U_{eff}$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item $\langle u \rangle = \dfrac{1}{T}\Big(U_0 \cdot \alpha T + (-U_0)\cdot(1-\alpha)T\Big) = U_0\big(\alpha - (1-\alpha)\big) = U_0(2\alpha - 1)$.
+  \item $U_{eff}^2 = \dfrac{1}{T}\displaystyle\int_0^T u^2(t)\,\mathrm{d}t = \dfrac{1}{T}\Big(U_0^2 \cdot \alpha T + U_0^2\cdot(1-\alpha)T\Big) = U_0^2$. Le carr\'e de $u(t)$ vaut toujours $U_0^2$ (que la tension soit \`a $+U_0$ ou $-U_0$), donc l'int\'egrale ne d\'epend pas du partage temporel entre les deux niveaux : $U_{eff} = U_0$, ind\'ependamment de $\alpha$.
+  \item $\langle u \rangle = 15\times(2\times0{,}3-1) = 15\times(-0{,}4) = \SI{-6}{\volt}$ ; $U_{eff} = \SI{15}{\volt}$.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Le seul rapport cyclique $\alpha$ permet de balayer continu\^ument la valeur moyenne de $-U_0$ \`a $+U_0$ (ici $\SI{-6}{\volt}$ pour $\alpha = 0{,}3$), tandis que la valeur efficace reste fig\'ee \`a $U_0$ : c'est exactement le comportement d'un hacheur command\'e en \guillemotleft\ bipolaire \guillemotright\ (exercice 5). Cons\'equence de dimensionnement : l'\'echauffement d'une charge r\'esistive, pilot\'e par $U_{eff}$, ne diminue pas lorsqu'on r\'eduit la valeur moyenne demand\'ee -- l'isolement et le calibre thermique doivent \^etre choisis sur $U_0$, jamais sur $\langle u\rangle$.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Un circuit comporte deux mailles partageant une branche commune. La maille 1 contient une source $E_1 = \SI{10}{\volt}$ et une r\'esistance $R_1 = \SI{100}{\ohm}$~; la maille 2 contient une source $E_2 = \SI{6}{\volt}$ et une r\'esistance $R_2 = \SI{50}{\ohm}$~; la branche commune contient une r\'esistance $R_3 = \SI{200}{\ohm}$ parcourue par un courant $i_3$, orient\'e de la maille 1 vers la maille 2. Les courants $i_1$ (maille 1) et $i_2$ (maille 2) sont orient\'es dans le sens des sources respectives, avec $i_3 = i_1 - i_2$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw
+(0,0) to[V, l=$E_1$] (0,3)
+to[R, l=$R_1$, i=$i_1$] (3,3)
+node[circ]{}
+to[R, l=$R_3$, i=$i_3$] (3,0)
+node[circ]{}
+-- (0,0);
+\draw
+(3,3) -- (6,3)
+to[R, l=$R_2$, i=$i_2$] (6,0)
+to[V, l=$E_2$] (3,0);
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \'Ecrire les deux \'equations de maille (loi des mailles) pour ce r\'eseau.
+  \item En d\'eduire le syst\`eme lin\'eaire en $i_1$ et $i_2$, puis calculer $i_1$, $i_2$ et $i_3$. Commenter le signe obtenu pour $i_3$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Loi des mailles (loi de Kirchhoff en tension) sur chaque maille :
+  \[ E_1 = R_1 i_1 + R_3 (i_1 - i_2) \qquad E_2 = R_2 i_2 + R_3 (i_2 - i_1) \]
+  \item Soit le syst\`eme :
+  \[
+  \begin{cases}
+    (R_1+R_3)\,i_1 - R_3\,i_2 = E_1 \\
+    -R_3\,i_1 + (R_2+R_3)\,i_2 = E_2
+  \end{cases}
+  \;\Longrightarrow\;
+  \begin{cases}
+    300\,i_1 - 200\,i_2 = 10 \\
+    -200\,i_1 + 250\,i_2 = 6
+  \end{cases}
+  \]
+  R\'esolution par \'elimination : de la premi\`ere \'equation, $i_1 = (10 + 200\,i_2)/300$. En substituant dans la seconde puis en multipliant par $300$ :
+  \[ -200\,(10 + 200\,i_2) + 75\,000\,i_2 = 1\,800 \;\Longrightarrow\; 35\,000\,i_2 = 3\,800 \]
+  Le coefficient $35\,000$ n'est autre que le d\'eterminant du syst\`eme, $\Delta = 300\times250 - 200^2 = 35\,000$~; sous forme de Cramer :
+  \[
+  i_2 = \frac{300\times 6 + 200\times 10}{35\,000} = \frac{3\,800}{35\,000} \approx \SI{108,6}{\milli\ampere}
+  \qquad
+  i_1 = \frac{250\times 10 + 200\times 6}{35\,000} = \frac{3\,700}{35\,000} \approx \SI{105,7}{\milli\ampere}
+  \]
+  \[
+  i_3 = i_1 - i_2 = \frac{3\,700 - 3\,800}{35\,000} = \frac{-100}{35\,000} \approx \SI{-2,86}{\milli\ampere}
+  \]
+  \textit{Commentaire sur le signe.} $i_3$ est \textbf{n\'egatif} : le courant circule en r\'ealit\'e de la maille 2 vers la maille 1, \`a l'inverse du sens de fl\`eche choisi arbitrairement dans l'\'enonc\'e. Ce r\'esultat ne doit surtout pas \^etre \guillemotleft\ corrig\'e \guillemotright\ en valeur absolue : l'orientation initiale n'est qu'une convention de calcul, et c'est le signe alg\'ebrique qui porte l'information physique sur le sens r\'eel du courant. On v\'erifie la coh\'erence sur la seconde \'equation de maille : $E_2 = R_2 i_2 + R_3(i_2 - i_1) = 50\times0{,}1086 + 200\times0{,}00286 \approx \SI{6,00}{\volt}$.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Les deux sources sont presque \'equilibr\'ees vis-\`a-vis de la branche commune : $|i_3| = \SI{2,86}{\milli\ampere}$ ne repr\'esente que $2{,}7\,\%$ de $i_1$. C\^ot\'e dimensionnement, $R_3$ ne dissipe que $R_3 i_3^2 \approx \SI{1,6}{\milli\watt}$ -- une r\'esistance de calibre $\SI{0,25}{\watt}$ suffit tr\`es largement -- alors que $R_1$ dissipe $R_1 i_1^2 \approx \SI{1,12}{\watt}$ et $R_2$ dissipe $R_2 i_2^2 \approx \SI{0,59}{\watt}$. Ce sont donc ces deux r\'esistances, et non celle de la branche commune, qui imposent le choix du calibre de puissance ($\SI{2}{\watt}$ et $\SI{1}{\watt}$ respectivement).
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize 2026, \'Epreuve 1 (admissibilit\'e), partie E, questions E4 et E6}
+]
+\CAPETSHOW{
+Un redresseur triphas\'e de type P3 (montage \'etoile, diodes \`a cathodes communes, suppos\'ees parfaites) alimente une charge fortement inductive, mod\'elis\'ee par une source de courant constant $I_S$. Les tensions secondaires du transformateur triphas\'e sont sinuso\"idales, de valeur efficace $V_{eff}$ et de p\'eriode $T_1$ : $v_1(t) = \sqrt{2}\,V_{eff}\cos(\omega_1 t)$. Le fonctionnement est celui d'un commutateur \guillemotleft\ plus positif \guillemotright\ : la diode dont l'anode est au potentiel le plus \'elev\'e conduit seule.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.8]
+\draw (0,0) -- (0,8);
+\draw (5,-2) -- (5,8);
+\draw (0,8) to[sV, l=$v_1$] (2,8) to[D, l=$D_1$, *-*] (4,8) -- (5,8) node[right]{$u_S$};
+\draw (0,4) to[sV, l=$v_2$] (2,4) to[D, l=$D_2$, *-*] (4,4) -- (5,4);
+\draw (0,0) to[sV, l=$v_3$] (2,0) to[D, l=$D_3$, *-*] (4,0) -- (5,0);
+\draw (5,-2) to[I, l=$I_S$] (0,-2) -- (0,0);
+\node[left] at (0,4) {$0$};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Donner la p\'eriode $T_S$ de la tension redress\'ee $u_S(t)$ en fonction de $T_1$, et justifier.
+  \item Montrer que la valeur moyenne de $u_S(t)$ s'\'ecrit $\langle u_S \rangle = \dfrac{3\sqrt{6}}{2\pi}\,V_{eff}$.
+  \item Le courant $i_{D1}$ dans la diode $D_1$ vaut $I_S$ pendant sa conduction (un tiers de la p\'eriode $T_1$) et $0$ ailleurs. D\'eterminer sa valeur efficace $I_{D1,eff}$ en fonction de $I_S$.
+  \item Application num\'erique : pour $V_{eff} = \SI{230}{\volt}$ (tension simple secondaire) et $I_S = \SI{15}{\ampere}$, calculer $\langle u_S \rangle$ et $I_{D1,eff}$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Chaque diode conduit pendant $2\pi/3$ (un tiers de p\'eriode angulaire), et une conduction a lieu par phase \`a chaque p\'eriode $T_1$ : le motif de $u_S(t)$ se r\'ep\`ete donc 3 fois par p\'eriode, soit $T_S = T_1/3$.
+  \item Sur l'intervalle de conduction de $D_1$, centr\'e sur le maximum de $v_1$, soit $\theta \in [-\pi/3\,;\,\pi/3]$, on a $u_S(\theta) = \sqrt{2}\,V_{eff}\cos\theta$. La valeur moyenne sur une p\'eriode angulaire $2\pi/3$ :
+  \[
+  \langle u_S \rangle = \frac{3}{2\pi}\int_{-\pi/3}^{\pi/3} \sqrt{2}\,V_{eff}\cos\theta\,\mathrm{d}\theta
+  = \frac{3\sqrt{2}\,V_{eff}}{2\pi}\Big[\sin\theta\Big]_{-\pi/3}^{\pi/3}
+  = \frac{3\sqrt{2}\,V_{eff}}{2\pi}\cdot\sqrt{3}
+  = \frac{3\sqrt{6}}{2\pi}\,V_{eff}
+  \]
+  \item $i_{D1}(t)$ est un cr\'eneau d'amplitude $I_S$, de dur\'ee $T_1/3$ sur la p\'eriode $T_1$ (rapport cyclique $1/3$) :
+  \[
+  I_{D1,eff} = \sqrt{\frac{1}{T_1}\int_0^{T_1} i_{D1}^2(t)\,\mathrm{d}t} = I_S\sqrt{\frac{1}{3}} = \frac{I_S}{\sqrt{3}}
+  \]
+  \item $\langle u_S \rangle = \dfrac{3\sqrt{6}}{2\pi}\times 230 \approx 1{,}17 \times 230 \approx \SI{269}{\volt}$ ; $I_{D1,eff} = 15/\sqrt{3} \approx \SI{8,66}{\ampere}$.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Le rapport $\langle u_S\rangle / V_{eff} = 1{,}17$ est la signature du montage P3 : avec $V_{eff} = \SI{230}{\volt}$ au secondaire, la tension continue plafonne \`a \SI{269}{\volt}, tr\`es en de\c{c}\`a des \SI{600}{\volt} continus fix\'es par le cahier des charges de la partie E -- c'est donc le rapport de transformation qu'il faut adapter ($V_{eff} \approx \SI{513}{\volt}$ serait n\'ecessaire). C\^ot\'e composants, chaque diode ne conduit qu'un tiers de la p\'eriode : elle est parcourue par $\langle i_{D1}\rangle = I_S/3 = \SI{5}{\ampere}$ et $I_{D1,eff} = \SI{8,66}{\ampere}$, et non par les \SI{15}{\ampere} de la charge ; elle doit en revanche tenir une tension inverse de cr\^ete $\sqrt{2}\sqrt{3}\,V_{eff} \approx \SI{563}{\volt}$. Un calibre normalis\'e \SI{800}{\volt} / \SI{10}{\ampere} r\'epond aux deux contraintes.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize 2022, \'epreuve \'ecrite disciplinaire appliqu\'ee, questions 33 \`a 36}
+]
+\CAPETSHOW{
+Un banc d'essai automobile utilise un frein \`a courant de Foucault pour appliquer une charge variable sur les roues d'un v\'ehicule test\'e. Le frein est mod\'elis\'e par une r\'esistance $R_f$ en s\'erie avec une inductance $L_f$, parcourues par un courant $i_f(t)$, $u_f(t)$ \'etant la tension \`a ses bornes. Ce frein est aliment\'e par un hacheur en pont en H (4 interrupteurs command\'es $T_1$ \`a $T_4$, 4 diodes en antiparall\`ele $D_1$ \`a $D_4$), lui-m\^eme aliment\'e par un bus continu de tension constante $E = \SI{207}{\volt}$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw (0,0) to[V, l=$E$] (0,4);
+\node[left] at (-0.05,3.3) {\scriptsize $+$};
+\node[left] at (-0.05,0.7) {\scriptsize $-$};
+\draw (0,4) -- (7,4);
+\draw (0,0) -- (7,0);
+\node[above] at (3.6,4) {$+E$};
+\node[below] at (3.6,0) {$0$};
+\draw (2.2,4) to[cspst, l=$T_1$] (2.2,2);
+\draw (2.2,2) to[cspst, l=$T_2$] (2.2,0);
+\draw (1.2,2) to[empty diode, l=$D_1$] (1.2,4);
+\draw (1.2,0) to[empty diode, l=$D_2$] (1.2,2);
+\draw (1.2,2) -- (2.2,2);
+\draw (6,4) to[cspst, l_=$T_3$] (6,2);
+\draw (6,2) to[cspst, l_=$T_4$] (6,0);
+\draw (7,2) to[empty diode, l_=$D_3$] (7,4);
+\draw (7,0) to[empty diode, l_=$D_4$] (7,2);
+\draw (6,2) -- (7,2);
+\draw (2.2,2) node[circ]{} to[R, l=$R_f$, i=$i_f$] (4.2,2) to[cute inductor, l=$L_f$] (6,2) node[circ]{};
+\draw[-latex] (5.7,2.75) -- (2.5,2.75) node[midway,above]{$u_f(t)$};
+\node[below left] at (2.15,1.95) {$A$};
+\node[below right] at (6.05,1.95) {$B$};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Exprimer $u_f(t)$ en fonction de $i_f(t)$, $R_f$ et $L_f$.
+  \item Le courant $i_f(t)$ est p\'eriodique en r\'egime \'etabli. Justifier que la valeur moyenne de la tension aux bornes de $L_f$ est nulle sur une p\'eriode, puis en d\'eduire $\langle u_f \rangle = R_f \langle i_f \rangle$.
+  \item Le hacheur fonctionne en pont en H bipolaire, command\'e par un rapport cyclique $\alpha$. Rappeler l'expression de $\langle u_f \rangle$ en fonction de $E$ et $\alpha$, puis calculer $\alpha$ pour obtenir un point de fonctionnement nominal $\langle i_f \rangle = \SI{8}{\ampere}$ avec $R_f = \SI{5}{\ohm}$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Loi des mailles sur la branche de charge (loi d'Ohm g\'en\'eralis\'ee, r\'esistance et inductance en s\'erie), en convention r\'ecepteur entre $A$ et $B$ :
+  \[ u_f(t) = R_f\, i_f(t) + L_f\,\frac{\mathrm{d}i_f}{\mathrm{d}t}(t) \]
+  \item En r\'egime p\'eriodique \'etabli, $i_f(T) = i_f(0)$, donc :
+  \[
+  \left\langle L_f \frac{\mathrm{d}i_f}{\mathrm{d}t} \right\rangle = \frac{L_f}{T}\int_0^T \frac{\mathrm{d}i_f}{\mathrm{d}t}\,\mathrm{d}t = \frac{L_f}{T}\big[i_f(T) - i_f(0)\big] = 0
+  \]
+  En moyennant l'\'equation de maille sur une p\'eriode : $\langle u_f \rangle = R_f \langle i_f \rangle + 0 = R_f \langle i_f \rangle$.
+  \item Hacheur 4 quadrants command\'e en bipolaire ($T_1$ et $T_4$ ferm\'es pendant $\alpha T$, $T_2$ et $T_3$ ferm\'es pendant $(1-\alpha)T$). La tension moyenne appliqu\'ee entre $A$ et $B$ vaut alors $\langle u_f \rangle = (2\alpha - 1)\,E$. Avec $\langle u_f \rangle = R_f \langle i_f \rangle = 5 \times 8 = \SI{40}{\volt}$ :
+  \[
+  40 = (2\alpha - 1)\times 207 \;\Longrightarrow\; \alpha = \frac{40/207 + 1}{2} \approx 0{,}597
+  \]
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Le rapport cyclique r\`egle directement $\langle i_f\rangle = (2\alpha-1)E/R_f$ sur toute la plage $\pm E/R_f = \pm\SI{41,4}{\ampere}$, continu\^ument et dans les deux sens : c'est cette r\'eversibilit\'e qui justifie le pont en H plut\^ot qu'un hacheur s\'erie, l'objectif du banc \'etant de faire varier la charge appliqu\'ee aux rouleaux en suivant la loi de route. Le point nominal ($\SI{40}{\volt}$ sur une excursion de $\pm\SI{207}{\volt}$) n'en exploite que $19\,\%$ : la r\'eserve de tension permet les transitoires de forte demande de couple, mais elle signifie aussi que la commande travaille tr\`es pr\`es de $\alpha = 0{,}5$, l\`a o\`u la r\'esolution du rapport cyclique est la plus critique pour la pr\'ecision du courant de freinage.
+
+\smallskip
+\textit{Point de vigilance jury.} Le rapport de jury CAPET 2022 (bilan de la partie 4.2 \guillemotleft\ Cr\'eation des conditions r\'eelles de conduite \guillemotright, treize questions \`a caract\`ere essentiellement \guillemotleft\ \'energie \guillemotright) constate : \guillemotleft\ La tension aux bornes d'une inductance n'est pas connue, pire l'utilisation de la loi d'Ohm est compl\`etement fausse avec des expressions non homog\`enes du type \texttt{u=(R+L)*i} ou \texttt{u = R*L*i}. Sur les candidats IE, seuls 40\% ont r\'epondu correctement. \guillemotright
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

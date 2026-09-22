@@ -1,0 +1,319 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(T02_pilote_v2.tex
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-03-20>
+(C:\Program Files\MiKTeX\tex/latex/base\article.cls
+Document Class: article 2025/01/22 v1.4n Standard LaTeX document class
+(C:\Program Files\MiKTeX\tex/latex/base\size11.clo)) (preamble_pilote_v2.tex
+(preamble.tex (C:\Program Files\MiKTeX\tex/generic/pdftex\glyphtounicode.tex)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/cmap\cmap.sty)
+(C:\Program Files\MiKTeX\tex/latex/base\fontenc.sty<<t1.cmap>>)
+(C:\Program Files\MiKTeX\tex/latex/base\inputenc.sty)
+(C:\Program Files\MiKTeX\tex/generic/babel\babel.sty
+(C:\Program Files\MiKTeX\tex/generic/babel\txtbabel.def)
+*************************************
+* Local config file bblopts.cfg used
+*
+(C:\Program Files\MiKTeX\tex/latex/arabi\bblopts.cfg)
+(C:\Program Files\MiKTeX\tex/generic/babel/locale/fr\babel-french.tex)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/babel-french\french.ldf
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/babel-french\french3.ldf)))
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/carlisle\scalefnt.sty)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/geometry\geometry.sty
+(C:\Program Files\MiKTeX\tex/latex/graphics\keyval.sty)
+(C:\Program Files\MiKTeX\tex/generic/iftex\ifvtex.sty
+(C:\Program Files\MiKTeX\tex/generic/iftex\iftex.sty))
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/geometry\geometry.cfg))
+(C:\Program Files\MiKTeX\tex/latex/amsmath\amsmath.sty
+For additional information on amsmath, use the `?' option.
+(C:\Program Files\MiKTeX\tex/latex/amsmath\amstext.sty
+(C:\Program Files\MiKTeX\tex/latex/amsmath\amsgen.sty))
+(C:\Program Files\MiKTeX\tex/latex/amsmath\amsbsy.sty)
+(C:\Program Files\MiKTeX\tex/latex/amsmath\amsopn.sty))
+(C:\Program Files\MiKTeX\tex/latex/amsfonts\amssymb.sty
+(C:\Program Files\MiKTeX\tex/latex/amsfonts\amsfonts.sty))
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/siunitx\siunitx.sty
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/translations\translations.sty
+(C:\Program Files\MiKTeX\tex/latex/etoolbox\etoolbox.sty)
+(C:\Program Files\MiKTeX\tex/generic/pdftexcmds\pdftexcmds.sty
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/infwarerr\infwarerr.sty)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty)))
+(C:\Program Files\MiKTeX\tex/latex/tools\array.sty))
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/booktabs\booktabs.sty)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/multirow\multirow.sty)
+(C:\Program Files\MiKTeX\tex/latex/tools\tabularx.sty)
+(C:\Program Files\MiKTeX\tex/latex/xcolor\xcolor.sty
+(C:\Program Files\MiKTeX\tex/latex/graphics-cfg\color.cfg)
+(C:\Program Files\MiKTeX\tex/latex/graphics-def\pdftex.def)
+(C:\Program Files\MiKTeX\tex/latex/graphics\mathcolor.ltx))
+(C:\Program Files\MiKTeX\tex/latex/tcolorbox\tcolorbox.sty
+(C:\Program Files\MiKTeX\tex/latex/pgf/frontendlayer\tikz.sty
+(C:\Program Files\MiKTeX\tex/latex/pgf/basiclayer\pgf.sty
+(C:\Program Files\MiKTeX\tex/latex/pgf/utilities\pgfrcs.sty
+(C:\Program Files\MiKTeX\tex/generic/pgf/utilities\pgfutil-common.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/utilities\pgfutil-latex.def)
+(C:\Program Files\MiKTeX\tex/generic/pgf/utilities\pgfrcs.code.tex
+(C:\Program Files\MiKTeX\tex/generic/pgf\pgf.revision.tex)))
+(C:\Program Files\MiKTeX\tex/latex/pgf/basiclayer\pgfcore.sty
+(C:\Program Files\MiKTeX\tex/latex/graphics\graphicx.sty
+(C:\Program Files\MiKTeX\tex/latex/graphics\graphics.sty
+(C:\Program Files\MiKTeX\tex/latex/graphics\trig.sty)
+(C:\Program Files\MiKTeX\tex/latex/graphics-cfg\graphics.cfg)))
+(C:\Program Files\MiKTeX\tex/latex/pgf/systemlayer\pgfsys.sty
+(C:\Program Files\MiKTeX\tex/generic/pgf/systemlayer\pgfsys.code.tex
+(C:\Program Files\MiKTeX\tex/generic/pgf/utilities\pgfkeys.code.tex
+(C:\Program Files\MiKTeX\tex/generic/pgf/utilities\pgfkeyslibraryfiltered.code.
+tex)) (C:\Program Files\MiKTeX\tex/generic/pgf/systemlayer\pgf.cfg)
+(C:\Program Files\MiKTeX\tex/generic/pgf/systemlayer\pgfsys-pdftex.def
+(C:\Program Files\MiKTeX\tex/generic/pgf/systemlayer\pgfsys-common-pdf.def)))
+(C:\Program Files\MiKTeX\tex/generic/pgf/systemlayer\pgfsyssoftpath.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/systemlayer\pgfsysprotocol.code.tex))
+(C:\Program Files\MiKTeX\tex/generic/pgf/basiclayer\pgfcore.code.tex
+(C:\Program Files\MiKTeX\tex/generic/pgf/math\pgfmath.code.tex
+(C:\Program Files\MiKTeX\tex/generic/pgf/math\pgfmathutil.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/math\pgfmathparser.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.basic.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.trigonometric.co
+de.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.random.code.tex)
+
+(C:\Program Files\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.comparison.code.
+tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.base.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.round.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.misc.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.integerarithmeti
+cs.code.tex) (C:\Program Files\MiKTeX\tex/generic/pgf/math\pgfmathcalc.code.tex
+) (C:\Program Files\MiKTeX\tex/generic/pgf/math\pgfmathfloat.code.tex))
+(C:\Program Files\MiKTeX\tex/generic/pgf/math\pgfint.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepoints.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepathconstruct.code.t
+ex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepathusage.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/basiclayer\pgfcorescopes.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/basiclayer\pgfcoregraphicstate.code.te
+x)
+(C:\Program Files\MiKTeX\tex/generic/pgf/basiclayer\pgfcoretransformations.code
+.tex) (C:\Program Files\MiKTeX\tex/generic/pgf/basiclayer\pgfcorequick.code.tex
+) (C:\Program Files\MiKTeX\tex/generic/pgf/basiclayer\pgfcoreobjects.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepathprocessing.code.
+tex) (C:\Program Files\MiKTeX\tex/generic/pgf/basiclayer\pgfcorearrows.code.tex
+) (C:\Program Files\MiKTeX\tex/generic/pgf/basiclayer\pgfcoreshade.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/basiclayer\pgfcoreimage.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/basiclayer\pgfcoreexternal.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/basiclayer\pgfcorelayers.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/basiclayer\pgfcoretransparency.code.te
+x) (C:\Program Files\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepatterns.code.tex
+) (C:\Program Files\MiKTeX\tex/generic/pgf/basiclayer\pgfcorerdf.code.tex)))
+(C:\Program Files\MiKTeX\tex/generic/pgf/modules\pgfmoduleshapes.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/modules\pgfmoduleplot.code.tex)
+(C:\Program Files\MiKTeX\tex/latex/pgf/compatibility\pgfcomp-version-0-65.sty)
+(C:\Program Files\MiKTeX\tex/latex/pgf/compatibility\pgfcomp-version-1-18.sty))
+ (C:\Program Files\MiKTeX\tex/latex/pgf/utilities\pgffor.sty
+(C:\Program Files\MiKTeX\tex/latex/pgf/utilities\pgfkeys.sty
+(C:\Program Files\MiKTeX\tex/generic/pgf/utilities\pgfkeys.code.tex))
+(C:\Program Files\MiKTeX\tex/latex/pgf/math\pgfmath.sty
+(C:\Program Files\MiKTeX\tex/generic/pgf/math\pgfmath.code.tex))
+(C:\Program Files\MiKTeX\tex/generic/pgf/utilities\pgffor.code.tex))
+(C:\Program Files\MiKTeX\tex/generic/pgf/frontendlayer/tikz\tikz.code.tex
+(C:\Program Files\MiKTeX\tex/generic/pgf/libraries\pgflibraryplothandlers.code.
+tex) (C:\Program Files\MiKTeX\tex/generic/pgf/modules\pgfmodulematrix.code.tex)
+
+(C:\Program Files\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibra
+rytopaths.code.tex))) (C:\Program Files\MiKTeX\tex/latex/tools\verbatim.sty)
+(C:\Program Files\MiKTeX\tex/latex/environ\environ.sty
+(C:\Program Files\MiKTeX\tex/latex/trimspaces\trimspaces.sty))
+(C:\Program Files\MiKTeX\tex/latex/tcolorbox\tcbraster.code.tex
+Library (tcolorbox): 'tcbraster.code.tex' version '6.9.0'
+) (C:\Program Files\MiKTeX\tex/latex/tcolorbox\tcbskins.code.tex
+Library (tcolorbox): 'tcbskins.code.tex' version '6.9.0'
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/tikzfill\tikzfill.image.sty
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/tikzfill\tikzlibraryfill.image
+.code.tex))
+(C:\Program Files\MiKTeX\tex/latex/tcolorbox\tcbskinsjigsaw.code.tex
+Library (tcolorbox): 'tcbskinsjigsaw.code.tex' version '6.9.0'
+)) (C:\Program Files\MiKTeX\tex/latex/tcolorbox\tcbbreakable.code.tex
+Library (tcolorbox): 'tcbbreakable.code.tex' version '6.9.0'
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/pdfcol\pdfcol.sty))
+(C:\Program Files\MiKTeX\tex/latex/tcolorbox\tcbhooks.code.tex
+Library (tcolorbox): 'tcbhooks.code.tex' version '6.9.0'
+) (C:\Program Files\MiKTeX\tex/latex/tcolorbox\tcbtheorems.code.tex
+Library (tcolorbox): 'tcbtheorems.code.tex' version '6.9.0'
+) (C:\Program Files\MiKTeX\tex/latex/tcolorbox\tcbfitting.code.tex
+Library (tcolorbox): 'tcbfitting.code.tex' version '6.9.0'
+) (C:\Program Files\MiKTeX\tex/latex/tcolorbox\tcblistingsutf8.code.tex
+Library (tcolorbox): 'tcblistingsutf8.code.tex' version '6.9.0'
+(C:\Program Files\MiKTeX\tex/latex/tcolorbox\tcblistings.code.tex
+Library (tcolorbox): 'tcblistings.code.tex' version '6.9.0'
+(C:\Program Files\MiKTeX\tex/latex/listings\listings.sty
+(C:\Program Files\MiKTeX\tex/latex/listings\lstpatch.sty)
+(C:\Program Files\MiKTeX\tex/latex/listings\lstmisc.sty)
+(C:\Program Files\MiKTeX\tex/latex/listings\listings.cfg))
+==> First Aid for listings.sty no longer applied!
+    Expected:
+        2024/09/23 1.10c (Carsten Heinz)
+    but found:
+        2025/11/14 1.11b (Carsten Heinz)
+    so I'm assuming it got fixed.
+(C:\Program Files\MiKTeX\tex/latex/tcolorbox\tcblistingscore.code.tex
+Library (tcolorbox): 'tcblistingscore.code.tex' version '6.9.0'
+(C:\Program Files\MiKTeX\tex/latex/tcolorbox\tcbprocessing.code.tex
+Library (tcolorbox): 'tcbprocessing.code.tex' version '6.9.0'
+)))
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/listingsutf8\listingsutf8.sty
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/stringenc\stringenc.sty
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/pdfescape\pdfescape.sty))))
+(C:\Program Files\MiKTeX\tex/latex/tcolorbox\tcbexternal.code.tex
+Library (tcolorbox): 'tcbexternal.code.tex' version '6.9.0'
+) (C:\Program Files\MiKTeX\tex/latex/tcolorbox\tcbmagazine.code.tex
+Library (tcolorbox): 'tcbmagazine.code.tex' version '6.9.0'
+) (C:\Program Files\MiKTeX\tex/latex/tcolorbox\tcbvignette.code.tex
+Library (tcolorbox): 'tcbvignette.code.tex' version '6.9.0'
+
+(C:\Program Files\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibra
+ryfadings.code.tex
+(C:\Program Files\MiKTeX\tex/generic/pgf/libraries\pgflibraryfadings.code.tex))
+) (C:\Program Files\MiKTeX\tex/latex/tcolorbox\tcbposter.code.tex
+Library (tcolorbox): 'tcbposter.code.tex' version '6.9.0'
+)) (C:\Program Files\MiKTeX\tex/latex/tools\multicol.sty)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/enumitem\enumitem.sty)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/mathtools\mathtools.sty
+(C:\Program Files\MiKTeX\tex/latex/tools\calc.sty)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/mathtools\mhsetup.sty))
+(C:\Program Files\MiKTeX\tex/latex/lm\lmodern.sty)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/microtype\microtype.sty
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/microtype\microtype-pdftex.def
+) (C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/microtype\microtype.cfg))
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/fancyhdr\fancyhdr.sty)
+(C:\Program Files\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibra
+rypositioning.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/libraries\pgflibraryarrows.meta.code.t
+ex) (C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/circuitikz\circuitikz.sty
+(C:\Program Files\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibra
+rycalc.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibra
+rybending.code.tex
+(C:\Program Files\MiKTeX\tex/generic/pgf/modules\pgfmodulebending.code.tex
+(C:\Program Files\MiKTeX\tex/generic/pgf/modules\pgfmodulenonlineartransformati
+ons.code.tex)
+(C:\Program Files\MiKTeX\tex/generic/pgf/libraries\pgflibrarycurvilinear.code.t
+ex)))
+(C:\Program Files\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibra
+ryfpu.code.tex
+(C:\Program Files\MiKTeX\tex/generic/pgf/libraries\pgflibraryfpu.code.tex))
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/circuitikz\pgfcirc.defines.t
+ex)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/circuitikz\pgfcircutils.tex)
+ (C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/circuitikz\pgfcircpath.tex)
+
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/circuitikz\pgfcircshapes.tex
+)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/circuitikz\pgfcircmonopoles.
+tex)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/circuitikz\pgfcircbipoles.te
+x)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/circuitikz\pgfcirctripoles.t
+ex)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/circuitikz\pgfcircquadpoles.
+tex)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/circuitikz\pgfcircmultipoles
+.tex)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/circuitikz\pgfcirclabel.tex)
+
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/circuitikz\pgfcircvoltage.te
+x)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/circuitikz\pgfcirccurrent.te
+x)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/circuitikz\pgfcircflow.tex))
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/lastpage\lastpage.sty
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/lastpage\lastpage2e.sty
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/lastpage\lastpagemodern.sty)
+
+))) (C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/lato\lato.sty
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/fontaxes\fontaxes.sty
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/figureversions\figureversions.
+sty)) (C:\Program Files\MiKTeX\tex/generic/iftex\ifluatex.sty)
+(C:\Program Files\MiKTeX\tex/generic/iftex\ifxetex.sty)
+(C:\Program Files\MiKTeX\tex/latex/xkeyval\xkeyval.sty
+(C:\Program Files\MiKTeX\tex/generic/xkeyval\xkeyval.tex
+(C:\Program Files\MiKTeX\tex/generic/xkeyval\xkvutils.tex))))
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/newtxsf\newtxsf.sty
+`newtxsf' v1.056, 2024/01/25 Math macros based on STIX sans serif and txfonts (
+msharpe) (C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/generic/binhex\binhex.tex))
+) (C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/lato\t1lato-tlf.fd)
+(C:\Program Files\MiKTeX\tex/latex/l3backend\l3backend-pdftex.def)
+No file T02_pilote_v2.aux.
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/newtxsf\omlntxsfmi.fd)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/newtx\untxexa.fd)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/newtx\lmsntxsy.fd)
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/translations/dicts\translation
+s-basic-dictionary-french.trsl)
+(C:\Program Files\MiKTeX\tex/context/base/mkii\supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (C:\Program Files\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-base.sty
+(C:\Program Files\MiKTeX\tex/latex/00miktex\epstopdf-sys.cfg))
+(T02_pilote_body.tex (C:\Program Files\MiKTeX\tex/latex/lm\t1lmss.fd)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/lato\ot1lato-tlf.fd)<<ot1.cmap
+>><<oml.cmap>> (C:\Program Files\MiKTeX\tex/latex/amsfonts\umsa.fd)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/microtype\mt-msa.cfg)
+(C:\Program Files\MiKTeX\tex/latex/amsfonts\umsb.fd)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/microtype\mt-msb.cfg)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/newtxsf\untxsfmia.fd)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/newtx\untxsym.fd)
+(C:\Users\Dylan\AppData\Roaming\MiKTeX\tex/latex/newtx\untxsyc.fd)
+
+LaTeX Warning: Reference `LastPage' on page 1 undefined on input line 174.
+
+[1{C:/Users/Dylan/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Program 
+Files/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}{C:/Users/Dylan/AppData/Roaming/MiKTe
+X/fonts/enc/dvips/lato/a_cl4kdn.enc}{C:/Users/Dylan/AppData/Roaming/MiKTeX/font
+s/enc/dvips/lato/a_y72t7m.enc}]
+
+LaTeX Warning: Reference `LastPage' on page 2 undefined on input line 372.
+
+[2]
+
+LaTeX Warning: Reference `LastPage' on page 3 undefined on input line 372.
+
+[3]
+
+LaTeX Warning: Reference `LastPage' on page 4 undefined on input line 476.
+
+[4])
+
+LaTeX Warning: Reference `LastPage' on page 5 undefined on input line 6.
+
+[5] 
+enddocument/afterlastpage (AED): lastpage setting LastPage.
+(T02_pilote_v2.aux)
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package lastpage Warning: Rerun to get the references right on input line 6.
+
+ )<C:/Users/Dylan/AppData/Roaming/MiKTeX/fonts/type1/typoland/lato/Lato-Bold.pf
+b><C:/Users/Dylan/AppData/Roaming/MiKTeX/fonts/type1/typoland/lato/Lato-Italic.
+pfb><C:/Users/Dylan/AppData/Roaming/MiKTeX/fonts/type1/typoland/lato/Lato-Regul
+ar.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmss10.pfb><C:/Program Fi
+les/MiKTeX/fonts/type1/public/lm/lmss9.pfb><C:/Program Files/MiKTeX/fonts/type1
+/public/lm/lmssbx10.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmsso10.
+pfb><C:/Users/Dylan/AppData/Roaming/MiKTeX/fonts/type1/public/txfonts/rtxmi.pfb
+><C:/Users/Dylan/AppData/Roaming/MiKTeX/fonts/type1/public/newtx/txexs.pfb><C:/
+Users/Dylan/AppData/Roaming/MiKTeX/fonts/type1/public/txfonts/txsyc.pfb><C:/Use
+rs/Dylan/AppData/Roaming/MiKTeX/fonts/type1/public/newtx/txsym.pfb><C:/Users/Dy
+lan/AppData/Roaming/MiKTeX/fonts/type1/public/newtx/txsys.pfb><C:/Users/Dylan/A
+ppData/Roaming/MiKTeX/fonts/type1/public/newtxsf/zsfmi-reg.pfb><C:/Users/Dylan/
+AppData/Roaming/MiKTeX/fonts/type1/public/newtxsf/zsfmia-reg.pfb>
+Output written on T02_pilote_v2.pdf (5 pages, 282823 bytes).
+Transcript written on T02_pilote_v2.log.
+pdflatex: major issue: So far, no MiKTeX administrator has checked for updates.

@@ -1,0 +1,450 @@
+% ============================================================================
+% T09 -- Onduleurs -- BANQUE D'EXERCICES
+% ----------------------------------------------------------------------------
+% PRINCIPE DE COMPLEMENTARITE (revision 2026-09-02) : cette banque ne doit pas
+% faire refaire les Questions Types de la fiche fiches/T09_Onduleurs.tex.
+% Les QT de la fiche sont :
+%   QT1 = 2024 E2 disciplinaire B10-B13 (THD pleine onde / MLI, spectre
+%         170/95/27/27/20 A et 37/22 A, norme IEC/EN 61000-2-2)
+%   QT2 = 2025 E2 disciplinaire Q14 (identification CV1/CV2/CV3 Mafate)
+%   QT3 = 2024 E2 appliquee Q45-46 (MSAP Urbanloop, f0 = 185,6 Hz, couplage)
+% Les trois exercices qui dupliquaient ces QT ont ete remplaces par d'autres
+% questions des memes sujets reels (ou d'une autre annee) portant sur un travail
+% intellectuel different. Le spectre 2024 (QT1) est en outre deja travaille dans
+% les notions T04 (Harmoniques) et T14 (Variation de vitesse) : il n'est plus
+% repris ici.
+%
+% SOURCES VERIFIEES POUR TOUTES LES DONNEES NUMERIQUES
+% ----------------------------------------------------------------------------
+%  - Exercice 1 : exercice inedit (pont en H pleine onde). Aucune donnee attribuee
+%    a un sujet reel. La formule THD = sqrt(pi^2/8 - 1) ~= 0,483 est un resultat
+%    mathematique de cours (serie de Fourier d'un creneau bipolaire).
+%
+%  - Exercice 2 : 2026, CAPET SII IE, Admissibilite : epreuve 2 (bus electrique a
+%    pile a combustible, essieu electrifie), questions A15 et A18.
+%    Fichier : docs/CAPET_Markdown-20260629T134311Z-3-001/CAPET_Markdown/docs/
+%              CAPET_SII_IE/06_PDFs_Originaux/2026/E2_Sujet_2026_BAC3/
+%              E2_Sujet_2026_BAC3.md
+%    l.215 : "moteur asynchrone (MAS) triphase a cage, 230 V / 400 V, 700 Hz"
+%    l.227 : tableau d'essai en charge nominale -- Vn = 230 V, In = 156 A,
+%            cos(phi)n = 0,94, eta_n = 0,905, Omega_n = 1079 rad/s, fn = 700 Hz
+%    l.276 : plaque a bornes six bornes U1/V1/W1/U2/V2/W2, phases Ph1/Ph2/Ph3
+%    l.298-300 : A18 donne explicitement v1eff = (sqrt(2)/3).U0
+%    l.308 : A19 donne U0 = 490 V et f0 = 700 Hz  -> coherent avec le calcul
+%            U0 = 3.Vn/sqrt(2) = 3 x 230 / sqrt(2) = 487,9 V ~= 490 V.
+%    Il n'existe pas encore de rapport de jury 2026 : les resultats donnes ici
+%    sont recalcules a partir des seules donnees textuelles du sujet, la valeur
+%    U0 = 490 V du sujet lui-meme servant de verification croisee.
+%
+%  - Exercice 3 : 2025, CAPET SII IE, Epreuve ecrite disciplinaire (reseau isole
+%    de Mafate, ile de La Reunion), questions Q21 a Q23.
+%    Sujet : .../2025/E2_Disciplinaire_IE_2025/E2_Disciplinaire_IE_2025.md
+%    l.335 : R0 = 17,7 ohm, L = 10 mH, commande pleine onde, VDC = 230 V, F = 50 Hz
+%    l.339-343 : Q21 (valeur efficace), Sdistri = 3 kVA, Q22 (P et Q), Q23 (THD = 0,48)
+%    Corrige : .../2025/Rapport_Jury_2025/Rapport_Jury_2025.md, Questions 21 a 23,
+%    qui donne Pdistri = 3011 W, Qdistri = 534,5 VAR et la remarque officielle
+%    "La valeur de la resistance R0 est arrondie ce qui explique ce resultat".
+%
+%  - Exercice 4 : 2024, CAPET SII IE, Epreuve ecrite disciplinaire appliquee
+%    (Urbanloop), questions 44, 48 et 49.
+%    Sujet : .../2024/E2_Appliquee_Commune_2024/E2_Appliquee_Commune_2024.md
+%    l.17  : intitule exact "EPREUVE ECRITE DISCIPLINAIRE APPLIQUEE"
+%    l.512 : "La structure du boitier d'alimentation est composee d'un pont
+%             redresseur PD2, d'un filtre et d'un hacheur serie"
+%    l.508 : les boitiers "imposent en sortie une tension U0 de 72 V continue (TBTS)"
+%    l.562 : Q44 (quadrants de fonctionnement de la machine synchrone)
+%    l.580-584 : Q48 (reversibilites) et Q49 (risques)
+%    l.598 : Q50 -- energie cinetique recuperee au freinage = -139 kJ
+%    Corrige : .../2024/Rapport_Jury_2024/Rapport_Jury_2024.md
+%    l.893 : "Comme le pont PD2 est unidirectionnel en courant et en tension, les
+%             boitiers sont unidirectionnels en courant et en tension."
+%    l.897 : "Pendant les phases de freinage, de l'energie est renvoyee aux boitiers
+%             d'alimentation. Si cette energie est trop importante, elle risque
+%             d'endommager les boitiers d'alimentation voire d'entrainer leurs
+%             destructions si rien n'est prevu pour absorber cette energie."
+%    La reponse a Q44 est une image non convertie dans le rapport : le corrige
+%    ci-dessous reconstruit le raisonnement quadrant par quadrant a partir du profil
+%    de vitesse decrit textuellement (acceleration / vitesse constante / freinage),
+%    sans attribuer de figure au sujet. Le schema du pont PD2 (DT4) est egalement une
+%    image non convertie : le schema circuitikz donne ici est la structure standard de
+%    cours d'un PD2 (quatre diodes), coherente avec la description textuelle l.512.
+%
+%  - Exercice 5 (docTech) : 2025, CAPET SII IE, Epreuve ecrite disciplinaire,
+%    questions Q33 a Q35.
+%    Sujet : .../2025/E2_Disciplinaire_IE_2025/E2_Disciplinaire_IE_2025.md
+%    l.342 : "cellules en serie dont la tension nominale VCEN = 3,69 V. La tension
+%             nominale de la batterie est EbN = 48 V"
+%    l.356 : "L'evolution de la tension aux bornes de la batterie en fonction de
+%             l'etat de charge est donnee sur le document technique DT12"
+%    l.358 : Q34 -- profondeur de decharge 85 % correspondant a VCE = 3,3 V
+%    l.360 : "On a VDC = Eb ; ... VdistriE = VDC/(1-alpha) ... VdistriEN = 230 V ...
+%             alpha_nom = 0,79"
+%    l.362 : Q35 -- calculer VdistriE chargee puis dechargee, conclure sur la
+%             reglementation "plus ou moins 10 % de sa valeur efficace nominale"
+%    Corrige : .../2025/Rapport_Jury_2025/Rapport_Jury_2025.md
+%    l.414-416 : Question 33 -- 48/3,69 = 13 cellules en serie
+%    l.418-424 : Question 34 -- "Pour DOD = 0 on a Eb DOD=0 = 13.4,1 = 53,3 V" ;
+%                "Pour DOD = 85% on a Eb DOD=85 = 13.3,3 = 42,9 V" ; Delta Eb = 10,4 V
+%    l.426-434 : Question 35 -- 42,9/(1-0,79) = 204,3 V ;
+%                "La norme impose 207 V <= Vdistrieff <= 253 V ; elle n'est donc pas
+%                 respectee."
+%    DOCUMENT TECHNIQUE DT12 : la courbe elle-meme est une image non convertie par
+%    Marker (l.651 du sujet : titre seul). L'encadre docTech de l'exercice 5 est donc
+%    RECONSTITUE a partir des deux seuls points de la courbe qui sont textuellement
+%    attestes : VCE = 4,1 V a DOD = 0 % (corrige officiel Question 34, l.420) et
+%    VCE = 3,3 V a DOD = 85 % (enonce du sujet Q34, l.358, et corrige l.422). Les deux
+%    points intermediaires ne sont PAS reproduits : l'extrait est presente sous forme
+%    de releves ponctuels de la courbe DT12, pas de graphe complet, afin de ne rien
+%    inventer.
+%
+% Citation du rapport de jury 2025 (exercice 5) : verbatim de la Question 42 du
+% corrige officiel, l.470 du Rapport_Jury_2025.md.
+% ============================================================================
+
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ifdefined\var\else\DeclareSIUnit{\var}{var}\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T09}} - Exercices - Onduleurs (monophas\'e et triphas\'e)}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T09 \quad Onduleurs (monophas\'e et triphas\'e)}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 5 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+% ============================================================
+% Exercice 1 -- inedit -- pont en H monophase, pleine onde, charge resistive
+% ============================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Un onduleur monophas\'e en pont complet (pont en H), constitu\'e de quatre interrupteurs command\'es $K_1$, $K_2$, $K_3$, $K_4$, est aliment\'e par un bus continu id\'eal de tension $E = \SI{48}{\volt}$. Il alimente une charge purement r\'esistive $R$. La commande est dite \guillemotleft\ pleine onde \guillemotright\ : chaque diagonale du pont conduit pendant une demi-p\'eriode, sans modulation de largeur d'impulsion, \`a la fr\'equence de sortie souhait\'ee $f = \SI{50}{\hertz}$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw
+(0,0) to[V, l=$E$] (0,4)
+to[short] (2,4) node[circ]{}
+to[short] (4,4) node[circ]{};
+\draw (0,0) to[short] (2,0) node[circ]{} to[short] (4,0) node[circ]{};
+\draw (2,4) to[nos, l=$K_1$] (2,2) node[circ]{} to[nos, l=$K_2$] (2,0);
+\draw (4,4) to[nos, l=$K_3$] (4,2) node[circ]{} to[nos, l=$K_4$] (4,0);
+\draw (2,2) to[R, l=$R$] (4,2);
+\node[above] at (3,4.3) {$u(t)$};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Indiquer, pour chaque demi-p\'eriode, la paire d'interrupteurs ferm\'ee pour obtenir $u(t) = +E$ puis $u(t) = -E$. Pr\'eciser pourquoi $K_1$ et $K_2$ ne doivent jamais \^etre ferm\'es simultan\'ement.
+  \item Repr\'esenter l'allure de $u(t)$ sur deux p\'eriodes et exprimer sa valeur efficace $U_{eff}$ en fonction de $E$, puis calculer $U_{eff}$.
+  \item Rappeler l'expression g\'en\'erale de l'amplitude $U_n$ de l'harmonique de rang $n$ impair de $u(t)$, puis calculer num\'eriquement $U_1$, $U_3$ et $U_5$.
+  \item Calculer le THD th\'eorique de $u(t)$ et v\'erifier qu'il correspond \`a la valeur de cours $\sqrt{\pi^2/8 - 1}$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Pour $u(t) = +E$ : $K_1$ et $K_4$ ferm\'es (diagonale 1), $K_2$ et $K_3$ ouverts. Pour $u(t) = -E$ : $K_2$ et $K_3$ ferm\'es (diagonale 2), $K_1$ et $K_4$ ouverts. $K_1$ et $K_2$ appartiennent au m\^eme bras : les fermer simultan\'ement court-circuiterait directement la source $E$ (court-circuit de bras).
+  \item $u(t)$ est un cr\'eneau bipolaire d'amplitude $\pm E$, de p\'eriode $T = 1/f = \SI{20}{\milli\second}$ :
+  \begin{center}
+  \begin{tikzpicture}[scale=0.85, >=Stealth]
+    \draw[-latex] (0,0) -- (8.5,0) node[right]{$t$};
+    \draw[-latex] (0,-1.6) -- (0,1.8) node[above]{$u(t)$};
+    \draw[dashed, gray] (0,1) -- (8,1); \node[left] at (0,1) {$E$};
+    \draw[dashed, gray] (0,-1) -- (8,-1); \node[left] at (0,-1) {$-E$};
+    \draw[thick]
+      (0,1) -- (2,1) -- (2,-1) -- (4,-1) -- (4,1) -- (6,1) -- (6,-1) -- (8,-1);
+    \draw[dotted] (2,-1) -- (2,-1.4) node[below]{$T/2$};
+    \draw[dotted] (4,-1) -- (4,-1.4) node[below]{$T$};
+    \draw[dotted] (6,-1) -- (6,-1.4) node[below]{$3T/2$};
+    \draw[dotted] (8,-1) -- (8,-1.4) node[below]{$2T$};
+  \end{tikzpicture}
+  \end{center}
+  Le carr\'e de $u(t)$ vaut toujours $E^2$ (que $u = +E$ ou $u = -E$), donc $U_{eff} = E = \SI{48}{\volt}$ (ind\'ependant du rapport cyclique, ici fix\'e \`a $0{,}5$).
+  \item D\'ecomposition en s\'erie de Fourier d'un cr\'eneau bipolaire : $U_n = \dfrac{4E}{n\pi}$ pour $n$ impair ($U_n = 0$ pour $n$ pair).
+  \[ U_1 = \frac{4\times 48}{\pi} \approx \SI{61,1}{\volt} \qquad U_3 = \frac{4\times 48}{3\pi} \approx \SI{20,4}{\volt} \qquad U_5 = \frac{4\times 48}{5\pi} \approx \SI{12,2}{\volt} \]
+  \item Le THD ne d\'epend pas de $E$ (il se simplifie dans le rapport) :
+  \[ \mathrm{THD} = \sqrt{\sum_{n=3,5,7,\ldots} \left(\frac{1}{n}\right)^2} = \sqrt{\frac{\pi^2}{8} - 1} \approx 0{,}483 = 48{,}3\ \% \]
+  On retrouve bien la valeur de cours : un onduleur monophas\'e command\'e en pleine onde g\'en\`ere, quelle que soit la tension $E$, un taux de distorsion harmonique th\'eorique voisin de $48\ \%$ -- tr\`es au-dessus des $25\ \%$ tol\'er\'es par la norme IEC/EN 61000-2-2, ce qui disqualifie la pleine onde pour tout raccordement r\'eseau sans filtrage.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% ============================================================
+% Exercice 2 -- reel 2026, Admissibilite : epreuve 2, questions A15 et A18
+% (remplace l'ancien exercice 2 -- 2025 Q14 identification CV1/CV2/CV3 -- qui
+%  dupliquait la QT2 de la fiche T09)
+% ============================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{1} \hfill\normalfont\footnotesize 2026, Admissibilit\'e : \'epreuve 2, questions A15 et A18}
+]
+\CAPETSHOW{
+L'essieu \'electrifi\'e d'un bus \`a pile \`a combustible est entra\^in\'e par deux machines asynchrones triphas\'ees \`a cage. Chaque machine porte la mention $\SI{230}{\volt}/\SI{400}{\volt}$, $\SI{700}{\hertz}$ et sa plaque \`a bornes comporte six bornes ($U_1$, $V_1$, $W_1$, $U_2$, $V_2$, $W_2$) auxquelles sont reli\'ees les entr\'ees et les sorties des trois enroulements. Chaque machine est aliment\'ee par un onduleur autonome triphas\'e dont les trois phases de sortie sont not\'ees $Ph_1$, $Ph_2$, $Ph_3$ et dont le bus continu d'entr\'ee est not\'e $U_0$.
+
+L'essai en charge nominale a donn\'e : tension simple nominale $V_n = \SI{230}{\volt}$, courant de ligne nominal $I_n = \SI{156}{\ampere}$, facteur de puissance $\cos\varphi_n = 0{,}94$, rendement $\eta_n = 0{,}905$, fr\'equence d'alimentation $f_n = \SI{700}{\hertz}$.
+
+L'exploitation du trac\'e de la tension simple $v_1(t)$ d\'elivr\'ee par l'onduleur command\'e en pleine onde conduit \`a la relation $V_{1,eff} = \dfrac{\sqrt{2}}{3}\,U_0$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.75]
+\draw (0,0) to[V, l=$U_0$] (0,4);
+\draw (0,4) -- (2,4) node[circ]{} -- (4,4) node[circ]{} -- (6,4) node[circ]{};
+\draw (0,0) -- (2,0) node[circ]{} -- (4,0) node[circ]{} -- (6,0) node[circ]{};
+\draw (2,4) to[nos, l_=$K_1$] (2,2) node[circ]{} to[nos, l_=$K_4$] (2,0);
+\draw (4,4) to[nos, l_=$K_2$] (4,2) node[circ]{} to[nos, l_=$K_5$] (4,0);
+\draw (6,4) to[nos, l_=$K_3$] (6,2) node[circ]{} to[nos, l_=$K_6$] (6,0);
+% Sorties de bras : les trois points milieux sont simplement reperes Ph1/Ph2/Ph3
+\node[right=1pt, font=\small] at (2,2) {$Ph_1$};
+\node[right=1pt, font=\small] at (4,2) {$Ph_2$};
+\node[right=1pt, font=\small] at (6,2) {$Ph_3$};
+\node[below] at (4,-0.6) {\small onduleur triphas\'e -- trois bras, six interrupteurs};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Rappeler ce que d\'esignent les deux tensions de la mention $\SI{230}{\volt}/\SI{400}{\volt}$ port\'ee par la machine. En d\'eduire le couplage \`a r\'ealiser sur la plaque \`a bornes pour que la machine fonctionne correctement lorsque l'onduleur lui d\'elivre une tension simple de $\SI{230}{\volt}$, et d\'ecrire le c\^ablage correspondant (barrettes et raccordement de $Ph_1$, $Ph_2$, $Ph_3$).
+  \item En d\'eduire la valeur de la tension $U_0$ du bus continu \`a appliquer \`a l'entr\'ee de l'onduleur pour obtenir une alimentation correcte de la machine asynchrone.
+  \item Calculer la puissance active absorb\'ee $P_{an}$ et la puissance utile $P_{un}$ de la machine au point nominal, puis le courant moyen $I_0$ appel\'e sur le bus continu par un onduleur suppos\'e sans pertes.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item La mention $\SI{230}{\volt}/\SI{400}{\volt}$ donne les deux tensions de r\'eseau admissibles : $\SI{230}{\volt}$ correspond au couplage \textbf{triangle} (chaque enroulement est alors soumis \`a la tension compos\'ee du r\'eseau) et $\SI{400}{\volt}$ au couplage \textbf{\'etoile} (chaque enroulement est soumis \`a $400/\sqrt{3} \approx \SI{230}{\volt}$). La tension nominale par enroulement vaut donc $\SI{230}{\volt}$ dans les deux cas.
+
+  L'onduleur d\'elivre ici une tension \emph{simple} $V_n = \SI{230}{\volt}$, donc une tension compos\'ee $U = \sqrt{3}\times 230 \approx \SI{400}{\volt}$ : c'est le couplage \textbf{\'etoile} qu'il faut r\'ealiser. C\^ablage : les trois sorties $U_2$, $V_2$, $W_2$ sont r\'eunies par deux barrettes horizontales (point neutre commun), et les trois entr\'ees $U_1$, $V_1$, $W_1$ re\c{c}oivent respectivement $Ph_1$, $Ph_2$, $Ph_3$.
+  \item De $V_{1,eff} = \dfrac{\sqrt{2}}{3}\,U_0$ on tire :
+  \[ U_0 = \frac{3\,V_{1,eff}}{\sqrt{2}} = \frac{3\times 230}{\sqrt{2}} \approx \SI{487,9}{\volt} \]
+  soit une tension de bus continu \`a fixer \`a $U_0 \approx \SI{490}{\volt}$.
+  \item Puissance active absorb\'ee (r\'eseau triphas\'e, tension simple) :
+  \[ P_{an} = 3\,V_n I_n \cos\varphi_n = 3 \times 230 \times 156 \times 0{,}94 \approx \SI[group-minimum-digits=4]{101182}{\watt} \approx \SI{101,2}{\kilo\watt} \]
+  \[ P_{un} = \eta_n \cdot P_{an} = 0{,}905 \times 101{,}2 \approx \SI{91,6}{\kilo\watt} \]
+  L'onduleur \'etant suppos\'e sans pertes, la puissance transitant par le bus continu est \'egale \`a $P_{an}$ :
+  \[ I_0 = \frac{P_{an}}{U_0} = \frac{101\,182}{487{,}9} \approx \SI{207}{\ampere} \]
+  \textbf{Conclusion.} Le couplage \'etoile associ\'e \`a un bus continu de $\SI{490}{\volt}$ place la machine exactement \`a sa tension nominale par enroulement ($\SI{230}{\volt}$) : c'est la condition pour que le flux magn\'etique nominal soit \'etabli et que le couple nominal soit disponible. Un bus continu plus faible sous-fluxerait la machine et lui interdirait de fournir les $\SI{91,6}{\kilo\watt}$ utiles exig\'es par le cahier des charges de l'essieu.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% ============================================================
+% Exercice 3 -- reel 2025, Epreuve ecrite disciplinaire, Q21 a Q23 -- CV3-2 Mafate
+% (conserve : disjoint des QT de la fiche, qui ne traite que Q14 pour ce sujet)
+% ============================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize 2025, \'Epreuve \'ecrite disciplinaire, questions Q21 \`a Q23}
+]
+\CAPETSHOW{
+Sur le r\'eseau isol\'e du cirque de Mafate (\^ile de La R\'eunion), l'\'etage de sortie CV3-2 de la cha\^ine de conversion est un pont complet monophas\'e \`a quatre interrupteurs command\'es, pilot\'e en pleine onde \`a la fr\'equence $F = \SI{50}{\hertz}$ et aliment\'e par un bus continu suppos\'e constant $V_{DC} = \SI{230}{\volt}$. Il d\'elivre la tension $V_{distri}(t)$ au r\'eseau local du foyer, mod\'elis\'e par une r\'esistance $R_0 = \SI{17,7}{\ohm}$ en s\'erie avec une inductance $L = \SI{10}{\milli\henry}$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw
+(0,0) to[V, l=$V_{DC}$] (0,4)
+to[short] (2,4) node[circ]{}
+to[short] (4,4) node[circ]{};
+\draw (0,0) to[short] (2,0) node[circ]{} to[short] (4,0) node[circ]{};
+\draw (2,4) to[nos, l=$K_1$] (2,2) node[circ]{} to[nos, l=$K_2$] (2,0);
+\draw (4,4) to[nos, l=$K_3$] (4,2) node[circ]{} to[nos, l=$K_4$] (4,0);
+\draw (2,2) to[R, l=$R_0$] (3,2) to[cute inductor, l=$L$] (4,2);
+\node[above] at (3,4.3) {$V_{distri}(t)$};
+\end{circuitikz}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.85, >=Stealth]
+  \draw[-latex] (0,0) -- (8.5,0) node[right]{$t$ (ms)};
+  \draw[-latex] (0,-1.6) -- (0,1.8) node[above]{$V_{distri}(t)$};
+  \draw[dashed, gray] (0,1) -- (8,1); \node[left] at (0,1) {$230$};
+  \draw[dashed, gray] (0,-1) -- (8,-1); \node[left] at (0,-1) {$-230$};
+  \draw[thick]
+    (0,1) -- (2,1) -- (2,-1) -- (4,-1) -- (4,1) -- (6,1) -- (6,-1) -- (8,-1);
+  \draw[dotted] (2,-1) -- (2,-1.4) node[below]{$10$};
+  \draw[dotted] (4,-1) -- (4,-1.4) node[below]{$20$};
+  \draw[dotted] (6,-1) -- (6,-1.4) node[below]{$30$};
+  \draw[dotted] (8,-1) -- (8,-1.4) node[below]{$40$};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Justifier que la valeur efficace $V_{distri,eff}$ de la tension d\'elivr\'ee par CV3-2 est \'egale \`a $V_{DC}$, et donner sa valeur num\'erique.
+  \item La charge consomme une puissance apparente nominale $S_{distri} = \SI{3}{\kilo\volt\ampere}$. En consid\'erant que le courant efficace global traversant la r\'esistance et l'inductance vaut $I_{eq} = S_{distri}/V_{distri,eff}$, calculer $I_{eq}$ puis en d\'eduire les puissances active $P_{distri}$ et r\'eactive $Q_{distri}$ consomm\'ees par la charge.
+  \item Le calcul du THD (rapport\'e au fondamental) de $V_{distri}$ donne $\mathrm{THD} = 0{,}48$. V\'erifier que cette valeur correspond \`a la formule th\'eorique du cours pour un pont monophas\'e command\'e en pleine onde, puis commenter la qualit\'e de l'onde produite par CV3-2.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item $V_{distri}(t)$ est un cr\'eneau bipolaire d'amplitude $\pm V_{DC}$ : son carr\'e vaut toujours $V_{DC}^2$, donc $V_{distri,eff} = V_{DC} = \SI{230}{\volt}$, quelle que soit la charge (r\'esultat ind\'ependant de $R_0$ et $L$).
+  \item $I_{eq} = \dfrac{S_{distri}}{V_{distri,eff}} = \dfrac{3\,000}{230} \approx \SI{13,04}{\ampere}$, soit $I_{eq}^2 = \left(\dfrac{3\,000}{230}\right)^2 \approx 170{,}13\ \si{\ampere\squared}$.
+  \[ P_{distri} = R_0 \cdot I_{eq}^2 = 17{,}7 \times 170{,}13 \approx \SI[group-minimum-digits=4]{3011}{\watt} \]
+  \[ Q_{distri} = L\omega \cdot I_{eq}^2 = (0{,}01 \times 2\pi \times 50) \times 170{,}13 \approx 3{,}1416 \times 170{,}13 \approx \SI{534,5}{\var} \]
+  (La l\'eg\`ere incoh\'erence entre $\sqrt{P_{distri}^2 + Q_{distri}^2} \approx \SI[group-minimum-digits=4]{3058}{\volt\ampere}$ et les \SI{3}{\kilo\volt\ampere} donn\'es provient de l'arrondi sur $R_0$, comme le signale le corrig\'e officiel.)
+  \item Formule de cours pour un pont monophas\'e command\'e en pleine onde : $\mathrm{THD} = \sqrt{\pi^2/8 - 1} \approx 0{,}483$, ce qui correspond bien \`a la valeur $0{,}48$ donn\'ee (\`a l'arrondi pr\`es).
+
+  \textbf{Conclusion.} La tension d\'elivr\'ee par CV3-2 comporte un taux de distorsion harmonique de l'ordre de $48\ \%$, avec des harmoniques de rang faible (3, 5, 7, \ldots) difficiles \`a filtrer : c'est deux fois plus que le seuil de $25\ \%$ usuellement retenu pour la compatibilit\'e \'electromagn\'etique d'un r\'eseau de distribution. Pour alimenter des r\'ecepteurs sensibles \`a la qualit\'e de l'onde, une commande MLI -- qui repousse les harmoniques vers les hautes fr\'equences -- serait donc pr\'ef\'erable \`a la commande pleine onde retenue pour cette \'etude simplifi\'ee.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% ============================================================
+% Exercice 4 -- reel 2024, Epreuve ecrite disciplinaire appliquee, Q44, Q48, Q49
+% (remplace l'ancien exercice 4 -- Urbanloop Q45-46, f0 = 185,6 Hz et couplage --
+%  qui dupliquait la QT3 de la fiche T09 ; meme sujet, questions differentes,
+%  travail intellectuel different : quadrants et reversibilite au lieu du calcul
+%  de frequence statorique)
+% ============================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize 2024, \'Epreuve \'ecrite disciplinaire appliqu\'ee, questions 44, 48 et 49}
+]
+\CAPETSHOW{
+Dans le syst\`eme de transport Urbanloop, chaque capsule est motoris\'ee par quatre machines synchrones triphas\'ees \`a aimants permanents, aliment\'ees chacune par un onduleur triphas\'e de tension. L'\'energie \'electrique est amen\'ee aux capsules par les rails, aliment\'es par des bo\^itiers r\'epartis le long de la voie. Chaque bo\^itier est raccord\'e au r\'eseau EDF monophas\'e et impose en sortie une tension continue $U_0 = \SI{72}{\volt}$ (TBTS). Sa structure interne associe un \textbf{pont redresseur PD2}, un filtre et un hacheur s\'erie.
+
+Le profil de vitesse d'une capsule entre deux stations comporte successivement une phase d'acc\'el\'eration, une phase \`a vitesse constante et une phase de freinage jusqu'\`a l'arr\^et, la capsule se d\'epla\c{c}ant toujours dans le m\^eme sens.
+
+\begin{center}
+\begin{circuitikz}[european, scale=1.0]
+% Pont PD2 a diodes en losange : structure standard de cours
+% (DT4 du sujet 2024 = image non convertie par Marker).
+% Sommet haut = rail + ; sommet bas = rail - ; sommets lateraux = bornes A et B
+% de la source. Les quatre diodes pointent toutes vers le haut (du - vers le +).
+\draw (-4.2,0.9) to[sV, l=$v_1$] (-4.2,-0.9);
+\draw (-4.2,0.9) -- (-3.4,0.9) -- (-3.4,0) -- (-1.5,0) node[circ]{}; % borne A (gauche)
+\draw (-4.2,-0.9) -- (-3.9,-0.9) -- (-3.9,-2.4) -- (1.5,-2.4) -- (1.5,0) node[circ]{}; % borne B (droite)
+% Branches du losange, orientees du bas (-) vers le haut (+)
+\draw (-1.5,0) to[D] (0,1.5);   % A  -> rail +
+\draw (1.5,0)  to[D] (0,1.5);   % B  -> rail +
+\draw (0,-1.5) to[D] (-1.5,0);  % -  -> A
+\draw (0,-1.5) to[D] (1.5,0);   % -  -> B
+\node[font=\small] at (-1.15,1.05) {$D_1$};
+\node[font=\small] at (1.15,1.05)  {$D_2$};
+\node[font=\small] at (-1.15,-1.05){$D_3$};
+\node[font=\small] at (1.15,-1.05) {$D_4$};
+\node[font=\small] at (-1.85,0.25) {$A$};
+\node[font=\small] at (1.85,0.25)  {$B$};
+\draw (0,1.5) node[circ]{} -- (3.6,1.5) node[above right, font=\small]{$+$};
+\draw (0,-1.5) node[circ]{} -- (3.6,-1.5) node[below right, font=\small]{$-$};
+\draw[-latex] (3.6,1.5) -- (3.6,-1.5);
+\node[right, font=\small] at (3.75,0) {$U_0 = \SI{72}{\volt}$};
+\node[font=\small] at (0,-3.0) {pont redresseur PD2};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Dans le plan couple-vitesse $(\Omega, C)$, identifier le ou les quadrants successivement occup\'es par une machine synchrone de la capsule au cours d'un trajet entre deux stations, et pr\'eciser dans chaque cas le mode de fonctionnement (moteur ou g\'en\'erateur).
+  \item En d\'eduire le sens du transfert d'\'energie entre la machine et son onduleur pendant la phase de freinage. Qu'exige ce sens de transfert de la part de l'onduleur ?
+  \item En observant la structure du bo\^itier d'alimentation, indiquer les r\'eversibilit\'es (en tension et en courant) du bo\^itier. Justifier.
+  \item Conclure en indiquant les risques li\'es \`a l'utilisation des bo\^itiers d'alimentation seuls, et proposer une solution technique permettant de les lever.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le sens de d\'eplacement est unique, donc la vitesse $\Omega$ reste toujours positive : seuls les quadrants 1 et 4 sont concern\'es.
+  \begin{itemize}
+    \item \textbf{Acc\'el\'eration} : $\Omega > 0$ et $C > 0$ (le couple entra\^ine la capsule) $\rightarrow$ \textbf{quadrant 1}, fonctionnement \textbf{moteur}.
+    \item \textbf{Vitesse constante} : $\Omega > 0$ et $C > 0$ (le couple compense la seule force a\'erodynamique) $\rightarrow$ \textbf{quadrant 1}, fonctionnement \textbf{moteur}.
+    \item \textbf{Freinage} : $\Omega > 0$ et $C < 0$ (le couple s'oppose au mouvement) $\rightarrow$ \textbf{quadrant 4}, fonctionnement \textbf{g\'en\'eratrice}.
+  \end{itemize}
+  \item En quadrant 4, la puissance m\'ecanique $P = C\,\Omega$ est n\'egative : l'\'energie cin\'etique de la capsule est reconvertie en \'energie \'electrique et remonte de la machine vers l'onduleur, donc vers les rails et les bo\^itiers. L'onduleur doit donc \^etre \textbf{r\'eversible en courant} : le bus continu conserve sa polarit\'e ($U_0 > 0$), mais le courant change de signe. C'est le cas d'un onduleur de tension \`a interrupteurs bidirectionnels en courant (transistor command\'e $+$ diode antiparall\`ele) -- structure classique des onduleurs de traction.
+  \item L'\'etage d'entr\'ee du bo\^itier est un \textbf{pont redresseur PD2 \`a diodes}, non command\'e. Les diodes ne conduisent que dans un seul sens et le pont ne peut d\'elivrer qu'une tension de sortie positive : \textbf{le pont PD2 est unidirectionnel en courant et en tension}, donc le bo\^itier d'alimentation l'est \'egalement. Il ne peut ni absorber de courant en sens inverse, ni renvoyer d'\'energie vers le r\'eseau EDF.
+  \item Pendant les phases de freinage, de l'\'energie est renvoy\'ee aux bo\^itiers d'alimentation par les rails. Comme les bo\^itiers ne sont pas r\'eversibles, cette \'energie ne peut ni \^etre restitu\'ee au r\'eseau ni \^etre \'evacu\'ee : elle s'accumule sur le bus continu et y provoque une surtension. Si cette \'energie est trop importante, elle risque d'endommager les bo\^itiers d'alimentation voire d'entra\^iner leur destruction si rien n'est pr\'evu pour l'absorber.
+
+  Solutions : soit remplacer le pont PD2 \`a diodes par un \textbf{redresseur command\'e r\'eversible} (pont \`a interrupteurs command\'es, autorisant le renvoi au r\'eseau), soit -- solution retenue dans le sujet -- \textbf{embarquer un \'el\'ement de stockage} (banc de supercondensateurs) dans la capsule, qui absorbe l'\'energie de freinage sans la faire remonter jusqu'aux bo\^itiers.
+
+  \textbf{Conclusion.} L'\'etude des quadrants montre que la cha\^ine doit \^etre r\'eversible \emph{jusqu'\`a} l'onduleur mais ne l'est pas \emph{au-del\`a} : c'est pr\'ecis\'ement cette rupture de r\'eversibilit\'e au niveau du pont PD2 qui impose au cahier des charges d'ajouter un stockage embarqu\'e, sans lequel la s\'ecurit\'e de l'installation ne serait pas assur\'ee.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% ============================================================
+% Exercice 5 -- docTech -- reel 2025, Epreuve ecrite disciplinaire, Q33 a Q35
+% (remplace l'ancien exercice 5 -- 2024 B10-B13, spectre 170/95/27/27/20 A --
+%  qui dupliquait la QT1 de la fiche T09 et est deja travaille dans T04 et T14)
+% ============================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize 2025, \'Epreuve \'ecrite disciplinaire, questions Q33 \`a Q35}
+]
+\CAPETSHOW{
+Toujours sur le r\'eseau isol\'e de Mafate, la tension du bus continu qui alimente l'onduleur CV3-2 est fournie par une batterie lithium via un convertisseur \'el\'evateur CV3-1 de rapport cyclique $\alpha$. La batterie est un assemblage de cellules identiques mont\'ees \textbf{en s\'erie}, de tension nominale $V_{CEN} = \SI{3,69}{\volt}$ par cellule ; la tension nominale de la batterie est $E_{bN} = \SI{48}{\volt}$.
+
+On admet $V_{DC} = \dfrac{E_b}{1-\alpha}$ et, pour l'onduleur command\'e en pleine onde, $V_{distri,eff} = V_{DC}$, soit $V_{distri,eff} = \dfrac{E_b}{1-\alpha}$. La valeur efficace nominale de la tension distribu\'ee est $V_{distri,effN} = \SI{230}{\volt}$ et le rapport cyclique nominal $\alpha_{nom} = 0{,}79$.
+
+\begin{tcolorbox}[docTech, title={Document technique DT12 -- \'evolution de la tension d'une cellule de la batterie lithium}]
+Rel\'ev\'es sur la courbe $V_{CE} = f(\mathrm{DOD})$ donnant la tension d'une cellule en fonction de la profondeur de d\'echarge (\emph{Depth Of Discharge}) :
+
+\begin{center}
+\begin{tabular}{@{}lc@{}}
+\toprule
+Profondeur de d\'echarge (DOD) & Tension d'une cellule $V_{CE}$ \\
+\midrule
+$0\ \%$ \quad (batterie pleinement charg\'ee) & \SI{4,1}{\volt} \\
+$85\ \%$ \quad (fin de d\'echarge autoris\'ee) & \SI{3,3}{\volt} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\footnotesize La r\'eglementation impose de maintenir la tension efficace du r\'eseau de distribution \`a $\pm 10\ \%$ de sa valeur efficace nominale.
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Relever sur le document technique DT12 la tension d'une cellule aux deux \'etats de charge document\'es, puis calculer le nombre de cellules qui composent la batterie. Justifier le choix d'une association en s\'erie.
+  \item En d\'eduire la tension $E_b$ aux bornes de la batterie pleinement charg\'ee puis d\'echarg\'ee \`a $85\ \%$, et calculer la variation $\Delta E_b$ correspondante.
+  \item Le rapport cyclique \'etant maintenu \`a sa valeur nominale $\alpha_{nom} = 0{,}79$, calculer la valeur efficace $V_{distri,eff}$ de la tension d\'elivr\'ee par l'onduleur dans chacun des deux \'etats de charge.
+  \item Conclure sur le respect de la r\'eglementation, et pr\'eciser la disposition \`a pr\'evoir sur la commande de CV3-1 pour que l'onduleur reste conforme sur toute la plage de d\'echarge.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Rel\'ev\'es sur DT12 : $V_{CE} = \SI{4,1}{\volt}$ \`a $\mathrm{DOD} = 0\ \%$ et $V_{CE} = \SI{3,3}{\volt}$ \`a $\mathrm{DOD} = 85\ \%$.
+
+  Le nombre de cellules se d\'eduit des grandeurs \emph{nominales} :
+  \[ N = \frac{E_{bN}}{V_{CEN}} = \frac{48}{3{,}69} = 13{,}0 \quad\Rightarrow\quad N = 13\ \text{cellules} \]
+  Les cellules sont mont\'ees en s\'erie car c'est l'association qui \textbf{additionne les tensions} : une cellule lithium seule ne d\'elivre que quelques volts, et il faut $\SI{48}{\volt}$ au bus batterie.
+  \item Les $13$ cellules \'etant en s\'erie, $E_b = N \cdot V_{CE}$ :
+  \[ E_{b,\mathrm{DOD}=0} = 13 \times 4{,}1 = \SI{53,3}{\volt} \qquad E_{b,\mathrm{DOD}=85} = 13 \times 3{,}3 = \SI{42,9}{\volt} \]
+  \[ \Delta E_b = 53{,}3 - 42{,}9 = \SI{10,4}{\volt} \]
+  Soit une variation de $10{,}4/48 \approx 22\ \%$ de la tension nominale de batterie -- consid\'erable pour la source d'un onduleur.
+  \item Avec $\alpha_{nom} = 0{,}79$, donc $1-\alpha_{nom} = 0{,}21$ :
+  \[ V_{distri,eff}\big|_{\mathrm{DOD}=0} = \frac{53{,}3}{0{,}21} \approx \SI{253,8}{\volt} \qquad
+     V_{distri,eff}\big|_{\mathrm{DOD}=85} = \frac{42{,}9}{0{,}21} \approx \SI{204,3}{\volt} \]
+  \item La r\'eglementation impose $\pm 10\ \%$ autour de $\SI{230}{\volt}$, soit la plage :
+  \[ 0{,}9 \times 230 = \SI{207}{\volt} \ \leqslant\ V_{distri,eff}\ \leqslant\ 1{,}1 \times 230 = \SI{253}{\volt} \]
+  Batterie d\'echarg\'ee \`a $85\ \%$ : $\SI{204,3}{\volt} < \SI{207}{\volt}$, \textbf{la r\'eglementation n'est pas respect\'ee}. Batterie pleinement charg\'ee : $\SI{253,8}{\volt} > \SI{253}{\volt}$, la limite haute est \'egalement d\'epass\'ee (de justesse). Le maintien du rapport cyclique \`a sa valeur nominale conduit donc \`a sortir du gabarit r\'eglementaire aux \textbf{deux} extr\'emit\'es de la plage de d\'echarge.
+
+  Disposition \`a pr\'evoir : le rapport cyclique de CV3-1 ne peut pas rester fixe. Il faut \textbf{asservir la tension du bus continu} $V_{DC}$ \`a une consigne constante en agissant sur $\alpha$ -- boucle de r\'egulation avec correcteur, mesurant $V_{DC}$ et ajustant $\alpha$ pour compenser la d\'erive de $E_b$. Num\'eriquement, il faudrait $\alpha = 1 - E_b/V_{DC}$, soit $\alpha \approx 0{,}77$ batterie pleine et $\alpha \approx 0{,}81$ batterie \`a $85\ \%$ de DOD.
+
+  \textbf{Conclusion.} La qualit\'e de l'onde produite par l'onduleur ne d\'epend pas seulement de sa commande : sa valeur efficace suit directement l'\'etat de charge de la batterie amont. C'est bien la r\'egulation du bus continu, et non l'onduleur lui-m\^eme, qui garantit le crit\`ere r\'eglementaire de $\pm 10\ \%$ sur la tension du r\'eseau local.
+\end{enumerate}
+
+\smallskip
+\textit{Point de vigilance jury (rapport de jury CAPET 2025, corrig\'e de la question 42) : \guillemotleft\ Lorsque la tension de la batterie chute, il faudra compenser cette chute en augmentant la valeur du rapport cyclique. Il faudra envisager une boucle de r\'egulation associ\'ee \`a un correcteur pour avoir une bonne pr\'ecision. Nous avons vu que la tension du bus continu \'etait tr\`es sensible \`a la variation du rapport cyclique. Le syst\`eme pourrait facilement \^etre instable. \guillemotright}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

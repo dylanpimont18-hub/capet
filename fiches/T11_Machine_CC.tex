@@ -1,0 +1,365 @@
+% AUDIT DE VERACITE 2026-09-20 -- corrections des citations de rapport de jury.
+% Bloc 4 : l'encadre jury entier a ete SUPPRIME. Ses deux citations, attribuees aux rapports 2022
+% (bilan de puissance de la MCC) et 2023 (choix hacheur 1Q/2Q/4Q et reversibilite), sont introuvables
+% dans les 8 rapports disponibles (2018-2025) : citations fabriquees. Aucun rapport ne commente le
+% bilan de puissance de la MCC ni la question des quadrants / de la reversibilite, donc aucun
+% remplacement pertinent n'existe. La fiche n'a desormais plus de citation de jury : c'est assume,
+% mieux vaut aucun encadre qu'un faux. La liste numerotee des attentes du jury est conservee.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ficheHeaders{T11}{Machine à courant continu}{colElec}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TETE
+% -----------------------------------------------------------------------
+
+\ficheEntete{T11}{Machine à courant continu (MCC)}{colElec}%
+  {électrotechnique - Machines électriques}%
+  {\textbf{Présence :} \textbf{10/13} sujets (2013-2026) - thème \emph{très fréquent}}%
+  {équation électrique (FCEM, résistance d'induit) - couple électromagnétique - bilan de puissance - quadrants de fonctionnement - hacheur 1Q/4Q - démarrage rhéostatique}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 equations fondamentales ---------------------------------------
+\textbf{1.1 Équations fondamentales (excitation séparée, flux $\phi$ constant)}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{lll}
+\toprule
+\textbf{Grandeur} & \textbf{Expression} & \textbf{Convention} \\
+\midrule
+FCEM & $E = k\phi\Omega$ & $[k\phi] = \mathrm{V\!\cdot\!s\!\cdot\!rad^{-1}} = \mathrm{N\!\cdot\!m\!\cdot\!A^{-1}}$ \\[4pt]
+Équation électrique (moteur) & $U = E + R_a I_a$ & $U > E$, courant entrant \\[4pt]
+Équation électrique (générateur) & $U = E - R_a I_a$ & $E > U$, courant sortant \\[4pt]
+Couple électromagnétique & $C_{em} = k\phi I_a$ & N$\cdot$m \\[4pt]
+Vitesse & $\Omega = \dfrac{U - R_a I_a}{k\phi}$ & rad$\cdot$s$^{-1}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.2 Bilan de puissance --------------------------------------------
+\textbf{1.2 Bilan de puissance}
+
+\smallskip
+\[
+  P_{abs} = U \cdot I_a = \underbrace{R_a I_a^2}_{P_{Joule}} + \underbrace{E \cdot I_a}_{P_{meca}}
+  \qquad;\qquad
+  P_{meca} = C_{em} \cdot \Omega
+\]
+Couple utile (en sortie d'arbre) : $C_u = C_{em} - C_{pertes}$ (pertes mécaniques, frottements).\\
+Rendement : $\eta = P_{meca} / P_{abs} = E I_a / (U I_a)$.
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.3 Quadrants de fonctionnement ----------------------------------
+\textbf{1.3 Quadrants de fonctionnement}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{llll}
+\toprule
+\textbf{Quadrant} & \textbf{Couple $C$} & \textbf{Vitesse $\Omega$} & \textbf{Mode} \\
+\midrule
+I  & $> 0$ & $> 0$ & Moteur direct \\
+II & $< 0$ & $> 0$ & Générateur (frein récupératif) \\
+III & $< 0$ & $< 0$ & Moteur inverse \\
+IV & $> 0$ & $< 0$ & Générateur inverse \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\begin{center}
+\begin{tikzpicture}[scale=0.95, font=\small]
+  \draw[->] (-3.2,0) -- (3.2,0) node[right] {$C_{em}$};
+  \draw[->] (0,-2.4) -- (0,2.4) node[above] {$\Omega$};
+  % Famille de caracteristiques couple-vitesse (pente negative : caracteristique tombante)
+  % Omega = U/(k*phi) - Ra/(k*phi)^2 * C_em : ordonnee a l'origine croissante avec U
+  \draw[thick, colElec] (-2.6,2.25) -- (2.6,1.35);
+  \draw[thick, colElec!55] (-2.6,1.45) -- (2.6,0.55);
+  \draw[thick, colElec!30] (-2.6,0.65) -- (2.6,-0.25);
+  \node[colElec, right] at (2.6,1.35) {\scriptsize $U_1$};
+  \node[colElec!55, right] at (2.6,0.55) {\scriptsize $U_2 < U_1$};
+  \node[colElec!30, right] at (2.6,-0.25) {\scriptsize $U_3 < U_2$};
+  % Etiquettes des quadrants
+  \node[font=\footnotesize] at (2.9,2.1) {I};
+  \node[font=\footnotesize] at (-2.9,2.1) {II};
+  \node[font=\footnotesize] at (-2.9,-2.1) {III};
+  \node[font=\footnotesize] at (2.9,-2.1) {IV};
+\end{tikzpicture}
+\end{center}
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.4 Hacheur de commande -------------------------------------------
+\textbf{1.4 Hacheur de commande de la MCC}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lll}
+\toprule
+\textbf{Hacheur} & \textbf{Tension moyenne} & \textbf{Quadrants} \\
+\midrule
+1 quadrant (série) & $\langle U \rangle = \alpha \cdot E_{dc}$ & I seulement \\[4pt]
+4 quadrants (pont en H bipolaire) & $\langle U \rangle = (2\alpha-1) \cdot E_{dc}$ & I, II, III, IV \\[4pt]
+Démarrage - courant d'appel & $I_{demarr} = U/R_a$ ( $\Omega = 0$) & Limiter par rhéostats ou hacheur \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHETIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthétique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Équations électriques}} \\
+$U = E + R_a I_a$ & Moteur & V \\
+$U = E - R_a I_a$ & Générateur & V \\
+$E = k\phi\Omega$ & FCEM & V \\
+$C_{em} = k\phi I_a$ & Couple em & N$\cdot$m \\
+$\Omega = (U - R_a I_a)/(k\phi)$ & Vitesse & rad/s \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Bilan de puissance}} \\
+$P_{abs} = U I_a$ & Électrique & W \\
+$P_J = R_a I_a^2$ & Pertes Joule & W \\
+$P_{meca} = E I_a = C_{em}\Omega$ & Mécanique & W \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Commande par hacheur}} \\
+$\langle U \rangle = \alpha E_{dc}$ & Hacheur 1Q & V \\
+$\langle U \rangle = (2\alpha-1)E_{dc}$ & Pont en H & V \\
+$\alpha = \frac{1}{2}(1 + \langle U \rangle/E_{dc})$ & Rapport cyc. 4Q & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Couple nominal}} \\
+$\Omega_{nom} = 2\pi N_{nom}/60$ & Conversion & rad/s \\
+$C_{nom} = P_{nom}/\Omega_{nom}$ & Couple nom. & N$\cdot$m \\
+$I_{demarr} = U/R_a$ & Courant à l'arrêt & A \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Données typiques}} \\
+$E_{dc} = 207\,\mathrm{V}$ (PD2 + 230\,V) & Bus DC & V \\
+$E_{dc} = 72\,\mathrm{V}$ (Urbanloop) & Bus DC & V \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets réels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Démarrage rhéostatique - courant constant (rame VMI) \hfill\normalfont\footnotesize E2 sujet 2019 (Q7-9)}
+]
+\textbf{Énoncé.}
+4 moteurs CC en série sont alimentés par $V_{alim} = 750\,\mathrm{V}$. Lors du démarrage, le courant est maintenu à $I = 380\,\mathrm{A}$ constant par des rhéostats. La tension d'un moteur vaut $U_{moteur} = k_2 V_{train}^2$ avec $k_2 = 0{,}1\,\mathrm{V\!\cdot\!s^2\!\cdot\!m^{-2}}$. Donner la loi de commande $R_{th}(V_{train})$.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Mise en équation.} Avec 4 moteurs en série et $R_a \approx 0$ :
+\[
+  V_{alim} = 4 U_{moteur} + R_{th} \cdot I
+  \quad\Rightarrow\quad
+  R_{th} = \frac{V_{alim} - 4 k_2 V_{train}^2}{I}
+  = \frac{750 - 4 \times 0{,}1 \times V_{train}^2}{380}
+\]
+
+\textbf{Étape 2 — Interprétation physique.} La résistance \textbf{diminue} quand le train accélère (la FCEM $E = k_2 V_{train}^2$ augmente et prend en charge la tension). L'énergie dissipée dans les rhéostats correspond aux pertes par effet Joule lors du démarrage (toute l'énergie stockée dans les inductances).
+
+\textbf{Conclusion.} La loi $R_{th}(V_{train})$ décroissante garantit un courant de démarrage constant à $380\,\mathrm{A}$ sur toute la plage de vitesse : elle respecte la contrainte de couple constant imposée par le cahier des charges de traction.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Hacheur 4 quadrants - rapport cyclique nominal \hfill\normalfont\footnotesize E2 appliquée 2022 (banc d'essai automobile, Q35-37)}
+]
+\textbf{Énoncé.}
+Un frein à courant de Foucault est alimenté par un hacheur 4 quadrants (pont en H). $E_{dc} = 207\,\mathrm{V}$ (après redresseur PD2). Tension nominale du frein : $\langle u_f \rangle = 192\,\mathrm{V}$.
+\begin{enumerate}[label=(\alph*)]
+  \item Justifier le choix d'un hacheur 4 quadrants.
+  \item Calculer $\alpha$ en commande bipolaire.
+\end{enumerate}
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Justification (a).} Pour démagnétiser le frein, il faut inverser le courant (donc inverser la tension) : une réversibilité en tension et en courant est nécessaire, ce qui impose un \textbf{hacheur 4 quadrants} (pont en H).
+
+\textbf{Étape 2 — Calcul de $\alpha$ (b).} Pont en H bipolaire : $\langle u_f \rangle = (2\alpha - 1) \cdot E_{dc}$
+\[
+  \alpha = \frac{1}{2}\left(1 + \frac{\langle u_f \rangle}{E_{dc}}\right)
+  = \frac{1}{2}\left(1 + \frac{192}{207}\right)
+  = \frac{1}{2}(1 + 0{,}927) \approx \mathbf{0{,}964}
+\]
+
+\textbf{Conclusion.} Le rapport cyclique $\alpha \approx 0{,}964$, proche de 1, confirme un fonctionnement en délestage quasi permanent côté positif : cohérent avec un frein fonctionnant majoritairement en régime établi et sollicité ponctuellement en inversion.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Couple nominal et vérification de dimensionnement \hfill\normalfont\footnotesize E2 sujet 2019 (Q28)}
+]
+\textbf{Énoncé.}
+Les moteurs Alsthom ont : $P_{nom} = 96\,\mathrm{kW}$, $N_{nom} = 1035\,\mathrm{tr/min}$. Calculer le couple nominal. Sachant que le couple thermique équivalent sur le trajet est $C_{th} \approx 557\,\mathrm{N\!\cdot\!m}$, conclure sur le dimensionnement.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Vitesse angulaire nominale.}
+\[
+  \Omega_{nom} = \frac{2\pi \times 1035}{60} = 108{,}4\,\mathrm{rad\!\cdot\!s^{-1}}
+\]
+
+\textbf{Étape 2 — Couple nominal.}
+\[
+  C_{nom} = \frac{P_{nom}}{\Omega_{nom}} = \frac{96\,000}{108{,}4} \approx \mathbf{885{,}6\,\mathrm{N\!\cdot\!m}}
+\]
+
+\textbf{Conclusion.} $C_{th} = 557\,\mathrm{N\!\cdot\!m} < C_{nom} = 885{,}6\,\mathrm{N\!\cdot\!m}$ : les moteurs sont \textbf{correctement dimensionnés} vis-à-vis du couple thermique équivalent du trajet.\checkmark
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs récurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Convention moteur vs générateur.}
+  En moteur : $U > E$, $U = E + R_a I_a$. En générateur : $E > U$, $E = U + R_a I_a$.
+  La confusion est explicitement sanctionnée par le jury 2024.
+
+  \item \textbf{Au démarrage, $E = 0$.}
+  À $\Omega = 0$, la FCEM est nulle : $I_{demarr} = U/R_a$ est très élevé.
+  C'est pourquoi on insère des rhéostats de démarrage ou on utilise un hacheur (démarrage progressif).
+
+  \item \textbf{Couple électromagnétique $\neq$ couple utile.}
+  $C_{em} = k\phi I_a$ est le couple développé par les forces de Laplace.
+  Le couple utile en sortie d'arbre est $C_u = C_{em} - C_{pertes\,mecaniques}$.
+
+  \item \textbf{Unités du gain $k\phi$.}
+  $[k\phi] = \mathrm{V\!\cdot\!s\!\cdot\!rad^{-1}} = \mathrm{N\!\cdot\!m\!\cdot\!A^{-1}}$ : le même coefficient apparaît dans $E = k\phi\Omega$ et dans $C_{em} = k\phi I_a$.
+
+  \item \textbf{Hacheur 4Q obligatoire pour la réversibilité.}
+  Un hacheur 1Q (tension toujours positive, courant toujours positif) ne permet pas le freinage récupératif ou l'inversion du sens de rotation. Justifier le choix du nombre de quadrants.
+
+  \item \textbf{Bilan de puissance en 3 niveaux.}
+  $P_{abs} = P_{Joule} + P_{meca}$. Présenter les trois termes avant tout calcul de rendement.
+
+\end{enumerate}
+
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PRESENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colPresence,
+  title={Présence dans les sujets analysés (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Année} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & $\checkmark$ & - & - & $\checkmark$ & - & - & $\checkmark$ & - & $\checkmark$ & - & - & $\checkmark$ \\
+E2 discipl. IE & $\checkmark$ & - & $\checkmark$ & - & - & $\checkmark$ & $\checkmark$ & - & - & $\checkmark$ & - & $\checkmark$ & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-thèmes fréquents :}
+équation électrique $U = E + R_a I_a$ (7/13) - couple électromagnétique (6/13) - bilan de puissance (5/13) - hacheur de commande 1Q/4Q (5/13) - démarrage rhéostatique (3/13)
+
+\medskip
+\textbf{Ordres de grandeur (repères rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Réseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, fréquence \SI{50}{\hertz}.
+  \item Courants d'étude fréquents en sujet : de quelques \si{\ampere} à quelques dizaines de \si{\ampere}.
+  \item En conversion d'énergie, un rendement attendu reste généralement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthèse express (à refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypothèses du modèle et les conventions de signe.
+  \item Écrire 2 à 4 relations clés avec unités.
+  \item Réaliser un calcul numérique complet et vérifier l'ordre de grandeur.
+  \item Justifier le résultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE

@@ -1,0 +1,440 @@
+% Sources verifiees 2026-07-15, revues 2026-08-25 (correction post-audit) :
+% - Titre exact de l'epreuve 2019 verifie par rendu de la page de garde du PDF source
+%   (docs/CAPET_SII_IE/06_PDFs_Originaux/2019/E2_Sujet_2019.pdf, page 1) :
+%   "ETUDE D'UN SYSTEME, D'UN PROCEDE OU D'UNE ORGANISATION", session 2019.
+% - Titre exact de l'epreuve 2026 verifie dans le Markdown source (E1_Sujet_2026.md, lignes 17-25) :
+%   "ADMISSIBILITE : EPREUVE 1".
+% -- Passe complementarite 2026-09-02 (protocole PROTOCOLE_COMPLEMENTARITE.md) :
+%   Deux exercices dupliquaient les Questions Types de la fiche T11 et ont ete remplaces.
+% - Exercice 2 (ancien) = decalque de la QT3 de la fiche (2019 Q28, Cnom + comparaison a Cth).
+%   Remplace par la CHAINE DE COUPLE 2019 Q25 a Q28 (E2_Sujet_2019.md l.503-525) : Ce = Fe.de/2,
+%   Cm = Ce.rho/eta_red, puis Cth par la definition du couple thermique equivalent, et enfin Cnom.
+%   Le C_th = 557 N.m n est donc plus une donnee parachutee mais un RESULTAT reconstruit a partir
+%   des seules valeurs publiees du sujet (Fe1=14,9 kN, Fe2=9,2 kN, dt1=42 s, dt2=51 s, T=2 048 s,
+%   somme i=3..18 = 558e6 : l.494 ; de=0,86 m, rho=0,17, eta_red=97 % : l.469-471 ;
+%   enonces Q25/Q26/Q27/Q28 : l.503/507/511/525 ; table Alsthom : l.515-520).
+%   Recalcul independant : Ce1=6 407, Ce2=3 956, Cm1=1 122,9, Cm2=693,3, Cth=557,0 N.m -> valeur
+%   du sujet confirmee, presentation preservee, aucune reserve ajoutee.
+%   Cet exercice porte aussi le seul encadre docTech du fichier (tables (a), (b), (c) et definition
+%   (d) transcrites TELLES QUELLES du sujet ; aucune valeur reconstituee ni inventee).
+% - Exercice 6 (ancien) = decalque de la QT1 de la fiche (2019 Q7-Q8, loi Rth(V) et p(t)).
+%   Remplace par les Questions 9 et 10 du meme sujet (enonces l.254 et l.262) : integration de
+%   p(t) avec V(t)=gamma.t -> E_Rh, puis bilan sur le trajet (4 phases de 42 s + 5 de 7 s,
+%   gamma=0,2 m/s2 : l.95 et l.258). Travail intellectuel different (calcul integral + bilan energetique)
+%   de la QT1 (mise en equation statique). Comparaison finale a l energie retour 12 550 W.h (l.169).
+%   Recalcul independant : E_Rh(42 s)=11,82 MJ=3 283 W.h ; E_Rh(7 s)=1,99 MJ=554 W.h ;
+%   total 4x3 283 + 5x554 = 15 903 W.h ~ 15,9 kW.h. Aucune valeur inventee.
+% - Exercice 3 : re-libelle "inspire de la question A10 du sujet 2026" (E1_Sujet_2026 : plan
+%   couple-vitesse, quadrants de fonctionnement, choix de la structure de variateur).
+% - Exercice 5 : diagramme d'ecoulement des puissances ajoute (equivalent de la Figure A3 du
+%   sujet 2026, qui precede la question A6).
+% - Citation du rapport de jury 2024 verifiee mot pour mot dans Rapport_Jury_2024.md (ligne 511).
+% - Valeurs numeriques des exercices 1 et 3 (inedits) : donnees pedagogiques arbitraires
+%   (non issues d'un produit industriel reel), pas de verification web necessaire.
+% - Ordre des exercices : reordonne en difficulte croissante (1-1-2-2-3-3).
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+% Unite "tour" (vitesse de rotation en tr/min) — non fournie par siunitx.
+\ifdefined\tr\else\DeclareSIUnit{\tr}{tr}\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T11}} - Exercices - Machine \`a courant continu (MCC)}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T11 \quad Machine \`a courant continu (MCC)}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Un moteur \`a courant continu \`a excitation s\'epar\'ee (flux $\phi$ constant) est mod\'elis\'e par sa r\'esistance d'induit $R_a = \SI{2}{\ohm}$ et sa force contre-\'electromotrice $E = k\phi\,\Omega$, avec $k\phi = \SI{0,5}{\volt\second\per\radian}$. Il est aliment\'e sous une tension continue constante $U = \SI{48}{\volt}$ et tourne, en r\'egime permanent, \`a la vitesse angulaire $\Omega = \SI{80}{\radian\per\second}$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw
+(0,0) to[R, l=$R_a$, i=$I_a$] (3,0)
+to[sV, l=$E$] (3,-2.5)
+-- (0,-2.5)
+to[short, -*] (0,0) node[above left]{$U$}
+;
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Calculer la valeur de la force contre-\'electromotrice $E$.
+  \item En \'ecrivant l'\'equation \'electrique en convention moteur, calculer le courant d'induit $I_a$.
+  \item Calculer le couple \'electromagn\'etique $C_{em}$ d\'evelopp\'e par le moteur.
+  \item Calculer la puissance \'electrique absorb\'ee $P_{abs}$, la puissance m\'ecanique $P_{meca}$ transmise \`a l'induit, et v\'erifier que $P_{meca} = C_{em}\cdot\Omega$.
+  \item En n\'egligeant les pertes m\'ecaniques (le couple utile est alors \'egal au couple \'electromagn\'etique), calculer le rendement du moteur.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item $E = k\phi \cdot \Omega = 0{,}5 \times 80 = \SI{40}{\volt}$.
+  \item Convention moteur : $U = E + R_a I_a \;\Longrightarrow\; I_a = \dfrac{U - E}{R_a} = \dfrac{48 - 40}{2} = \SI{4}{\ampere}$.
+  \item $C_{em} = k\phi \cdot I_a = 0{,}5 \times 4 = \SI{2}{\newton\meter}$.
+  \item $P_{abs} = U \cdot I_a = 48 \times 4 = \SI{192}{\watt}$ ; $P_{meca} = E \cdot I_a = 40 \times 4 = \SI{160}{\watt}$. V\'erification : $C_{em}\cdot\Omega = 2 \times 80 = \SI{160}{\watt} = P_{meca}$. \checkmark
+  \item $\eta = \dfrac{P_{meca}}{P_{abs}} = \dfrac{160}{192} = 0{,}833$, soit $\SI{83,3}{\percent}$ (majoration par rapport au rendement r\'eel, puisque les pertes m\'ecaniques et les pertes fer sont n\'eglig\'ees ici).
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} L'alimentation du moteur doit \^etre dimensionn\'ee sur la puissance absorb\'ee $P_{abs} = \SI{192}{\watt}$, et non sur les $\SI{160}{\watt}$ de puissance m\'ecanique : l'\'ecart de $\SI{32}{\watt}$ correspond exactement aux pertes Joule d'induit $R_a I_a^2 = 2\times4^2$. Le rendement de $\SI{83,3}{\percent}$ obtenu est une \emph{borne sup\'erieure} du rendement r\'eel, les pertes collectives (frottements, ventilation, pertes fer) \'etant ici n\'eglig\'ees : un cahier des charges exigeant un rendement garanti devra \^etre v\'erifi\'e sur un bilan de puissance complet (cf. exercice 5).
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{1} \hfill\normalfont\footnotesize 2019, \'Etude d'un syst\`eme, d'un proc\'ed\'e ou d'une organisation, questions 25 \`a 28}
+]
+\CAPETSHOW{
+D'anciennes motrices de rames de m\'etro MF67 sont \'etudi\'ees en vue de leur transformation en V\'ehicules de Maintenance Industriels (VMI). Chaque moteur \`a courant continu est reli\'e \`a l'axe de rotation d'un essieu par un r\'educteur de rapport $\rho$ et de rendement $\eta_{red}$ ; deux roues de diam\`etre $d_e$ sont solidaires de l'essieu. On cherche \`a v\'erifier que les moteurs existants restent utilisables pour tracter la rame VMI.
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9, >=Stealth,
+  bloc/.style={draw=colExo, thick, fill=colExo!12, minimum width=2.2cm,
+               minimum height=1.0cm, align=center, font=\footnotesize}]
+  \node[bloc] (m) at (0,0) {Moteur CC\\$C_m$, $\Omega_m$};
+  \node[bloc] (r) at (3.6,0) {R\'educteur\\$\rho$, $\eta_{red}$};
+  \node[bloc] (e) at (7.2,0) {Essieu\\$C_e$, roues $d_e$};
+  \draw[->, very thick, colExo] (m.east) -- (r.west);
+  \draw[->, very thick, colExo] (r.east) -- (e.west);
+  \draw[->, very thick, colExo] (e.east) -- (9.6,0);
+  \node[font=\footnotesize, above] at (9.0,0.06) {$F_e$};
+\end{tikzpicture}
+\end{center}
+
+\begin{tcolorbox}[docTech, title={Document technique -- extraits du dossier VMI (sujet 2019)}]
+\footnotesize
+\textbf{(a) Caract\'eristiques de la transmission d'un essieu}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Diam\`etre d'une roue & $d_e = \SI{0,86}{\meter}$ \\
+Rapport de r\'eduction & $\rho = 0{,}17$ \\
+Rendement du r\'educteur & $\eta_{red} = \SI{97}{\percent}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{(b) Profil d'effort de traction sur le trajet aller-retour} (18 phases \`a effort constant)
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Effort de traction durant la phase 1 & $F_{e1} = \SI{14,9}{\kilo\newton}$ \\
+Effort de traction durant la phase 2 & $F_{e2} = \SI{9,2}{\kilo\newton}$ \\
+Dur\'ee de la phase 1 & $\Delta t_1 = \SI{42}{\second}$ \\
+Dur\'ee de la phase 2 & $\Delta t_2 = \SI{51}{\second}$ \\
+Dur\'ee totale du trajet & $T = \SI[group-minimum-digits=4]{2048}{\second}$ \\
+Contribution des phases 3 \`a 18 & $\displaystyle\sum_{i=3}^{18} C_{mi}^2\cdot\Delta t_i = 558\times10^{6}\ \si{\newton\squared\meter\squared\second}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{(c) Plaque signal\'etique des moteurs Alsthom \`a courant continu \'equipant les motrices}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Tension nominale & \SI{360}{\volt} \\
+Courant nominal & \SI{305}{\ampere} \\
+Puissance nominale & \SI{96}{\kilo\watt} \\
+Vitesse nominale & \SI[group-minimum-digits=4]{1035}{\tr\per\minute} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{(d) D\'efinition du couple thermique \'equivalent.} Lorsque le couple d\'evelopp\'e par une machine n'est pas constant sur son cycle, on dimensionne le moteur sur le couple constant qui provoquerait le m\^eme \'echauffement :
+\[ C_{th} = \sqrt{\frac{1}{T}\sum_{i=1}^{18} C_{mi}^2\cdot\Delta t_i} \]
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Relever dans le document technique les grandeurs n\'ecessaires \`a l'\'etude : les caract\'eristiques g\'eom\'etriques et \'energ\'etiques de la transmission d'un essieu d'une part, les quatre grandeurs nominales des moteurs Alsthom d'autre part. Pr\'eciser, pour chacune, l'unit\'e associ\'ee.
+  \item Exprimer le couple $C_e$ au niveau des roues d'un essieu en fonction de l'effort de traction $F_e$ et du diam\`etre de roue $d_e$. Calculer les couples $C_{e1}$ et $C_{e2}$ des phases 1 et 2.
+  \item En raisonnant sur les puissances et en tenant compte du rendement du r\'educteur, exprimer le couple moteur $C_m$ en fonction de $C_e$, $\eta_{red}$ et $\rho$. Calculer $C_{m1}$ et $C_{m2}$.
+  \item En d\'eduire le couple thermique \'equivalent $C_{th}$ sur le cycle complet de fonctionnement de la rame.
+  \item \`A partir de la plaque signal\'etique, calculer le couple nominal $C_{nom}$ des moteurs et conclure sur la possibilit\'e de les utiliser pour tracter la rame VMI.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \emph{Extraction.} Transmission (document (a)) : diam\`etre de roue $d_e = \SI{0,86}{\meter}$, rapport de r\'eduction $\rho = 0{,}17$ (sans unit\'e), rendement du r\'educteur $\eta_{red} = 0{,}97$ (sans unit\'e). Moteurs Alsthom (document (c)) : $U_n = \SI{360}{\volt}$, $I_n = \SI{305}{\ampere}$, $P_n = \SI{96}{\kilo\watt}$, $N_n = \SI[group-minimum-digits=4]{1035}{\tr\per\minute}$. On notera que la puissance nominale n'est pas le produit $U_n I_n = \SI{109,8}{\kilo\watt}$ : $P_n$ d\'esigne bien la puissance \emph{utile} sur l'arbre, l'\'ecart correspondant aux pertes de la machine (rendement $\approx \SI{87}{\percent}$).
+  \item L'effort $F_e$ s'applique au rayon de la roue, soit $d_e/2$ :
+  \[ C_e = F_e\cdot\frac{d_e}{2} \]
+  \[ C_{e1} = 14\,900\times\frac{0{,}86}{2} = \SI[group-minimum-digits=4]{6407}{\newton\meter} \qquad
+     C_{e2} = 9\,200\times\frac{0{,}86}{2} = \SI[group-minimum-digits=4]{3956}{\newton\meter} \]
+  \item La puissance transmise \`a l'essieu vaut $\eta_{red}$ fois la puissance fournie par le moteur : $C_e\,\Omega_e = \eta_{red}\,C_m\,\Omega_m$. Avec $\rho = \Omega_e/\Omega_m$ (rapport de r\'eduction) :
+  \[ C_m = \frac{C_e\cdot\rho}{\eta_{red}} \]
+  \[ C_{m1} = \frac{6\,407\times0{,}17}{0{,}97} \approx \SI[group-minimum-digits=4]{1123}{\newton\meter} \qquad
+     C_{m2} = \frac{3\,956\times0{,}17}{0{,}97} \approx \SI{693}{\newton\meter} \]
+  \item En reportant dans la d\'efinition du document (d), les phases 1 et 2 explicit\'ees et les phases 3 \`a 18 regroup\'ees dans la somme fournie :
+  \[ C_{th} = \sqrt{\frac{C_{m1}^2\,\Delta t_1 + C_{m2}^2\,\Delta t_2 + 558\times10^{6}}{T}} \]
+  \[ C_{th} = \sqrt{\frac{1\,123^2\times42 + 693^2\times51 + 558\times10^{6}}{2\,048}}
+     = \sqrt{\frac{635{,}5\times10^{6}}{2\,048}} \approx \SI{557}{\newton\meter} \]
+  \item \[ \Omega_n = \frac{2\pi\cdot N_n}{60} = \frac{2\pi\times 1\,035}{60} \approx \SI{108,4}{\radian\per\second}
+     \qquad C_{nom} = \frac{P_n}{\Omega_n} = \frac{96\,000}{108{,}4} \approx \SI{885,6}{\newton\meter} \]
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Le couple thermique \'equivalent du cycle, $C_{th} \approx \SI{557}{\newton\meter}$, reste inf\'erieur au couple nominal des moteurs, $C_{nom} \approx \SI{885,6}{\newton\meter}$ : l'\'echauffement moyen sur le trajet est donc couvert par le dimensionnement d'origine, avec une marge de $\SI{37}{\percent}$. Les moteurs Alsthom existants sont \textbf{correctement dimensionn\'es} pour tracter la rame VMI, ce qui valide la r\'eutilisation des motrices MF67 sans remotorisation. Attention toutefois : le crit\`ere thermique n'est pas le seul -- le couple maximal instantan\'e du cycle, $C_{m1} \approx \SI[group-minimum-digits=4]{1123}{\newton\meter}$, d\'epasse le couple nominal, ce qui n'est admissible que parce qu'il n'est demand\'e que pendant \SI{42}{\second} et reste dans la capacit\'e de surcharge transitoire de la machine.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize exercice in\'edit, inspir\'e de la question A10 du sujet 2026 (\'Epreuve 1)}
+]
+\CAPETSHOW{
+Un moteur \`a courant continu \`a excitation s\'epar\'ee entra\^ine directement les roues d'un petit v\'ehicule \'electrique de manutention. Ce v\'ehicule doit pouvoir avancer, reculer, et \^etre frein\'e \'electriquement (freinage r\'ecup\'eratif) dans les deux sens de marche.
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9, >=Stealth]
+  \draw[-latex] (-3.2,0) -- (3.2,0) node[right]{\footnotesize $\Omega$};
+  \draw[-latex] (0,-3.2) -- (0,3.2) node[above]{\footnotesize $C_{em}$};
+  \node at (1.7,1.7) {\footnotesize Quadrant I};
+  \node at (-1.7,1.7) {\footnotesize Quadrant II};
+  \node at (-1.7,-1.7) {\footnotesize Quadrant III};
+  \node at (1.7,-1.7) {\footnotesize Quadrant IV};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Rappeler le signe du couple $C_{em}$ et de la vitesse $\Omega$ dans chacun des quatre quadrants du plan $(\Omega, C_{em})$, et associer \`a chacun un mode de fonctionnement (moteur ou g\'en\'erateur/frein) en pr\'ecisant le sens de marche.
+  \item Le v\'ehicule avance ($\Omega > 0$) puis le conducteur d\'eclenche un freinage r\'ecup\'eratif : indiquer dans quel quadrant fonctionne alors la machine, et pr\'eciser si la puissance \'electrique $E\cdot I_a$ est re\c{c}ue ou restitu\'ee par l'induit.
+  \item Un hacheur \`a un seul quadrant (rapport cyclique $0 \le \alpha \le 1$, tension de sortie toujours positive) permet-il d'assurer l'ensemble du cahier des charges (marche avant, marche arri\`ere, freinage r\'ecup\'eratif dans les deux sens) ? Justifier, et proposer la structure de convertisseur adapt\'ee.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item
+  \begin{center}
+  \begin{tabular}{ccll}
+  \toprule
+  Quadrant & $C_{em}$ & $\Omega$ & Mode \\
+  \midrule
+  I & $>0$ & $>0$ & Moteur, marche avant \\
+  II & $<0$ & $>0$ & G\'en\'erateur / frein r\'ecup\'eratif, marche avant \\
+  III & $<0$ & $<0$ & Moteur, marche arri\`ere \\
+  IV & $>0$ & $<0$ & G\'en\'erateur / frein r\'ecup\'eratif, marche arri\`ere \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  \item Le v\'ehicule avance ($\Omega > 0$) et le freinage impose un couple s'opposant au mouvement, donc $C_{em} < 0$ : la machine fonctionne en \textbf{quadrant II}. Dans ce mode, $E > U$ (fonctionnement g\'en\'erateur) : la puissance \'electrique $E\cdot I_a$ est \textbf{restitu\'ee} par l'induit (renvoy\'ee vers la source, c'est le principe du freinage r\'ecup\'eratif).
+  \item Non : un hacheur 1Q ne peut fournir qu'une tension de sortie de signe constant et un courant de signe constant, ce qui ne permet de fonctionner que dans le quadrant I (ou III selon le c\^ablage). Il ne permet ni l'inversion du sens de marche, ni le freinage r\'ecup\'eratif. Pour couvrir les quatre quadrants (r\'eversibilit\'e en tension \emph{et} en courant), il faut un \textbf{hacheur 4 quadrants} (pont en H), dont le rapport cyclique $\alpha \in [0,1]$ pilote une tension moyenne $\langle U \rangle = E_{dc}(2\alpha - 1)$ pouvant prendre les deux signes.
+  \end{enumerate}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize 2026, \'Epreuve 1 (admissibilit\'e), partie A, questions A1 \`a A3}
+]
+\CAPETSHOW{
+L'ouverture et la fermeture des portes d'un bus \`a hydrog\`ene sont assur\'ees par un actionneur \`a courant continu \`a excitation constante, dont le sch\'ema \'electrique de l'induit est donn\'e ci-dessous ($u(t)$ tension aux bornes de l'induit, $R$ r\'esistance d'induit, $L$ inductance d'induit, $i(t)$ courant d'induit, $e(t) = K_e\cdot\Omega(t)$ force contre-\'electromotrice).
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw
+(0,0) to[R, l=$R$, i=$i(t)$] (2.5,0)
+to[cute inductor, l=$L$] (5,0)
+to[sV, l=$e(t)$] (5,-2.5)
+-- (0,-2.5)
+to[short, -*] (0,0) node[above left]{$u(t)$}
+;
+\end{circuitikz}
+\end{center}
+
+La documentation constructeur donne, en r\'egime nominal : tension nominale $U_n = \SI{200}{\volt}$, courant nominal $I_n = \SI{0,5}{\ampere}$, vitesse de rotation nominale $N_n = \SI[group-minimum-digits=4]{1800}{\tr\per\minute}$.
+
+Un essai \`a rotor bloqu\'e (donc $\Omega = 0$ et $e(t) = 0$) est r\'ealis\'e sous tension r\'eduite $U = \SI{3,3}{\volt}$ : le courant absorb\'e $i(t)$ \'evolue alors suivant le chronogramme ci-dessous, r\'egi par une \'equation diff\'erentielle du premier ordre de constante de temps $\tau = L/R$.
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9, >=Stealth]
+  \draw[-latex] (0,0) -- (7.5,0) node[right]{\footnotesize $t$ (ms)};
+  \draw[-latex] (0,-0.3) -- (0,3.2) node[above]{\footnotesize $i(t)$ (A)};
+  \draw[dashed, gray] (0,2.5) -- (7,2.5); \node[left] at (0,2.5) {\footnotesize $0{,}5$};
+  \draw[dashed, gray] (0,1.575) -- (3,1.575); \node[left] at (0,1.575) {\footnotesize $0{,}315$};
+  \node[below left] at (0,0) {\footnotesize $0$};
+  \draw[thick, domain=0:7, samples=60, smooth, variable=\x]
+    plot ({\x}, {2.5*(1-exp(-\x/3))});
+  \draw[dotted] (1,0) -- (1,{2.5*(1-exp(-1/3))}) node[pos=0, below]{\footnotesize $5$};
+  \draw[dotted] (3,0) -- (3,1.575) node[pos=0, below]{\footnotesize $15$};
+  \draw[dotted] (6,0) -- (6,{2.5*(1-exp(-6/3))}) node[pos=0, below]{\footnotesize $30$};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Donner l'\'equation \'electrique liant $u(t)$, $R$, $L$, $i(t)$ et $e(t)$. Que devient-elle en r\'egime permanent (grandeurs continues) ?
+  \item En r\'egime permanent \`a rotor bloqu\'e, simplifier cette \'equation et en d\'eduire la valeur de $R$. Calculer le courant qui serait absorb\'e \`a rotor bloqu\'e si l'essai avait \'et\'e fait sous tension nominale $U_n$, et justifier le choix d'une tension r\'eduite pour cet essai.
+  \item En exploitant le chronogramme (la constante de temps $\tau$ correspond \`a l'instant o\`u $i(t)$ atteint $63\,\%$ de sa valeur finale), d\'eterminer la valeur de l'inductance $L$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Loi des mailles sur le sch\'ema \'equivalent de l'induit :
+  \[ u(t) = R\,i(t) + L\,\frac{\mathrm{d}i}{\mathrm{d}t}(t) + e(t) \]
+  En r\'egime permanent (grandeurs continues, d\'eriv\'ee nulle) : $U = R\,I + E$.
+  \item \`A rotor bloqu\'e, $\Omega = 0$ donc $e(t) = 0$ : en r\'egime permanent, $U = R\,I \Rightarrow R = U/I$. D'apr\`es le chronogramme, le courant final atteint $I = \SI{0,5}{\ampere}$ pour $U = \SI{3,3}{\volt}$, donc $R = 3{,}3/0{,}5 = \SI{6,6}{\ohm}$.
+  \`A tension nominale, le courant \`a rotor bloqu\'e serait $I_{\text{bloqu\'e}} = U_n/R = 200/6{,}6 \approx \SI{30,3}{\ampere}$, soit plus de $60$ fois le courant nominal $I_n = \SI{0,5}{\ampere}$ : un tel courant d\'etruirait l'induit par \'echauffement. L'essai est donc men\'e sous tension r\'eduite pour rester dans une plage de courant raisonnable tout en conservant le m\^eme rapport $L/R$.
+  \item La constante de temps se lit au point o\`u $i(t)$ atteint $63\,\%$ de $0{,}5\,\si{\ampere}$, soit $\approx \SI{0,315}{\ampere}$ : d'apr\`es le chronogramme, $\tau \approx \SI{15}{\milli\second}$. D'o\`u :
+  \[ L = R \cdot \tau = 6{,}6 \times 15\times10^{-3} \approx \SI{99}{\milli\henry} \approx \SI{100}{\milli\henry} \]
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Les valeurs identifi\'ees, $R = \SI{6,6}{\ohm}$ et $L \approx \SI{100}{\milli\henry}$, sont exactement celles que le sujet retient ensuite pour la suite de l'\'etude : l'exploitation graphique est donc valid\'ee. La constante de temps \'electrique $\tau \approx \SI{15}{\milli\second}$ est la donn\'ee dimensionnante pour la commande : un hacheur pilotant cet induit devra d\'ecouper \`a une fr\'equence tr\`es sup\'erieure \`a $1/\tau \approx \SI{67}{\hertz}$ -- en pratique quelques kilohertz -- pour que l'ondulation du courant d'induit, donc du couple appliqu\'e \`a la porte, reste n\'egligeable.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize 2026, \'Epreuve 1 (admissibilit\'e), partie A, questions A4 \`a A6}
+]
+\CAPETSHOW{
+On reprend l'actionneur \`a courant continu de l'exercice pr\'ec\'edent. Ind\'ependamment des r\'esultats obtenus pr\'ec\'edemment, le sujet retient pour la suite de l'\'etude la valeur $R = \SI{6,6}{\ohm}$ pour la r\'esistance d'induit. L'actionneur fonctionne en r\'egime nominal permanent : $U_n = \SI{200}{\volt}$, $I_n = \SI{0,5}{\ampere}$, $N_n = \SI[group-minimum-digits=4]{1800}{\tr\per\minute}$.
+
+Un essai \`a vide est par ailleurs r\'ealis\'e : la tension d'alimentation est de $\SI{200}{\volt}$ et le courant absorb\'e par l'induit est de $I_0 = \SI{0,05}{\ampere}$ en r\'egime permanent.
+
+Le sch\'ema d'\'ecoulement des puissances de l'induit de l'actionneur est donn\'e ci-dessous.
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9, every node/.style={transform shape}, >=Stealth,
+  bloc/.style={draw=colExo, thick, fill=colExo!12, minimum width=2.4cm,
+               minimum height=1.1cm, align=center, font=\footnotesize}]
+  \node[bloc] (b1) at (0,0) {Induit\\(\'electrique)};
+  \node[bloc] (b2) at (5.6,0) {Arbre\\(m\'ecanique)};
+  \draw[->, very thick, colExo] (-3.6,0) -- (b1.west);
+  \node[font=\footnotesize, above] at (-2.4,0.06) {$P_A$};
+  \draw[->, very thick, colExo] (b1.east) -- (b2.west);
+  \node[font=\footnotesize, above] at (2.8,0.06) {$P_{EM}$};
+  \draw[->, very thick, colExo] (b2.east) -- (9.2,0);
+  \node[font=\footnotesize, above] at (8.0,0.06) {$P_U$};
+  \draw[->, thick] (b1.south) -- (0,-1.5);
+  \node[font=\footnotesize, below, align=center] at (0,-1.5) {$P_{JR}$\\pertes Joule};
+  \draw[->, thick] (b2.south) -- (5.6,-1.5);
+  \node[font=\footnotesize, below, align=center] at (5.6,-1.5) {$P_{FM}$\\pertes fer et m\'ecaniques};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item En r\'egime nominal permanent, calculer la force contre-\'electromotrice $E_n$, puis la vitesse angulaire nominale $\Omega_n$ (en $\si{\radian\per\second}$). En d\'eduire la constante de force contre-\'electromotrice $K_e = E_n/\Omega_n$.
+  \item \`A vide, le couple utile est nul : le couple \'electromagn\'etique $C_{em} = K_c\cdot I_0$ (avec $K_c = K_e$, exprim\'ee en $\si{\newton\meter\per\ampere}$) sert alors uniquement \`a compenser le couple de pertes $C_p$. Calculer la valeur num\'erique de $C_p$.
+  \item En r\'egime nominal, \'etablir successivement les expressions puis les valeurs num\'eriques de la puissance active absorb\'ee $P_A$, des pertes Joule $P_{JR}$, de la puissance \'electromagn\'etique $P_{EM}$, des pertes m\'ecaniques et fer (assimil\'ees au terme $C_p \cdot \Omega_n$) $P_{FM}$, de la puissance utile $P_U$, et du rendement $\eta$ de l'actionneur.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item $E_n = U_n - R\,I_n = 200 - 6{,}6\times0{,}5 = \SI{196,7}{\volt}$.
+  \[ \Omega_n = \frac{2\pi \cdot N_n}{60} = \frac{2\pi \times 1\,800}{60} = \SI{188,5}{\radian\per\second} \]
+  \[ K_e = \frac{E_n}{\Omega_n} = \frac{196{,}7}{188{,}5} \approx \SI{1,044}{\volt\second\per\radian} \]
+  \item \`A vide, en r\'egime permanent, le bilan des couples sur l'arbre s'\'ecrit $C_{em} = C_p$ (couple utile nul) :
+  \[ C_p = K_c \cdot I_0 = 1{,}044 \times 0{,}05 \approx \SI{0,052}{\newton\meter} \]
+  \item Bilan de puissance en r\'egime nominal :
+  \[ P_A = U_n \cdot I_n = 200 \times 0{,}5 = \SI{100}{\watt} \]
+  \[ P_{JR} = R \cdot I_n^2 = 6{,}6 \times 0{,}5^2 = \SI{1,65}{\watt} \]
+  \[ P_{EM} = P_A - P_{JR} = E_n \cdot I_n = 196{,}7 \times 0{,}5 \approx \SI{98,35}{\watt} \]
+  \[ P_{FM} = C_p \cdot \Omega_n = 0{,}052 \times 188{,}5 \approx \SI{9,8}{\watt} \]
+  \[ P_U = P_{EM} - P_{FM} \approx 98{,}35 - 9{,}8 \approx \SI{88,55}{\watt} \]
+  \[ \eta = \frac{P_U}{P_A} = \frac{88{,}55}{100} \approx 0{,}886 \text{, soit } \SI{88,6}{\percent} \]
+
+\smallskip
+\textit{Point de vigilance jury (rapport de jury CAPET 2024, sur un sujet diff\'erent mobilisant les m\^emes comp\'etences de base) : \guillemotleft\ le jury regrette le manque de ma\^itrise des formules de base sur les r\'eseaux triphas\'es, le r\'egime sinuso\"idal et les relations d'\'electrocin\'etique telles que la loi des mailles, la loi des n\oe uds ou encore la loi d'Ohm \guillemotright\ -- l'\'ecriture s\^ure de $U = E + R\,I$ (loi des mailles) et du bilan de puissance associ\'e reste une comp\'etence de base attendue, y compris sur un sujet centr\'e MCC.}
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Les pertes totales valent $100 - 88{,}55 = \SI{11,45}{\watt}$, dont $\SI{9,8}{\watt}$ de pertes collectives (fer et m\'ecaniques), soit environ $\SI{86}{\percent}$ des pertes : c'est sur elles, et non sur les pertes Joule d'induit ($\SI{1,65}{\watt}$), qu'il faudrait agir pour am\'eliorer le rendement. Surtout, le couple utile nominal $C_U = P_U/\Omega_n = 88{,}55/188{,}5 \approx \SI{0,47}{\newton\meter}$ reste sup\'erieur au couple r\'esistant constant $C_R = \SI{0,4}{\newton\meter}$ impos\'e par la charge dans la suite du sujet : l'actionneur est donc capable d'entra\^iner les portes du bus en r\'egime nominal, avec une marge de couple d'environ $\SI{18}{\percent}$.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize 2019, \'Etude d'un syst\`eme, d'un proc\'ed\'e ou d'une organisation, questions 9 et 10}
+]
+\CAPETSHOW{
+On poursuit l'\'etude du d\'emarrage rh\'eostatique des motrices MF67 transform\'ees en VMI. Les quatre moteurs \`a courant continu d'un bogie sont connect\'es \emph{en s\'erie} au d\'emarrage et deux rh\'eostats identiques, de r\'esistance totale $R_{th}$, maintiennent le courant d'induit constant \`a $I = \SI{380}{\ampere}$ pendant toute la phase d'acc\'el\'eration. On admet, comme \'etabli pr\'ec\'edemment, que la puissance instantan\'ee dissip\'ee dans les rh\'eostats vaut
+\[ p(t) = \big(V_{alim} - 4\,k_2\,V(t)^2\big)\cdot I \]
+avec $V_{alim} = \SI{750}{\volt}$ et $k_2 = \SI{0,1}{\volt\second\squared\per\meter\squared}$.
+
+Le d\'emarrage est effectu\'e \`a acc\'el\'eration constante $\gamma$ : la vitesse du train cro\^it lin\'eairement depuis l'arr\^et, $V(t) = \gamma\,t$, pendant une dur\'ee $\Delta t_1$. L'objet de l'exercice est de chiffrer l'\'energie \emph{perdue} par ce proc\'ed\'e sur un trajet complet, afin de la comparer aux autres postes de consommation du VMI.
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9, >=Stealth]
+  \draw[-latex] (0,0) -- (7.2,0) node[right]{\footnotesize $t$};
+  \draw[-latex] (0,-0.2) -- (0,3.1) node[above]{\footnotesize $p(t)$};
+  \draw[dashed, gray] (0,2.6) -- (6.4,2.6);
+  \node[left] at (0,2.6) {\footnotesize $V_{alim}\,I$};
+  \draw[dashed, gray] (6.4,0) -- (6.4,1.44);
+  \node[below] at (6.4,0) {\footnotesize $\Delta t_1$};
+  \node[below left] at (0,0) {\footnotesize $0$};
+  \draw[thick, colExo, domain=0:6.4, samples=60, smooth, variable=\x]
+    plot ({\x}, {2.6*(1-0.0069*\x*\x)});
+  \node[colExo, font=\footnotesize, right] at (4.6,2.35) {$p(t)$};
+  \path[fill=colExo!14] (0,0) -- plot[domain=0:6.4, samples=60, smooth, variable=\x]
+    ({\x}, {2.6*(1-0.0069*\x*\x)}) -- (6.4,0) -- cycle;
+  \node[font=\footnotesize] at (3.0,0.8) {$E_{Rh}$};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item En utilisant $V(t) = \gamma\,t$, \'etablir l'expression litt\'erale de l'\'energie $E_{Rh}$ dissip\'ee par les rh\'eostats lors d'une phase de d\'emarrage de dur\'ee $\Delta t_1$, en fonction de $\gamma$, $I$, $V_{alim}$, $k_2$ et $\Delta t_1$.
+  \item V\'erifier l'homog\'en\'eit\'e de l'expression obtenue, puis indiquer comment $E_{Rh}$ \'evolue si l'on double l'acc\'el\'eration $\gamma$ \`a dur\'ee de d\'emarrage inchang\'ee. Interpr\'eter physiquement.
+  \item Lors d'un trajet aller-retour, un bogie subit quatre phases d'acc\'el\'eration de \SI{42}{\second} (zone de transfert) et cinq phases d'acc\'el\'eration de \SI{7}{\second} (zone de chantier), toutes \`a $\gamma = \SI{0,2}{\meter\per\second\squared}$. Calculer l'\'energie totale $E_{RHs}$ dissip\'ee par les rh\'eostats sur le trajet, en $\si{\watt\hour}$ puis en $\si{\kilo\watt\hour}$.
+  \item Sachant que l'\'energie de d\'eplacement du m\^eme trajet aller-retour est de l'ordre de $\SI[group-minimum-digits=4]{12550}{\watt\hour}$ pour la phase retour, commenter le poids du d\'emarrage rh\'eostatique dans le bilan \'energ\'etique et proposer une \'evolution technologique de la cha\^ine de traction.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item L'\'energie est l'int\'egrale de la puissance instantan\'ee sur la dur\'ee du d\'emarrage. En rempla\c{c}ant $V(t)$ par $\gamma\,t$ :
+  \[ E_{Rh} = \int_0^{\Delta t_1} p(t)\,\mathrm{d}t
+     = I\int_0^{\Delta t_1}\big(V_{alim} - 4\,k_2\,\gamma^2 t^2\big)\,\mathrm{d}t \]
+  \[ \boxed{\;E_{Rh} = I\left(V_{alim}\,\Delta t_1 - \frac{4\,k_2\,\gamma^2\,\Delta t_1^{\,3}}{3}\right)\;} \]
+  \item \emph{Homog\'en\'eit\'e.} Le premier terme est un produit $\si{\ampere}\times\si{\volt}\times\si{\second} = \si{\joule}$. Pour le second, $k_2\gamma^2\Delta t_1^2$ est en $\si{\volt\second\squared\per\meter\squared}\times\si{\meter\squared\per\second\tothe{4}}\times\si{\second\squared} = \si{\volt}$, multipli\'e par $I\,\Delta t_1$ on retrouve bien des joules. \checkmark
+
+  Si $\gamma$ double \`a $\Delta t_1$ constant, seul le terme soustractif est modifi\'e, et il est multipli\'e par $4$ : l'\'energie dissip\'ee \textbf{diminue}. C'est logique : \`a dur\'ee \'egale, une acc\'el\'eration plus forte fait monter la vitesse plus vite, donc la f.c.\'e.m. cumul\'ee $4k_2V^2$ des moteurs cro\^it plus vite et absorbe une part plus grande de la tension d'alimentation ; les rh\'eostats, qui ne re\c{c}oivent que la tension \emph{restante}, dissipent moins.
+  \item Application num\'erique avec $I = \SI{380}{\ampere}$, $V_{alim} = \SI{750}{\volt}$, $k_2 = 0{,}1$ et $\gamma = 0{,}2$, soit $4k_2\gamma^2/3 = 4\times0{,}1\times0{,}04/3 = 5{,}33\times10^{-3}$ :
+
+  Phase de \SI{42}{\second} :
+  \[ E_{Rh}(42) = 380\left(750\times42 - 5{,}33\times10^{-3}\times42^3\right)
+     = 380\,(31\,500 - 395) \approx \SI{11,82}{\mega\joule} \]
+  soit $11{,}82\times10^6/3\,600 \approx \SI[group-minimum-digits=4]{3283}{\watt\hour}$.
+
+  Phase de \SI{7}{\second} :
+  \[ E_{Rh}(7) = 380\left(750\times7 - 5{,}33\times10^{-3}\times7^3\right)
+     = 380\,(5\,250 - 1{,}83) \approx \SI{1,99}{\mega\joule} \approx \SI{554}{\watt\hour} \]
+  Total sur le trajet :
+  \[ E_{RHs} = 4\times3\,283 + 5\times554 \approx \SI[group-minimum-digits=4]{15900}{\watt\hour} \approx \SI{15,9}{\kilo\watt\hour} \]
+  \item Ces $\SI{15,9}{\kilo\watt\hour}$ sont de l'\'energie \emph{int\'egralement perdue en chaleur} dans les rh\'eostats : elle est du m\^eme ordre de grandeur que l'\'energie de d\'eplacement du trajet retour ($\approx \SI{12,55}{\kilo\watt\hour}$), donc loin d'\^etre marginale dans le bilan. On observe d'ailleurs que le terme correctif en $\gamma^2\Delta t_1^3$ ne repr\'esente ici que $\SI{1,3}{\percent}$ du total : la quasi-totalit\'e de l'\'energie inject\'ee pendant le d\'emarrage part dans les r\'esistances.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Le d\'emarrage rh\'eostatique double quasiment la consommation \'energ\'etique du trajet pour un service rendu nul : c'est le crit\`ere qui disqualifie ce proc\'ed\'e d\`es que le v\'ehicule est aliment\'e par batterie, o\`u l'\'energie embarqu\'ee est la ressource dimensionnante. Le rempla\c{c}ement des rh\'eostats par un \textbf{hacheur} (variateur \`a d\'ecoupage) supprime cette dissipation -- le r\'eglage du courant s'y fait par modulation du rapport cyclique et non par dissipation -- et rend en outre possible le freinage r\'ecup\'eratif, ce qui r\'eduit d'autant la capacit\'e de batterie \`a embarquer.
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

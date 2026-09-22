@@ -1,0 +1,399 @@
+﻿\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colElec}{T30}} - Metrologie, instrumentation, schematisation}
+\fancyhead[R]{\small\textit{CAPET SII IE - Session 2026}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TeTE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colElec,
+  colframe=colElec,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T30 \quad Metrologie, instrumentation, schematisation}\\[2pt]
+  {\color{colElec!30!white}\small
+    \textbf{Domaine :} electrotechnique transversal - Mesure et schemas \quad
+    \textbf{Presence :} \textbf{10/13} sujets (2013-2026) - theme \emph{majeur}
+  }\\[1pt]
+  {\color{colElec!20!white}\footnotesize
+    Sous-themes : chaene de mesure - CAN (quantum, Shannon) - capteurs courants - schemas electriques IEC - incertitudes - oscilloscope - multimetre - wattmetre
+  }
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Chaene de mesure ---------------------------------------------
+\textbf{1.1 Chaene de mesure - structure et parametres}
+
+\begin{center}
+\small
+Grandeur physique $\longrightarrow$ \textbf{Capteur} $\longrightarrow$ \textbf{Conditionneur} $\longrightarrow$ \textbf{CAN} $\longrightarrow$ Traitement numerique
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lll}
+\toprule
+\textbf{Parametre} & \textbf{Definition} & \textbf{Unite} \\
+\midrule
+Sensibilite $S$ & $\Delta\text{Sortie} / \Delta\text{Entree}$ & [sortie]/[entree] \\
+Pleine echelle (PE) & etendue maximale de mesure & [entree] \\
+Resolution & Plus petite variation detectable & [entree] \\
+Precision & ecart maximal valeur mesuree / valeur vraie & [entree] \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textit{Exemple (2026 B11) :} sensibilite de la chaene temperature = $2{,}684\,\mathrm{^\circ C^{-1}}$.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 Convertisseur Analogique-Numerique ---------------------------
+\textbf{1.2 Convertisseur Analogique/Numerique (CAN)}
+
+\[
+  q = \frac{U_{PE}}{2^n - 1} \approx \frac{U_{PE}}{2^n}
+  \qquad \text{(quantum)}
+  \qquad
+  N = \text{round}\!\left(\frac{U \cdot 2^n}{U_{PE}}\right)
+  \quad \text{(mot numerique)}
+\]
+
+\textbf{Erreur de quantification maximale :} $\pm q/2$
+
+\textbf{Theoreme de Shannon-Nyquist :}
+\[
+  f_e \geq 2\,f_{max}
+\]
+
+\textbf{Filtre anti-repliement :} doit couper toutes les frequences $f > f_e/2$ \textbf{avant} l'echantillonnage.
+
+\textbf{echantillonneur-bloqueur (E/B) d'ordre zero :} maintient la valeur echantillonnee constante pendant $T_e = 1/f_e$.
+
+\textit{Source (2026 B13-B17) :} $T_e \leq t_{R5\%}/10$ (10 echantillons dans le regime transitoire).
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 Capteurs courants --------------------------------------------
+\textbf{1.3 Capteurs courants en ingenierie electrique}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{llll}
+\toprule
+\textbf{Capteur} & \textbf{Grandeur} & \textbf{Principe} & \textbf{Precision typ.} \\
+\midrule
+Thermocouple J & $-40^\circ\mathrm{C}$ - $750^\circ\mathrm{C}$ & Seebeck & $\pm 2{,}5^\circ\mathrm{C}$ \\
+Thermocouple T & $-200^\circ\mathrm{C}$ - $350^\circ\mathrm{C}$ & Seebeck & $\pm 1^\circ\mathrm{C}$ \\
+Pt100 / Pt1000 & Temperature & Resistance & $\pm 0{,}3^\circ\mathrm{C}$ \\
+Codeur incremental & Position / vitesse & Optique & $0{,}15$ mm/imp. \\
+Codeur absolu & Position absolue & Gray & - \\
+Capteur pression & Pression & Piezoresistif & - \\
+Debitmetre EM & Debit & Faraday & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 Schemas electriques - normes IEC -----------------------------
+\textbf{1.4 Schemas electriques - normes IEC 61082 / CEI 60617}
+
+\begin{itemize}
+  \item \textbf{Convention :} alimentation + en haut, commun (neutre/0 V) en bas ; lecture gauche - droite
+  \item \textbf{etat de repos :} contacts NO et NF representes \textbf{hors tension, hors commande}
+  \item \textbf{Schema unifilaire :} une ligne = tous les conducteurs d'un circuit triphase
+  \item \textbf{Schema developpe :} chaque conducteur separe ; utilise pour la commande 24 V DC
+  \item \textbf{Schema de commande :} logique de contacts + bobines (contacteurs, relais)
+\end{itemize}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.5 Instruments de mesure -----------------------------------------
+\textbf{1.5 Instruments de mesure}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lll}
+\toprule
+\textbf{Instrument} & \textbf{Branchement} & \textbf{Mesure} \\
+\midrule
+Voltmetre & Parallele ($R_{int}$ elevee) & Tension \\
+Amperemetre & Serie ($R_{int}$ faible) & Courant \\
+Ohmmetre & Circuit \textbf{hors tension} & Resistance \\
+Oscilloscope & Parallele & $u(t)$, $f$, $\varphi$, forme d'onde \\
+Pince amperemetrique & Sans coupure & Courant \\
+Wattmetre / analyseur & - & $P$ [W], $Q$ [VAR], $S$ [VA], $\cos\varphi$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Dephasage - l'oscilloscope :} $\varphi = 360e \times \Delta t / T$
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHeTIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthetique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{5.2cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{CAN}} \\
+$q = U_{PE}/2^n$ & Quantum & V \\
+$\varepsilon_{quant} = \pm q/2$ & Erreur max & V \\
+$N = \text{round}(U \cdot 2^n / U_{PE})$ & Mot numerique & - \\
+$f_e \geq 2\,f_{max}$ & Shannon & Hz \\
+$T_e \leq t_{R5\%}/10$ & Periode (\&) & s \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{5.2cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Metrologie}} \\
+$S = \Delta G_{out}/\Delta G_{in}$ & Sensibilite & - \\
+$u_B = a/\sqrt{3}$ & Incertitude B & - \\
+$U = k\,u_c$, $k=2$ ($95\,\%$) & Incertitude elargie & - \\
+\multicolumn{3}{@{}l}{\footnotesize\textit{Oscilloscope}} \\
+$f = 1/T$ & Frequence & Hz \\
+$\varphi = 360e \cdot \Delta t/T$ & Dephasage & $$ \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets reels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+% Mini-procedure de resolution type copie concours
+\begin{tcolorbox}[questiontype,title={Procedure type copie concours (5 etapes)}]
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Qualifier le modele} : hypotheses, domaine de validite, grandeurs d'entree/sortie.
+  \item \textbf{Ecrire les lois} : equations de base avec symboles et unites SI.
+  \item \textbf{Isoler l'inconnue} : expression litterale, puis application numerique tracee.
+  \item \textbf{Controler l'ordre de grandeur} : coherence physique et unite finale.
+  \item \textbf{Conclure concours} : phrase courte orientee decision technique.
+\end{enumerate}
+\end{tcolorbox}
+
+% Visuel de methode : chemin de resolution CAPET
+\begin{center}
+\begin{tikzpicture}[font=\small, node distance=7mm and 6mm, >=Stealth]
+  \node[draw, rounded corners, fill=colElec!8, inner sep=4pt] (n1) {Notions};
+  \node[draw, rounded corners, fill=colElec!8, right=of n1, inner sep=4pt] (n2) {Methode};
+  \node[draw, rounded corners, fill=colElec!8, right=of n2, inner sep=4pt] (n3) {Application annale};
+  \node[draw, rounded corners, fill=colElec!8, right=of n3, inner sep=4pt] (n4) {Verification jury};
+  \draw[->, thick, colElec] (n1) -- (n2);
+  \draw[->, thick, colElec] (n2) -- (n3);
+  \draw[->, thick, colElec] (n3) -- (n4);
+\end{tikzpicture}
+\end{center}
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Sensibilite de la chaene de mesure et mot numerique \hfill\normalfont\footnotesize E2 2026 (B11)}
+]
+\textbf{enonce.}
+La chaene de mesure de temperature d'une pile - combustible comporte un capteur ($K_c = 0{,}0316\,\mathrm{V\,^{\circ}C^{-1}}$), un amplificateur et un CAN 10 bits pleine echelle $U_{PE} = \SI{3{,}3}{\volt}$. Montrer que la sensibilite est $S = 2{,}684\,\mathrm{^{\circ}C^{-1}}$. En deduire le mot numerique $N_C$ correspondant - $T_C = 55^\circ\mathrm{C}$ (binaire et hexadecimal).
+
+\tcbline
+
+\textbf{Corrige.}
+
+Gain amplificateur $G_A = U_{PE} / (K_c \times T_{max}) = 3{,}3/(0{,}0316 \times 100) \approx 1{,}044$.
+
+Sensibilite $S = G_A \times K_c \times 2^{10} / U_{PE} = 2{,}684\,\mathrm{^{\circ}C^{-1}}$ $\checkmark$
+
+Mot numerique pour $T_C = 55^\circ\mathrm{C}$ :
+\[
+  N_C = \text{round}(S \times T_C) = \text{round}(2{,}684 \times 55) = \text{round}(147{,}6) = 148_{10}
+\]
+$148_{10} = 1001\,0100_2 = \text{0x94}$
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Shannon et filtre anti-repliement \hfill\normalfont\footnotesize E2 2026 (B13-B17)}
+]
+\textbf{enonce.}
+Le regime transitoire de l'asservissement de temperature dure $t_{R5\%} = \SI{3{,}6}{\second}$. Le cahier des charges exige 10 echantillons dans ce regime. Determiner $T_e$ max, $f_e$ min, puis la frequence de coupure $f_c$ du filtre anti-repliement.
+
+\tcbline
+
+\textbf{Corrige.}
+
+$T_e \leq t_{R5\%}/10 = 3{,}6/10 = \SI{0{,}36}{\second}$ - $f_e \geq 1/T_e = \SI{2{,}78}{\hertz}$.
+
+\textbf{Theoreme de Shannon :} $f_c \leq f_e/2 = \SI{1{,}39}{\hertz}$ (frequence de coupure du filtre anti-repliement).
+
+\textbf{Rele du filtre :} eliminer toutes les composantes frequentielles $f > f_e/2$ du signal analogique \emph{avant} l'echantillonnage, afin d'eviter le repliement spectral.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Choix d'un capteur de temperature \hfill\normalfont\footnotesize E2 disciplinaire 2024 (D1)}
+]
+\textbf{enonce.}
+Pour une mesure de $-20^\circ\mathrm{C}$ - $40^\circ\mathrm{C}$ dans une installation frigorifique, choisir entre un thermocouple J ($-40^\circ\mathrm{C}$ - $750^\circ\mathrm{C}$, $\pm 2{,}5^\circ\mathrm{C}$) et un thermocouple T ($-200^\circ\mathrm{C}$ - $350^\circ\mathrm{C}$, $\pm 1^\circ\mathrm{C}$). Justifier.
+
+\tcbline
+
+\textbf{Corrige.}
+
+Les deux capteurs sont adaptes - la plage de mesure. Le thermocouple \textbf{T} est - privilegier :
+\begin{itemize}
+  \item Precision meilleure ($\pm 1^\circ\mathrm{C}$ vs $\pm 2{,}5^\circ\mathrm{C}$)
+  \item Adapte aux basses temperatures (jusqu'a $-200^\circ\mathrm{C}$)
+  \item CDC : erreur max $< 2^\circ\mathrm{C}$ (si specifie) - seul le type T respecte la contrainte
+\end{itemize}
+
+\textbf{Le jury attendait} : justification comparative avec les donnees de la notice constructeur + conclusion motivee vis--vis du cahier des charges.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs recurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Schema electrique : point noir majeur depuis 2018.} "La majorite des candidats ne semble pas maetriser la conception d'un schema electrique." Moyenne 4,8/20 en 2021. Maetriser \textbf{schema de puissance} + \textbf{schema de commande} separement.
+
+  \item \textbf{Voltmetre en parallele, amperemetre en serie.} L'inversion detruit l'appareil ou fausse la mesure. Un amperemetre en parallele court-circuite la branche.
+
+  \item \textbf{Shannon : $f_e > 2\,f_{max}$, strictement.} $f_e = 2\,f_{max}$ est la limite theorique, non atteignable en pratique. Dans un calcul CAPET, ecrire $f_e \geq 2\,f_{max}$ et commenter.
+
+  \item \textbf{Erreur de quantification $\neq$ precision totale.} La quantification est une source d'erreur parmi d'autres (non-linearite, bruit, derive thermique). Ne pas confondre resolution ($n$ bits) et precision totale.
+
+  \item \textbf{Thermocouple : compensation de soudure froide.} La f..m. Seebeck est tres faible (quelques mV). L'amplificateur d'instrumentation et la compensation de la soudure de reference sont indispensables.
+
+  \item \textbf{Symboles IEC 60617} - utiliser (pas les symboles ANSI americains). Verifier notamment les representations des contacteurs, disjoncteurs et fusibles.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2021 : "Le jury s'interroge sur la faiblesse generale des candidats dans la realisation de schemas electriques. Les postes de TP disposent d'oscilloscopes numeriques, multimetres, dynamometres, tachymetres et cartes d'acquisition - ces instruments doivent etre parfaitement connus et utilisables."\\
+Rapport jury 2024 : "Les questions relatives - la chaene de mesure numerique (CAN, Shannon, quantum) sont bien traitees par les candidats prepares. En revanche, les choix de capteurs sans argumentation comparative sont sanctionnes."
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PReSENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colGrayLight,
+  colframe=colSeparator,
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+  before skip=4pt, after skip=0pt,
+  fonttitle=\small\bfseries,
+  title={Presence dans les sujets analyses (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Annee} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+Schema electrique   & - & - & $\checkmark$ & - & - & $\checkmark$ & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & - & - & - \\
+Chaene mesure / CAN & - & - & - & - & - & - & $\checkmark$ & - & $\checkmark$ & - & - & $\checkmark$ & $\checkmark$ \\
+Capteurs / choix    & - & - & - & $\checkmark$ & - & - & - & - & - & - & $\checkmark$ & $\checkmark$ & - \\
+Oscilloscope / mesure & - & $\checkmark$ & - & - & $\checkmark$ & - & - & - & - & - & $\checkmark$ & - & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-themes frequents :}
+schema electrique puissance + commande (variateur) - chaene de mesure + CAN (quantum, Shannon) - choix de capteur (thermocouple J vs T, codeur) - mesure - l'oscilloscope ($f$, $\varphi$, $T$) - filtre anti-repliement
+
+\medskip
+\textbf{Ordres de grandeur (reperes rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Reseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, frequence \SI{50}{\hertz}.
+  \item Courants d'etude frequents en sujet : de quelques \si{\ampere} a quelques dizaines de \si{\ampere}.
+  \item En conversion d'energie, un rendement attendu reste generalement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthese express (a refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypotheses du modele et les conventions de signe.
+  \item Ecrire 2 a 4 relations cles avec unites.
+  \item Realiser un calcul numerique complet et verifier l'ordre de grandeur.
+  \item Justifier le resultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE
+
+
+
+
+
+
+
+
+

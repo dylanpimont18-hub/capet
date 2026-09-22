@@ -1,0 +1,313 @@
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T07}} - Exercices - Hacheurs}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T07 \quad Hacheurs (1, 2 et 4 quadrants)}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 5 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2025, \'epreuve \'ecrite disciplinaire appliqu\'ee, questions 14 et 19}
+]
+\CAPETSHOW{
+Le convertisseur CV1 adapte la tension d\'elivr\'ee par des panneaux photovolta\"iques $U_{PV}$ \`a la tension du bus de stockage $E_b = \SI{48}{\volt}$ (batterie), dans une cha\^ine de r\'egulation MPPT (recherche du point de puissance maximale). Le sujet lie les deux tensions par une \emph{fonction de modulation} $f_m$ telle que $U_{PV} = f_m\,E_b$.
+
+\begin{center}
+\begin{tikzpicture}[scale=1, >=Stealth, node distance=1.4cm]
+  \node[draw, align=center, minimum width=2.4cm, minimum height=1cm] (pv) {Panneaux PV\\$U_{PV}$};
+  \node[draw, align=center, minimum width=2.6cm, minimum height=1cm, right=1.3cm of pv] (cv1) {CV1\\hacheur, $\alpha$};
+  \node[draw, align=center, minimum width=2.6cm, minimum height=1cm, right=1.3cm of cv1] (bus) {Bus DC\\batterie $E_b=\SI{48}{\volt}$};
+  \draw[-latex] (pv) -- (cv1);
+  \draw[-latex] (cv1) -- (bus);
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Trois points de fonctionnement sont relev\'es sur les documents techniques DT6 et DT7 : $P_1$ ($U_1 = \SI{195}{\volt}$), $P_{max}$ (point nominal, $U = \SI{317}{\volt}$) et $P_2$ ($U_2 = \SI{340}{\volt}$). Calculer, pour chacun, la fonction de modulation $f_m = U_{PV}/E_b$.
+  \item En d\'eduire la fonction de CV1 : hacheur \'el\'evateur (Boost) ou hacheur d\'evolteur (Buck) ? Justifier.
+  \item En admettant la loi du hacheur \'el\'evateur $U_{PV} = E_b/(1-\alpha)$, calculer le rapport cyclique $\alpha$ correspondant \`a chacun des trois points.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \[ f_{m1} = \dfrac{195}{48} \approx 4{,}06 \qquad f_{m,max} = \dfrac{317}{48} \approx 6{,}60 \qquad f_{m2} = \dfrac{340}{48} \approx 7{,}08 \]
+  \item Les trois valeurs sont sup\'erieures \`a 1 : la tension c\^ot\'e panneaux est toujours plus \'elev\'ee que la tension de la batterie $E_b = \SI{48}{\volt}$. La relation $U_{PV} = E_b/(1-\alpha)$ n'admet une solution avec $0 \le \alpha < 1$ que si $U_{PV} \geq E_b$, ce qui est bien le cas ici. Un hacheur d\'evolteur (Buck), \`a l'inverse, ne peut relier que deux tensions telles que $\langle u\rangle = \alpha E \le E$ : il ne pourrait pas satisfaire cette contrainte. CV1 est donc un \textbf{hacheur \'el\'evateur}.
+  \item Avec $f_m = 1/(1-\alpha)$, soit $\alpha = 1 - 1/f_m$ :
+  \[ \alpha_1 = 1 - \dfrac{1}{4{,}06} \approx 0{,}754 \qquad \alpha_{max} = 1 - \dfrac{1}{6{,}60} \approx 0{,}848 \qquad \alpha_2 = 1 - \dfrac{1}{7{,}08} \approx 0{,}859 \]
+  \textbf{Conclusion.} Les trois rapports cycliques restent group\'es entre $0{,}75$ et $0{,}86$ alors que $U_{PV}$ varie de pr\`es de $75\,\%$ (195 \`a \SI{340}{\volt}) : la commande MPPT doit donc r\'esoudre de tr\`es faibles variations de $\alpha$ pour balayer toute la caract\'eristique du champ photovolta\"ique, ce qui fixe la r\'esolution minimale exig\'ee du modulateur de largeur d'impulsion de CV1.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{2} \hfill\normalfont\footnotesize 2025, \'epreuve \'ecrite disciplinaire appliqu\'ee, question 16 (document technique DT5)}
+]
+\CAPETSHOW{
+Le hacheur \'el\'evateur CV1 d'une installation photovolta\"ique en site isol\'e est aliment\'e par un champ de panneaux mont\'es \emph{en s\'erie}, dont la tension nominale vaut $U_{nom} = \SI{317}{\volt}$ et le courant nominal $I_{nom} = \SI{9,47}{\ampere}$. Avant de dimensionner le convertisseur, il faut caract\'eriser sa source.
+
+% Extrait DT5 du sujet E2 disciplinaire IE 2025 : toutes les valeurs ci-dessous sont
+% textuellement presentes dans E2_Disciplinaire_IE_2025.md l.599 (caracteristiques d'un panneau)
+% et l.587-595 (synoptique : rendement modulateur 90 %, pertes ligne 3 %).
+% Seule la mise en forme en tableau est reconstituee (le DT original est une image).
+\begin{tcolorbox}[docTech, title={Document technique DT5 -- caract\'eristiques d'un panneau du champ (extrait)}]
+\footnotesize
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Technologie & monocristallin \\
+Rendement du panneau $\eta_{panneau}$ & \SI{18,9}{\percent} \\
+Puissance nominale $P_{nom}$ & \SI{375}{\watt} \\
+Tension nominale $U_{nom}$ & \SI{39,6}{\volt} \\
+Courant nominal $I_{nom}$ & \SI{9,47}{\ampere} \\
+Tension \`a vide $U_{co}$ & \SI{48,2}{\volt} \\
+Courant de court-circuit $I_{cc}$ & \SI{9,92}{\ampere} \\
+Dimensions $L \times l \times e$ & \SI{1980}{\milli\metre} $\times$ \SI{1002}{\milli\metre} $\times$ \SI{40}{\milli\metre} \\
+Masse & \SI{22}{\kilo\gram} \\
+\midrule
+\multicolumn{2}{@{}l}{\textit{Synopt.} : panneaux mont\'es en s\'erie -- modulateur d'\'energie $\eta_{Mod} = \SI{90}{\percent}$} \\
+\multicolumn{2}{@{}l}{\hphantom{\textit{Synopt.} : }ligne de distribution : pertes \SI{3}{\percent}} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever} dans le document technique DT5 les trois grandeurs qui permettent de d\'eterminer la composition du champ : la grandeur \'electrique caract\'eristique du mode d'association impos\'e (s\'erie), la puissance unitaire et les dimensions hors-tout d'un panneau.
+  \item \textbf{Calculer} le nombre de panneaux du champ, puis en d\'eduire la puissance nominale $P_{nom,champ}$ et la surface totale du champ.
+  \item V\'erifier la coh\'erence entre la puissance nominale du champ obtenue \`a la question 2 et le produit $U_{nom}\,I_{nom}$ donn\'e pour le champ complet.
+  \item Le hacheur CV1 \'el\`eve la tension du champ vers un bus $E_b$. Sachant que le courant nominal d'un panneau vaut \SI{9,47}{\ampere} et que ce courant traverse \emph{aussi} l'inductance d'entr\'ee du hacheur, indiquer quel calibre de courant permanent il faut au minimum retenir pour l'interrupteur command\'e de CV1, et pourquoi le calibre en \emph{tension} ne peut, lui, pas se d\'eduire de $U_{nom}$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Extraction du DT5 : le montage \'etant \emph{en s\'erie}, c'est la \textbf{tension nominale} d'un panneau $U_{nom,1} = \SI{39,6}{\volt}$ qui s'additionne (le courant, lui, est commun \`a tous les panneaux d'une cha\^ine s\'erie). Puissance unitaire : $P_{nom,1} = \SI{375}{\watt}$. Dimensions : $\SI{1,980}{\metre} \times \SI{1,002}{\metre}$.
+  \item Nombre de panneaux :
+  \[ N = \dfrac{U_{nom,champ}}{U_{nom,1}} = \dfrac{317}{39{,}6} \approx 8{,}0 \;\Longrightarrow\; N = 8 \text{ panneaux en s\'erie} \]
+  \[ P_{nom,champ} = 8 \times 375 = \SI{3000}{\watt} = \SI{3}{\kilo\watt} \]
+  \[ S = 8 \times 1{,}980 \times 1{,}002 \approx \SI{15,9}{\metre\squared} \approx \SI{16}{\metre\squared} \]
+  \item Le champ complet d\'ebite $U_{nom}\,I_{nom} = 317 \times 9{,}47 \approx \SI{3002}{\watt} \approx \SI{3}{\kilo\watt}$ : la valeur co\"incide avec les \SI{3}{\kilo\watt} obtenus par $8 \times \SI{375}{\watt}$, ce qui confirme le montage \emph{tout s\'erie} de 8 panneaux (un montage mixte s\'erie/parall\`ele donnerait la m\^eme puissance mais pas la m\^eme tension \`a \SI{317}{\volt}).
+  \item Le montage \'etant enti\`erement s\'erie, le courant du champ est celui d'un seul panneau : $I = \SI{9,47}{\ampere}$ au point nominal, et $I_{cc} = \SI{9,92}{\ampere}$ en court-circuit (irradiance maximale). C'est ce courant qui traverse en permanence l'inductance d'entr\'ee et l'interrupteur command\'e de CV1 pendant sa phase passante : il faut donc un calibre de courant permanent \textbf{sup\'erieur \`a $I_{cc} = \SI{9,92}{\ampere}$}, major\'e de la demi-ondulation de d\'ecoupage et d'une marge de d\'eclassement thermique -- en pratique un composant de l'ordre de \SIrange{15}{20}{\ampere}. En revanche, le calibre en \textbf{tension} ne se d\'eduit pas de $U_{nom} = \SI{317}{\volt}$ : d'une part la tension \`a vide du champ vaut $8 \times 48{,}2 = \SI{385,6}{\volt}$ (par temps froid et fort ensoleillement, panneaux non charg\'es), d'autre part l'interrupteur d'un hacheur supporte \`a l'\'etat bloqu\'e la tension du \emph{c\^ot\'e oppos\'e} du convertisseur, pas celle de sa source.
+
+  \smallskip
+  \textbf{Conclusion.} La lecture du DT5 fixe donc les deux contraintes de dimensionnement des semi-conducteurs de CV1 : un calibre en courant impos\'e par $I_{cc} \approx \SI{9,9}{\ampere}$ (grandeur commune \`a tous les panneaux en s\'erie) et un calibre en tension impos\'e par la tension \`a vide du champ, \SI{385,6}{\volt}, et non par sa tension nominale -- omettre cet \'ecart de pr\`es de \SI{70}{\volt} conduirait \`a un claquage de l'interrupteur au premier matin d'hiver ensoleill\'e.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize 2023, \'epreuve \'ecrite disciplinaire appliqu\'ee, questions C3 et C4}
+]
+\CAPETSHOW{
+Le convertisseur DC/DC de recharge du robot Bakus transf\`ere l'\'energie d'une batterie LiFePO$_4$ de f.\'e.m. $E_{LiFePO4}$ (r\'esistance n\'egligeable) vers la batterie Li-ion du robot, mod\'elis\'ee par un mod\`ele de Th\'evenin ($E_{Li\text{-}ion}$ en s\'erie avec $R_{Li\text{-}ion}$). Les deux interrupteurs $K_a$ et $K_b$ sont command\'es de fa\c{c}on compl\'ementaire sur la p\'eriode de d\'ecoupage $T$ : $K_a$ ferm\'e et $K_b$ ouvert pour $t \in [0\,;\,\alpha T[$, puis $K_a$ ouvert et $K_b$ ferm\'e pour $t \in [\alpha T\,;\,T[$.
+
+Hypoth\`eses du sujet : interrupteurs parfaits, r\'egime p\'eriodique et conduction continue, $i_{Bakus}$ toujours positif, $E_{Li\text{-}ion}$ constante sur une p\'eriode.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.8]
+\draw
+(0,0) to[V] (0,4)
+(0,4) to[normal open switch, l=$K_a$] (3,4)
+(3,0) to[empty diode] (3,4)
+(3,0) -- (0,0)
+(3,4) to[cute inductor, l=$L$, i^=$i_{Bakus}$] (6,4)
+(6,4) to[R, l=$R_{Li\text{-}ion}$] (6,2)
+(6,2) to[battery2] (6,0)
+(6,0) -- (3,0)
+;
+\node[left] at (-0.45,2) {$E_{LiFePO4}$};
+\node at (0.45,3.2) {\small $+$};
+\node at (0.45,0.8) {\small $-$};
+\node[left] at (2.8,2) {$K_b$};
+\draw[-latex] (3.6,0.35) -- (3.6,3.65);
+\node[right] at (3.6,2) {$u_{CS}$};
+\node[right] at (6.9,1) {$E_{Li\text{-}ion}$};
+\draw (1.5,0) node[ground]{};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Pour $t \in [0\,;\,\alpha T[$ : d\'ecrire le sch\'ema \'equivalent du montage (quels \'el\'ements restent dans la maille, quel est l'\'etat de $K_b$ et pourquoi), puis \'etablir l'\'equation diff\'erentielle v\'erifi\'ee par $i_{Bakus}(t)$.
+  \item Toujours pour $t \in [0\,;\,\alpha T[$, en supposant d\'esormais $R_{Li\text{-}ion}$ n\'egligeable, d\'eterminer l'expression temporelle de $i_{Bakus}(t)$ en fonction de $E_{LiFePO4}$, $E_{Li\text{-}ion}$, $L$, $t$ et de la valeur initiale $I_{min}$.
+  \item Reprendre les deux questions pr\'ec\'edentes pour $t \in [\alpha T\,;\,T[$ : \'equation diff\'erentielle, puis expression temporelle en fonction du temps r\'eduit $t' = t - \alpha T$ et de la valeur $I_{max}$ atteinte en $t = \alpha T$.
+  \item En \'ecrivant que le r\'egime est p\'eriodique ($i_{Bakus}(T) = i_{Bakus}(0)$), retrouver la relation entre $\langle u_{Li\text{-}ion}\rangle$, $\alpha$ et $E_{LiFePO4}$ \emph{sans} passer par le trac\'e de $u_{CS}$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Phase 1 ($K_a$ ferm\'e).} $K_a$ relie directement la source $E_{LiFePO4}$ \`a l'inductance. La tension au point milieu vaut alors $u_{CS} = E_{LiFePO4} > 0$ : la diode $K_b$, dont la cathode est port\'ee \`a ce potentiel et l'anode \`a la masse, est \textbf{bloqu\'ee}. La maille est donc : source $\to$ $K_a$ $\to$ $L$ $\to$ $R_{Li\text{-}ion}$ $\to$ $E_{Li\text{-}ion}$ $\to$ masse. La loi des mailles donne
+  \[ L\,\dfrac{\mathrm{d}i_{Bakus}}{\mathrm{d}t} + R_{Li\text{-}ion}\,i_{Bakus} = E_{LiFePO4} - E_{Li\text{-}ion} \]
+  \item Avec $R_{Li\text{-}ion}$ n\'eglig\'ee, l'\'equation se r\'eduit \`a $L\,\mathrm{d}i_{Bakus}/\mathrm{d}t = E_{LiFePO4} - E_{Li\text{-}ion}$, second membre constant : le courant cro\^it \textbf{lin\'eairement}.
+  \[ i_{Bakus}(t) = \dfrac{E_{LiFePO4} - E_{Li\text{-}ion}}{L}\,t + I_{min} \qquad t \in [0\,;\,\alpha T[ \]
+  La pente est positive car $E_{LiFePO4} = \SI{500}{\volt} \gg E_{Li\text{-}ion}$ : c'est la phase de \emph{magn\'etisation} de l'inductance, celle qui charge la batterie du robot.
+  \item \textbf{Phase 2 ($K_a$ ouvert, $K_b$ ferm\'e -- roue libre).} L'inductance impose la continuit\'e du courant : celui-ci ne peut plus venir de la source, il se referme par $K_b$. La maille devient $L$ $\to$ $R_{Li\text{-}ion}$ $\to$ $E_{Li\text{-}ion}$ $\to$ $K_b$, et $u_{CS} = 0$ :
+  \[ L\,\dfrac{\mathrm{d}i_{Bakus}}{\mathrm{d}t} + R_{Li\text{-}ion}\,i_{Bakus} = -\,E_{Li\text{-}ion} \]
+  puis, $R_{Li\text{-}ion}$ n\'eglig\'ee et avec $t' = t - \alpha T$ :
+  \[ i_{Bakus}(t') = -\,\dfrac{E_{Li\text{-}ion}}{L}\,t' + I_{max} \qquad t' \in [0\,;\,(1-\alpha)T[ \]
+  Le courant d\'ecro\^it lin\'eairement : l'inductance se d\'emagn\'etise en continuant d'alimenter la batterie.
+  \item \textbf{P\'eriodicit\'e.} En r\'egime \'etabli, la croissance de la phase 1 compense exactement la d\'ecroissance de la phase 2 :
+  \[ \dfrac{E_{LiFePO4} - E_{Li\text{-}ion}}{L}\,\alpha T \;=\; \dfrac{E_{Li\text{-}ion}}{L}\,(1-\alpha)T \]
+  \[ \Longrightarrow\; \alpha E_{LiFePO4} - \alpha E_{Li\text{-}ion} = E_{Li\text{-}ion} - \alpha E_{Li\text{-}ion} \;\Longrightarrow\; E_{Li\text{-}ion} = \alpha\,E_{LiFePO4} \]
+  Or, $R_{Li\text{-}ion}$ \'etant n\'eglig\'ee, $\langle u_{Li\text{-}ion}\rangle = E_{Li\text{-}ion}$, d'o\`u $\langle u_{Li\text{-}ion}\rangle = \alpha\,E_{LiFePO4}$.
+
+  \smallskip
+  \textbf{Conclusion.} La loi du d\'evolteur n'est donc pas un r\'esultat \`a m\'emoriser mais la cons\'equence directe de la condition de p\'eriodicit\'e $\Delta i_{mont\acute{e}e} = \Delta i_{descente}$ : c'est l'\'egalit\'e des aires sous $v_L$ sur une p\'eriode. Cette formulation temporelle est la seule qui permette d'encha\^iner ensuite sur l'ondulation $\Delta i_{Bakus} = (E_{LiFePO4} - E_{Li\text{-}ion})\alpha T / L$ et donc sur le dimensionnement de $L$ impos\'e par l'exigence de pr\'eservation de la batterie Li-ion (\SI{2}{\ampere} cr\^ete \`a cr\^ete au maximum).
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{3} \hfill\normalfont\footnotesize 2025, \'epreuve \'ecrite disciplinaire appliqu\'ee, questions 29, 31 et 32}
+]
+\CAPETSHOW{
+Le convertisseur CV3-1 d'une installation en site isol\'e \'el\`eve la tension batterie $E_b$ vers le bus continu $V_{DC}$. Sa structure r\'eelle (document technique DT9) comporte \textbf{deux branches entrelac\'ees} : une premi\`ere cellule ($Q_1$, $D_1$, inductance $L_1$) et une seconde cellule identique ($Q_3$, $D_4$, inductance $L_2$), la commande de la seconde \'etant d\'ecal\'ee de $T/2$ par rapport \`a celle de la premi\`ere. Le rapport cyclique $\alpha$ est commun aux deux branches, tous les interrupteurs sont parfaits et le rendement de CV3-1 est unitaire. Le courant de sortie de l'\'etage est not\'e $i_S$, le courant de batterie $i_b$ (valeur moyenne $I_b$).
+
+On admet pour la premi\`ere branche les r\'esultats \'etablis pr\'ec\'edemment :
+\[ i_{L1}(t) = \dfrac{E_b}{L_1}\,t + I_{min}\ \ \text{pour } t \in\, ]0\,;\,\alpha T]
+\qquad
+i_{L1}(t) = \dfrac{E_b - V_{DC}}{L_1}\,(t-\alpha T) + I_{max}\ \ \text{pour } t \in\, ]\alpha T\,;\,T] \]
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9, >=Stealth, font=\footnotesize]
+  \draw[->] (0,0) -- (8.6,0) node[right] {$t$};
+  \draw[->] (0,-0.2) -- (0,2.3) node[above] {$i_{L1}$, $i_{L2}$};
+  \draw[thick, colExo] (0,0.5) -- (2.4,1.8) -- (4,0.5) -- (6.4,1.8) -- (8,0.5);
+  \draw[thick, dashed, colElec] (0,1.15) -- (0.4,0.5) -- (2.8,1.8) -- (4.4,0.5) -- (6.8,1.8) -- (8,1.35);
+  \draw[dotted] (2.4,0) -- (2.4,1.8);
+  \draw[dotted] (4,0) -- (4,0.5);
+  \node[below] at (2.4,0) {$\alpha T$};
+  \node[below] at (4,0) {$T$};
+  \node[below] at (8,0) {$2T$};
+  \node[right, colExo] at (8.1,0.5) {$i_{L1}$};
+  \node[right, colElec] at (8.1,1.35) {$i_{L2}$};
+  \draw[<->] (4,0.5) -- (4.4,0.5) node[midway, below=1pt] {\scriptsize $T/2$};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \'Etablir, sur le mod\`ele de $i_{L1}$, les deux expressions temporelles de $i_{L2}(t)$ : pour $t \in\, ]\tfrac{T}{2}\,;\,\tfrac{T}{2}+\alpha T]$ puis pour $t \in\, ]\tfrac{T}{2}+\alpha T\,;\,\tfrac{3T}{2}]$. Pr\'eciser \`a chaque fois l'\'etat de $Q_3$ et de $D_4$.
+  \item Le courant $i_S$ n'est aliment\'e par une branche que pendant la fraction de p\'eriode o\`u la diode de cette branche conduit, et chaque branche transporte la moiti\'e du courant de batterie. En d\'eduire l'expression de la valeur moyenne $\langle i_S\rangle$ en fonction de $\alpha$ et de $I_b$.
+  \item En \'ecrivant le bilan de puissance du convertisseur suppos\'e parfait, exprimer $V_{DC}$ en fonction de $\alpha$ et de $E_b$. Conclure sur la nature du convertisseur.
+  \item Application num\'erique : $E_b = \SI{48}{\volt}$ et le bus doit \^etre r\'egul\'e \`a $V_{DC} = \SI{230}{\volt}$. Calculer $\alpha$, puis le courant moyen $I_b$ appel\'e \`a la batterie si l'\'etage doit fournir $\langle i_S\rangle = \SI{13}{\ampere}$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item La seconde branche reproduit le comportement de la premi\`ere, d\'ecal\'e de $T/2$.
+
+  \textbf{Pour $t \in\, ]\tfrac{T}{2}\,;\,\tfrac{T}{2}+\alpha T]$} : $Q_3$ est \textbf{passant}, $D_4$ est \textbf{bloqu\'ee}. L'interrupteur \'etant parfait, $v_{Q3} = 0$, donc $v_{L2} = E_b$ :
+  \[ i_{L2}(t) = \dfrac{E_b}{L_2}\left(t - \dfrac{T}{2}\right) + I_{min} \]
+  \textbf{Pour $t \in\, ]\tfrac{T}{2}+\alpha T\,;\,\tfrac{3T}{2}]$} : $Q_3$ est \textbf{bloqu\'e}, $D_4$ est \textbf{passante}. La diode \'etant parfaite, $v_{D4} = 0$, donc $v_{L2} = E_b - V_{DC} < 0$ :
+  \[ i_{L2}(t) = \dfrac{E_b - V_{DC}}{L_2}\left(t - \alpha T - \dfrac{T}{2}\right) + I_{max} \]
+  \item Chaque branche ne d\'ebite vers la sortie que pendant sa phase de roue libre, de dur\'ee $(1-\alpha)T$, et le courant qu'elle transporte alors vaut $I_b/2$ (partage \'egal entre les deux branches identiques). Sur une p\'eriode $T$, les deux branches contribuent :
+  \[ \langle i_S\rangle = 2 \cdot \dfrac{1}{T}\,(T - \alpha T)\cdot\dfrac{I_b}{2} = I_b\,(1-\alpha) \]
+  \item Convertisseur parfait, donc puissance d'entr\'ee = puissance de sortie :
+  \[ P_E = E_b\,I_b = P_S = V_{DC}\,\langle i_S\rangle = V_{DC}\,I_b\,(1-\alpha) \]
+  En simplifiant par $I_b \neq 0$ :
+  \[ \boxed{V_{DC} = \dfrac{E_b}{1-\alpha}} \]
+  Comme $0 \le \alpha < 1$, on a toujours $V_{DC} \geq E_b$ : CV3-1 est bien un \textbf{hacheur \'el\'evateur} (Boost), ici \`a deux cellules entrelac\'ees. Il est remarquable que le bilan \'energ\'etique redonne exactement la loi obtenue par la condition $\langle v_L\rangle = 0$ : les deux voies de d\'emonstration sont \'equivalentes, et le jury accepte l'une comme l'autre \`a condition qu'elle soit men\'ee jusqu'au bout.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2025, commentaires du jury, analyse globale des r\'esultats) : \guillemotleft\ De nombreux candidats ne maitrisent pas les lois basiques de l'\'electricit\'e (la loi des n\oe uds, la loi des mailles, les calculs de puissance ou encore la loi d'Ohm) \guillemotright.}
+  \item \[ 1-\alpha = \dfrac{E_b}{V_{DC}} = \dfrac{48}{230} \approx 0{,}2087 \;\Longrightarrow\; \alpha \approx 0{,}791 \]
+  \[ I_b = \dfrac{\langle i_S\rangle}{1-\alpha} = \dfrac{13}{0{,}2087} \approx \SI{62,3}{\ampere} \]
+  \textbf{Conclusion.} Pour \SI{13}{\ampere} livr\'es au bus continu, la batterie \SI{48}{\volt} doit fournir plus de \SI{62}{\ampere} : c'est la contrepartie in\'evitable de l'\'el\'evation de tension \`a puissance constante ($\approx \SI{3}{\kilo\watt}$). C'est pr\'ecis\'ement ce courant \'elev\'e qui justifie l'entrelacement des deux branches : chacune n'en transporte que la moiti\'e, soit environ \SI{31}{\ampere}, ce qui divise par deux le calibre des semi-conducteurs et par quatre les pertes Joule par branche, tout en doublant la fr\'equence apparente de l'ondulation vue par le condensateur de bus.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Un hacheur en pont en H (4 quadrants), aliment\'e par un bus continu $E = \SI{300}{\volt}$, alimente une charge r\'esistive-inductive $R = \SI{8}{\ohm}$, $L$ (frein \`a courant de Foucault). La commande est bipolaire sym\'etrique : les interrupteurs diagonaux ($T_1,T_4$) et ($T_2,T_3$) sont command\'es en compl\'ementaire, avec un rapport cyclique $\alpha$ pour la diagonale $(T_1,T_4)$. Chaque interrupteur command\'e est associ\'e \`a une diode en antiparall\`ele ($D_1$ \`a $D_4$), indispensable au passage du courant inductif lors des commutations.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw (-2.4,4) -- (7.4,4);
+\draw (-2.4,0) -- (7.4,0);
+\node[above] at (3,4.05) {$+E$};
+\node[below] at (3,-0.05) {$0$};
+\draw (-2.4,0) to[V] (-2.4,4);
+\node[left] at (-3.15,2) {$E$};
+\node at (-2.68,3.4) {\small $+$};
+\node at (-2.68,0.6) {\small $-$};
+\draw (0,4) to[normal open switch] (0,2);
+\draw (0,2) to[normal open switch] (0,0);
+\node[right] at (0.2,3) {$T_1$};
+\node[right] at (0.2,1) {$T_2$};
+\draw (-1.2,2) -- (0,2);
+\draw (-1.2,2) to[empty diode] (-1.2,4);
+\draw (-1.2,0) to[empty diode] (-1.2,2);
+\node[left] at (-1.55,3) {$D_1$};
+\node[left] at (-1.55,1) {$D_2$};
+\draw (6,4) to[normal open switch] (6,2);
+\draw (6,2) to[normal open switch] (6,0);
+\node[left] at (5.8,3) {$T_3$};
+\node[left] at (5.8,1) {$T_4$};
+\draw (6,2) -- (7.2,2);
+\draw (7.2,2) to[empty diode] (7.2,4);
+\draw (7.2,0) to[empty diode] (7.2,2);
+\node[right] at (7.55,3) {$D_3$};
+\node[right] at (7.55,1) {$D_4$};
+\draw (0,2) to[R, l=$R$] (3,2) to[cute inductor, l=$L$] (6,2);
+\node[circ] at (0,2) {};
+\node[circ] at (6,2) {};
+\node[circ] at (-1.2,2) {};
+\node[circ] at (7.2,2) {};
+\node at (-0.45,1.6) {$A$};
+\node at (6.45,1.6) {$B$};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Rappeler l'expression de la tension moyenne aux bornes de la charge $\langle u_{AB}\rangle$ en fonction de $E$ et $\alpha$, pour une commande bipolaire sym\'etrique.
+  \item En r\'egime permanent, justifier que $\langle u_{AB}\rangle = R\langle i\rangle$ (m\^eme argument qu'avec un hacheur simple quadrant).
+  \item Calculer le rapport cyclique $\alpha$ n\'ecessaire pour obtenir un courant moyen $\langle i\rangle = \SI{5}{\ampere}$ dans le frein.
+  \item Une commande unipolaire (au lieu de bipolaire) permettrait de doubler la fr\'equence apparente de l'ondulation de courant sans changer la fr\'equence de d\'ecoupage des interrupteurs. Quel est l'int\'er\^et pratique de cette propri\'et\'e pour le dimensionnement de $L$ ?
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Commande bipolaire sym\'etrique (pont en H, 4 quadrants) :
+  \[ \langle u_{AB}\rangle = (2\alpha - 1)\,E \]
+  qui varie contin\^ument de $-E$ (pour $\alpha=0$) \`a $+E$ (pour $\alpha=1$), en passant par $0$ pour $\alpha = 0{,}5$.
+  \item En r\'egime p\'eriodique \'etabli, le courant $i(t)$ dans $L$ v\'erifie $i(T)=i(0)$, donc $\langle L\,\mathrm{d}i/\mathrm{d}t\rangle = 0$ (m\^eme raisonnement que pour un hacheur simple quadrant). En moyennant la loi des mailles $u_{AB} = Ri + L\,\mathrm{d}i/\mathrm{d}t$ sur une p\'eriode, il reste $\langle u_{AB}\rangle = R\langle i\rangle$.
+  \item $\langle u_{AB}\rangle = R\langle i\rangle = 8\times5 = \SI{40}{\volt}$, donc :
+  \[ 40 = (2\alpha-1)\times300 \;\Longrightarrow\; \alpha = \dfrac{40/300+1}{2} = \dfrac{1{,}133}{2} \approx 0{,}567 \]
+  \textbf{Conclusion.} Le point de fonctionnement demand\'e est obtenu tout pr\`es de $\alpha = 0{,}5$, c'est-\`a-dire de la tension moyenne nulle : en commande bipolaire, la charge voit pourtant \`a chaque instant $\pm\SI{300}{\volt}$, donc une ondulation de courant maximale alors que le courant moyen n'est que de \SI{5}{\ampere}. C'est exactement le domaine o\`u la commande bipolaire est la plus p\'enalisante pour le dimensionnement du filtre, ce qui motive la question suivante.
+  \item Une ondulation de courant \`a fr\'equence apparente doubl\'ee (\`a fr\'equence de d\'ecoupage $f$ inchang\'ee) permet, pour une m\^eme ondulation maximale tol\'er\'ee $\Delta i_{max}$, de r\'eduire l'inductance $L$ n\'ecessaire (l'ondulation \'etant proportionnelle \`a $1/(Lf_{apparente})$) : c'est le m\^eme b\'en\'efice, en substance, que l'entrelacement de plusieurs bras (exercice 4), obtenu ici sans mat\'eriel suppl\'ementaire, uniquement par le choix de la strat\'egie de commande des 4 interrupteurs.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

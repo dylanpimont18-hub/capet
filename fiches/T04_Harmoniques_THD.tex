@@ -1,0 +1,378 @@
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ficheHeaders{T04}{Harmoniques et THD}{colElec}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TETE
+% -----------------------------------------------------------------------
+
+\ficheEntete{T04}{Harmoniques réseau, THD et puissance déformante}{colElec}%
+  {électrotechnique / Qualité réseau}%
+  {\textbf{Présence :} \textbf{9/13} sujets (2013-2026) - thème \emph{fréquent}}%
+  {décomposition de Fourier - THD - facteur de puissance - MLI - norme IEC~61000-2-2 - filtre LC}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Decomposition de Fourier -------------------------------------
+\textbf{1.1 Décomposition de Fourier d'un signal périodique}
+
+\smallskip
+Tout courant périodique se décompose en :
+\[
+  i(t) = I_0 + \sum_{n=1}^{\infty} I_n\sqrt{2}\cos(n\omega t + \varphi_n)
+\]
+où $I_0$ est la composante continue, $I_1$ le fondamental ($n=1$) et $I_n$ les harmoniques de rang $n$.
+
+\smallskip
+\begin{center}
+\begin{tikzpicture}[scale=0.72, font=\footnotesize]
+  \draw[->] (0,0) -- (7.2,0) node[right] {rang $n$};
+  \draw[->] (0,0) -- (0,3.4) node[above] {$I_n/I_1$};
+  \draw[colElec, fill=colElec!25] (0.65,0) rectangle (1.15,3.0);
+  \node[below] at (0.9,0) {1};
+  \draw[colElec, fill=colElec!25] (1.55,0) rectangle (2.05,1.0);
+  \node[below] at (1.8,0) {3};
+  \draw[colElec, fill=colElec!25] (2.45,0) rectangle (2.95,0.6);
+  \node[below] at (2.7,0) {5};
+  \draw[colElec, fill=colElec!25] (3.35,0) rectangle (3.85,0.43);
+  \node[below] at (3.6,0) {7};
+  \draw[colElec, fill=colElec!25] (4.25,0) rectangle (4.75,0.33);
+  \node[below] at (4.5,0) {9};
+  \draw[colElec, fill=colElec!25] (5.15,0) rectangle (5.65,0.27);
+  \node[below] at (5.4,0) {11};
+  \draw[colElec, fill=colElec!25] (6.05,0) rectangle (6.55,0.23);
+  \node[below] at (6.3,0) {13};
+\end{tikzpicture}
+\end{center}
+Exemple de spectre en raies d'un signal riche en harmoniques impairs : le fondamental (rang 1) domine, les harmoniques décroissent en $1/n$.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{lll}
+\toprule
+\textbf{Grandeur} & \textbf{Expression} & \textbf{Remarque} \\
+\midrule
+Valeur efficace totale & $I_{eff} = \sqrt{I_1^2 + I_2^2 + \cdots} = I_1\sqrt{1+THD^2}$ & racine de la somme des carrés \\[5pt]
+THD courant (IEC) & $THD = \dfrac{\sqrt{I_2^2+I_3^2+\cdots}}{I_1}$ & normalisé par $I_1$, sans unité \\[8pt]
+THD en pourcentage & $THD\% = THD \times 100$ & limite norme : $25\%$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.2 Puissances en presence d'harmoniques ------------------------
+\textbf{1.2 Puissances en présence d'harmoniques}
+
+\smallskip
+Lorsque la tension réseau est sinusoïdale ($v(t) = V_1\sqrt{2}\cos\omega t$), seul le fondamental du courant contribue à $P$ et $Q$ :
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{llll}
+\toprule
+\textbf{Grandeur} & \textbf{Formule} & \textbf{Unité} & \textbf{Remarque} \\
+\midrule
+Puissance active & $P = V_1 I_1 \cos\varphi_1$ & W & seul le fondamental contribue \\[4pt]
+Puissance réactive & $Q = V_1 I_1 \sin\varphi_1$ & VAR & lié au déphasage fondamental \\[4pt]
+Puissance déformante & $D = V_1 \sqrt{I_2^2+I_3^2+\cdots} = V_1 I_1 \cdot THD$ & VAD & due aux harmoniques \\[4pt]
+Puissance apparente & $S = \sqrt{P^2+Q^2+D^2}$ & VA & \\[4pt]
+Facteur de puissance & $FP = \dfrac{P}{S} = \dfrac{\cos\varphi_1}{\sqrt{1+THD^2}}$ & - & $FP \leq \cos\varphi_1$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.3 MLI et filtrage ----------------------------------------------
+\textbf{1.3 MLI et filtrage des harmoniques}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{lp{8cm}}
+\toprule
+\textbf{Mode} & \textbf{Effet sur le spectre harmonique} \\
+\midrule
+Pleine onde & Harmoniques de rangs $h = 6k\pm1$ (5, 7, 11, 13\ldots) à basse fréquence. $THD$ élevé : $\approx 31\%$ (tension triphasée théorique), $\approx 48\%$ (tension monophasée), jusqu'à $\approx 59\%$ sur le courant (sujet 2024). \\[4pt]
+MLI ($f_{MLI}$) & Harmoniques de basse fréquence éliminés ; repoussés autour de $f_{MLI}$ et ses multiples. Filtrage LC passe-bas possible avec $f_c < f_{MLI}$. \\[4pt]
+Filtre LC & $f_c = \dfrac{1}{2\pi\sqrt{LC}}$ à placer $f_c \ll f_{MLI}$ pour atténuer les harmoniques MLI. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+{\footnotesize \textbf{Norme IEC/EN~61000-2-2} : $THD < 25\%$ (soit $THD = 0{,}25$) pour le raccordement au réseau public.}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHETIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthétique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.0cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Harmoniques}} \\
+$THD = \sqrt{\sum_{n\geq2}I_n^2}\,/\,I_1$ & Taux distorsion & - \\
+$I_{eff} = I_1\sqrt{1+THD^2}$ & Valeur efficace & A \\
+$THD_{po} \approx 0{,}48$ & Pleine onde mono & - \\
+$THD_{tri} \approx 0{,}31$ & Pont triphasé th. & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Puissances}} \\
+$P = V_1 I_1 \cos\varphi_1$ & P active & W \\
+$Q = V_1 I_1 \sin\varphi_1$ & P réactive & VAR \\
+$D = V_1 I_1 \cdot THD$ & P déformante & VAD \\
+$S = \sqrt{P^2+Q^2+D^2}$ & P apparente & VA \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.0cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Facteur de puissance}} \\
+$FP = P/S$ & Définition & - \\
+$FP = \cos\varphi_1/\sqrt{1+THD^2}$ & Avec harm. & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Norme et filtre}} \\
+$THD < 0{,}25$ & Limite IEC & - \\
+$f_c = 1/(2\pi\sqrt{LC})$ & Coupure filtre & Hz \\
+$h = 6k\pm1$ & Rangs harm. tri. & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Ondulation hacheur}} \\
+$\Delta i = E\alpha(1-\alpha)/(Lf)$ & Ondulation DC & A \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets réels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT1 - THD pleine onde vs MLI 6 kHz - conformité norme IEC \hfill\normalfont\footnotesize E2 disciplinaire 2024 (B9-B13)}
+]
+\textbf{Énoncé.}
+L'onduleur alimente la MAS. Le DT fournit la décomposition spectrale du courant absorbé, en mode pleine onde (harmoniques dominants de rangs 5, 7, 11, 13) puis en mode MLI $f_{MLI}=\SI{6}{\kilo\hertz}$.
+\textbf{B9.} Calculer $THD_\text{cas1}$. \textbf{B10.} Comparer à la norme IEC~61000-2-2. \textbf{B11-B13.} Conclure sur l'effet de la MLI et proposer un filtre.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Cas 1, pleine onde.}
+En pleine onde triphasée, les harmoniques dominants sont de rangs $6k\pm1$ (5, 7, 11, 13\ldots) :
+\[
+  THD_\text{cas1} = \frac{\sqrt{I_5^2 + I_7^2 + I_{11}^2 + I_{13}^2 + \cdots}}{I_1}
+  = \sqrt{\left(\frac{I_5}{I_1}\right)^2 + \left(\frac{I_7}{I_1}\right)^2 + \cdots}
+  \approx \mathbf{0{,}59} \quad (59\%)
+\]
+(valeur du corrigé officiel 2024, calculée à partir des amplitudes spectrales du DT).
+Non conforme : $59\% > 25\%$ (limite IEC~61000-2-2).
+
+\textbf{Étape 2 — Cas 2, MLI \SI{6}{\kilo\hertz}.}
+\[
+  THD_\text{cas2} \approx \mathbf{0{,}25} \quad (25\%)
+\]
+Conforme à la limite. La MLI déplace les harmoniques de basse fréquence vers $f \approx f_{MLI} = \SI{6}{\kilo\hertz}$ et ses multiples, qui peuvent ensuite être atténués par un filtre LC passe-bas ($f_c < f_{MLI}$).
+
+\textbf{Conclusion.} Le passage en MLI fait chuter le THD de 59\,\% à 25\,\% : la commande respecte tout juste la limite IEC 61000-2-2, un filtre LC additionnel reste recommandé pour se ménager une marge de sécurité.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Puissance déformante et facteur de puissance réel \hfill\normalfont\footnotesize E2 sujet 2018 (questions 7-9)}
+]
+\textbf{Énoncé.}
+Un convertisseur absorbe un courant déformé : $I_1$, $\varphi_1$, $THD$ connus. La tension réseau est sinusoïdale ($V_1$). Calculer $D$, $S$ et $FP$.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Puissances élémentaires.}
+\[
+  P = V_1 I_1 \cos\varphi_1
+  \qquad
+  Q = V_1 I_1 \sin\varphi_1
+  \qquad
+  D = V_1 \cdot I_1 \cdot THD
+\]
+
+\textbf{Étape 2 — Puissance apparente et facteur de puissance.}
+\[
+  S = \sqrt{P^2+Q^2+D^2}
+  \qquad
+  FP = \frac{P}{S} = \frac{\cos\varphi_1}{\sqrt{1+THD^2}}
+\]
+
+\textbf{Conclusion.} $\cos\varphi_1$ est le facteur de \emph{déplacement} (seul déphasage fondamental) ; $FP$ est le facteur de puissance \emph{réel}, toujours inférieur à $\cos\varphi_1$ en présence d'harmoniques — c'est $FP$, pas $\cos\varphi_1$, qui doit être comparé à une exigence de facturation ou de conformité réseau.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - THD d'un onduleur pleine onde monophasé \hfill\normalfont\footnotesize E2 disciplinaire 2025 (CV3-2)}
+]
+\textbf{Énoncé.}
+L'onduleur CV3-2 fonctionne en pleine onde. Calculer le THD du fondamental de la tension de sortie.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Série de Fourier de la tension pleine onde.}
+\[
+  v(t) = \frac{4V_{DC}}{\pi}\!\left(\cos\omega t - \frac{1}{3}\cos 3\omega t + \frac{1}{5}\cos 5\omega t - \cdots\right)
+\]
+
+\textbf{Étape 2 — Calcul du THD.}
+Les amplitudes harmoniques valent $V_n = V_1/n$, donc :
+\[
+  THD_{fond} = \frac{\sqrt{(V_1/3)^2+(V_1/5)^2+(V_1/7)^2+\cdots}}{V_1}
+             = \sqrt{\frac{1}{9}+\frac{1}{25}+\frac{1}{49}+\cdots} \approx \mathbf{0{,}48}
+\]
+
+\textbf{Conclusion.} $THD \approx 48\,\%$ dépasse largement la limite IEC de 25\,\% : la commande pleine onde seule ne peut pas être raccordée telle quelle au réseau public, une commande MLI ou un filtrage additionnel est nécessaire.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs récurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Normalisation du THD par $I_1$, pas par $I_{eff}$.}
+  La définition IEC est $THD = \sqrt{\sum_{n\geq2}I_n^2}\,/\,I_1$.
+  Diviser par $I_{eff}$ donne un résultat différent : erreur fréquente.
+
+  \item \textbf{La MLI ne supprime pas les harmoniques, elle les déplace.}
+  Elle repousse les harmoniques vers $f_{MLI}$ et ses multiples. Un filtre LC reste nécessaire.
+
+  \item \textbf{$FP \neq \cos\varphi_1$ en présence d'harmoniques.}
+  $FP = \cos\varphi_1/\sqrt{1+THD^2}$ : toujours inférieur à $\cos\varphi_1$.
+  Confondre les deux fausse toute conclusion sur la conformité.
+
+  \item \textbf{Puissance active et harmoniques.}
+  Seul le fondamental contribue à $P$ si la tension est sinusoïdale.
+  Les harmoniques du courant vont uniquement dans $D$ (puissance déformante).
+
+  \item \textbf{Norme IEC~61000-2-2 : limite $25\%$ sur le THD global.}
+  Cette limite s'applique au $THD$ total du courant, pas à chaque harmonique individuelle.
+
+  \item \textbf{Ondulation $\neq$ THD.}
+  L'ondulation $\Delta i$ est une grandeur temporelle crête-crête. Le THD est fréquentiel. Ne pas les confondre dans les conclusions.
+
+  \item \textbf{Rangs harmoniques pont triphasé.}
+  $h = 6k\pm1$ (5, 7, 11, 13\ldots). Les rangs 3, 9, 15\ldots sont absents en triphasé équilibré.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2024 : «~La MLI permet de limiter le THD du courant et donc d'en limiter les ondulations. La mise en place de la MLI génère des harmoniques dans les hautes fréquences, permettant l'utilisation d'un filtre passe-bas.~»\\
+Rapport jury 2025 : «~La partie 2 (convertisseurs et harmoniques) a été abordée par 97\,\% des candidats mais seulement 8{,}5\,\% ont obtenu la moyenne. Le calcul de THD reste mal maîtrisé.~»
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PRESENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colPresence,
+  title={Présence dans les sujets analysés (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Année} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & - & - & - & - & - & - & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+E2 discipl. IE & - & - & - & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-thèmes fréquents :}
+THD (9/13) - comparaison pleine onde / MLI (6/13) - facteur de puissance avec harmoniques (8/13) - norme IEC~61000-2-2 (5/13) - filtre LC (5/13)
+
+\medskip
+\textbf{Ordres de grandeur (repères rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Réseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, fréquence \SI{50}{\hertz}.
+  \item Courants d'étude fréquents en sujet : de quelques \si{\ampere} à quelques dizaines de \si{\ampere}.
+  \item En conversion d'énergie, un rendement attendu reste généralement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthèse express (à refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypothèses du modèle et les conventions de signe.
+  \item Écrire 2 à 4 relations clés avec unités.
+  \item Réaliser un calcul numérique complet et vérifier l'ordre de grandeur.
+  \item Justifier le résultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE

@@ -1,0 +1,90 @@
+% preamble.tex — packages et commandes communes a toutes les fiches CAPET SII IE
+\input{glyphtounicode}
+\pdfgentounicode=1
+\usepackage{cmap}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage[a4paper, top=1.6cm, bottom=1.6cm, left=1.4cm, right=1.4cm]{geometry}
+\setlength{\headheight}{14.5pt}
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{siunitx}
+\sisetup{locale=FR, output-decimal-marker={,}, inter-unit-product=\ensuremath{{}\cdot{}}}
+\usepackage{array, booktabs, multirow, tabularx}
+\usepackage{xcolor}
+\usepackage[most, breakable]{tcolorbox}
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\usepackage{lastpage}
+
+% ── Couleurs par domaine ──────────────────────────────────────────────
+\definecolor{colElec}{RGB}{26, 82, 148}       % Électrotechnique — bleu foncé
+\definecolor{colElecLight}{RGB}{210, 225, 245} % fond bleu clair
+\definecolor{colAuto}{RGB}{34, 120, 66}        % Automatique — vert
+\definecolor{colMeca}{RGB}{185, 90, 20}        % Mécanique — orange
+\definecolor{colTherm}{RGB}{160, 40, 40}       % Thermique — rouge
+\definecolor{colQT}{RGB}{232, 244, 233}        % fond question type (vert très léger)
+\definecolor{colJury}{RGB}{255, 243, 205}      % fond jury (jaune ambre)
+\definecolor{colJuryFrame}{RGB}{200, 130, 0}   % bordure jury
+\definecolor{colGrayLight}{RGB}{245, 245, 247} % fond gris neutre
+\definecolor{colSeparator}{RGB}{180, 180, 180} % gris séparateur
+
+% ── Style tcolorbox de section principale ────────────────────────────
+\tcbset{
+  ficheSection/.style={
+    breakable,
+    enhanced,
+    colback=#1!7!white,
+    colframe=#1,
+    colbacktitle=#1,
+    coltitle=white,
+    fonttitle=\bfseries\normalsize,
+    left=4pt, right=4pt, top=3pt, bottom=4pt,
+    before skip=6pt, after skip=6pt,
+  }
+}
+
+% ── Style encadré question type ──────────────────────────────────────
+\tcbset{
+  questiontype/.style={
+    breakable,
+    enhanced,
+    colback=colQT,
+    colframe=colElec!55!black,
+    colbacktitle=colElec!55!black,
+    coltitle=white,
+    fonttitle=\bfseries\small,
+    left=4pt, right=4pt, top=3pt, bottom=3pt,
+    before skip=5pt, after skip=5pt,
+  }
+}
+
+% ── Style encadré jury ───────────────────────────────────────────────
+\tcbset{
+  jury/.style={
+    breakable,
+    enhanced,
+    colback=colJury,
+    colframe=colJuryFrame,
+    fonttitle=\bfseries\normalsize,
+    left=4pt, right=4pt, top=3pt, bottom=3pt,
+  }
+}
+
+% ── Mise en page ─────────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\setlist[itemize]{leftmargin=1.2em, itemsep=1pt, topsep=2pt, parsep=0pt}
+\setlist[enumerate]{leftmargin=1.2em, itemsep=3pt, topsep=2pt, parsep=0pt}
+
+\setlength{\parskip}{2pt}
+\setlength{\columnsep}{10pt}

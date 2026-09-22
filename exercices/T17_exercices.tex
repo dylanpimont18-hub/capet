@@ -1,0 +1,467 @@
+% T17 -- Distribution et s\'ecurit\'e \'electrique, r\'egimes de terre -- banque d'exercices
+%
+% REFONTE 2026-09-02 : mise en compl\'ementarit\'e avec la fiche fiches/T17_Distribution_Securite.tex.
+% Les trois Questions Types de la fiche sont :
+%   QT1 = identification du SLT TT + choix du DDR 30 mA ;
+%   QT2 = chute de tension 2024 B5-B9 (850 m, 258 A, Ru = 20 mOhm/km, Lu = 1,2 mH/km, 7,2 %) ;
+%   QT3 = choix du disjoncteur NSX250N MA220 associ\'e au variateur (2021, question 17).
+% Le Bloc 4 de la fiche traite en outre la s\'electivit\'e diff\'erentielle 300/30 mA (rapport >= 3)
+% et l'impossibilit\'e du mode diff\'erentiel en TN-C. Les cinq exercices qui reprenaient ces
+% contenus ont donc \'et\'e remplac\'es par d'autres questions des M\^EMES sujets r\'eels.
+%
+% Sources de la version actuelle (toutes relues dans les .md de conversion Marker) :
+%   - Ex. 1 : E2_Disciplinaire_IE_2024, "\'Epreuve \'ecrite disciplinaire", questions B1 et B2.
+%     Donn\'ees d'\'enonc\'e (E2_Disciplinaire_IE_2024.md l.185-201) : Un = 400 V / Vn = 230 V,
+%     Is = 229 A, cos(phi_mot) = 0,85, f = 50 Hz, P0 = 1 kW avec cos(phi_0) = 1,
+%     Pe = 43 kW et Qe = 25,5 kVAR. Corrig\'e officiel (Rapport_Jury_2024.md l.174-186) :
+%     Pmot = 134,3 kW, Qcharge = 83 237 + 25 500 = 108,7 kVAR, Pcharge = 178,3 kW.
+%     Iabs et Fp recalcul\'es (les formules du rapport sont des images omises) : 302,7 A / 0,854.
+%   - Ex. 2 : E2_Sujet_2017 (EDE ENE 2, option \'energie), questions B1.1 et B1.2.
+%     Puissances relev\'ees dans le corrig\'e officiel E2_Corrige_2017.md l.59 : r\'echauffeur 3 kW,
+%     pompes d'hydromassage 2 x 2,25 kW, pompe de circulation 260 W. Facteurs de puissance et
+%     r\'epartition sur les phases : \'enonc\'e du sujet l.147-153. Courants du corrig\'e (l.65-73) :
+%     13,05 A / 11,37 A / 1,41 A -- recalcul\'es et confirm\'es.
+%     (La version pr\'ec\'edente de cet exercice utilisait des puissances INVENT\'EES de 1,5 kW et
+%     750 W : elles sont remplac\'ees ici par les valeurs authentiques du sujet.)
+%   - Ex. 3 : E2_Disciplinaire_IE_2024, questions B3 et B4 (compensation d'\'energie r\'eactive).
+%     \'Enonc\'e l.219-225 ; d\'emonstration du corrig\'e officiel Rapport_Jury_2024.md l.191-197.
+%     ATTENTION : le rapport imprime "C = 0,016 F" mais sa propre formule C = Qabs/(3.omega.Vn^2)
+%     donne 2,18 mF ; la valeur imprim\'ee est incoh\'erente avec la formule (artefact de la
+%     conversion Marker ou coquille du rapport). On retient ici le r\'esultat de la formule.
+%   - Ex. 4 : E2_Sujet_2017, question B2.3. Contexte (abonnement 18 kVA triphas\'e heures creuses,
+%     16 kW de consommation r\'eguli\`ere sans d\'es\'equilibre notable) : sujet l.177.
+%     Corrig\'e officiel E2_Corrige_2017.md l.105-115 : Pphase1 = 3 260 W, P = 3 x 3,26 = 9,78 kW,
+%     nouvel abonnement 16 + 9,78 = 25,78 kW -> 30 kVA.
+%   - Ex. 5 (docTech) : E2_Sujet_2018 (EDE ENE 2), questions 18 et 19. L'extrait DRS7 reproduit
+%     dans le docTech (Imax / In / Up des PF65r, PF30r, PF30, PF15, PF8 et tableau des r\'ef\'erences
+%     1P+N / 3P+N) est TEXTUELLEMENT pr\'esent dans E2_Sujet_2018.md l.888-1010 et l.1016-1038 :
+%     rien n'y est reconstitu\'e. Contexte de l'installation (r\'eseau 3P+N 400 V 50 Hz, SLT TT,
+%     pas de paratonnerre \`a moins de 30 m) : sujet l.243-247. Courant absorb\'e par le r\'egulateur
+%     COMPACTO II (17 A/phase) : Rapport_Jury_2018.md l.2272. Corrig\'e officiel des questions 18
+%     et 19 : Rapport_Jury_2018.md l.2246-2248 (PF65r 3P+N, r\'ef. 15685 ; calibre 20 A courbe C).
+%     Citation jury : verbatim exact de Rapport_Jury_2018.md l.2508.
+%   - Ex. 6 : E2_Sujet_2021, "\'Etude d'un syst\`eme, d'un proc\'ed\'e ou d'une organisation",
+%     questions 16 et 18 (la question 17, choix du disjoncteur, est d\'ej\`a la QT3 de la fiche).
+%     Corrig\'e officiel Rapport_Jury_2021.md l.637-655 : ATV630C11N4 90 kW ; In moteur = 160,4 A
+%     avec eta = 0,942 et cos(phi) = 0,86 sous 400 V ; In variateur = 170 A (DT9) ; Ith = 0,94 In.
+%     Citation jury : verbatim exact de Rapport_Jury_2021.md l.769 (bilan de la partie C).
+%
+% \'Elements SUPPRIM\'ES par cette refonte et \`a ne jamais r\'eintroduire :
+%   - la citation "il est imp\'eratif de justifier le choix du disjoncteur..." attribu\'ee aux
+%     rapports 2021/2024 : INTROUVABLE, fabriqu\'ee ;
+%   - la configuration "300 mA en t\^ete / 30 mA par d\'epart" attribu\'ee \`a la question 19 du
+%     sujet 2021 : la question 19 r\'eelle porte sur les sch\'emas de puissance et de commande ;
+%   - les valeurs lin\'eiques Ru = 0,225 Ohm/km et Xu = 0,08 Ohm/km (fausses) de l'ancien
+%     exercice de chute de tension.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ifdefined\var\else\DeclareSIUnit{\var}{var}\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T17}} - Exercices - Distribution et s\'ecurit\'e \'electrique}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T17 \quad Distribution et s\'ecurit\'e \'electrique, r\'egimes de terre}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 1 -- 2024, B1 et B2
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2024, \'epreuve \'ecrite disciplinaire (option IE), questions B1 et B2}
+]
+\CAPETSHOW{
+L'atelier bois et menuiserie d'un lyc\'ee est aliment\'e par un r\'eseau triphas\'e \'equilibr\'e de tension compos\'ee $U_r = \SI{400}{\volt}$ (tension simple $V_n = \SI{230}{\volt}$), \`a la fr\'equence $f = \SI{50}{\hertz}$. Il regroupe trois groupes de r\'ecepteurs :
+
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item le \textbf{moto-ventilateur} de l'extracteur d'air, machine asynchrone triphas\'ee de courant nominal $I_S = \SI{229}{\ampere}$ sous $U_n = \SI{400}{\volt}$, de facteur de puissance $\cos\varphi_{mot} = 0{,}85$ ;
+  \item les \textbf{ordinateurs et l'automate de s\'ecurit\'e}, qui consomment $P_0 = \SI{1}{\kilo\watt}$ avec $\cos\varphi_0 = 1$ ;
+  \item l'\textbf{\'eclairage et les \'equipements} de l'atelier (groupe de per\c{c}age, brosses, cha\^ines et scies), qui consomment $P_e = \SI{43}{\kilo\watt}$ et $Q_e = \SI{25,5}{\kilo\var}$.
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.9, every node/.style={scale=0.9}]
+  \foreach \y in {2.4,2.1,1.8} { \draw[thick] (0,\y) -- (8.1,\y); }
+  \node[left, align=center, font=\scriptsize] at (0,2.1) {R\'eseau\\triphas\'e\\\SI{400}{\volt}};
+  \node[draw, minimum width=1.9cm, minimum height=0.9cm, align=center, font=\scriptsize] (m) at (1.9,0.5) {MAS\\extracteur\\$I_S{=}\SI{229}{\ampere}$};
+  \node[draw, minimum width=1.9cm, minimum height=0.9cm, align=center, font=\scriptsize] (o) at (4.4,0.5) {Ordinateurs\\+ automate\\$P_0{=}\SI{1}{\kilo\watt}$};
+  \node[draw, minimum width=2.1cm, minimum height=0.9cm, align=center, font=\scriptsize] (e) at (7.0,0.5) {\'Eclairage\\+ \'equipements\\$P_e{=}\SI{43}{\kilo\watt}$};
+  \foreach \n in {m,o,e} { \draw (\n.north) -- (\n.north |- 0,1.8); }
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Calculer la puissance active $P_{mot}$ et la puissance r\'eactive $Q_{mot}$ absorb\'ees par le moto-ventilateur.
+  \item En appliquant le th\'eor\`eme de Boucherot, en d\'eduire la puissance active totale $P_{charge}$, la puissance r\'eactive totale $Q_{charge}$ et la puissance apparente totale $S_{charge}$ de l'atelier.
+  \item En d\'eduire le courant total absorb\'e $I_{abs}$ par l'installation, ainsi que son facteur de puissance $F_p$.
+  \item Le gestionnaire d'\'energie impose un facteur de puissance compris entre $0{,}92$ et $1$. Conclure.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item La machine \'etant triphas\'ee \'equilibr\'ee et aliment\'ee sous la tension simple $V_n$ :
+  \[ P_{mot} = 3\,V_n\,I_S\cos\varphi_{mot} = 3\times 230\times 229\times 0{,}85 \approx \SI{134,3}{\kilo\watt} \]
+  \[ Q_{mot} = P_{mot}\tan\varphi_{mot} = 134\,308\times\tan(\arccos 0{,}85) \approx \SI[group-minimum-digits=4]{83237}{\var} \approx \SI{83,2}{\kilo\var} \]
+  \item Le th\'eor\`eme de Boucherot autorise la somme s\'epar\'ee des puissances actives et des puissances r\'eactives (jamais des puissances apparentes). Les ordinateurs et l'automate ayant $\cos\varphi_0 = 1$, ils n'apportent aucun r\'eactif ($Q_0 = 0$) :
+  \[ P_{charge} = P_{mot} + P_0 + P_e = 134{,}3 + 1 + 43 = \boldsymbol{\SI{178,3}{\kilo\watt}} \]
+  \[ Q_{charge} = Q_{mot} + Q_0 + Q_e = 83{,}2 + 0 + 25{,}5 = \boldsymbol{\SI{108,7}{\kilo\var}} \]
+  \[ S_{charge} = \sqrt{P_{charge}^2 + Q_{charge}^2} = \sqrt{178{,}3^2 + 108{,}7^2} \approx \SI{208,8}{\kilo\volt\ampere} \]
+  \item L'installation \'etant triphas\'ee, $S_{charge} = 3\,V_n\,I_{abs} = \sqrt{3}\,U_r\,I_{abs}$, d'o\`u :
+  \[ I_{abs} = \frac{S_{charge}}{3\,V_n} = \frac{208\,800}{3\times 230} \approx \SI{303}{\ampere} \]
+  \[ F_p = \frac{P_{charge}}{S_{charge}} = \frac{178{,}3}{208{,}8} \approx 0{,}854 \]
+  \item \textbf{Conclusion.} Le facteur de puissance mesur\'e, $F_p \approx 0{,}854$, est \textbf{inf\'erieur \`a la borne basse de $0{,}92$} impos\'ee par le gestionnaire d'\'energie : l'exigence contractuelle n'est pas satisfaite en l'\'etat. L'installation transporte $\SI{108,7}{\kilo\var}$ de r\'eactif qui ne produit aucun travail utile mais surcharge la ligne (303 A au lieu des 258 A qu'appellerait la m\^eme puissance active \`a $F_p = 1$). Une \textbf{batterie de condensateurs de compensation} doit donc \^etre ajout\'ee en parall\`ele de l'installation : c'est l'objet de l'exercice 3.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 2 -- 2017, B1.1 et B1.2
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{1} \hfill\normalfont\footnotesize 2017, EDE ENE 2 (option \'energie), questions B1.1 et B1.2}
+]
+\CAPETSHOW{
+L'armoire \'electrique d'un spa domestique r\'epartit ses r\'ecepteurs \textbf{monophas\'es} (tension simple $U = \SI{230}{\volt}$) sur les trois phases du r\'eseau triphas\'e. La documentation constructeur du spa donne les puissances suivantes : r\'echauffeur \SI{3}{\kilo\watt} ; pompes d'hydromassage $2\times\SI{2,25}{\kilo\watt}$ ; pompe de circulation \SI{260}{\watt}.
+
+Le sujet pr\'ecise la r\'epartition et les facteurs de puissance :
+
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item le \textbf{r\'echauffeur} (purement r\'esistif, $\cos\varphi = 1$) est aliment\'e par la \textbf{phase 1} ;
+  \item la \textbf{pompe de circulation} ($\cos\varphi = 0{,}80$), utilis\'ee pour la filtration et le r\'echauffeur, est \'egalement aliment\'ee par la \textbf{phase 1} ;
+  \item les \textbf{pompes d'hydromassage 1 et 2} ($\cos\varphi = 0{,}86$) sont aliment\'ees respectivement par les \textbf{phases 2 et 3}, et fonctionnent le plus souvent simultan\'ement.
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.85, every node/.style={scale=0.85}]
+  \foreach \p/\y in {1/2.6,2/1.4,3/0.2} {
+    \draw[thick] (0,\y) -- (7.4,\y) node[right,font=\scriptsize]{Phase \p};
+  }
+  \node[draw,minimum width=2.1cm,minimum height=0.6cm,align=center,font=\scriptsize] (rc) at (1.6,3.4) {R\'echauffeur\\\SI{3}{\kilo\watt}, $\cos\varphi{=}1$};
+  \draw (1.6,3.1) -- (1.6,2.6);
+  \node[draw,minimum width=2.4cm,minimum height=0.6cm,align=center,font=\scriptsize] (pc) at (4.8,3.4) {Pompe circulation\\\SI{260}{\watt}, $\cos\varphi{=}0{,}80$};
+  \draw (4.8,3.1) -- (4.8,2.6);
+  \node[draw,minimum width=2.4cm,minimum height=0.6cm,align=center,font=\scriptsize] (p1) at (3.0,2.0) {Pompe hydro 1\\\SI{2,25}{\kilo\watt}, $\cos\varphi{=}0{,}86$};
+  \draw (3.0,1.7) -- (3.0,1.4);
+  \node[draw,minimum width=2.4cm,minimum height=0.6cm,align=center,font=\scriptsize] (p2) at (3.0,0.8) {Pompe hydro 2\\\SI{2,25}{\kilo\watt}, $\cos\varphi{=}0{,}86$};
+  \draw (3.0,0.5) -- (3.0,0.2);
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Rappeler l'expression du courant absorb\'e par un r\'ecepteur \textbf{monophas\'e} en fonction de sa puissance active, de sa tension d'alimentation et de son facteur de puissance.
+  \item Calculer le courant consomm\'e par chacun des quatre r\'ecepteurs.
+  \item Le r\'echauffeur, le plus gros consommateur, sera prot\'eg\'e par un appareil de commande et de protection int\'egral dont les calibres disponibles sont : $1{,}25$ \`a \SI{5}{\ampere} ; $3$ \`a \SI{12}{\ampere} ; $4{,}5$ \`a \SI{18}{\ampere}. Indiquer le calibre \`a retenir et conclure sur l'ad\'equation de ce choix.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Pour un r\'ecepteur monophas\'e, la puissance active vaut $P = U\,I\cos\varphi$, d'o\`u :
+  \[ I = \frac{P}{U\cos\varphi} \]
+  Le facteur $\cos\varphi$ est bien au \textbf{d\'enominateur} : plus il est faible, plus le courant appel\'e est \'elev\'e \`a puissance active \'egale.
+  \item \[ I_{\text{r\'echauffeur}} = \frac{3\,000}{230\times 1} \approx \SI{13,05}{\ampere} \qquad I_{\text{pompe circ.}} = \frac{260}{230\times 0{,}80} \approx \SI{1,41}{\ampere} \]
+  \[ I_{\text{pompe hydro 1}} = I_{\text{pompe hydro 2}} = \frac{2\,250}{230\times 0{,}86} \approx \SI{11,37}{\ampere} \]
+  On remarque que la pompe de circulation, malgr\'e son mauvais facteur de puissance ($0{,}80$), reste le r\'ecepteur le moins consommateur : sa faible puissance active domine l'effet du $\cos\varphi$.
+  \item Le courant du r\'echauffeur vaut $\SI{13,05}{\ampere}$. Il faut donc un calibre dont la \textbf{plage de r\'eglage encadre} cette valeur :
+  \begin{itemize}
+    \item $1{,}25$ \`a \SI{5}{\ampere} : trop faible, $13{,}05 > 5$ -- d\'eclenchement permanent ;
+    \item $3$ \`a \SI{12}{\ampere} : trop faible \'egalement, $13{,}05 > 12$ ;
+    \item $4{,}5$ \`a \SI{18}{\ampere} : \textbf{convient}, $4{,}5 < 13{,}05 < 18$.
+  \end{itemize}
+
+  \smallskip
+  \textbf{Conclusion.} On retient le calibre \textbf{$4{,}5$ \`a \SI{18}{\ampere}}, seul \`a encadrer le courant d'emploi de \SI{13,05}{\ampere} : le r\'eglage de la protection thermique pourra \^etre positionn\'e sur la valeur exacte du courant d'emploi, condition impos\'ee par la NF C 15-100 pour la protection contre les surcharges ($I_B \leq I_n \leq I_z$). Le calibre imm\'ediatement inf\'erieur ($3$ \`a \SI{12}{\ampere}) aurait provoqu\'e des d\'eclenchements intempestifs en fonctionnement nominal.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 3 -- 2024, B3 et B4
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize 2024, \'epreuve \'ecrite disciplinaire (option IE), questions B3 et B4}
+]
+\CAPETSHOW{
+On reprend l'atelier de l'exercice 1, dont le bilan de puissances a conduit \`a $P_{charge} = \SI{178,3}{\kilo\watt}$ et $Q_{charge} = \SI{108,7}{\kilo\var}$ sous une tension simple $V_n = \SI{230}{\volt}$ \`a $f = \SI{50}{\hertz}$.
+
+Pour respecter l'exigence du gestionnaire d'\'energie, une \textbf{batterie de condensateurs} est ajout\'ee \textbf{en parall\`ele} de l'installation : un condensateur de capacit\'e $C$ par phase, coupl\'es en \textbf{\'etoile}. Le dimensionnement est r\'ealis\'e de mani\`ere \`a ramener le facteur de puissance de l'ensemble \`a la valeur \textbf{unitaire} au point de fonctionnement nominal.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85, every node/.style={scale=0.85}]
+  \draw (0,3.0) node[left,font=\scriptsize]{Ph 1} -- (5.6,3.0);
+  \draw (0,2.6) node[left,font=\scriptsize]{Ph 2} -- (4.4,2.6);
+  \draw (0,2.2) node[left,font=\scriptsize]{Ph 3} -- (3.2,2.2);
+  % batterie de condensateurs en etoile
+  \draw (3.2,2.2) to[C, l_=$C$] (3.2,0.6);
+  \draw (4.4,2.6) to[C, l_=$C$] (4.4,0.6);
+  \draw (5.6,3.0) to[C, l=$C$] (5.6,0.6);
+  \draw (3.2,0.6) -- (5.6,0.6);
+  \draw (4.4,0.6) -- (4.4,0.35);
+  \node[font=\scriptsize, below] at (4.4,0.3) {point neutre de la batterie};
+  % charge
+  \node[draw, minimum width=2.0cm, minimum height=0.9cm, align=center, font=\scriptsize] (ch) at (7.6,1.7) {Atelier\\$P_{charge}$\\$Q_{charge}$};
+  \draw (5.6,3.0) -- (7.6,3.0) -- (ch.north);
+  \fill (3.2,2.2) circle (1.4pt); \fill (4.4,2.6) circle (1.4pt); \fill (5.6,3.0) circle (1.4pt);
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \'Ecrire la condition portant sur la puissance r\'eactive totale (charge + batterie) pour que le facteur de puissance de l'ensemble soit unitaire.
+  \item Rappeler l'expression de la puissance r\'eactive $Q_C$ fournie par une batterie triphas\'ee de trois condensateurs $C$ coupl\'es en \'etoile sous la tension simple $V_n$. En d\'eduire l'expression litt\'erale de $C$ en fonction de $Q_{charge}$, $\omega$ et $V_n$.
+  \item Calculer la valeur num\'erique de $C$ et conclure sur la faisabilit\'e technique de cette compensation.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le facteur de puissance de l'ensemble vaut $F_p' = P_{totale}/S_{totale}$. Les condensateurs \'etant suppos\'es parfaits, ils ne consomment aucune puissance active : $P_{totale} = P_{charge}$. La condition $F_p' = 1$ \'equivaut donc \`a $S_{totale} = P_{totale}$, c'est-\`a-dire :
+  \[ Q_{totale} = Q_C + Q_{charge} = 0 \qquad\Longleftrightarrow\qquad \boldsymbol{Q_C = -\,Q_{charge}} \]
+  Les condensateurs doivent \textbf{fournir} exactement la puissance r\'eactive que la charge \textbf{absorbe} : la circulation de r\'eactif est alors confin\'ee \`a la boucle locale charge/batterie et dispara\^it de la ligne d'alimentation.
+  \item Chaque condensateur, coupl\'e en \'etoile, est soumis \`a la tension simple $V_n$ et absorbe une puissance r\'eactive $-C\,\omega\,V_n^2$ (n\'egative : un condensateur fournit du r\'eactif). Pour les trois phases :
+  \[ Q_C = -\,3\,C\,\omega\,V_n^2 \]
+  En reportant dans la condition pr\'ec\'edente, $-3\,C\,\omega\,V_n^2 = -Q_{charge}$, d'o\`u :
+  \[ \boxed{\;C = \frac{Q_{charge}}{3\,\omega\,V_n^2}\;} \]
+  \item Avec $\omega = 2\pi f = 2\pi\times 50 \approx \SI{314}{\radian\per\second}$ :
+  \[ C = \frac{108{,}7\times 10^3}{3\times 2\pi\times 50\times 230^2} = \frac{108\,700}{3\times 314\times 52\,900} \approx \SI{2,18e-3}{\farad} \approx \SI{2,2}{\milli\farad} \]
+
+  \smallskip
+  \textbf{Conclusion.} Il faut trois condensateurs d'environ \SI{2,2}{\milli\farad} (soit \SI{2200}{\micro\farad}) tenant la tension simple de \SI{230}{\volt}, ce qui correspond \`a des mod\`eles de puissance courants du commerce (une batterie de compensation d'environ \SI{36}{\kilo\var} par phase) : la compensation est donc \textbf{techniquement r\'ealisable}. Une fois install\'ee, l'atelier est vu par le r\'eseau comme une charge purement active de \SI{178,3}{\kilo\watt} \`a $F_p = 1$, ce qui satisfait l'exigence contractuelle du gestionnaire d'\'energie ($0{,}92 \leq F_p \leq 1$) et ram\`ene le courant de ligne de \SI{303}{\ampere} \`a \SI{258}{\ampere}, soit un all\`egement de pr\`es de \SI{15}{\percent} sur le dimensionnement des c\^ables.
+
+  \smallskip
+  \textbf{Remarque.} La compensation ne r\'eduit pas la puissance active consomm\'ee, donc pas la facture d'\'energie au sens strict : elle supprime la p\'enalit\'e sur le r\'eactif et lib\`ere de la capacit\'e de transport sur l'installation existante.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 4 -- 2017, B2.3
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize 2017, EDE ENE 2 (option \'energie), question B2.3}
+]
+\CAPETSHOW{
+On reprend l'installation du spa de l'exercice 2. Le propri\'etaire dispose d\'ej\`a d'un \textbf{abonnement de \SI{18}{\kilo\volt\ampere} en triphas\'e} avec heures creuses ; ses derni\`eres factures font appara\^itre des consommations r\'eguli\`eres de \textbf{\SI{16}{\kilo\watt} au maximum, sans d\'es\'equilibre notable}.
+
+L'installation du spa vient s'ajouter \`a cette consommation existante. Le cas de fonctionnement le plus contraignant est celui o\`u le r\'echauffeur fonctionne : le r\'echauffeur et la pompe de circulation sont alors tous deux aliment\'es par la \textbf{phase 1}, tandis que les phases 2 et 3 ne re\c{c}oivent rien (les pompes d'hydromassage sont \`a l'arr\^et d\`es que le r\'echauffeur fonctionne).
+
+On rappelle qu'en triphas\'e la puissance souscrite est \textbf{r\'epartie \`a parts \'egales entre les trois phases} : le disjoncteur de branchement d\'eclenche d\`es qu'\textbf{une seule} phase d\'epasse le tiers de la puissance souscrite, quel que soit le niveau de charge des deux autres.
+
+Les puissances souscrites normalis\'ees disponibles en triphas\'e sont : $3$, $6$, $9$, $12$, $15$, $18$, $24$ et \SI{30}{\kilo\volt\ampere}.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Calculer la puissance suppl\'ementaire $P_{phase\,1}$ appel\'ee sur la phase 1 par le spa dans ce cas de fonctionnement.
+  \item En tenant compte de la r\`egle de r\'epartition rappel\'ee ci-dessus, en d\'eduire la puissance suppl\'ementaire $P$ qu'il faut souscrire sur l'abonnement \textbf{triphas\'e}. Expliquer pourquoi ce n'est pas simplement $P_{phase\,1}$.
+  \item D\'eterminer la puissance totale n\'ecessaire, puis le nouvel abonnement \`a souscrire. Conclure sur la pertinence \'economique du choix du triphas\'e dans cette situation.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item C'est lors du fonctionnement du r\'echauffeur que la puissance appel\'ee est la plus \'elev\'ee. Le r\'echauffeur et la pompe de circulation \'etant tous deux sur la phase 1 :
+  \[ P_{phase\,1} = P_{\text{r\'echauffeur}} + P_{\text{circulation}} = 3\,000 + 260 = \SI[group-minimum-digits=4]{3260}{\watt} = \SI{3,26}{\kilo\watt} \]
+  \item Le disjoncteur de branchement triphas\'e surveille \textbf{chaque phase ind\'ependamment}, et la puissance souscrite est divis\'ee par trois pour d\'efinir le seuil de chaque phase. Pour que la phase 1 puisse encaisser \SI{3,26}{\kilo\watt} de plus, il faut donc augmenter la puissance souscrite de \textbf{trois fois} cette valeur :
+  \[ P = 3\times P_{phase\,1} = 3\times 3{,}26 = \SI{9,78}{\kilo\watt} \]
+  Ce n'est pas simplement $P_{phase\,1}$ car la souscription est un contrat \textbf{global} : on ne peut pas acheter de la puissance sur une seule phase. Les \SI{6,52}{\kilo\watt} suppl\'ementaires souscrits sur les phases 2 et 3 seront in\'evitablement pay\'es sans jamais \^etre utilis\'es -- c'est le co\^ut direct du \textbf{d\'es\'equilibre} de l'installation.
+  \item Le nouvel abonnement doit couvrir la consommation existante augment\'ee de ce suppl\'ement :
+  \[ P_{totale} = 16 + 9{,}78 = \SI{25,78}{\kilo\watt} \]
+  La valeur normalis\'ee imm\'ediatement sup\'erieure \'etant \SI{30}{\kilo\volt\ampere} (celle de \SI{24}{\kilo\volt\ampere} \'etant insuffisante), il faut souscrire un \textbf{nouvel abonnement de \SI{30}{\kilo\volt\ampere}}.
+
+  \smallskip
+  \textbf{Conclusion.} Le d\'es\'equilibre de l'installation force \`a passer de \SI{18}{\kilo\volt\ampere} \`a \SI{30}{\kilo\volt\ampere}, soit deux crans normalis\'es, alors que la puissance r\'eellement ajout\'ee n'est que de \SI{3,26}{\kilo\watt} : environ \SI{6,5}{\kilo\watt} de puissance souscrite seront pay\'es sans jamais \^etre consomm\'es. C'est un crit\`ere de conception d\'eterminant : \textbf{r\'e\'equilibrer la r\'epartition} des r\'ecepteurs sur les trois phases (par exemple en d\'epla\c{c}ant la pompe de circulation sur la phase 2) aurait limit\'e le suppl\'ement \`a $3\times 3 = \SI{9}{\kilo\watt}$, et une conception plus fine du d\'ecoupage aurait pu \'eviter le changement d'abonnement.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 5 -- docTech -- 2018, questions 18 et 19
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize 2018, EDE ENE 2, questions 18 et 19 (document ressource DRS7)}
+]
+\CAPETSHOW{
+L'\'eclairage public de la rue principale d'une commune est pilot\'e par un r\'egulateur-variateur COMPACTO~II\textsuperscript{\textregistered}, install\'e dans un coffret en bord de voirie. Le dossier technique pr\'ecise :
+
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item r\'eseau \'electrique d'alimentation triphas\'e \textbf{3 P + N}, \SI{400}{\volt}, \SI{50}{\hertz} ;
+  \item sch\'ema de liaison \`a la terre de l'installation de type \textbf{TT} ;
+  \item pas de paratonnerre \`a moins de \SI{30}{\meter} du coffret d'installation.
+\end{itemize}
+
+Le constructeur pr\'econise l'installation de parafoudres de \textbf{type 2} en amont et en aval du r\'egulateur, assurant la protection \`a la fois contre les surtensions en \textbf{mode commun (MC)} et en \textbf{mode diff\'erentiel (MD)}. Le \textbf{courant maximum de d\'echarge est estim\'e \`a \SI{15}{\kilo\ampere}}. Le r\'egulateur absorbe \SI{17}{\ampere} par phase.
+
+\begin{tcolorbox}[docTech, title={Document technique DRS7 -- parafoudres de type 2, gamme PF (d'apr\`es Merlin Gerin)}]
+\footnotesize
+\textbf{Caract\'eristiques par mod\`ele} (onde de courant normalis\'ee $8/20~\upmu\text{s}$) :
+
+\begin{center}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Mod\`ele & Protection & $I_{max}$ ($8/20~\upmu$s) & $U_p$ \\
+\midrule
+PF 65r & mode commun & \SI{65}{\kilo\ampere} & \SI{2}{\kilo\volt} \\
+PF 30r / PF 30 & mode commun & \SI{30}{\kilo\ampere} & \SI{1,8}{\kilo\volt} \\
+PF 15 & mode commun & \SI{15}{\kilo\ampere} & \SI{1,8}{\kilo\volt} \\
+       & mode diff\'erentiel & \SI{8}{\kilo\ampere} & \SI{1}{\kilo\volt} \\
+PF 8  & mode commun & \SI{8}{\kilo\ampere} & \SI{1,5}{\kilo\volt} \\
+       & mode diff\'erentiel & \SI{8}{\kilo\ampere} & \SI{1}{\kilo\volt} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\emph{Le PF65r int\`egre une protection en mode diff\'erentiel ainsi qu'un contact de signalisation \`a distance ; il est conseill\'e pour un niveau de risque tr\`es \'elev\'e. Le PF8 assure une protection fine des r\'ecepteurs et se place en cascade avec les parafoudres de t\^ete.}
+
+\smallskip
+\textbf{R\'ef\'erences PF} ($U_n = \SI{400}{\volt}$) :
+
+\begin{center}
+\begin{tabular}{@{}llccc@{}}
+\toprule
+Type & Mod\`ele & $U_c$ (V) & $I_n$ MC/MD (kA) & R\'ef. \\
+\midrule
+1P + N & PF 65r & 440 & 20 & 15\,684 \\
+       & PF 30r & 440 & 10 & 15\,689 \\
+       & PF 30  & 440 & 10 & 15\,687 \\
+       & PF 15  & 440/250 & 5 & 15\,692 \\
+       & PF 8   & 440/250 & 2 & 15\,695 \\
+\midrule
+3P + N & PF 65r & 440 & 20 & 15\,685 \\
+       & PF 30r & 440 & 10 & 15\,690 \\
+       & PF 30  & 440 & 10 & 15\,688 \\
+       & PF 15  & 440/250 & 5 & 15\,693 \\
+       & PF 8   & 440/250 & 2 & 15\,696 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\textbf{D\'econnexion des parafoudres.} \emph{Un des param\`etres du parafoudre est la valeur du courant maximum $I_{max}$ (onde $8/20~\upmu$s) qu'il peut supporter sans d\'egradation. Si cette valeur est d\'epass\'ee, le parafoudre sera d\'etruit et se mettra en court-circuit d\'efinitivement. Le courant de d\'efaut devra \^etre \'elimin\'e par un d\'econnecteur externe plac\'e en amont. Seul un disjoncteur pourra assurer la protection compl\`ete exig\'ee : ne pas d\'eclencher \`a 20 chocs \`a $I_n$, pouvoir d\'eclencher \`a $I_{max}$ sans se d\'etruire, et assurer la d\'econnexion du parafoudre en cas de court-circuit de ce dernier.}
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever} dans le document technique, pour chacun des cinq mod\`eles de la gamme PF, la valeur du courant maximum de d\'echarge $I_{max}$ en mode commun, et \textbf{indiquer} lesquels de ces mod\`eles offrent en outre une protection en mode diff\'erentiel.
+  \item En d\'eduire, en justifiant par les deux crit\`eres impos\'es par le cahier des charges (courant maximum de d\'echarge estim\'e et modes de protection exig\'es), le \textbf{mod\`ele} de parafoudre \`a retenir. Attention au pi\`ege de d\'esignation de la gamme.
+  \item \textbf{D\'eterminer} la r\'ef\'erence compl\`ete du parafoudre \`a commander, en tenant compte de la nature du r\'eseau d'alimentation.
+  \item Le disjoncteur de d\'econnexion associ\'e doit avoir le \textbf{m\^eme calibre} que le disjoncteur de t\^ete, de mani\`ere \`a ne pas cr\'eer de s\'electivit\'e entre eux. Les calibres normalis\'es disponibles sont $10$, $16$, $20$, $25$ et \SI{32}{\ampere}, en courbes B, C ou D. \textbf{D\'eterminer} le calibre et le type de courbe de d\'eclenchement \`a retenir, puis conclure.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Lecture directe du tableau des caract\'eristiques :
+  \begin{center}
+  \begin{tabular}{@{}lcc@{}}
+  \toprule
+  Mod\`ele & $I_{max}$ mode commun & Protection mode diff\'erentiel \\
+  \midrule
+  PF 65r & \SI{65}{\kilo\ampere} & oui \\
+  PF 30r / PF 30 & \SI{30}{\kilo\ampere} & non \\
+  PF 15 & \SI{15}{\kilo\ampere} & oui (mais $I_{max} = \SI{8}{\kilo\ampere}$ en MD) \\
+  PF 8 & \SI{8}{\kilo\ampere} & oui (mais $I_{max} = \SI{8}{\kilo\ampere}$ en MD) \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  Seuls les \textbf{PF 65r}, \textbf{PF 15} et \textbf{PF 8} offrent les deux modes de protection ; les PF 30r et PF 30 ne prot\`egent qu'en mode commun.
+  \item Deux crit\`eres doivent \^etre satisfaits \textbf{simultan\'ement} :
+  \begin{itemize}
+    \item \textbf{Courant maximum de d\'echarge} : le parafoudre doit supporter $I_m = \SI{15}{\kilo\ampere}$ \emph{sans d\'egradation}. Le PF 8 ($I_{max} = \SI{8}{\kilo\ampere}$) est \'elimin\'e. Le PF 15 affiche bien $I_{max} = \SI{15}{\kilo\ampere}$ en mode commun, \textbf{mais seulement \SI{8}{\kilo\ampere} en mode diff\'erentiel} : il ne tient donc pas les \SI{15}{\kilo\ampere} sur les deux modes.
+    \item \textbf{Modes de protection} : MC \emph{et} MD sont exig\'es par le constructeur du r\'egulateur. Les PF 30r et PF 30 sont \'elimin\'es (mode commun seul).
+  \end{itemize}
+  Le seul mod\`ele satisfaisant les deux crit\`eres est le \textbf{PF 65r} ($I_{max} = \SI{65}{\kilo\ampere} \geq \SI{15}{\kilo\ampere}$, protection MC et MD, signalisation \`a distance).
+
+  \smallskip
+  \emph{Pi\`ege de d\'esignation} : le chiffre du nom commercial (PF \textbf{15}) d\'esigne l'ordre de grandeur du courant maximum de d\'echarge du mod\`ele, \textbf{pas} le courant de d\'echarge de l'installation. Choisir le PF 15 « parce que $I_m = \SI{15}{\kilo\ampere}$ » revient \`a dimensionner le composant exactement \`a sa limite de destruction, sans aucune marge, et sans satisfaire le mode diff\'erentiel.
+  \item Le r\'eseau \'etant \textbf{triphas\'e 3 P + N}, il faut la version \textbf{3P + N} du PF 65r (et non la version 1P + N, monophas\'ee). D'apr\`es le tableau des r\'ef\'erences :
+  \[ \text{PF 65r, 3P + N} \;\longrightarrow\; \text{r\'ef\'erence } \boldsymbol{15\,685} \]
+  \item Le disjoncteur de d\'econnexion doit \^etre adapt\'e au parafoudre et, pour \'eviter toute s\'electivit\'e avec le disjoncteur de t\^ete, porter le \textbf{m\^eme calibre} que celui-ci. Le r\'egulateur COMPACTO~II\textsuperscript{\textregistered} absorbant $I = \SI{17}{\ampere}$ par phase, le calibre normalis\'e imm\'ediatement sup\'erieur est \textbf{\SI{20}{\ampere}} (le calibre \SI{16}{\ampere} serait inf\'erieur au courant d'emploi).
+
+  Le choix de la courbe se fait sur la nature de la charge : la charge est un r\'egulateur d'\'eclairage, sans moteur donc \textbf{sans courant de d\'emarrage} et \textbf{sans d\'epart long} (pas de forte pointe d'enclenchement \`a tol\'erer). La \textbf{courbe C} (seuil magn\'etique entre $5$ et $10\,I_n$) est donc adapt\'ee ; la courbe D, r\'eserv\'ee aux charges \`a fort courant d'appel, serait inutilement permissive.
+
+  \smallskip
+  \textbf{Conclusion.} L'ensemble retenu -- \textbf{parafoudre PF 65r 3P + N, r\'ef. 15\,685}, associ\'e \`a un \textbf{disjoncteur de d\'econnexion \SI{20}{\ampere} courbe C} -- satisfait les trois exigences du cahier des charges : il supporte le courant de d\'echarge estim\'e de \SI{15}{\kilo\ampere} avec une large marge, prot\`ege le r\'egulateur en mode commun \emph{et} en mode diff\'erentiel comme le pr\'econise le constructeur, et permet la d\'econnexion du parafoudre en fin de vie sans provoquer la coupure s\'elective de l'installation compl\`ete.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2018, commentaire des questions 16 \`a 19) : \guillemotleft\ C'est ici le sch\'ema de liaison \`a la terre de type TT qui conditionnait et justifiait le choix des diff\'erents \'el\'ements de protection. Son importance n'a pas \'et\'e relev\'ee par un grand nombre de candidats. [\dots] Certains candidats ont \'egalement confondu la r\'ef\'erence du parafoudre PF15 avec le courant de d\'echarge de 15 kA. Le mod\`ele est rarement donn\'e avec la r\'ef\'erence en triphas\'e et certains candidats font un choix de parafoudre en monophas\'e. \guillemotright}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 6 -- 2021, questions 16 et 18
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize 2021, \'Etude d'un syst\`eme, d'un proc\'ed\'e ou d'une organisation, questions 16 et 18}
+]
+\CAPETSHOW{
+Le groupe motopompe d'une micro-STEP solaire est entra\^in\'e par un moteur asynchrone triphas\'e de \textbf{puissance utile $P_u = \SI{90}{\kilo\watt}$}, aliment\'e sous une tension compos\'ee $U = \SI{400}{\volt}$. Sa plaque signal\'etique donne un rendement $\eta = 0{,}942$ et un facteur de puissance $\cos\varphi = 0{,}86$.
+
+Ce moteur est pilot\'e par un \textbf{variateur de vitesse Schneider ATV630}. Le document technique DT9 du sujet indique que, pour un moteur de \SI{90}{\kilo\watt} sous \SI{400}{\volt} avec une capacit\'e de surcharge de \SI{150}{\percent} du courant nominal (mode \emph{Heavy Duty}), la r\'ef\'erence retenue est l'\textbf{ATV630C11N4}, dont le \textbf{courant nominal est $I_n = \SI{170}{\ampere}$}.
+
+Le variateur assure lui-m\^eme la protection thermique du moteur : le param\`etre $I_{th}$ (courant thermique) est r\'eglable de $0{,}2$ \`a $1{,}1\,I_n$, o\`u $I_n$ d\'esigne le courant nominal \textbf{du variateur}.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.85, every node/.style={scale=0.85}]
+  \node[align=center,font=\scriptsize] (res) at (-0.2,0.6) {R\'eseau\\$\SI{400}{\volt}$};
+  \node[draw,minimum width=2.0cm,minimum height=1.0cm,align=center,font=\scriptsize] (var) at (2.6,0.6) {ATV630C11N4\\$I_n{=}\SI{170}{\ampere}$\\\emph{prot. thermique}};
+  \node[draw,minimum width=1.9cm,minimum height=1.0cm,align=center,font=\scriptsize] (mot) at (5.9,0.6) {MAS\\$P_u{=}\SI{90}{\kilo\watt}$\\$\eta{=}0{,}942$};
+  \node[draw,circle,minimum size=0.7cm,font=\scriptsize] (p) at (8.2,0.6) {P};
+  \draw[->] (0.8,0.6) -- (var.west);
+  \draw[->] (var.east) -- (mot.west);
+  \draw[->] (mot.east) -- (p.west) node[midway,above,font=\scriptsize]{pompe};
+  \draw[dashed,->] (var.south) .. controls (4.2,-0.5) .. (mot.south) node[midway,below,font=\scriptsize]{$I_{th}$};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le variateur est choisi sur le crit\`ere d'une surcharge de \SI{150}{\percent} du courant nominal du moteur. Expliquer \`a quelle contrainte de l'application (entra\^inement d'une pompe) correspond cette exigence, et pourquoi elle interdit de dimensionner le variateur au plus juste.
+  \item Calculer le courant nominal $I_{n\,moteur}$ absorb\'e par le moteur \`a son r\'egime nominal.
+  \item En d\'eduire la valeur de r\'eglage du param\`etre $I_{th}$ du variateur, exprim\'ee en fraction de $I_n$. V\'erifier qu'elle appartient bien \`a la plage r\'eglable et conclure sur le r\^ole de ce r\'eglage.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item L'entra\^inement d'une pompe impose au variateur de d\'elivrer transitoirement un courant tr\`es sup\'erieur au courant nominal : au \textbf{d\'emarrage} (il faut vaincre l'inertie de la colonne d'eau et les frottements \`a l'amor\c{c}age) et lors des \textbf{surcouples} li\'es aux variations de charge hydraulique (variation de hauteur manom\'etrique, d\'emarrage sur conduite pleine). Le mode \emph{Heavy Duty} garantit une capacit\'e de surcharge de \SI{150}{\percent} du courant nominal moteur pendant une dur\'ee limit\'ee.
+
+  Dimensionner le variateur au plus juste (sur le seul courant nominal permanent) conduirait \`a une \textbf{mise en s\'ecurit\'e du variateur \`a chaque d\'emarrage}, ou \`a un \'echauffement excessif de ses semi-conducteurs de puissance : la r\'eserve de surcharge fait partie int\'egrante du crit\`ere de choix.
+  \item Le moteur \'etant triphas\'e, la puissance \textbf{absorb\'ee} vaut $P_a = P_u/\eta$ et s'exprime $P_a = \sqrt{3}\,U\,I\cos\varphi$ :
+  \[ I_{n\,moteur} = \frac{P_u}{\eta\,\sqrt{3}\,U\cos\varphi} = \frac{90\,000}{0{,}942\times\sqrt{3}\times 400\times 0{,}86} \approx \SI{160,4}{\ampere} \]
+  On v\'erifie la coh\'erence du choix du variateur : $I_n = \SI{170}{\ampere} > \SI{160,4}{\ampere}$, et la r\'eserve de surcharge de \SI{150}{\percent} porte la capacit\'e transitoire \`a environ \SI{255}{\ampere}, sup\'erieure aux $1{,}5\times 160{,}4 = \SI{241}{\ampere}$ demand\'es par le cahier des charges.
+  \item Le param\`etre $I_{th}$ doit \^etre r\'egl\'e sur le courant nominal du \textbf{moteur} \`a prot\'eger, mais il s'exprime en fraction du courant nominal du \textbf{variateur} :
+  \[ I_{th} = I_{n\,moteur} = k\,I_n \quad\text{avec}\quad k = \frac{I_{n\,moteur}}{I_n} = \frac{160{,}4}{170} \approx 0{,}94 \qquad\text{soit}\qquad \boldsymbol{I_{th} = 0{,}94\,I_n} \]
+  Cette valeur appartient bien \`a la plage r\'eglable $[0{,}2\,I_n\,;\,1{,}1\,I_n]$, et se situe confortablement \`a l'int\'erieur de celle-ci.
+
+  \smallskip
+  \textbf{Conclusion.} Le r\'eglage $I_{th} = 0{,}94\,I_n$ cale exactement l'image thermique interne du variateur sur le courant nominal r\'eel du moteur (\SI{160,4}{\ampere}) et non sur celui du variateur (\SI{170}{\ampere}) : le moteur est ainsi prot\'eg\'e contre les surcharges prolong\'ees \emph{par le variateur lui-m\^eme}, ce qui justifie que le disjoncteur plac\'e en amont soit du type \textbf{MA (d\'eclencheur magn\'etique seul)}, sans relais thermique redondant. Laisser $I_{th}$ au maximum de $1{,}1\,I_n = \SI{187}{\ampere}$ reviendrait \`a autoriser en permanence \SI{17}{\percent} de surcharge sur le moteur sans aucune d\'etection : le moteur ne serait alors prot\'eg\'e par rien.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2021, bilan de la partie C) : \guillemotleft\ Les candidats se sont limit\'es \`a proposer une r\'ef\'erence de composants parfois incompl\`ete sans justification, sans indiquer clairement les crit\`eres de choix. \guillemotright}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

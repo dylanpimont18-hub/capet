@@ -1,0 +1,30 @@
+T01|T01_Grandeurs_Electrocinetique|T01_exercices|Grandeurs electriques et electrocinetique
+T02|T02_Puissance_AC|T02_exercices|Puissance en regime alternatif sinusoidal
+T03|T03_Representations_Complexes_Impedances|T03_exercices|Representation complexe, impedances
+T04|T04_Harmoniques_THD|T04_exercices|Harmoniques reseau, THD
+T05|T05_Phenomenes_Thermiques|T05_exercices|Phenomenes thermiques
+T06|T06_Transformateur|T06_exercices|Transformateur
+T07|T07_Hacheurs|T07_exercices|Hacheurs
+T08|T08_Redresseurs|T08_exercices|Redresseurs
+T09|T09_Onduleurs|T09_exercices|Onduleurs
+T10|T10_Mecanique|T10_exercices|Mecanique et transmissions
+T11|T11_Machine_CC|T11_exercices|Machine a courant continu
+T12|T12_Machine_Synchrone|T12_exercices|Machine synchrone et brushless
+T13|T13_Machine_Asynchrone|T13_exercices|Machine asynchrone
+T14|T14_Variation_Vitesse|T14_exercices|Variation de vitesse et de couple
+T15|T15_Stockage_Energie|T15_exercices|Stockage d'energie electrique
+T16|T16_Energies_Renouvelables|T16_exercices|Energies renouvelables
+T17|T17_Distribution_Securite|T17_exercices|Distribution et securite electrique
+T18|T18_Composants_Electroniques|T18_exercices|Composants electroniques
+T19|T19_AOP|T19_exercices|Amplificateur operationnel
+T20|T20_Filtres_RC_RL|T20_exercices|Regime sinusoidal et filtres
+T21|T21_Fonctions_Transfert_Bode|T21_exercices|Fonctions de transfert, Bode
+T22|T22_CAN_CNA_Numerisation|T22_exercices|CAN/CNA et numerisation
+T23|T23_Capteurs_Conditionnement|T23_exercices|Capteurs et conditionnement
+T24|T24_Systemes_Embarques|T24_exercices|Systemes embarques
+T25|T25_Transmission_Numerique|T25_exercices|Transmission numerique
+T26|T26_Modelisation_Systemes|T26_exercices|Modelisation des systemes lineaires
+T27|T27_Systemes_Boucles_Correcteurs|T27_exercices|Systemes boucles et correcteurs
+T28|T28_Logique_Combinatoire|T28_exercices|Logique combinatoire
+T29|T29_Logique_Sequentielle_GRAFCET|T29_exercices|Logique sequentielle, GRAFCET
+T30|T30_Mesurage_Instrumentation|T30_exercices|Mesurage et instrumentation

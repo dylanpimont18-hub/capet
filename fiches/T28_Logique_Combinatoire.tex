@@ -1,0 +1,342 @@
+% Audit de veracite des citations de rapport de jury - 2026-09-20
+% Bloc 4 : citation jury 2023 (numeration / hexadecimal / BCD) introuvable dans
+% le corpus ; remplacee par le verbatim exact du Rapport_Jury_2023 (l.463).
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ficheHeaders{T28}{Logique combinatoire}{colAuto}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TETE
+% -----------------------------------------------------------------------
+
+\ficheEntete{T28}{Logique combinatoire}{colAuto}%
+  {électronique numérique - Logique et codage}%
+  {\textbf{Présence :} \textbf{3/13} sujets (implicite) - thème de \emph{culture}}%
+  {algèbre de Boole - portes logiques - De Morgan - table de vérité - Karnaugh - circuits combinatoires - codage binaire / BCD / Gray}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colAuto,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Operateurs fondamentaux --------------------------------------
+\textbf{1.1 Algèbre de Boole - opérateurs et théorèmes}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{llll}
+\toprule
+\textbf{Opération} & \textbf{Notation} & \textbf{Identités notables} & \\
+\midrule
+ET (AND) & $A \cdot B$ & Idempotence : $A \cdot A = A$ & \\
+OU (OR) & $A + B$ & Absorption : $A(A+B)=A$ & \\
+NON (NOT) & $\overline{A}$ & Complémentarité : $A \cdot \overline{A} = 0$ & \\
+\midrule
+\multicolumn{4}{l}{\textbf{Théorèmes de De Morgan :}} \\
+\multicolumn{4}{l}{$\overline{A \cdot B} = \overline{A} + \overline{B}$ \hspace{2em} $\overline{A + B} = \overline{A} \cdot \overline{B}$} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 Portes logiques -----------------------------------------------
+\textbf{1.2 Portes logiques élémentaires (2 entrées)}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lll}
+\toprule
+\textbf{Porte} & \textbf{Expression} & \textbf{Remarque} \\
+\midrule
+AND & $S = A \cdot B$ & $S = 1$ ssi $A = B = 1$ \\
+OR & $S = A + B$ & $S = 0$ ssi $A = B = 0$ \\
+NOT & $S = \overline{A}$ & Inverseur \\
+NAND & $S = \overline{A \cdot B}$ & Porte universelle \\
+NOR & $S = \overline{A + B}$ & Porte universelle \\
+XOR & $S = A \oplus B$ & $S = 1$ ssi $A \neq B$ \\
+XNOR & $S = \overline{A \oplus B}$ & $S = 1$ ssi $A = B$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Réalisation universelle :} toute fonction est réalisable avec des NAND seuls (ou NOR seuls).
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 Table de verite et formes canoniques --------------------------
+\textbf{1.3 Table de vérité - formes canoniques}
+
+Pour $n$ variables : $2^n$ lignes.
+\begin{itemize}
+  \item \textbf{SOP (Somme de mintermes)} : somme des mintermes pour lesquels $S = 1$
+  \item \textbf{POS (Produit de maxtermes)} : produit des maxtermes pour lesquels $S = 0$
+\end{itemize}
+
+\textit{Exemple - demi-additionneur :}
+\begin{center}
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{cccc}
+\toprule
+$A$ & $B$ & $S = A \oplus B$ & $C = A \cdot B$ \\
+\midrule
+0 & 0 & 0 & 0 \\
+0 & 1 & 1 & 0 \\
+1 & 0 & 1 & 0 \\
+1 & 1 & 0 & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\textbf{Schéma du demi-additionneur :}
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\small, scale=0.95]
+  \node (A) at (0,1.6) {$A$};
+  \node (B) at (0,0.4) {$B$};
+  \node[draw, minimum width=13mm, minimum height=9mm] (xor) at (3.2,1.5) {XOR};
+  \node[draw, minimum width=13mm, minimum height=9mm] (and) at (3.2,0.5) {AND};
+  \draw[->] (A) -| (2.4,1.7) |- (xor.west);
+  \draw[->] (B) -| (2.6,1.3) |- (xor.west);
+  \draw[->] (A) -| (2.4,0.7) |- (and.west);
+  \draw[->] (B) -| (2.6,0.3) |- (and.west);
+  \draw[->] (xor.east) -- ++(1,0) node[right] {$S$};
+  \draw[->] (and.east) -- ++(1,0) node[right] {$C$};
+\end{tikzpicture}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 Tableau de Karnaugh -------------------------------------------
+\textbf{1.4 Simplification par tableau de Karnaugh}
+
+\textbf{Règles :} grouper les « 1 » adjacents par puissances de 2 (groupes de 2 → $-1$ var, de 4 → $-2$ var, de 8 → $-3$ var). Le tableau est \textbf{torique} : les bords sont adjacents.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.5 Circuits combinatoires courants ------------------------------
+\textbf{1.5 Circuits combinatoires courants}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lp{9cm}}
+\toprule
+\textbf{Circuit} & \textbf{Fonction} \\
+\midrule
+Multiplexeur $2^n \to 1$ & Sélectionne 1 entrée parmi $2^n$ selon $n$ bits de sélection \\
+Décodeur $n \to 2^n$ & Active une sortie parmi $2^n$ (adressage mémoire) \\
+Additionneur complet & $S = A \oplus B \oplus C_{in}$ ; $C_{out} = A\cdot B + C_{in}(A\oplus B)$ \\
+Comparateur & Génère $A > B$, $A = B$, $A < B$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.6 Codage numerique ----------------------------------------------
+\textbf{1.6 Codages numériques}
+
+\begin{itemize}
+  \item \textbf{Binaire naturel :} $N_{10} = b_{n-1}\cdot 2^{n-1} + \cdots + b_1 \cdot 2 + b_0$
+  \item \textbf{BCD :} chaque décimale codée sur 4 bits (ex. : $9 = 1001_2$)
+  \item \textbf{Code Gray :} un seul bit change entre deux mots consécutifs - codeurs angulaires
+  \item \textbf{Hexadécimal :} base 16 ; chiffres 0-9 puis A→F ; $0\text{x}45 = 69_{10}$
+\end{itemize}
+
+\textit{Connexion sujets CAPET (2023) :} codeur incrémental 12 bits, résolution $0{,}15$ mm/impulsion ; 8 bits de poids fort retenus (résolution effective $0{,}15 \times 2^4 = 2{,}4$ mm).
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHETIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colAuto,
+  title={2. Formulaire synthétique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{5cm}l@{}}
+\toprule
+\textbf{Identité / formule} & \textbf{Nom} \\
+\midrule
+$\overline{A \cdot B} = \overline{A} + \overline{B}$ & De Morgan AND \\
+$\overline{A + B} = \overline{A} \cdot \overline{B}$ & De Morgan OR \\
+$A(A+B) = A$ & Absorption \\
+$A+A\cdot B = A$ & Absorption \\
+$A \oplus B = A\overline{B} + \overline{A}B$ & XOR développé \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{5cm}l@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} \\
+\midrule
+$S = A \oplus B \oplus C_{in}$ & Additionneur (somme) \\
+$C_{out} = AB + C_{in}(A\oplus B)$ & Additionneur (retenue) \\
+$n$ variables → $2^n$ lignes & Table vérité \\
+$q = U_{PE}/2^n$ & Quantum CAN \\
+$f_e \geq 2\,f_{max}$ & Shannon \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colAuto,
+  title={3. Questions types - extraites des sujets réels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Codage binaire / hexadécimal \hfill\normalfont\footnotesize E2 disciplinaire 2023 (D2-D3)}
+]
+\textbf{Énoncé.}
+Un codeur incrémental génère une impulsion tous les $0{,}15$ mm. La distance maximale à coder est $680$ mm. Quel est le nombre minimal de bits nécessaires ? Le registre ne retient que les 8 bits de poids fort. Quelle est la résolution effective de position ?
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Nombre de bits.} Nombre de positions : $N = 680 / 0{,}15 = 4\,533$. Nombre de bits : $2^{12} = 4\,096 < 4\,533 < 8\,192 = 2^{13}$ - \textbf{13 bits}.
+
+\textbf{Étape 2 — Résolution effective.} Les 8 bits de poids fort correspondent à ignorer les 5 bits de poids faible :
+résolution effective $= 0{,}15 \times 2^5 = 0{,}15 \times 32 = \SI{4{,}8}{\milli\metre}$.
+
+\textbf{Conclusion.} La troncature à 8 bits dégrade la résolution de \SI{0{,}15}{\milli\metre} à \SI{4{,}8}{\milli\metre} : ce compromis mémoire/précision doit être validé vis-à-vis de la tolérance mécanique exigée par le cahier des charges avant d'être retenu.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Application de De Morgan \hfill\normalfont\footnotesize Cours programme}
+]
+\textbf{Énoncé.}
+Simplifier l'expression $S = \overline{\overline{A} \cdot \overline{B}}$ et identifier la porte correspondante. Puis simplifier $F = \overline{A + B + C}$.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1.} $S = \overline{\overline{A} \cdot \overline{B}} = \overline{\overline{A}} + \overline{\overline{B}} = A + B$ - \textbf{porte OR} réalisée par un NOR suivi d'un NON.
+
+\textbf{Étape 2.} $F = \overline{A + B + C} = \overline{A} \cdot \overline{B} \cdot \overline{C}$ (De Morgan généralisé) - NOR à 3 entrées.
+
+\textbf{Conclusion.} Ces deux simplifications confirment qu'une fonction OR (ou NOR à $n$ entrées) peut toujours se reconstruire à partir de portes NAND/NOR seules, ce qui justifie leur qualification de portes universelles.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Conversion hexadécimal / décimal \hfill\normalfont\footnotesize E2 disciplinaire 2022 (Q.17)}
+]
+\textbf{Énoncé.}
+Un registre Siemens S7-1500 contient la valeur $\text{0x}2A$ (hexadécimal). Donner la valeur décimale. Un masquage par ET avec $\text{0x}0F$ est appliqué. Que conserve-t-on ?
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Conversion.} $\text{0x}2A = 2 \times 16 + 10 = 42_{10}$ ; en binaire : $0010\,1010_2$.
+
+\textbf{Étape 2 — Masquage.} Masque $\text{0x}0F = 0000\,1111_2$. Le ET logique donne $0000\,1010_2 = 10_{10}$.
+
+\textbf{Conclusion.} Le masque $\text{0x}0F$ isole les 4 bits de poids faible (le quartet de droite) et met à zéro les 4 bits de poids fort : c'est une opération classique d'extraction d'un champ dans un registre, très utilisée en programmation d'automate.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs récurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{De Morgan - le piège classique.} $\overline{A + B} = \overline{A} \cdot \overline{B}$ (ET), \textbf{pas} $\overline{A} + \overline{B}$. Toujours vérifier sur un cas numérique ($A=1$, $B=0$).
+
+  \item \textbf{Tableau de Karnaugh torique.} Les cases des bords gauche et droit sont adjacentes, de même pour haut et bas. Oublier de boucler est une perte de simplification.
+
+  \item \textbf{Confusion bit / octet.} Le jury 2023 signale : "beaucoup d'amalgames entre bit et octet". 1 octet = 8 bits ; $2^8 = 256$ valeurs.
+
+  \item \textbf{XOR vs OR inclusif.} $A \oplus B = 1$ ssi $A \neq B$ (OR \emph{exclusif}). Le OR standard est $A = 1$ \textbf{ou} $B = 1$ \textbf{ou} les deux.
+
+  \item \textbf{Codage binaire signé.} Pour les registres d'automate sur 16 bits signés (Siemens S7), le MSB est le bit de signe (complément à 2). Plage : $-32\,768$ à $+32\,767$.
+
+  \item \textbf{Contexte CAPET.} La logique combinatoire pure (Karnaugh, SOP/POS) est peu présente dans les épreuves écrites. Maîtriser \emph{surtout} le codage binaire, hexadécimal, et les opérations de masquage/décalage qui apparaissent régulièrement.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2023 : «~La cinquième partie permettait d'aborder l'électronique numérique et la communication par liaison série. Le jury constate beaucoup d'amalgames entre bit et octet et invite les candidats à revoir le principe d'une liaison série.~»
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PRESENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colPresence,
+  title={Présence dans les sujets analysés (2013-2026) - logique numérique et codage},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Année} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+Codage binaire/hex & - & - & - & - & - & - & - & - & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & - \\
+Masquage / registre & - & - & - & - & - & - & - & - & - & $\checkmark$ & - & - & - \\
+Logique comb. pure & - & - & - & - & - & - & - & - & - & - & - & - & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-thèmes fréquents :}
+codage binaire - résolution/précision - conversion hexadécimal - masquage ET/OU - nombre de bits pour coder une position - conversion décimal/binaire/hexa
+
+\end{tcolorbox}
+
+\CAPETENDFILE

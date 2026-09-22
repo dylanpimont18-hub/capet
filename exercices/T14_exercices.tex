@@ -1,0 +1,436 @@
+% T14 -- Variation de vitesse et de couple des machines -- banque d'exercices
+% Sources (toutes les valeurs numeriques sont reprises de sujets/corriges/rapports de jury
+% reels ; les seules donnees reconstituees sont signalees en commentaire devant l'exercice 4) :
+%   - E1_Sujet_2024 / E2_Disciplinaire_IE_2024 (Epreuve ecrite disciplinaire, questions A2, A3,
+%     A5 a A7, C3, C5 a C11 ; le document technique DT1 -- modele monophase equivalent et
+%     bilan de puissance -- n'est complet que dans la version E2_Disciplinaire)
+%     et Rapport_Jury_2024 (elements de correction A5-A8, C8, C10/C11)
+%   - E1_Sujet_2014_commun_SII (Analyse d'un systeme pluritechnique, questions 22 a 24,
+%     documents techniques DT5 et DT6) et E1_Corrige_2014_commun_SII (corrige officiel Q22-Q24)
+%   - E1_Sujet_2026 (Epreuve 1, admissibilite, question A10)
+%   - Exercice 2 : exercice inedit (donnees inventees, calculs non controverses : Ns = 60 f / p,
+%     Omega = 2 pi N / 60, Pu = Cu Omega)
+% Complementarite avec la fiche T14_Variation_Vitesse.tex (passe 2026-09-02) : les deux exercices
+% qui dupliquaient les Questions Types de la fiche ont ete remplaces --
+%   ancien ex. 3 (THD, 2024 B10-B11) = QT1 de la fiche  -> bilan de puissance MAS (2024 A2, A5-A7)
+%   ancien ex. 4 (ATV630, 2021 Q15-18) = QT2 de la fiche -> choix variateur Altivar 71 sur DT5/DT6
+%                                                          (2014 Q22-Q24), exercice docTech.
+% Ordre des exercices : gradation croissante 1-1-2-2-2-3.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ifdefined\tr\else\DeclareSIUnit{\tr}{tr}\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T14}} - Exercices - Variation de vitesse et de couple des machines}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T14 \quad Variation de vitesse et de couple des machines}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2024, \'Epreuve \'ecrite disciplinaire, question A3}
+]
+\CAPETSHOW{
+Une machine asynchrone triphas\'ee entra\^ine un moto-extracteur d'air. Sa plaque signal\'etique indique une tension compos\'ee $U_S = \SI{400}{\volt}$ (tension simple $V_S = \SI{230}{\volt}$), une fr\'equence d'alimentation $f = \SI{50}{\hertz}$, un nombre de paires de p\^oles $p = 2$ et une vitesse de rotation nominale $N = \SI{1400}{\tr\per\minute}$.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Rappeler l'expression litt\'erale de la vitesse des champs tournants $N_s$ (vitesse de synchronisme) en fonction de $f$ et $p$, puis la calculer en \si{\tr\per\minute}.
+  \item D\'efinir le glissement $g$ de la machine asynchrone en fonction de $N_s$ et $N$, puis calculer sa valeur num\'erique.
+  \item Le variateur de fr\'equence pilote la machine en commande scalaire, en maintenant le rapport $V_S/f$ constant. Justifier physiquement l'int\'er\^et de maintenir ce rapport constant lorsque la fr\'equence $f$ varie.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item La vitesse des champs tournants (vitesse de synchronisme) est donn\'ee par :
+  \[ N_s = \frac{60\,f}{p} = \frac{60\times 50}{2} = \SI{1500}{\tr\per\minute} \]
+  \item Le glissement caract\'erise l'\'ecart relatif entre la vitesse du champ tournant et la vitesse m\'ecanique du rotor :
+  \[ g = \frac{N_s - N}{N_s} = \frac{1500 - 1400}{1500} \approx 0{,}067 \quad (6{,}7\,\%) \]
+  \item Le flux magn\'etique dans l'entrefer est proportionnel au rapport $V_S/f$ (\`a l'ordre de grandeur pr\`es, en n\'egligeant la chute de tension statorique). Si $f$ diminue sans que $V_S$ diminue proportionnellement, le flux augmente et risque de saturer le circuit magn\'etique~; si $V_S$ diminue sans que $f$ diminue de m\^eme, le flux chute et le couple maximal disponible s'effondre. Maintenir $V_S/f = \text{constante}$ permet donc de conserver un flux \`a peu pr\`es constant sur toute la plage de vitesse, et donc une aptitude au couple sensiblement constante (commande scalaire dite \guillemotleft\ \`a flux constant \guillemotright).
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Avec $N_s = \SI{1500}{\tr\per\minute}$ et $g \approx 6{,}7\,\%$, le point de fonctionnement nominal se situe au voisinage imm\'ediat du synchronisme. Comme les pertes Joule rotoriques valent $P_{jr} = g\,P_{tr}$ ($P_{tr}$ : puissance transmise au rotor), ce glissement garantit que moins de $7\,\%$ de la puissance transmise est dissip\'ee au rotor~: la machine reste dans la plage de glissement ($g \leq \SI{10}{\percent}$) qui conditionne le rendement annonc\'e sur la plaque signal\'etique, et la commande scalaire $V_S/f$ devra pr\'eserver cette situation \`a toutes les fr\'equences de fonctionnement.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{1} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Pour r\'eduire la consommation \'energ\'etique d'un moto-ventilateur en p\'eriode de faible besoin de renouvellement d'air, un variateur de fr\'equence alimente la machine asynchrone ($p=2$ paires de p\^oles) \`a une fr\'equence r\'eduite $f = \SI{42}{\hertz}$ (au lieu de $\SI{50}{\hertz}$ en fonctionnement nominal). Le glissement \`a ce point de fonctionnement est $g = 5\,\%$. Le couple utile fourni par le ventilateur \`a ce r\'egime est $C_u = \SI{120}{\newton\metre}$.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Calculer la vitesse de synchronisme $N_s$ (en \si{\tr\per\minute}) \`a $f=\SI{42}{\hertz}$.
+  \item En d\'eduire la vitesse de rotation r\'eelle $N$ (en \si{\tr\per\minute}), puis la vitesse angulaire $\Omega$ (en $\si{\radian\per\second}$).
+  \item Calculer la puissance utile $P_u = C_u\,\Omega$ fournie par la machine \`a ce point de fonctionnement, en $\si{\kilo\watt}$.
+  \item Pourquoi est-il pr\'ef\'erable, du point de vue \'energ\'etique, de r\'eduire la fr\'equence d'alimentation plut\^ot que de laisser la machine tourner \`a $\SI{50}{\hertz}$ et de r\'eguler le d\'ebit d'air par un volet m\'ecanique ?
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \[ N_s = \frac{60\,f}{p} = \frac{60\times 42}{2} = \SI{1260}{\tr\per\minute} \]
+  \item \[ N = N_s(1-g) = 1260\times(1-0{,}05) = \SI{1197}{\tr\per\minute} \]
+  \[ \Omega = \frac{2\pi N}{60} = \frac{2\pi\times 1197}{60} \approx \SI{125,4}{\radian\per\second} \]
+  \item \[ P_u = C_u\,\Omega = 120\times 125{,}4 \approx \SI{15048}{\watt} \approx \SI{15,05}{\kilo\watt} \]
+  \item R\'eguler le d\'ebit d'air par un volet m\'ecanique impose de conserver le moteur \`a sa vitesse (et donc sa puissance absorb\'ee) nominale en permanence, l'exc\'edent d'\'energie \'etant dissip\'e en pertes de charge suppl\'ementaires dans le volet. En r\'eduisant directement la fr\'equence d'alimentation (donc la vitesse), la puissance m\'ecanique fournie par le moteur diminue avec le besoin r\'eel (la puissance a\'eraulique varie environ avec le cube de la vitesse pour un ventilateur centrifuge) : la commande scalaire par variateur permet ainsi une \'economie d'\'energie substantielle par rapport \`a une r\'egulation par organe m\'ecanique passif.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} \`A $f = \SI{42}{\hertz}$, la machine tourne \`a $\SI{1197}{\tr\per\minute}$ et ne fournit plus que $P_u = \SI{15,05}{\kilo\watt}$. La vitesse est ramen\'ee \`a $42/50 = 84\,\%$ de sa valeur nominale~; pour un ventilateur, dont la puissance a\'eraulique varie sensiblement comme le cube de la vitesse, cela correspond \`a $0{,}84^{3} \approx 59\,\%$ de la puissance demand\'ee au r\'egime nominal, l\`a o\`u une r\'egulation par volet l'aurait maintenue au voisinage de $100\,\%$. L'exigence de sobri\'et\'e \'energ\'etique du cahier des charges est donc satisfaite par la seule action sur la fr\'equence, sans organe m\'ecanique suppl\'ementaire.
+
+\smallskip
+\textit{Conseil de m\'ethode -- conversions d'unit\'es. Le rapport de jury CAPET 2020 (bilan de la quatri\`eme partie, dimensionnement de la batterie du robot) formule une remarque de port\'ee g\'en\'erale sur ce point~: \guillemotleft\ Le jury note ici les progr\`es des candidats quant aux conversions d'unit\'es \guillemotright. Ne jamais m\'elanger \si{\tr\per\minute} et $\si{\radian\per\second}$ dans un m\^eme calcul, et toujours convertir explicitement via $\Omega = 2\pi N/60$ avant d'utiliser une grandeur angulaire dans une formule de puissance ou de couple.}
+}
+\end{tcolorbox}
+
+% --- Exercice 3 : remplace l'ancien exercice THD (2024 B10-B11), doublon strict de la QT1 de
+%     la fiche T14 (memes valeurs 170/95/27/27/20 et 37/22). Nouveau travail : bilan de
+%     puissance de la MAS et validation du dimensionnement (2024, A2 et A5 a A7).
+%     Toutes les donnees sont dans E1_Sujet_2024.md (l.117-163) et le modele DT1 complet
+%     figure dans E2_Disciplinaire_IE_2024.md (l.790-830 : R'r = 0,1 ohm, Lf = 3,6 mH,
+%     Pjr = 3 R'r I'r^2 = g.Ptr, Ppm = Cp.Omega, Pa = 3 Vs Is cos(phi)).
+%     Verification : Pu = 100,5 kW et Cu = 685,7 N.m -- le Rapport_Jury_2024 (l.167) releve
+%     exactement Cu = 686 N.m et Omega = 146,5 rad/s ; le sujet pose "Pu = 100 kW" (l.161).
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize 2024, \'Epreuve \'ecrite disciplinaire, questions A2 et A5 \`a A7}
+]
+\CAPETSHOW{
+Le moto-extracteur d'air d'un atelier doit renouveler \num{10} fois par heure l'air de deux salles de volumes $V_1 = \SI{2500}{\cubic\metre}$ et $V_2 = \SI{2750}{\cubic\metre}$. Compte tenu des pertes de charge du r\'eseau d'aspiration, l'extracteur doit exercer une pression totale $\Delta p = \SI{5297}{\pascal}$, la puissance a\'eraulique valant $P_{extra} = \Delta p\times D_t$ ($D_t$ : d\'ebit total, en $\si{\cubic\metre\per\second}$). Le ventilateur centrifuge a un rendement $\eta_v = 0{,}78$.
+
+La machine asynchrone qui l'entra\^ine porte la plaque signal\'etique : $V_S = \SI{230}{\volt}$, $I_S = \SI{229}{\ampere}$, $\cos\varphi_{mot} = 0{,}85$, $f = \SI{50}{\hertz}$, $N = \SI{1400}{\tr\per\minute}$, $p=2$. Son mod\`ele monophas\'e \'equivalent donne $R'_r = \SI{0,1}{\ohm}$ (r\'esistance rotorique ramen\'ee au stator) et, au point nominal, un courant rotorique ramen\'e $I'_r = \SI{122}{\ampere}$. Le couple de pertes est constant, $C_p = \SI{200}{\newton\metre}$.
+
+Le bilan de puissance de la machine, en convention moteur, s'\'ecrit :
+\[ P_a = 3\,V_S\,I_S\cos\varphi_{mot}, \qquad P_{jr} = 3\,R'_r\,{I'_r}^{2}, \qquad P_{pm} = C_p\,\Omega, \qquad P_u = P_a - P_{jr} - P_{pm} \]
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Calculer le d\'ebit total $D_t$ dans la canalisation principale, puis la puissance a\'eraulique $P_{extra}$ et la puissance utile que le moteur doit fournir au ventilateur.
+  \item Calculer, au point de fonctionnement nominal, la puissance absorb\'ee $P_a$, les pertes Joule au rotor $P_{jr}$ et les pertes m\'ecaniques $P_{pm}$.
+  \item En d\'eduire la puissance utile $P_u$ disponible en sortie d'arbre, puis le couple utile $C_u$ correspondant.
+  \item Valider (ou non) le choix de cette motorisation en comparant les r\'esultats des questions 1 et 3.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le volume \`a renouveler est $V_1+V_2 = \SI{5250}{\cubic\metre}$, dix fois par heure :
+  \[ D_t = \frac{10\times(2\,500+2\,750)}{3\,600} \approx \SI{14,58}{\cubic\metre\per\second} \]
+  \[ P_{extra} = \Delta p\times D_t = 5\,297\times 14{,}58 \approx \SI{77,2}{\kilo\watt} \]
+  Le ventilateur ayant un rendement $\eta_v = 0{,}78$, la puissance utile \emph{requise} sur l'arbre moteur vaut :
+  \[ P_{u,requise} = \frac{P_{extra}}{\eta_v} = \frac{77{,}2\times 10^{3}}{0{,}78} \approx \SI{99,0}{\kilo\watt} \]
+  \item Puissance absorb\'ee au stator :
+  \[ P_a = 3\,V_S\,I_S\cos\varphi_{mot} = 3\times 230\times 229\times 0{,}85 \approx \SI{134,3}{\kilo\watt} \]
+  Pertes Joule au rotor :
+  \[ P_{jr} = 3\,R'_r\,{I'_r}^{2} = 3\times 0{,}1\times 122^{2} = \SI{4465}{\watt} \approx \SI{4,47}{\kilo\watt} \]
+  Vitesse angulaire, puis pertes m\'ecaniques :
+  \[ \Omega = \frac{2\pi N}{60} = \frac{2\pi\times 1\,400}{60} \approx \SI{146,6}{\radian\per\second}
+     \qquad\Longrightarrow\qquad
+     P_{pm} = C_p\,\Omega = 200\times 146{,}6 \approx \SI{29,3}{\kilo\watt} \]
+  \item Puissance utile en sortie d'arbre, puis couple utile associ\'e :
+  \[ P_u = P_a - P_{jr} - P_{pm} = 134{,}3 - 4{,}47 - 29{,}3 \approx \SI{100,5}{\kilo\watt} \]
+  \[ C_u = \frac{P_u}{\Omega} = \frac{100\,522}{146{,}6} \approx \SI{686}{\newton\metre} \]
+  \item La machine d\'elivre $P_u \approx \SI{100,5}{\kilo\watt}$ alors que l'entra\^inement du ventilateur n'en r\'eclame que $\SI{99,0}{\kilo\watt}$ : la puissance disponible est sup\'erieure au besoin, la motorisation convient.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Le point de fonctionnement nominal ($C_u \approx \SI{686}{\newton\metre}$ \`a $\Omega \approx \SI{146,6}{\radian\per\second}$) place la machine \`a peine au-dessus du besoin a\'eraulique : la marge n'est que de $(100{,}5-99{,}0)/99{,}0 \approx 1{,}5\,\%$. L'exigence de dimensionnement est donc satisfaite, mais sans r\'eserve~; toute d\'erive (encrassement des filtres augmentant $\Delta p$, vieillissement du ventilateur) la ferait franchir. C'est pr\'ecis\'ement ce qui justifie l'insertion d'un variateur de vitesse en amont : il permet d'ajuster en permanence le point de fonctionnement au besoin r\'eel plut\^ot que de surdimensionner la machine.
+}
+\end{tcolorbox}
+
+% --- Exercice 4 : remplace l'ancien exercice ATV630 (2021 Q15-18), doublon strict de la QT2
+%     de la fiche T14 (memes 90 kW, cos(phi) 0,86, eta 0,942, ATV630C11N4, 170 A,
+%     NSX250N MA220). Nouveau travail : choix d'un variateur pour un pont levant, a partir
+%     des documents techniques DT5 (plaque moteur WEG) et DT6 (Altivar 71) du sujet 2014.
+%     C'est l'exercice docTech de la notion (constat 2.5 de l'audit).
+%   PROVENANCE DES DONNEES DES ENCADRES docTech :
+%     - DT5, moteurs WEG : valeurs textuellement presentes dans
+%       E1_Sujet_2014_commun_SII.md (l.468-503) -- modele 110 kW : Torque 1067 Nm, RPM 985,
+%       In 208/120 A, Efficiency 94.3, cos(phi) 0.85, Il/In 6.4, Cd/Cn 210 %, Cm/Cn 220 % ;
+%       modele 132 kW : Torque 1287 Nm, RPM 980, In 247/142 A, Efficiency 94.4, cos(phi) 0.86,
+%       Il/In 6.3, Cd/Cn 190 %, Cm/Cn 200 %. Rien n'est invente ici.
+%     - DT6, Altivar 71 : la conversion Markdown du tableau constructeur est illisible (OCR
+%       degrade, E1_Sujet_2014_commun_SII.md l.527-568) ; n'y sont lisibles que les references
+%       ATV71HC13N4 / ATV71HC16N4, les puissances moteur 132 / 160 kW et la puissance
+%       apparente 157 (kVA). Les courants de sortie continus sont RECONSTITUES a partir du
+%       catalogue Schneider Altivar 71 (fiches produit ATV71HC13N4 et ATV71HC16N4, verifiees
+%       en ligne : HC16N4 = 314 A continus ; HC13N4 = 259 A a 2,5 kHz, 157,3 kVA -- ce dernier
+%       chiffre recoupe exactement le "157" lisible dans le DT6 du sujet). La valeur 314 A est
+%       en outre confirmee par le corrige officiel E1_Corrige_2014_commun_SII.md (l.227-229 :
+%       "Variateur Altivar71: ATV71EXS5C16N4 ... Pumax = 160 kW et I = 314 A").
+%     - Les courants maximaux pendant 60 s (110 % du courant continu, service standard de la
+%       gamme Altivar 71) sont RECONSTITUES de la meme source catalogue ; ils ne servent a
+%       aucune reponse et ne figurent que pour la vraisemblance du document.
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize 2014, Analyse d'un syst\`eme pluritechnique, questions 22 \`a 24}
+]
+\CAPETSHOW{
+La trav\'ee mobile d'un pont levant est manoeuvr\'ee par deux cha\^ines d'\'energie identiques comportant chacune un moteur asynchrone triphas\'e aliment\'e par un variateur de vitesse. Le moteur retenu par le constructeur est le \textbf{mod\`ele WEG \SI{132}{\kilo\watt}} du document technique DT5 ci-dessous, aliment\'e sous $U = \SI{400}{\volt}$ entre phases.
+
+Le choix du variateur s'appuie sur le courant qu'il doit fournir : \emph{ce courant devra \^etre au moins \'egal au courant n\'ecessaire au moteur au moment du couple de charge maximum}. Ce couple de charge maximal, atteint \`a l'\'etat de vent descendant limite ultime (ELU), vaut $C_{M,ELU} = \SI{1479,7}{\newton\metre}$.
+
+\begin{tcolorbox}[docTech, title={Document technique DT5 -- moteurs WEG (extrait)}]
+\centering\footnotesize
+\begin{tabular}{lcc}
+\toprule
+Caract\'eristique & Mod\`ele \SI{110}{\kilo\watt} & Mod\`ele \SI{132}{\kilo\watt} \\
+\midrule
+Output                 & \SI{110}{\kilo\watt} & \SI{132}{\kilo\watt} \\
+Poles                  & 6 & 6 \\
+Frequency              & \SI{50}{\hertz} & \SI{50}{\hertz} \\
+Torque                 & \SI{1067}{\newton\metre} & \SI{1287}{\newton\metre} \\
+Voltage                & 380/\SI{660}{\volt} & 380/\SI{660}{\volt} \\
+Frame                  & 315S/M & 315S/M \\
+RPM                    & 985 & 980 \\
+$I_n$                  & 208/\SI{120}{\ampere} & 247/\SI{142}{\ampere} \\
+Efficiency (100\,\%)   & 94{,}3 & 94{,}4 \\
+Power factor (100\,\%) & 0{,}85 & 0{,}86 \\
+$I_\ell/I_n$           & 6{,}4 & 6{,}3 \\
+$C_d/C_n$ ; $C_m/C_n$  & 210\,\% ; 220\,\% & 190\,\% ; 200\,\% \\
+\bottomrule
+\end{tabular}
+\end{tcolorbox}
+
+\begin{tcolorbox}[docTech, title={Document technique DT6 -- variateurs Altivar 71 (extrait, r\'eseau \SI{400}{\volt})}]
+\centering\footnotesize
+\begin{tabular}{lcc}
+\toprule
+ & ATV71HC13N4 & ATV71HC16N4 \\
+\midrule
+Puissance moteur ($U=\SI{400}{\volt}$)   & \SI{132}{\kilo\watt} & \SI{160}{\kilo\watt} \\
+Courant de sortie continu                & \SI{259}{\ampere} & \SI{314}{\ampere} \\
+Courant maximal pendant \SI{60}{\second} & \SI{285}{\ampere} & \SI{345}{\ampere} \\
+Puissance apparente continue             & \SI{157}{\kilo\volt\ampere} & \SI{190}{\kilo\volt\ampere} \\
+\bottomrule
+\end{tabular}
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Relever, dans le document technique DT5, les caract\'eristiques du moteur \SI{132}{\kilo\watt} n\'ecessaires \`a la suite de l'\'etude : nombre de p\^oles, vitesse de rotation nominale, rendement et facteur de puissance. En d\'eduire le nombre de paires de p\^oles $p$.
+  \item Calculer la fr\'equence de rotation du champ tournant de ce moteur, puis son glissement nominal.
+  \item \`A partir du couple de charge maximal $C_{M,ELU}$, calculer la puissance utile que devra fournir le moteur, puis l'intensit\'e qu'il absorbera dans ces conditions.
+  \item \`A l'aide du document technique DT6, conclure quant au choix du variateur r\'epondant \`a la contrainte du cahier des charges.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Lecture directe de la colonne \guillemotleft\ Mod\`ele \SI{132}{\kilo\watt} \guillemotright\ du DT5 : \emph{Poles} $= 6$, donc $p = 6/2 = 3$ paires de p\^oles~; \emph{RPM} $= \SI{980}{\tr\per\minute}$ (vitesse nominale $N$)~; \emph{Efficiency} $\eta = 0{,}944$~; \emph{Power factor} $\cos\varphi = 0{,}86$. Le moteur, pr\'evu 380/\SI{660}{\volt}, est aliment\'e ici sous $U = \SI{400}{\volt}$ entre phases.
+  \item Fr\'equence de rotation du champ tournant :
+  \[ N_s = \frac{60\,f}{p} = \frac{60\times 50}{3} = \SI{1000}{\tr\per\minute} \]
+  Glissement nominal :
+  \[ g = \frac{N_s - N}{N_s} = \frac{1\,000 - 980}{1\,000} = 0{,}02 \quad (2\,\%) \]
+  \item Au couple de charge maximal, la vitesse reste voisine de la vitesse nominale :
+  \[ \Omega = \frac{2\pi N}{60} = \frac{2\pi\times 980}{60} \approx \SI{102,6}{\radian\per\second} \]
+  \[ P_u = C_{M,ELU}\times\Omega = 1\,479{,}7\times 102{,}6 \approx \SI{151,9}{\kilo\watt} \]
+  L'intensit\'e absorb\'ee s'obtient par $P_u = \eta\,\sqrt{3}\,U\,I\cos\varphi$ :
+  \[ I = \frac{P_u}{\eta\,\sqrt{3}\,U\cos\varphi} = \frac{151{,}9\times 10^{3}}{0{,}944\times\sqrt{3}\times 400\times 0{,}86} \approx \SI{270}{\ampere} \]
+  \item Le variateur doit d\'elivrer en \emph{permanence} au moins $\SI{270}{\ampere}$. Dans le DT6, l'ATV71HC13N4 ne fournit que $\SI{259}{\ampere}$ en continu : bien que sa puissance moteur annonc\'ee ($\SI{132}{\kilo\watt}$) corresponde exactement \`a celle de la plaque, il est \textbf{insuffisant} au couple de charge maximal, car le moteur y d\'eveloppe $\SI{151,9}{\kilo\watt}$, tr\`es au-del\`a de sa puissance de plaque. Le calibre imm\'ediatement sup\'erieur, l'\textbf{ATV71HC16N4} ($\SI{160}{\kilo\watt}$, $\SI{314}{\ampere}$ continus), couvre le besoin puisque $\SI{270}{\ampere} \leq \SI{314}{\ampere}$.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Le choix se porte sur l'\textbf{ATV71HC16N4}, avec un taux de charge de $270/314 \approx 86\,\%$ de son courant de sortie continu. Le point d\'ecisif du dimensionnement n'est pas la puissance de plaque du moteur mais le \emph{courant appel\'e au couple de charge maximal} : dimensionner le variateur sur les $\SI{132}{\kilo\watt}$ de la plaque aurait conduit \`a l'ATV71HC13N4, donc \`a un d\'eclenchement en surcharge dans l'\'etat de vent descendant limite ultime, situation pr\'ecis\'ement pr\'evue par le cahier des charges du pont levant.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{2} \hfill\normalfont\footnotesize 2026, \'Epreuve 1 (admissibilit\'e), question A10}
+]
+\CAPETSHOW{
+Un actionneur \'electrique \`a courant continu (machine \`a courant continu, MCC) doit entra\^iner une charge suivant deux sens de rotation, en fonctionnement moteur uniquement (aucun freinage r\'ecup\'eratif n'est demand\'e par le cahier des charges). Ses caract\'eristiques, obtenues lors d'essais pr\'ealables, sont : r\'esistance d'induit $R = \SI{6,6}{\ohm}$, inductance d'induit $L = \SI{100}{\milli\henry}$, constante de f.e.m. $K_e = \SI{1,044}{\volt\second\per\radian}$, constante de couple $K_c = \SI{1,044}{\newton\metre\per\ampere}$, couple de pertes $C_p = \SI{0,052}{\newton\metre}$.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Rappeler la relation entre la tension d'induit $U$, le courant d'induit $I$ et la vitesse angulaire $\Omega$ en r\'egime permanent, ainsi que la relation donnant le couple utile $C_u$ en fonction de $I$. Identifier les grandeurs \'electriques de commande $(U, I)$ que l'on peut associer aux grandeurs m\'ecaniques $(C, \Omega)$.
+  \item Sur le plan couple-vitesse $(\Omega, C)$ ci-dessous, les quatre quadrants correspondent respectivement \`a : quadrant I ($\Omega>0$, $C>0$), quadrant II ($\Omega<0$, $C>0$), quadrant III ($\Omega<0$, $C<0$), quadrant IV ($\Omega>0$, $C<0$). Hachurer, en justifiant, les quadrants qui doivent \^etre accessibles \`a l'actionneur compte tenu du cahier des charges (fonctionnement moteur uniquement, deux sens de rotation).
+
+  \begin{center}
+  \begin{tikzpicture}[>=Stealth, scale=0.9]
+    \draw[->] (-2.6,0) -- (2.6,0) node[right]{$\Omega$};
+    \draw[->] (0,-2.2) -- (0,2.2) node[above]{$C$};
+    \draw[dashed,gray] (0,0) rectangle (2.2,1.9);
+    \draw[dashed,gray] (0,0) rectangle (-2.2,1.9);
+    \draw[dashed,gray] (0,0) rectangle (2.2,-1.9);
+    \draw[dashed,gray] (0,0) rectangle (-2.2,-1.9);
+    \node at (1.1,0.95) {\footnotesize I};
+    \node at (-1.1,0.95) {\footnotesize II};
+    \node at (-1.1,-0.95) {\footnotesize III};
+    \node at (1.1,-0.95) {\footnotesize IV};
+  \end{tikzpicture}
+  \end{center}
+
+  \item Proposer une structure de variateur (modulateur d'\'energie) adapt\'ee \`a ce cahier des charges, et justifier pourquoi un simple hacheur non r\'eversible (un seul quadrant) ne convient pas.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item En r\'egime permanent (courant constant, terme $L\,\mathrm{d}I/\mathrm{d}t$ nul) : $U = R\,I + K_e\,\Omega$. Le couple \'electromagn\'etique est proportionnel au courant d'induit : $C_{em} = K_c\,I$ (le couple utile valant $C_u = C_{em}-C_p$). Les grandeurs \'electriques de commande sont donc : le courant d'induit $I$, associ\'e au couple $C$, et la tension d'induit $U$, associ\'ee \`a la vitesse $\Omega$ (\`a $I$ donn\'e).
+  \item Le fonctionnement est demand\'e dans les deux sens de rotation, donc pour $\Omega>0$ et $\Omega<0$, mais uniquement en mode moteur (jamais en frein/g\'en\'erateur), c'est-\`a-dire avec un couple moteur de m\^eme signe que la vitesse ($C$ et $\Omega$ de m\^eme signe). Les quadrants n\'ecessaires sont donc le quadrant I ($\Omega>0$, $C>0$, sens de rotation 1) et le quadrant III ($\Omega<0$, $C<0$, sens de rotation 2). Les quadrants II et IV, qui correspondraient \`a un fonctionnement en freinage (couple et vitesse de signes oppos\'es), ne sont pas requis ici.
+
+  \begin{center}
+  \begin{tikzpicture}[>=Stealth, scale=0.9]
+    \fill[colExo!12] (0,0) rectangle (2.2,1.9);
+    \fill[colExo!12] (0,0) rectangle (-2.2,-1.9);
+    \begin{scope}
+      \clip (0,0) rectangle (2.2,1.9);
+      \foreach \k in {-2.4,-2.15,...,2.4}{\draw[colExo!70,thin] (\k-2.4,-2.4) -- (\k+2.4,2.4);}
+    \end{scope}
+    \begin{scope}
+      \clip (0,0) rectangle (-2.2,-1.9);
+      \foreach \k in {-2.4,-2.15,...,2.4}{\draw[colExo!70,thin] (\k-2.4,-2.4) -- (\k+2.4,2.4);}
+    \end{scope}
+    \draw[->] (-2.6,0) -- (2.6,0) node[right]{$\Omega$};
+    \draw[->] (0,-2.2) -- (0,2.2) node[above]{$C$};
+    \draw[colExo,thick] (0,0) rectangle (2.2,1.9);
+    \draw[colExo,thick] (0,0) rectangle (-2.2,-1.9);
+    \draw[dashed,gray] (0,0) rectangle (-2.2,1.9);
+    \draw[dashed,gray] (0,0) rectangle (2.2,-1.9);
+    \node at (1.1,0.95) {\footnotesize I};
+    \node at (-1.1,0.95) {\footnotesize II};
+    \node at (-1.1,-0.95) {\footnotesize III};
+    \node at (1.1,-0.95) {\footnotesize IV};
+  \end{tikzpicture}
+
+  {\footnotesize Zones hachur\'ees : quadrants I (moteur, sens de rotation 1) et III (moteur, sens de rotation 2), les seuls requis par le cahier des charges.}
+  \end{center}
+
+  \item Un hacheur non r\'eversible (un seul quadrant, un seul sens pour $U$ et pour $I$) ne permet ni d'inverser le sens de rotation, ni m\^eme de changer le signe de la tension appliqu\'ee \`a l'induit : il ne couvre qu'un seul quadrant. Pour disposer des quadrants I et III, il faut un hacheur en pont en H (4 interrupteurs command\'es), naturellement capable des 4 quadrants, m\^eme si seuls les quadrants I et III sont exploit\'es ici (les quadrants II et IV resteraient accessibles si un besoin de freinage r\'ecup\'eratif apparaissait par la suite).
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Le cahier des charges (deux sens de rotation, fonctionnement moteur seul) impose exactement deux quadrants oppos\'es, I et III~; or aucune structure ne r\'ealise ces deux quadrants sans pouvoir inverser la tension d'induit. Le pont en H est donc la structure minimale conforme, et le hacheur un quadrant est \'ecart\'e non pas pour une question de calibre mais parce qu'il ne satisfait pas l'exigence \guillemotleft\ deux sens de rotation \guillemotright.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize 2024, \'Epreuve \'ecrite disciplinaire, questions C3 et C5 \`a C11}
+]
+\CAPETSHOW{
+On \'etudie l'asservissement de vitesse (commande scalaire) de la machine asynchrone de l'exercice 1. Le comportement m\'ecanique de l'ensemble moteur + charge est r\'egi, en petites variations et \`a glissement faible, par l'\'equation :
+\[ C_{em}(t) - C_r(t) = J\frac{\mathrm{d}\Omega}{\mathrm{d}t} + f_v\,\Omega(t) \]
+avec $J$ le moment d'inertie ramen\'e sur l'arbre moteur et $f_v$ le coefficient de frottement visqueux. On pose $K_{meca} = 1/f_v$ et $\tau_{meca} = J/f_v$~; le constructeur retient, pour cette motorisation, les valeurs num\'eriques $K_{meca} = 250$ et $\tau_{meca} = \SI{8,5}{\second}$.
+
+La boucle d'asservissement de vitesse (autopilotage scalaire) est repr\'esent\'ee par le sch\'ema-blocs suivant, o\`u $H_m(p) = \dfrac{K_{meca}}{1+\tau_{meca}p}$ mod\'elise la fonction de transfert m\'ecanique pr\'ec\'edente en variable de Laplace, et o\`u l'on suppose que la pulsation statorique $\omega_s$ suit instantan\'ement sa consigne $\omega_{sref}$ (pas de retard du variateur) :
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth]
+  \node (in) at (0,0) {$\Omega_{ref}(p)$};
+  \node[draw,circle,minimum size=0.5cm,inner sep=0pt] (s1) at (1.7,0) {};
+  \node[draw,minimum width=1.3cm,minimum height=0.8cm] (ki) at (3.3,0) {$K_i/p$};
+  \node[draw,circle,minimum size=0.5cm,inner sep=0pt] (s2) at (5.0,0) {};
+  \node[draw,minimum width=1.0cm,minimum height=0.8cm] (kp) at (6.3,0) {$K_p$};
+  \node[draw,minimum width=1.7cm,minimum height=0.8cm] (hm) at (8.1,0) {$H_m(p)$};
+  \coordinate (tap) at (9.3,0);
+  \node (out) at (10.5,0) {$\Omega(p)$};
+
+  \draw[->] (in) -- (s1);
+  \draw[->] (s1) -- (ki);
+  \draw[->] (ki) -- (s2);
+  \draw[->] (s2) -- (kp);
+  \draw[->] (kp) -- (hm);
+  \draw[->] (hm) -- (tap) -- (out);
+
+  \node[above=1pt of s1] {\footnotesize $+$};
+  \node[below left=-1pt and -1pt of s1] {\footnotesize $-$};
+  \node[above=1pt of s2] {\footnotesize $+$};
+  \node[below left=-1pt and -1pt of s2] {\footnotesize $-$};
+
+  \draw[->] (hm.south) -- ++(0,-0.9) -| (s2.south);
+  \draw[->] (tap) -- ++(0,-1.7) -| (s1.south);
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item En posant $\varepsilon_1(p) = \Omega_{ref}(p) - \Omega(p)$ et $\varepsilon_2(p)$ l'\'ecart en sortie du second comparateur, \'ecrire les \'equations liant $\varepsilon_1$, $\varepsilon_2$, $\Omega$, $\Omega_{ref}$ et la sortie du bloc $K_i/p$, puis \'etablir que :
+  \[ H_{BF}(p) = \frac{\Omega(p)}{\Omega_{ref}(p)} = \frac{K_pK_iK_{meca}}{\tau_{meca}\,p^2 + (1+K_pK_{meca})\,p + K_pK_iK_{meca}} \]
+  \item Mettre $H_{BF}(p)$ sous la forme canonique $H_{BF}(p) = \dfrac{1}{1+\dfrac{2m}{\omega_0}p+\dfrac{1}{\omega_0^2}p^2}$ et exprimer $m$ et $\omega_0$ en fonction de $K_p$, $K_i$, $K_{meca}$ et $\tau_{meca}$.
+  \item Le cahier des charges impose un amortissement $m=1$ (pas de d\'epassement) et un temps de r\'eponse $T_r = \SI{1}{\second}$, li\'e \`a $\omega_0$ par la relation usuelle (crit\`ere \`a 5\,\%, $m=1$) $\omega_0 = 5/T_r$. En d\'eduire les valeurs num\'eriques de $K_p$ et $K_i$.
+  \item Le sujet d\'efinit la marge de phase de la boucle de vitesse par $M_\varphi = \mathrm{Arg}\big(H_{BF}(\SI{0}{\decibel})\big) + 180^\circ$, o\`u $\mathrm{Arg}\big(H_{BF}(\SI{0}{\decibel})\big)$ d\'esigne l'argument de $H_{BF}$ \`a la pulsation pour laquelle son gain vaut \SI{0}{\decibel}. Conclure sur l'erreur statique, le d\'epassement et la marge de phase de cette boucle vis-\`a-vis d'un cahier des charges exigeant $D\,\%\leq 5\,\%$, une erreur statique nulle et une marge de phase $M_\varphi \geq 90^\circ$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item D'apr\`es le sch\'ema-blocs :
+  \[
+  \varepsilon_1(p) = \Omega_{ref}(p)-\Omega(p), \qquad
+  \varepsilon_2(p) = \frac{K_i}{p}\varepsilon_1(p) - \Omega(p), \qquad
+  \Omega(p) = H_m(p)\,K_p\,\varepsilon_2(p)
+  \]
+  En substituant successivement :
+  \[
+  \Omega(p) = H_m(p)K_p\left[\frac{K_i}{p}\big(\Omega_{ref}(p)-\Omega(p)\big) - \Omega(p)\right]
+  \]
+  \[
+  \Omega(p)\left[1 + H_m(p)K_p + H_m(p)K_p\frac{K_i}{p}\right] = H_m(p)K_p\frac{K_i}{p}\,\Omega_{ref}(p)
+  \]
+  En multipliant num\'erateur et d\'enominateur par $p$, puis en rempla\c{c}ant $H_m(p) = K_{meca}/(1+\tau_{meca}p)$ et en multipliant \`a nouveau par $(1+\tau_{meca}p)$ :
+  \[
+  H_{BF}(p) = \frac{K_pK_iK_{meca}}{p(1+\tau_{meca}p) + K_pK_{meca}\,p + K_pK_iK_{meca}}
+  = \frac{K_pK_iK_{meca}}{\tau_{meca}p^2 + (1+K_pK_{meca})p + K_pK_iK_{meca}}
+  \]
+  \item En factorisant le d\'enominateur par le terme constant $K_pK_iK_{meca}$ :
+  \[
+  H_{BF}(p) = \dfrac{1}{\dfrac{\tau_{meca}}{K_pK_iK_{meca}}p^2 + \dfrac{1+K_pK_{meca}}{K_pK_iK_{meca}}p + 1}
+  \]
+  Par identification avec la forme canonique :
+  \[
+  \omega_0 = \sqrt{\frac{K_pK_iK_{meca}}{\tau_{meca}}}
+  \qquad\text{et}\qquad
+  m = \frac{\omega_0\,(1+K_pK_{meca})}{2\,K_pK_iK_{meca}}
+  \]
+  \item Avec $T_r = \SI{1}{\second}$, $\omega_0 = 5/T_r = \SI{5}{\radian\per\second}$. De $\omega_0^2 = K_pK_iK_{meca}/\tau_{meca}$ :
+  \[ K_pK_i = \frac{\omega_0^2\,\tau_{meca}}{K_{meca}} = \frac{25\times 8{,}5}{250} = 0{,}85 \]
+  En reportant dans l'expression de $m=1$ :
+  \[
+  \frac{2}{\omega_0} = \frac{1+K_pK_{meca}}{K_pK_iK_{meca}}
+  \;\Longrightarrow\;
+  0{,}4 = \frac{1+250K_p}{0{,}85\times 250}
+  \;\Longrightarrow\;
+  1+250K_p \approx 85
+  \;\Longrightarrow\;
+  K_p \approx 0{,}34
+  \]
+  puis $K_i = 0{,}85/K_p \approx 2{,}5$. On retrouve, aux arrondis de calcul pr\`es, les valeurs $K_p = 0{,}35$ et $K_i = 2{,}5$ du corrig\'e officiel.
+  \item Avec $m=1$ (r\'egime critique, syst\`eme ap\'eriodique, sans r\'esonance), le d\'epassement relatif est nul~: $D\,\% = 0 \leq 5\,\%$. La boucle contient un int\'egrateur pur ($K_i/p$), donc de classe~1~: par le th\'eor\`eme de la valeur finale, l'erreur statique \`a un \'echelon de vitesse est nulle.
+
+  Pour la marge de phase, $m=1$ permet de factoriser le d\'enominateur canonique :
+  \[
+  H_{BF}(p) = \frac{1}{\left(1+\dfrac{p}{\omega_0}\right)^{2}}
+  \qquad\Longrightarrow\qquad
+  \big|H_{BF}(j\omega)\big| = \frac{1}{1+\left(\dfrac{\omega}{\omega_0}\right)^{2}}
+  \]
+  Ce module vaut $1$ (soit \SI{0}{\decibel}) en $\omega \to 0$ et d\'ecro\^it ensuite de fa\c{c}on monotone~: le gain \SI{0}{\decibel} n'est donc atteint qu'\`a pulsation nulle, o\`u $\mathrm{Arg}(H_{BF}) = 0^\circ$. Avec la d\'efinition du sujet :
+  \[ M_\varphi = \mathrm{Arg}\big(H_{BF}(\SI{0}{\decibel})\big) + 180^\circ = 0^\circ + 180^\circ = 180^\circ \geq 90^\circ \]
+  Cette valeur est celle relev\'ee graphiquement sur le diagramme de Bode de $H_{BF}$ (document technique DT4) dans les \'el\'ements de correction du rapport de jury CAPET 2024, questions C10 et C11.
+
+  \textbf{Conclusion.} Les trois exigences du cahier des charges ($D\,\% = 0 \leq 5\,\%$, erreur statique nulle, $M_\varphi = 180^\circ \geq 90^\circ$) sont simultan\'ement respect\'ees par le r\'eglage $K_p \approx 0{,}35$ et $K_i \approx 2{,}5$~: l'autopilotage scalaire est valid\'e dans l'hypoth\`ese id\'eale $\omega_s = \omega_{sref}$. Cette conclusion ne pr\'ejuge pas du cas r\'eel o\`u le variateur pr\'esente un retard du premier ordre, qui d\'egrade le d\'epassement au-del\`a des 5\,\% admis.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

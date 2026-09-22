@@ -1,0 +1,375 @@
+% AUDIT DE VERACITE 2026-09-20 -- corrections des citations de rapport de jury.
+% Bloc 4, encadre jury :
+%   - SUPPRIME la citation attribuee au « Rapport jury 2019 » sur le « couple thermique equivalent » :
+%     verbatim introuvable dans les 8 rapports disponibles (2018-2025) ; la locution « couple thermique »
+%     elle-meme n'apparait dans aucun rapport. Citation fabriquee, aucun remplacement pertinent trouve.
+%   - REMPLACE la citation attribuee au « Rapport jury 2024 » (plage de mesure / tolerance du capteur),
+%     egalement introuvable, par le verbatim authentique du Rapport_Jury_2020.md ligne 703, qui traite
+%     bien de la justification du choix du capteur. Annee de citation corrigee en consequence.
+% Aucun autre contenu de la fiche n'a ete modifie.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ficheHeaders{T05}{Phénomènes thermiques}{colTherm}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TETE
+% -----------------------------------------------------------------------
+
+\ficheEntete{T05}{Phénomènes thermiques}{colTherm}%
+  {Thermique / Instrumentation}%
+  {\textbf{Présence :} \textbf{7/13} sujets (2013-2026) - thème \emph{fréquent}}%
+  {couple thermique équivalent - résistance thermique - capteurs (PT100, thermocouple) - transmetteur 4-20\,mA - vapeur saturée}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colTherm,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Couple thermique equivalent ----------------------------------
+\textbf{1.1 Couple thermique équivalent sur un cycle}
+
+\smallskip
+Un moteur soumis à un cycle de couples $C_{m1}, C_{m2}, \ldots$ de durées $\Delta t_1, \Delta t_2, \ldots$ (période totale $T$) est
+caractérisé par son couple thermique équivalent :
+\[
+  C_{th} = \sqrt{\frac{\sum_{i} C_{mi}^2 \cdot \Delta t_i}{T}}
+\]
+Le courant thermique équivalent $I_{th}$ s'obtient de même ($I_{th}^2 = \sum I_i^2\Delta t_i/T$).
+$C_{th}$ doit être inférieur au couple nominal du moteur pour garantir l'échauffement admissible.
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.2 Resistance thermique -----------------------------------------
+\textbf{1.2 Résistance thermique et modèle thermique}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{llll}
+\toprule
+\textbf{Grandeur} & \textbf{Expression} & \textbf{Unité} & \textbf{Analogie électrique} \\
+\midrule
+Flux thermique (conduction) & $\Phi = \lambda S\,\Delta T/e$ & W & courant \\[4pt]
+Résistance thermique (conduction) & $R_{th} = e/(\lambda S)$ & K/W & résistance \\[4pt]
+Résistance thermique (convection) & $R_{th,conv} = 1/(hS)$ & K/W & résistance \\[4pt]
+Élévation de température & $\Delta T = R_{th} \cdot P$ & K & loi d'Ohm \\[4pt]
+Température jonction & $T_j = T_{amb} + R_{th,ja} \cdot P_{dissipee}$ & $^\circ\mathrm{C}$ & \\[4pt]
+Constante de temps & $\tau_{th} = R_{th} \cdot C_{th,cap}$ & s & $\tau = RC$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\textbf{Circuit thermique équivalent (analogie électrique) :}
+\begin{center}
+\begin{circuitikz}[european, scale=0.9]
+  \draw (0,0) node[left]{$T_j$} to[R, l=$R_{th}$, i>=$\Phi$] (3.4,0) node[right]{$T_{amb}$};
+\end{circuitikz}
+\end{center}
+Le flux thermique $\Phi$ joue le rôle du courant, l'écart de température $\Delta T = T_j - T_{amb}$ celui de la tension : $\Delta T = R_{th} \cdot \Phi$, exactement comme la loi d'Ohm.
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.3 Capteurs de temperature --------------------------------------
+\textbf{1.3 Capteurs de température}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{lllll}
+\toprule
+\textbf{Capteur} & \textbf{Principe} & \textbf{Plage} & \textbf{Sortie} & \textbf{Précision} \\
+\midrule
+PT100 & Résistif ($R$ croît avec $T$) & $-200$ à $+850^\circ\mathrm{C}$ & $\Omega$ & $\pm 0{,}3^\circ\mathrm{C}$ \\[3pt]
+Thermocouple J & Seebeck (Fe/Constantan) & $-30$ à $+700^\circ\mathrm{C}$ & $\mu$V/K & $\pm1{,}5^\circ\mathrm{C}$ cl.1 \\[3pt]
+Thermocouple K & Seebeck (NiCr/Ni) & $-200$ à $+1260^\circ\mathrm{C}$ & $\mu$V/K & $\pm 2{,}2^\circ\mathrm{C}$ cl.1 \\[3pt]
+DS1820 & Numérique, bus 1-Wire & $-55$ à $+125^\circ\mathrm{C}$ & bits & $\pm0{,}5^\circ\mathrm{C}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+PT100 : $R(T) = 100\,(1 + \alpha T)$ avec $\alpha = 3{,}85\times10^{-3}\,\text{K}^{-1}$.
+Thermocouple : $e_{AB} = k_S(T_1 - T_2)$ (effet Seebeck). \textbf{Toujours compenser la jonction froide} si $T_{ref} \neq 0^\circ\mathrm{C}$.
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.4 Transmetteur 4-20 mA -----------------------------------------
+\textbf{1.4 Transmetteur 4-20 mA}
+
+\smallskip
+Relation linéaire entre grandeur physique $T$ et courant $I_{out}$ :
+\[
+  I_{out} = 4 + 16 \cdot \frac{T - T_{min}}{T_{max} - T_{min}} \quad [\text{mA}]
+\]
+$4\,\text{mA} \leftrightarrow T_{min}$ ; $20\,\text{mA} \leftrightarrow T_{max}$ ; $\Delta I = 16\,\text{mA}$ sur toute la plage.
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHETIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colTherm,
+  title={2. Formulaire synthétique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.2cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Thermique moteur}} \\
+$C_{th}^2 = \sum C_{mi}^2\Delta t_i\,/\,T$ & Couple therm. & N$\cdot$m \\
+$I_{th}^2 = \sum I_i^2\Delta t_i\,/\,T$ & Courant therm. & A \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Résistance thermique}} \\
+$R_{th} = e/(\lambda S)$ & Conduction & K/W \\
+$R_{th} = 1/(hS)$ & Convection & K/W \\
+$\Delta T = R_{th} \cdot P$ & Échauffement & K \\
+$T_j = T_{amb} + R_{th,ja} \cdot P$ & Jonction & $^\circ\mathrm{C}$ \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.2cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Capteurs}} \\
+$R(T) = 100(1+\alpha T)$ & PT100 & $\Omega$ \\
+$e = k_S(T_1 - T_2)$ & Thermocouple & V \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Transmetteur 4-20\,mA}} \\
+$I_{out} = 4 + 16\cdot(T-T_{min})/\Delta T_m$ & Conversion & mA \\
+$\Delta T_m = T_{max} - T_{min}$ & Plage capteur & $^\circ\mathrm{C}$ \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Effet Joule}} \\
+$P_J = R\,I^2 = U\,I$ & Source chaleur & W \\
+$\tau_{th} = R_{th} \cdot C_{th,cap}$ & Cste de temps & s \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colTherm,
+  title={3. Questions types - extraites des sujets réels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  colframe=colTherm!55!black, colbacktitle=colTherm!55!black,
+  title={QT1 - Couple thermique équivalent sur un cycle \hfill\normalfont\footnotesize E2 sujet 2019}
+]
+\textbf{Énoncé.}
+Un moteur subit un cycle de période $T = 2048\,\text{s}$.
+Les phases 1 et 2 sont caractérisées par $F_{e1} = 14{,}9\,\text{kN}$, $\Delta t_1 = 42\,\text{s}$ et $F_{e2} = 9{,}2\,\text{kN}$, $\Delta t_2 = 51\,\text{s}$.
+Pour les phases 3 à 18 : $\sum C_{mi}^2\Delta t_i = 558\times10^6\,\text{N}^2\text{m}^2\text{s}$.
+Calculer le couple thermique équivalent $C_{th}$.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Contribution des phases 1 et 2.}
+(Les couples $C_{m1}$, $C_{m2}$ sont calculés à partir des forces et du bras de levier fournis en DT.)
+\[
+  \sum_\text{phases 1 et 2} C_{mi}^2\Delta t_i = C_{m1}^2 \cdot 42 + C_{m2}^2 \cdot 51
+\]
+
+\textbf{Étape 2 — Couple thermique total.}
+\[
+  C_{th} = \sqrt{\frac{C_{m1}^2\cdot42 + C_{m2}^2\cdot51 + 558\times10^6}{2048}}
+\]
+
+\textbf{Conclusion.} Le couple thermique équivalent obtenu doit être comparé au couple nominal du moteur retenu ; s'il lui est inférieur, l'échauffement reste admissible sur le cycle. \textit{Erreur fréquente : oublier de prendre la racine carrée à la fin (on calcule $C_{th}^2$ et non $C_{th}$).}
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  colframe=colTherm!55!black, colbacktitle=colTherm!55!black,
+  title={QT2 - Transmetteur 4-20\,mA - calcul du courant de sortie \hfill\normalfont\footnotesize E2 disciplinaire 2024 (partie E)}
+]
+\textbf{Énoncé.}
+Un transmetteur de température a la plage : $T_{min} = -20^\circ\mathrm{C} \to 4\,\text{mA}$, $T_{max} = +200^\circ\mathrm{C} \to 20\,\text{mA}$.
+Calculer $I_{out}$ pour $T = 120^\circ\mathrm{C}$.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Application de la relation linéaire.}
+\[
+  I_{out} = 4 + 16 \cdot \frac{T - T_{min}}{T_{max} - T_{min}}
+          = 4 + 16 \cdot \frac{120 - (-20)}{200 - (-20)}
+          = 4 + 16 \cdot \frac{140}{220}
+\]
+
+\textbf{Étape 2 — Résultat.}
+\[
+  I_{out} = 4 + 10{,}2 \approx \mathbf{14{,}2\,\text{mA}}
+\]
+
+\textbf{Conclusion.} $14{,}2\,\text{mA}$ est bien compris entre 4 et 20\,mA, cohérent avec $T = 120^\circ\mathrm{C}$ dans la plage $[-20;200]^\circ\mathrm{C}$ : la mesure est exploitable telle quelle par la chaîne d'acquisition.\checkmark
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  colframe=colTherm!55!black, colbacktitle=colTherm!55!black,
+  title={QT3 - Surveillance par PT100 - algorithme et interpolation \hfill\normalfont\footnotesize E2 disciplinaire 2022 (cogénération)}
+]
+\textbf{Énoncé.}
+Trois sondes PT100 ($T_1$, $T_2$, $T_3$) surveillent une canalisation vapeur à $P_s = 12\,\text{bars}$.
+Lire la température de vaporisation dans la table et écrire l'algorithme de surveillance.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Lecture de table.}
+À $P_s = 12\,\text{bars}$ : $T_{vap} = 187{,}96^\circ\mathrm{C}$ (interpolation linéaire si nécessaire).
+
+\textbf{Étape 2 — Algorithme de surveillance.}
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{l}
+\textbf{SI} $(T_1 - T_2 < 12^\circ\mathrm{C})$ \textbf{ET} $(T_3 < 160^\circ\mathrm{C})$ \textbf{ALORS}\\
+\quad état $\leftarrow$ Fonctionnement correct\\
+\textbf{SINON}\\
+\quad état $\leftarrow$ Alarme / Défaut\\
+\textbf{FIN SI}
+\end{tabular}
+\end{center}
+
+\textbf{Conclusion.} $(T_1 - T_2 < 12^\circ\mathrm{C})$ détecte un retour d'eau trop froid (condensats) ; $T_3 < 160^\circ\mathrm{C}$ surveille la vapeur en fin de circuit : ces deux seuils couvrent les deux défauts thermiques les plus probables de l'installation.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs récurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Oublier la racine carrée dans $C_{th}$.}
+  La formule donne $C_{th}^2$ : il faut impérativement extraire $\sqrt{\cdot}$ à la fin.
+  S'arrêter au carré est l'erreur la plus signalée par le jury 2019.
+
+  \item \textbf{Transmetteur 4-20\,mA : $\Delta I = 16\,\text{mA}$, pas 20.}
+  Le courant varie de 4 à 20\,mA, soit une plage de $16\,\text{mA}$.
+  Diviser par 20 au lieu de 16 est une erreur fréquente.
+
+  \item \textbf{Interpolation linéaire dans les tables thermodynamiques.}
+  Si la pression exacte n'est pas tabulée, interpoler entre les deux valeurs encadrantes.
+  Ne pas prendre la valeur la plus proche sans calcul.
+
+  \item \textbf{Thermocouple : compensation de jonction froide.}
+  La tension fournie est $e = k_S(T_{mesure} - T_{ref})$. Si $T_{ref} \neq 0^\circ\mathrm{C}$, appliquer la correction thermique avant de conclure.
+
+  \item \textbf{PT100 vs thermocouple : ne pas confondre les principes.}
+  PT100 : résistif (pont de Wheatstone) - grande précision, plage limitée.
+  Thermocouple : effet Seebeck - plage étendue, sensibilité moindre.
+
+  \item \textbf{Effet Peltier $\neq$ effet Seebeck.}
+  Seebeck : $\Delta T \to e$ (capteur, thermocouple). Peltier : $I \to \Delta T$ (module thermoélectrique). L'effet exploité dans un thermocouple est l'effet Seebeck.
+
+  \item \textbf{Préciser la plage et la tolérance du capteur choisi.}
+  Le jury apprécie de vérifier que la grandeur à mesurer est dans la plage du capteur et de préciser la classe de tolérance.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2020 : «~Le choix du capteur, dans cette partie, est également très rarement justifié. Le jury rappelle que toute conclusion doit être chiffrée en lien avec une grandeur physique.~»
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PRESENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colPresence,
+  title={Présence dans les sujets analysés (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Année} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & - & - & - & - & - & - & - & - & $\checkmark$ & - & $\checkmark$ & - \\
+E2 discipl. IE & - & - & - & $\checkmark$ & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & - & $\checkmark$ & - & $\checkmark$ & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-thèmes fréquents :}
+couple thermique équivalent (5/13) - capteurs PT100/thermocouple (7/13) - transmetteur 4-20\,mA (4/13) - tables vapeur saturée (3/13) - résistance thermique composants (3/13)
+
+\medskip
+\textbf{Ordres de grandeur (repères rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Réseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, fréquence \SI{50}{\hertz}.
+  \item Courants d'étude fréquents en sujet : de quelques \si{\ampere} à quelques dizaines de \si{\ampere}.
+  \item En conversion d'énergie, un rendement attendu reste généralement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthèse express (à refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypothèses du modèle et les conventions de signe.
+  \item Écrire 2 à 4 relations clés avec unités.
+  \item Réaliser un calcul numérique complet et vérifier l'ordre de grandeur.
+  \item Justifier le résultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE

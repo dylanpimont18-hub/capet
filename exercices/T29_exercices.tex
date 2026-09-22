@@ -1,0 +1,907 @@
+% T29 -- Logique sequentielle, GRAFCET -- banque d'exercices
+%
+% =====================================================================
+% 1. RELEVE DE CORPUS (verifie le 2026-09-20, grep sur les .md Marker de
+%    docs/CAPET_Markdown-20260629T134311Z-3-001/.../06_PDFs_Originaux/)
+% =====================================================================
+% Le mot "GRAFCET" n'apparait que DEUX fois dans tout le corpus 2013-2026 :
+%   E1_Sujet_2017.md l.1058 et l.1112 -- et dans les deux cas uniquement
+%   comme intitule du programme STI2D/SI ("Langage de description :
+%   graphe d'etats, logigramme, GRAFCET, algorigramme"), JAMAIS comme
+%   question d'examen. Recherches complementaires infructueuses :
+%   "receptivite" -> 0 occurrence ; "sequentiel" -> 4 occurrences
+%   (2013 l.858 = adressage bus, 2021 E1 l.371/496/522) ; "bascule" ->
+%   uniquement au sens mecanique (basculement de catamaran 2018,
+%   basculement de registres a volets 2013) ; aucune bascule RS/JK/D
+%   dans aucun sujet.
+% CONCLUSION : le GRAFCET n'a jamais ete interroge au CAPET SII IE sur
+%   2013-2026. Les questions de sequentiel reel portent sur le DIAGRAMME
+%   ETATS-TRANSITIONS (2017, 2021) et sur le cablage/parametrage de
+%   demarreurs et automates (2022). Consequence assumee : 3 exercices
+%   sont adaptes de sujets reels, 3 sont INEDITS et signales comme tels
+%   dans leur titre ("exercice inedit"). Aucune reference de sujet n'est
+%   inventee.
+%
+% =====================================================================
+% 2. SOURCES REELLES (relues dans les .md, lignes citees)
+% =====================================================================
+%   - Ex. 2 : 2021, "EDE STI 1 -- Analyse et exploitation pedagogique
+%     d'un systeme pluritechnique", questions 28, 29 et 30.
+%     Enonce : E1_Sujet_2021.md l.496-514 (diagramme etats-transitions
+%     figure 16 de l'automate de sonde ; variables V/presence_bras/
+%     profondeur/mesure_ref/arret_machine decrites dans le tableau
+%     l.500-508 ; V_descente = 0,1 m/s, V_montee = 0,2 m/s ; attente de
+%     10 s a la surface l.492 ; niveau superieur du liquide 2,5 m sous
+%     la position initiale de la sonde l.492 ; N = 0,064 tr/min l.510).
+%     Elements de syntaxe du diagramme (entry/do/exit, "after x s",
+%     "when x=xc") : annexe A6, E1_Sujet_2021.md l.732-758.
+%     CORRIGE OFFICIEL : Rapport_Jury_2021.md l.301-317 --
+%       Q28 : 1/0,064 = 15,6 min par tour, soit 7,8 min entre deux
+%             passages de bras long ;
+%       Q29 : 10 s + 25 s + 10 s + 40 s + 32,5 s = 117,5 s ~ 1,96 min
+%             (descente 2,5 m a 0,1 m/s = 25 s ; descente 4 m a 0,1 m/s
+%             = 40 s ; montee 6,5 m a 0,2 m/s = 32,5 s) ;
+%       Q30 : 2 min < 7,8 min, aucun risque d'enroulement du cable.
+%     La descente de 4 m sous la surface n'est explicitee que par le
+%     corrige : elle est donc DONNEE dans l'enonce de l'exercice.
+%     Citation jury : verbatim exact de Rapport_Jury_2021.md l.455
+%     (commentaire de la Partie 5).
+%
+%   - Ex. 4 : 2017, "EDE STI 1" (sujet commun SII, rame de metro MF 2000),
+%     questions 30 et 32. Enonce et pseudocode : E1_Sujet_2017.md
+%     l.728-816 (machine d'etats-transitions figure 22 du module de
+%     commande du plan de ligne dynamique PLD ; fonctions
+%     Faire_clignoter(Nstation), Eteindre_voyant(Nstation),
+%     Allumer_Tous_Les_Voyants() decrites l.730 ; pseudocode complet
+%     l.752-790 ; variable Sens l.804-810).
+%     CORRIGE OFFICIEL : E1_Corrige_2017.md l.269-292 --
+%       Q30 : Etat 1 = "Attente ouverture des portes", 2 = "Attente
+%             fermeture des portes", 3 = "Portes fermees", 4 = "Inter
+%             stations", 5 = "Etat final" ; bloc 2 a completer :
+%             SI Evt_Ferm_portes==Vrai ALORS Evt_Ferm_Portes=Faux ;
+%             Eteindre_voyant(Nstation) ; Etat<-3 ; FIN_SI.
+%     Le GRAFCET equivalent construit dans le corrige de l'exercice est
+%     une TRADUCTION proposee ici (le sujet ne demandait pas de GRAFCET) :
+%     c'est dit explicitement dans le corrige.
+%
+%   - Ex. 5 (docTech) : 2022, "EDE ENE 1 -- Epreuve ecrite disciplinaire"
+%     (option Ingenierie electrique), question 13.
+%     L'extrait DT B6 reproduit dans le docTech (demarreurs TeSys U en
+%     coffret, arret reflexe / arret standard) est TEXTUELLEMENT present
+%     dans E2_Disciplinaire_IE_2022.md l.681-697 : rien n'y est
+%     reconstitue. Enonce de la question 13 : l.309-311.
+%     CORRIGE OFFICIEL : Rapport_Jury_2022.md l.226-236 -- trois (en fait
+%     quatre) fonctions du TeSys U (protection magnetique, commande,
+%     surveillance d'etat, protection thermique) contre disjoncteur +
+%     contacteur + relais de protection en solution conventionnelle ;
+%     mode "Arret Standard" car l'arret est gere a distance depuis
+%     l'automate ; LUCA12BL car tension de commande 400 V, courant
+%     moteur < 12 A, BL = alimentation continue 24 V ; RM17 TG = relais
+%     de controle de reseaux triphases (ordre des phases L1/L2/L3 et
+%     absence d'une ou plusieurs phases).
+%     Le GRAFCET du convoyeur (questions 3 et 4) est INEDIT : il traduit
+%     le cahier des charges du DT B6, il n'etait pas demande en 2022.
+%     Citation jury : verbatim exact de Rapport_Jury_2022.md l.397.
+%
+% =====================================================================
+% 3. EXERCICES INEDITS (aucune source de sujet revendiquee)
+% =====================================================================
+%   - Ex. 1 : bascules RS et D, chronogramme -- inedit.
+%   - Ex. 3 : GRAFCET d'un poste de percage, divergence/convergence ET
+%     -- inedit.
+%   - Ex. 6 : GRAFCET de securite a deux niveaux (GRAFCET de conduite +
+%     GRAFCET de production) avec forcage -- inedit.
+%   Aucun de ces trois exercices ne porte de reference de sujet : ils
+%   sont titres "exercice inedit".
+%
+% =====================================================================
+% 4. COMPLEMENTARITE AVEC LA FICHE fiches/T29_Logique_Sequentielle_GRAFCET.tex
+% =====================================================================
+% Questions types de la fiche, DELIBEREMENT EVITEES ici :
+%   QT1 = cablage API M340 + variateur ATV630, schemas de puissance et
+%         de commande (2021 E2 appl. commune, Q.19-20) -> aucun exercice
+%         de cablage API/variateur dans ce fichier.
+%   QT2 = algorigramme du bloc fonction "Controler le volume", seuils
+%         5 %/95 % (2021 E2 appl. commune, Q.24) -> aucun exercice
+%         d'algorigramme a seuils.
+%   QT3 = duree de transmission d'une trame UART NMEA 71 caracteres a
+%         115 200 bauds, format 8N1 (2023) -> aucun exercice de liaison
+%         serie.
+% Le Bloc 4 de la fiche traite en outre : le commun 0 V API/variateur,
+% la boucle 4-20 mA, la syntaxe du Texte Structure (:= vs =) et
+% l'opposition action/receptivite. Ces contenus ne sont pas repris ici.
+% Perimetre T28 (combinatoire pur : tables de verite, Karnaugh,
+% logigrammes sans memoire) : non aborde -- tous les exercices de ce
+% fichier portent sur un comportement A MEMOIRE (bascules, etapes,
+% etats).
+%
+% =====================================================================
+% 5. CONFORMITE NORMATIVE DES GRAFCET (NF EN 60848 / CEI 60848)
+% =====================================================================
+% Formalisme verifie par WebSearch/WebFetch le 2026-09-20
+% (fr.wikipedia.org/wiki/Grafcet, qui cite la norme ; recoupe par
+% norminfo.afnor.org/norme/NF%20EN%2060848 et
+% sitelec.org/cours/abati/grafcet1.htm) :
+%   - "Une etape est representee par un carre repere par un numero
+%     identificateur." -> carres numerotes.
+%   - "Une etape initiale est representee par un carre double."
+%     -> option [double] de tikz sur l'etape initiale UNIQUEMENT.
+%   - "Une transition entre deux etapes est representee par une barre
+%     perpendiculaire aux liaisons orientees." -> chaque transition
+%     porte SA barre ; aucune liaison etape->etape sans barre.
+%   - "A chaque transition est associee une receptivite inscrite a
+%     droite de la barre de transition." -> receptivite systematiquement
+%     a droite.
+%   - Actions associees : rectangle relie au COTE DROIT de l'etape.
+%   - Sequences simultanees (ET) : "Le debut et la fin des sequences
+%     simultanees sont representes par DEUX TRAITS PARALLELES"
+%     -> double barre, une SEULE transition avant la divergence ET et
+%     une SEULE apres la convergence ET.
+%   - Selection de sequences (OU) : "Les differentes sequences possibles
+%     sont installees sous UN TRAIT HORIZONTAL" -> simple barre, et une
+%     transition DANS CHAQUE branche (jamais avant la divergence OU).
+%   - Regles d'evolution 2 a 5 : validation (toutes les etapes
+%     immediatement precedentes actives), franchissement (activation des
+%     suivantes + desactivation des precedentes), franchissements
+%     simultanes, et "si une meme etape doit etre simultanement
+%     desactivee et activee, elle reste ACTIVE".
+% Chaque GRAFCET de ce fichier a ete deroule sur un cycle complet dans
+% son corrige : aucune etape bloquante, retour a la situation initiale.
+% =====================================================================
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+% --- styles GRAFCET (NF EN 60848) ------------------------------------
+% etape : carre numerote ; etapeInit : carre double (etape initiale) ;
+% action : rectangle accole a droite de l'etape.
+\tikzset{
+  etape/.style={draw, thick, minimum width=8mm, minimum height=8mm,
+                inner sep=1pt, font=\small},
+  etapeInit/.style={draw, double, double distance=1.1pt, thick,
+                minimum width=8mm, minimum height=8mm,
+                inner sep=1pt, font=\small},
+  action/.style={draw, thick, minimum height=8mm, inner xsep=4pt,
+                inner ysep=1pt, font=\scriptsize, anchor=west},
+  recept/.style={font=\scriptsize, anchor=west},
+}
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T29}} - Exercices - Logique sequentielle}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T29 \quad Logique s\'equentielle, GRAFCET, automates programmables}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 1 -- INEDIT -- bascules RS et D
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Le d\'emarrage d'un tapis convoyeur est command\'e par deux boutons-poussoirs \`a contact \textbf{momentan\'e} : un bouton de marche $m$ et un bouton d'arr\^et $a$. Le contacteur du moteur, command\'e par la sortie $Q$, doit rester enclench\'e apr\`es le rel\^achement de $m$ : la fonction est donc \textbf{m\'emorisante}, et non combinatoire.
+
+On envisage deux r\'ealisations.
+
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item \textbf{Solution A} : une bascule \textbf{RS asynchrone} c\^abl\'ee avec $S = m$ et $R = a$.
+  \item \textbf{Solution B} : une bascule \textbf{D synchrone} sur front montant d'une horloge $H$ de p\'eriode \SI{10}{\milli\second}, avec $D = (m + Q)\cdot\overline{a}$.
+\end{itemize}
+
+Le chronogramme ci-dessous donne le profil des entr\'ees. Les instants $t_1$ \`a $t_5$ rep\`erent les fronts utiles.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.95, every node/.style={scale=0.95}]
+  % axes
+  \foreach \y/\nom in {3.2/$m$, 2.0/$a$, 0.8/$H$} {
+    \draw[->] (0,\y) -- (10.4,\y) node[right,font=\scriptsize]{};
+    \node[left,font=\small] at (-0.1,\y+0.25) {\nom};
+  }
+  % m : impulsion t1 (1.2-2.0) et impulsion t4 (7.0-7.6)
+  \draw[thick] (0,3.2) -- (1.2,3.2) -- (1.2,3.8) -- (2.0,3.8) -- (2.0,3.2)
+        -- (7.0,3.2) -- (7.0,3.8) -- (7.6,3.8) -- (7.6,3.2) -- (10.2,3.2);
+  % a : impulsion t3 (5.0-5.6) et impulsion t5 (9.0-9.6)
+  \draw[thick] (0,2.0) -- (5.0,2.0) -- (5.0,2.6) -- (5.6,2.6) -- (5.6,2.0)
+        -- (9.0,2.0) -- (9.0,2.6) -- (9.6,2.6) -- (9.6,2.0) -- (10.2,2.0);
+  % H : horloge periodique, periode 1.2 (front montant tous les 1.2)
+  \draw[thick] (0,0.8) -- (0.6,0.8) -- (0.6,1.4) -- (1.2,1.4) -- (1.2,0.8)
+        -- (1.8,0.8) -- (1.8,1.4) -- (2.4,1.4) -- (2.4,0.8)
+        -- (3.0,0.8) -- (3.0,1.4) -- (3.6,1.4) -- (3.6,0.8)
+        -- (4.2,0.8) -- (4.2,1.4) -- (4.8,1.4) -- (4.8,0.8)
+        -- (5.4,0.8) -- (5.4,1.4) -- (6.0,1.4) -- (6.0,0.8)
+        -- (6.6,0.8) -- (6.6,1.4) -- (7.2,1.4) -- (7.2,0.8)
+        -- (7.8,0.8) -- (7.8,1.4) -- (8.4,1.4) -- (8.4,0.8)
+        -- (9.0,0.8) -- (9.0,1.4) -- (9.6,1.4) -- (9.6,0.8) -- (10.2,0.8);
+  % reperes
+  \foreach \x/\lab in {1.2/$t_1$, 2.0/$t_2$, 5.0/$t_3$, 7.0/$t_4$, 9.0/$t_5$} {
+    \draw[dotted] (\x,0.4) -- (\x,4.0);
+    \node[below,font=\scriptsize] at (\x,0.35) {\lab};
+  }
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Donner la table de v\'erit\'e de la bascule RS asynchrone et pr\'eciser la combinaison \textbf{interdite}. Indiquer ce qui distingue fondamentalement cette fonction d'une fonction combinatoire.
+  \item Tracer l'\'evolution de $Q$ pour la \textbf{solution A} sur l'intervalle $[0\,;\,t_5]$.
+  \item Tracer l'\'evolution de $Q$ pour la \textbf{solution B}. Pr\'eciser le retard maximal introduit par la synchronisation.
+  \item L'exigence de s\'ecurit\'e du cahier des charges impose que \textbf{l'arr\^et soit prioritaire sur la marche}, et que le temps de r\'eponse \`a un appui sur $a$ n'exc\`ede pas \SI{20}{\milli\second}. Conclure sur les deux solutions.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Table de v\'erit\'e de la bascule RS.}
+  \begin{center}
+  \begin{tabular}{@{}cccl@{}}
+  \toprule
+  $S$ & $R$ & $Q_{n+1}$ & Commentaire \\
+  \midrule
+  0 & 0 & $Q_n$ & \textbf{M\'emorisation} de l'\'etat pr\'ec\'edent \\
+  1 & 0 & 1 & Mise \`a 1 (\emph{Set}) \\
+  0 & 1 & 0 & Mise \`a 0 (\emph{Reset}) \\
+  1 & 1 & \textbf{interdit} & $Q$ et $\overline{Q}$ simultan\'ement impos\'es \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  La ligne $S = R = 0$ est la signature du \textbf{s\'equentiel} : la sortie ne d\'epend pas seulement des entr\'ees pr\'esentes, mais aussi de l'\textbf{\'etat pass\'e} $Q_n$. Une fonction combinatoire (th\`eme T28) associe au contraire une sortie unique \`a chaque combinaison d'entr\'ees, sans m\'emoire. La combinaison $S = R = 1$ est interdite car les deux portes NOR c\^abl\'ees en crois\'e imposeraient $Q = \overline{Q} = 0$ : l'\'etat obtenu \`a la lev\'ee simultan\'ee des deux commandes est alors \textbf{impr\'evisible} (course critique).
+  \item \textbf{Solution A (RS asynchrone).} La bascule r\'eagit \emph{imm\'ediatement} aux fronts :
+  \begin{center}
+  \begin{tikzpicture}[>=Stealth, scale=0.95, every node/.style={scale=0.95}]
+    \draw[->] (0,0.8) -- (10.4,0.8);
+    \node[left,font=\small] at (-0.1,1.05) {$Q_A$};
+    \draw[thick,colExo] (0,0.8) -- (1.2,0.8) -- (1.2,1.4) -- (5.0,1.4) -- (5.0,0.8)
+          -- (7.0,0.8) -- (7.0,1.4) -- (9.0,1.4) -- (9.0,0.8) -- (10.2,0.8);
+    \foreach \x/\lab in {1.2/$t_1$, 2.0/$t_2$, 5.0/$t_3$, 7.0/$t_4$, 9.0/$t_5$} {
+      \draw[dotted] (\x,0.4) -- (\x,1.7);
+      \node[below,font=\scriptsize] at (\x,0.35) {\lab};
+    }
+  \end{tikzpicture}
+  \end{center}
+  $Q_A$ passe \`a 1 sur le front montant de $m$ en $t_1$ et \textbf{y reste} apr\`es le rel\^achement en $t_2$ : c'est bien l'effet m\'emoire recherch\'e (auto-maintien). $Q_A$ retombe \`a 0 d\`es le front montant de $a$ en $t_3$, puis le cycle se reproduit en $t_4$/$t_5$.
+  \item \textbf{Solution B (bascule D synchrone).} La sortie ne change qu'aux \textbf{fronts montants de $H$}, tous les \SI{10}{\milli\second}. Chaque commande est donc prise en compte au premier front montant qui suit son apparition :
+  \begin{center}
+  \begin{tikzpicture}[>=Stealth, scale=0.95, every node/.style={scale=0.95}]
+    \draw[->] (0,0.8) -- (10.4,0.8);
+    \node[left,font=\small] at (-0.1,1.05) {$Q_B$};
+    % fronts montants de H a 0.6, 1.8, 3.0, 4.2, 5.4, 6.6, 7.8, 9.0(front a 9.0)
+    \draw[thick,colExo] (0,0.8) -- (1.8,0.8) -- (1.8,1.4) -- (5.4,1.4) -- (5.4,0.8)
+          -- (7.8,0.8) -- (7.8,1.4) -- (9.6,1.4) -- (9.6,0.8) -- (10.2,0.8);
+    \foreach \x/\lab in {1.2/$t_1$, 5.0/$t_3$, 7.0/$t_4$, 9.0/$t_5$} {
+      \draw[dotted] (\x,0.4) -- (\x,1.7);
+      \node[below,font=\scriptsize] at (\x,0.35) {\lab};
+    }
+    \foreach \x in {1.8,5.4,7.8,9.6} { \draw[dashed,colSlate] (\x,0.4) -- (\x,1.7); }
+    \node[above,font=\scriptsize,colSlate] at (1.8,1.45) {front $H$};
+  \end{tikzpicture}
+  \end{center}
+  Le terme $D = (m + Q)\cdot\overline{a}$ reconstitue l'auto-maintien ($+\,Q$) et l'arr\^et prioritaire ($\cdot\,\overline{a}$). Une commande apparaissant juste apr\`es un front d'horloge attend un cycle complet : le \textbf{retard maximal} vaut donc une p\'eriode d'horloge, soit \SI{10}{\milli\second}.
+  \item \textbf{Analyse des deux exigences.}
+  \begin{itemize}
+    \item \textbf{Arr\^et prioritaire.} La solution A ne le garantit \textbf{pas} : si $m$ et $a$ sont press\'es simultan\'ement, on retombe sur la combinaison interdite $S = R = 1$ et l'\'etat final est ind\'etermin\'e. La solution B le garantit \textbf{par construction}, le facteur $\overline{a}$ forçant $D = 0$ quelle que soit la valeur de $m$.
+    \item \textbf{Temps de r\'eponse.} Solution A : r\'eponse imm\'ediate (quelques dizaines de \si{\nano\second}). Solution B : au pire \SI{10}{\milli\second}, donc $\SI{10}{\milli\second} < \SI{20}{\milli\second}$.
+  \end{itemize}
+
+  \smallskip
+  \textbf{Conclusion.} Seule la \textbf{solution B} satisfait \emph{simultan\'ement} les deux exigences : elle assure la priorit\'e \`a l'arr\^et de mani\`ere d\'eterministe, et son retard maximal de \SI{10}{\milli\second} reste sous la limite de \SI{20}{\milli\second} impos\'ee. La solution A, bien que plus rapide, est \'ecart\'ee car elle laisse subsister un \'etat ind\'etermin\'e sur une commande de s\'ecurit\'e -- un crit\`ere r\'edhibitoire. On retiendra que pour une fonction d'arr\^et, la \textbf{pr\'evisibilit\'e} prime sur la rapidit\'e.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 2 -- 2021 EDE STI 1, questions 28, 29 et 30
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{2} \hfill\normalfont\footnotesize 2021, EDE STI 1, questions 28, 29 et 30}
+]
+\CAPETSHOW{
+Dans une usine de traitement, un \textbf{bras racleur} tourne en continu dans une cuve de d\'ecantation \`a la vitesse $N = \SI{0,064}{\tr\per\minute}$. La cuve comporte \textbf{deux bras longs diam\'etralement oppos\'es}.
+
+Une \textbf{sonde acoustique} suspendue \`a un c\^able descend p\'eriodiquement dans la cuve pour relever le profil de s\'edimentation. Le c\^able ne doit \`a aucun moment se trouver dans la cuve au passage d'un bras long : des d\'etecteurs inductifs v\'erifient l'absence de bras avant chaque descente.
+
+Le comportement s\'equentiel de l'automate de sonde est d\'ecrit par le diagramme \'etats-transitions ci-dessous (formalisme de l'annexe A6 du sujet : \texttt{entry/} action \`a l'entr\'ee de l'\'etat, \texttt{do/} action pendant l'\'etat, \texttt{after x s} apr\`es $x$ secondes, \texttt{when x=xc} lorsqu'une valeur est atteinte).
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.95, every node/.style={scale=0.95},
+   etat/.style={draw, thick, rounded corners=2mm, align=center,
+                font=\scriptsize, inner sep=3pt, minimum width=3.3cm}]
+  \fill (0,5.6) circle (2.4pt);
+  \node[etat] (att) at (0,4.6) {\textbf{Attente}\\ do / sonde immobile};
+  \node[etat] (d1)  at (0,3.2) {\textbf{Descente 1}\\ do / $V = V_{descente}$};
+  \node[etat] (mes) at (0,1.8) {\textbf{Mesure de r\'ef\'erence}\\ entry / mesure\_ref};
+  \node[etat] (d2)  at (0,0.4) {\textbf{Descente 2}\\ do / $V = V_{descente}$};
+  \node[etat] (mon) at (0,-1.0) {\textbf{Mont\'ee}\\ do / $V = V_{montee}$};
+  \draw[->] (0,5.6) -- (att.north);
+  \draw[->] (att) -- (d1) node[midway,right,font=\scriptsize]{\;after 10 s [presence\_bras = 0]};
+  \draw[->] (d1) -- (mes) node[midway,right,font=\scriptsize]{\;when profondeur = \SI{2,5}{\meter}};
+  \draw[->] (mes) -- (d2) node[midway,right,font=\scriptsize]{\;after 10 s};
+  \draw[->] (d2) -- (mon) node[midway,right,font=\scriptsize]{\;when profondeur = \SI{6,5}{\meter}};
+  \draw[->] (mon.west) -- (-3.2,-1.0) -- (-3.2,4.6) -- (att.west);
+  \node[font=\scriptsize,align=center,anchor=east] at (-3.35,1.8)
+        {when\\profondeur\\$=\SI{0}{\meter}$};
+\end{tikzpicture}
+\end{center}
+
+Donn\'ees : $V_{descente} = \SI{0,1}{\meter\per\second}$ ; $V_{montee} = \SI{0,2}{\meter\per\second}$. Le niveau sup\'erieur du liquide se trouve \SI{2,5}{\meter} en dessous de la position initiale de la sonde, et la sonde descend ensuite de \SI{4}{\meter} dans le liquide (soit une profondeur totale parcourue de \SI{6,5}{\meter}).
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Calculer la dur\'ee, en minutes, entre deux passages de bras long \`a l'aplomb de la sonde.
+  \item En d\'etaillant la dur\'ee de chacun des cinq \'etats, d\'eterminer la dur\'ee totale d'un aller-retour complet de la sonde, en secondes puis en minutes.
+  \item Conclure sur le risque, pour le c\^able de sonde, de s'enrouler dans un bras long.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{P\'eriode de passage des bras.} La dur\'ee d'un tour complet du bras vaut l'inverse de la vitesse de rotation :
+  \[ T_{tour} = \frac{1}{N} = \frac{1}{0{,}064} \approx \SI{15,6}{\minute} \]
+  La cuve comportant \textbf{deux} bras longs diam\'etralement oppos\'es, un bras passe \`a l'aplomb de la sonde \textbf{deux fois par tour} :
+  \[ T_{passage} = \frac{T_{tour}}{2} = \frac{15{,}6}{2} = \boldsymbol{\SI{7,8}{\minute}} \]
+  \item \textbf{Dur\'ee d'un aller-retour.} On parcourt le diagramme \'etat par \'etat, chaque dur\'ee \'etant lue soit dans la r\'eceptivit\'e (\texttt{after 10 s}), soit d\'eduite de $t = d/V$ :
+  \begin{center}
+  \begin{tabular}{@{}llc@{}}
+  \toprule
+  \'Etat & Justification & Dur\'ee \\
+  \midrule
+  Attente & \texttt{after 10 s} (attente apr\`es d\'etection) & \SI{10}{\second} \\
+  Descente 1 & \SI{2,5}{\meter} \`a \SI{0,1}{\meter\per\second} : $2{,}5/0{,}1$ & \SI{25}{\second} \\
+  Mesure de r\'ef\'erence & \texttt{after 10 s} (mesure \`a la surface) & \SI{10}{\second} \\
+  Descente 2 & \SI{4}{\meter} \`a \SI{0,1}{\meter\per\second} : $4/0{,}1$ & \SI{40}{\second} \\
+  Mont\'ee & \SI{6,5}{\meter} \`a \SI{0,2}{\meter\per\second} : $6{,}5/0{,}2$ & \SI{32,5}{\second} \\
+  \midrule
+  \multicolumn{2}{@{}l}{\textbf{Total}} & \textbf{\SI{117,5}{\second}} \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  \[ T_{cycle} = 10 + 25 + 10 + 40 + 32{,}5 = \SI{117,5}{\second} = \frac{117{,}5}{60} \approx \boldsymbol{\SI{1,96}{\minute}} \quad\text{(soit quasiment \SI{2}{\minute})} \]
+  On remarquera que la \textbf{mont\'ee} des \SI{6,5}{\meter} est plus rapide que la seule premi\`ere descente de \SI{2,5}{\meter} suivie de la seconde : la vitesse de remont\'ee est doubl\'ee, ce qui n'est pas neutre dans le bilan.
+  \item \textbf{Comparaison des deux dur\'ees.}
+  \[ T_{cycle} \approx \SI{2}{\minute} \quad\ll\quad T_{passage} = \SI{7,8}{\minute} \]
+
+  \smallskip
+  \textbf{Conclusion.} Le cycle complet de la sonde dure environ \SI{2}{\minute}, soit pr\`es de \textbf{quatre fois moins} que l'intervalle de \SI{7,8}{\minute} s\'eparant deux passages de bras long. La sonde a donc tout le temps de descendre, mesurer et remonter entre deux passages : l'exigence de non-enroulement du c\^able est \textbf{respect\'ee}, et ce avec une marge confortable. Cette marge est d'ailleurs indispensable, car la condition de d\'epart \texttt{[presence\_bras = 0]} ne garantit \`a elle seule qu'une chose : l'absence de bras \emph{\`a l'instant du lancement}. C'est bien la comparaison des deux dur\'ees, et non le seul d\'etecteur inductif, qui valide la s\'ecurit\'e du dispositif.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2021, commentaire de la partie 5) : \guillemotleft\ Cette partie a \'et\'e moins trait\'ee que les autres. Le jury constate, comme pour les mod\`eles multiphysiques, que la maitrise du langage Python est tr\`es d\'ependante des sp\'ecialit\'es pr\'esent\'ees et reste globalement tr\`es insuffisante. Les calculs cin\'ematiques manquent de rigueur. \guillemotright}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 3 -- INEDIT -- GRAFCET, divergence/convergence ET
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Un poste de per\c{c}age automatis\'e usine des pi\`eces amen\'ees une \`a une sur un plateau. Le cahier des charges est le suivant.
+
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item Au repos, le bridage est desserr\'e et la broche est en position haute ($h$ = 1).
+  \item Un appui sur le bouton de d\'epart de cycle $dcy$, la pi\`ece \'etant pr\'esente ($p$ = 1), lance le \textbf{serrage} de la pi\`ece (action $SER$) jusqu'\`a l'information de pi\`ece serr\'ee $s$.
+  \item La pi\`ece serr\'ee, on lance \textbf{simultan\'ement} la \textbf{descente de la broche} (action $DES$, jusqu'au capteur de fin de per\c{c}age $b$) et l'\textbf{arrosage} de la zone d'usinage (action $ARR$, pendant une dur\'ee fixe de \SI{6}{\second}). Ces deux actions sont ind\'ependantes et de dur\'ees diff\'erentes.
+  \item Lorsque les deux op\'erations sont \emph{toutes les deux} termin\'ees, la broche \textbf{remonte} (action $MON$) jusqu'au capteur haut $h$.
+  \item La broche en haut, le bridage se \textbf{desserre} (action $DES\!S$) jusqu'\`a l'information $\overline{s}$, et le syst\`eme revient au repos.
+\end{itemize}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Justifier que la structure \`a employer pour les op\'erations simultan\'ees est une \textbf{divergence en ET} et non une divergence en OU. Pr\'eciser ce qui distingue graphiquement les deux structures dans la norme NF EN 60848.
+  \item Tracer le GRAFCET complet du poste, conforme \`a la norme NF EN 60848 (\'etapes num\'erot\'ees, \'etape initiale en double carr\'e, barres de transition avec r\'eceptivit\'es, actions en rectangle).
+  \item D\'erouler un cycle complet et v\'erifier qu'aucune \'etape ne reste bloqu\'ee et que le GRAFCET revient bien \`a sa situation initiale.
+  \item Un technicien propose de supprimer les \'etapes d'attente situ\'ees juste avant la convergence en ET, \guillemotleft\ pour simplifier \guillemotright. Analyser cette proposition au regard des r\`egles d'\'evolution, et conclure.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{ET ou OU ?} La descente de broche et l'arrosage doivent \^etre men\'es \textbf{en parall\`ele} : ce ne sont pas deux chemins \emph{alternatifs} entre lesquels le syst\`eme choisirait, mais deux s\'equences \emph{simultan\'ement} actives. C'est la d\'efinition m\^eme de la divergence en ET (s\'equences simultan\'ees). Une divergence en OU (s\'election de s\'equences) aiguillerait au contraire vers \emph{une seule} branche selon la r\'eceptivit\'e vraie, ce qui reviendrait ici \`a percer \emph{ou} arroser -- contraire au cahier des charges.
+
+  \smallskip
+  Distinction graphique selon la norme NF EN 60848 :
+  \begin{center}
+  \begin{tabular}{@{}lll@{}}
+  \toprule
+  & \textbf{Divergence en ET} & \textbf{Divergence en OU} \\
+  \midrule
+  Trait & \textbf{double} barre horizontale & \textbf{simple} barre horizontale \\
+  Transitions & \textbf{une seule}, \emph{avant} la double barre & \textbf{une par branche}, \emph{apr\`es} la barre \\
+  Effet & toutes les branches activ\'ees & une seule branche activ\'ee \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  \textbf{Faute classique} : placer une transition dans chaque branche sous une double barre. La double barre ne porte \emph{jamais} de r\'eceptivit\'e dans ses branches : la synchronisation est d\'ej\`a assur\'ee par la barre elle-m\^eme.
+  \item \textbf{GRAFCET du poste de per\c{c}age.}
+  \begin{center}
+  \begin{tikzpicture}[>=Stealth, scale=1.0, every node/.style={scale=1.0}]
+    % --- etape initiale 0
+    \node[etapeInit] (e0) at (0,8.2) {0};
+    % transition dcy.p
+    \draw[thick] (0,7.8) -- (0,7.4);
+    \draw[very thick] (-0.35,7.4) -- (0.35,7.4);
+    \node[recept] at (0.45,7.4) {$dcy \cdot p$};
+    \draw[->,thick] (0,7.4) -- (0,7.0);
+    % etape 1 : serrage
+    \node[etape] (e1) at (0,6.6) {1};
+    \node[action] at (0.4,6.6) {$SER$ \ serrage};
+    % transition s
+    \draw[thick] (0,6.2) -- (0,5.8);
+    \draw[very thick] (-0.35,5.8) -- (0.35,5.8);
+    \node[recept] at (0.45,5.8) {$s$};
+    \draw[->,thick] (0,5.8) -- (0,5.5);
+    % --- DIVERGENCE ET : double barre
+    \draw[very thick] (-3.4,5.45) -- (3.4,5.45);
+    \draw[very thick] (-3.4,5.32) -- (3.4,5.32);
+    \node[font=\scriptsize,colSlate,anchor=east] at (-3.5,5.39) {divergence ET};
+    % branche gauche : etape 2 descente
+    \draw[->,thick] (-2.6,5.32) -- (-2.6,4.9);
+    \node[etape] (e2) at (-2.6,4.5) {2};
+    \node[action] at (-2.2,4.5) {$DES$ \ descente};
+    \draw[thick] (-2.6,4.1) -- (-2.6,3.7);
+    \draw[very thick] (-2.95,3.7) -- (-2.25,3.7);
+    \node[recept] at (-2.15,3.7) {$b$};
+    \draw[->,thick] (-2.6,3.7) -- (-2.6,3.3);
+    \node[etape] (e3) at (-2.6,2.9) {3};
+    \node[recept,font=\scriptsize,colSlate] at (-2.2,2.9) {attente};
+    % branche droite : etape 4 arrosage
+    \draw[->,thick] (1.4,5.32) -- (1.4,4.9);
+    \node[etape] (e4) at (1.4,4.5) {4};
+    \node[action] at (1.8,4.5) {$ARR$ \ arrosage};
+    \draw[thick] (1.4,4.1) -- (1.4,3.7);
+    \draw[very thick] (1.05,3.7) -- (1.75,3.7);
+    \node[recept] at (1.85,3.7) {$t/X4/\SI{6}{\second}$};
+    \draw[->,thick] (1.4,3.7) -- (1.4,3.3);
+    \node[etape] (e5) at (1.4,2.9) {5};
+    \node[recept,font=\scriptsize,colSlate] at (1.8,2.9) {attente};
+    % --- CONVERGENCE ET : double barre
+    \draw[thick] (-2.6,2.5) -- (-2.6,2.25);
+    \draw[thick] (1.4,2.5) -- (1.4,2.25);
+    \draw[very thick] (-3.4,2.25) -- (3.4,2.25);
+    \draw[very thick] (-3.4,2.12) -- (3.4,2.12);
+    \node[font=\scriptsize,colSlate,anchor=east] at (-3.5,2.19) {convergence ET};
+    % transition = 1 apres la convergence
+    \draw[thick] (0,2.12) -- (0,1.8);
+    \draw[very thick] (-0.35,1.8) -- (0.35,1.8);
+    \node[recept] at (0.45,1.8) {$=1$};
+    \draw[->,thick] (0,1.8) -- (0,1.4);
+    % etape 6 : montee
+    \node[etape] (e6) at (0,1.0) {6};
+    \node[action] at (0.4,1.0) {$MON$ \ mont\'ee};
+    \draw[thick] (0,0.6) -- (0,0.2);
+    \draw[very thick] (-0.35,0.2) -- (0.35,0.2);
+    \node[recept] at (0.45,0.2) {$h$};
+    \draw[->,thick] (0,0.2) -- (0,-0.2);
+    % etape 7 : desserrage
+    \node[etape] (e7) at (0,-0.6) {7};
+    \node[action] at (0.4,-0.6) {$DESS$ \ desserrage};
+    \draw[thick] (0,-1.0) -- (0,-1.4);
+    \draw[very thick] (-0.35,-1.4) -- (0.35,-1.4);
+    \node[recept] at (0.45,-1.4) {$\overline{s}$};
+    % reprise vers etape 0
+    \draw[thick] (0,-1.4) -- (-6.4,-1.4) -- (-6.4,8.2);
+    \draw[->,thick] (-6.4,8.2) -- (e0.west);
+  \end{tikzpicture}
+  \end{center}
+  Les \'etapes 3 et 5 sont des \textbf{\'etapes d'attente} sans action : elles mat\'erialisent la fin de chaque branche et permettent la synchronisation.
+  \item \textbf{D\'eroulement d'un cycle complet.}
+  \begin{center}
+  \begin{tabular}{@{}llp{7.6cm}@{}}
+  \toprule
+  \'Etape(s) active(s) & R\'eceptivit\'e & \'Ev\'enement \\
+  \midrule
+  \{0\} & $dcy\cdot p$ & D\'epart de cycle, pi\`ece pr\'esente $\rightarrow$ \{1\} \\
+  \{1\} & $s$ & Serrage termin\'e $\rightarrow$ franchissement de la transition unique, la \textbf{double barre active 2 ET 4} $\rightarrow$ \{2, 4\} \\
+  \{2, 4\} & $b$ & Fin de per\c{c}age (par ex. \`a $t = \SI{4}{\second}$) $\rightarrow$ \{3, 4\} \\
+  \{3, 4\} & $t/X4/\SI{6}{\second}$ & Fin d'arrosage ($t = \SI{6}{\second}$) $\rightarrow$ \{3, 5\} \\
+  \{3, 5\} & $=1$ & Les \textbf{deux} \'etapes amont de la convergence \'etant actives, la transition (r\'eceptivit\'e toujours vraie) est franchie $\rightarrow$ \{6\} \\
+  \{6\} & $h$ & Broche en haut $\rightarrow$ \{7\} \\
+  \{7\} & $\overline{s}$ & Desserrage effectif $\rightarrow$ \{0\} : \textbf{retour \`a la situation initiale} \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  Le cycle se referme sur l'\'etape 0 et aucune \'etape n'est bloquante : chaque \'etape poss\`ede une transition aval dont la r\'eceptivit\'e devient vraie. Le sc\'enario invers\'e (arrosage termin\'e avant le per\c{c}age) conduit \`a la s\'equence $\{2,4\} \rightarrow \{2,5\} \rightarrow \{3,5\}$ et aboutit au m\^eme r\'esultat : la convergence attend syst\'ematiquement \textbf{la plus lente des deux branches}.
+  \item \textbf{Analyse de la proposition du technicien.} Supprimer les \'etapes 3 et 5 reviendrait \`a faire aboutir directement les transitions $b$ et $t/X4/\SI{6}{\second}$ sur la double barre de convergence. Or la r\`egle d'\'evolution impose qu'une transition ne soit franchissable que si \textbf{toutes} ses \'etapes imm\'ediatement pr\'ec\'edentes sont actives : sans \'etape d'attente, la branche la plus rapide n'aurait nulle part o\`u \guillemotleft\ patienter \guillemotright. Le franchissement ne pourrait se produire que si $b$ et la fin de temporisation \'etaient vraies \textbf{exactement au m\^eme instant} -- \'ev\'enement de probabilit\'e nulle en pratique. Le GRAFCET se bloquerait donc d\`es le premier cycle.
+
+  \smallskip
+  \textbf{Conclusion.} La proposition doit \^etre \textbf{rejet\'ee} : les \'etapes d'attente 3 et 5 ne sont pas un ornement mais la condition m\^eme du fonctionnement de la convergence en ET. Le cahier des charges impose que la remont\'ee n'intervienne qu'apr\`es l'ach\`evement des \emph{deux} op\'erations ; le GRAFCET propos\'e le garantit pour toute r\'epartition des dur\'ees de per\c{c}age et d'arrosage, ce qui est pr\'ecis\'ement le r\^ole d'une synchronisation.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 4 -- 2017 EDE STI 1, questions 30 et 32
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{3} \hfill\normalfont\footnotesize 2017, EDE STI 1, questions 30 et 32}
+]
+\CAPETSHOW{
+Les rames de m\'etro MF 2000 embarquent un \textbf{plan de ligne dynamique} (PLD) : une barrette de diodes \'electroluminescentes, une par station, dont l'\'etat (allum\'e fixe, clignotant, \'eteint) informe le voyageur de la progression de la rame. La ligne comporte $N$ stations $X(1)$ \`a $X(N)$.
+
+Le module de commande dispose de trois proc\'edures : \texttt{Faire\_clignoter(Nstation)}, \texttt{Eteindre\_voyant(Nstation)} et \texttt{Allumer\_Tous\_Les\_Voyants()}. Quatre \'ev\'enements bool\'eens sont fournis par l'informatique de s\'ecurit\'e du train : \texttt{Evt\_Ouv\_Portes}, \texttt{Evt\_Ferm\_Portes}, \texttt{Evt\_Sortie\_Station} et \texttt{Evt\_Entree\_Station}. Ces variables sont remises \`a \texttt{Faux} par le programme apr\`es prise en compte.
+
+Un extrait du pseudocode implant\'e (variable enti\`ere \texttt{Etat} de 1 \`a 5) est donn\'e ci-dessous. \textbf{L'initialisation} place \texttt{Etat} $\leftarrow$ 1, allume tous les voyants, puis fait clignoter le voyant de la station 1.
+
+\begin{tcolorbox}[docTech, title={Extrait du pseudocode du module de commande (bloc 2 lacunaire)}]
+\footnotesize\ttfamily
+TANT\_QUE Etat < 5\\
+\hspace*{1em}SELON Etat\\
+\hspace*{2em}1 : SI Evt\_Ouv\_Portes==Vrai ALORS\\
+\hspace*{3em}Evt\_Ouv\_Portes$\leftarrow$Faux ; Etat$\leftarrow$2\\
+\hspace*{2em}FIN\_SI\\
+\hspace*{2em}\ \ \ \ SI Evt\_Sortie\_Station==Vrai ALORS\\
+\hspace*{3em}Evt\_Sortie\_Station$\leftarrow$Faux ; Eteindre\_voyant(Nstation)\\
+\hspace*{3em}Etat$\leftarrow$4 ; Faire\_clignoter(Next\_Station)\\
+\hspace*{2em}FIN\_SI\\[3pt]
+\hspace*{2em}2 : \underline{\hspace{3.2cm}}\ \ \emph{(bloc \`a compl\'eter)}\\[3pt]
+\hspace*{2em}3 : SI Evt\_Ouv\_Portes==Vrai ALORS\\
+\hspace*{3em}Evt\_Ouv\_Portes$\leftarrow$Faux ; Faire\_clignoter(Nstation) ; Etat$\leftarrow$2\\
+\hspace*{2em}FIN\_SI\\
+\hspace*{2em}\ \ \ \ SI Evt\_Sortie\_Station==Vrai ALORS\\
+\hspace*{3em}Evt\_Sortie\_Station$\leftarrow$Faux\\
+\hspace*{3em}SI Nstation==N ALORS Etat$\leftarrow$5\\
+\hspace*{3em}SINON Etat$\leftarrow$4 ; Faire\_clignoter(Next\_Station) FIN\_SI\\
+\hspace*{2em}FIN\_SI\\[3pt]
+\hspace*{2em}4 : SI Evt\_Entree\_Station==Vrai ALORS\\
+\hspace*{3em}Evt\_Entree\_Station$\leftarrow$Faux\\
+\hspace*{3em}Nstation=Nstation+1 ; Next\_Station=Next\_Station+1 ; Etat$\leftarrow$1\\
+\hspace*{2em}FIN\_SI\\
+\hspace*{1em}FIN\_SELON\\
+FIN\_TANT\_QUE
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Donner le \textbf{nom} de chacun des cinq \'etats correspondant aux cinq valeurs de la variable \texttt{Etat}.
+  \item Compl\'eter le \textbf{bloc 2} du pseudocode. Indiquer quel \'ev\'enement il doit tester et quelle action sur le voyant il doit d\'eclencher.
+  \item Tracer le \textbf{chronogramme} de l'\'etat du voyant de la station 5, puis de celui de la station 6, dans le cas $Sens = 0$ et $N > 8$. Le chronogramme d\'ebute avec la rame \`a quai en station 5, portes ferm\'ees, voyant 5 \textbf{allum\'e fixe}. Les \'ev\'enements successifs sont : ouverture des portes, fermeture des portes, sortie de station, entr\'ee en station 6.
+  \item V\'erifier que le comportement obtenu est conforme au cahier des charges : \guillemotleft\ le voyageur doit \`a tout instant pouvoir identifier la station o\`u se trouve la rame, et distinguer un arr\^et en station d'un inter-stations \guillemotright. Conclure.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Nom des cinq \'etats} (corrig\'e officiel du sujet) :
+  \begin{center}
+  \begin{tabular}{@{}cl@{}}
+  \toprule
+  Valeur de \texttt{Etat} & Nom de l'\'etat \\
+  \midrule
+  1 & Attente ouverture des portes \\
+  2 & Attente fermeture des portes \\
+  3 & Portes ferm\'ees \\
+  4 & Inter-stations \\
+  5 & \'Etat final \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  La condition de boucle \texttt{TANT\_QUE Etat < 5} confirme que l'\'etat 5 est bien l'\textbf{\'etat final} : il provoque la sortie de la boucle, ce qui correspond au terminus ($Nstation == N$).
+  \item \textbf{Bloc 2 \`a compl\'eter.} L'\'etat 2 est \guillemotleft\ attente fermeture des portes \guillemotright\ : il teste donc \texttt{Evt\_Ferm\_Portes}. Le voyageur \'etant sur le point de repartir, le voyant de la station courante, jusque-l\`a clignotant (arr\^et en cours), doit \^etre \textbf{\'eteint} :
+  \begin{center}
+  \begin{minipage}{0.86\linewidth}\ttfamily\small
+  2 : SI Evt\_Ferm\_Portes==Vrai ALORS\\
+  \hspace*{1em}Evt\_Ferm\_Portes$\leftarrow$Faux\\
+  \hspace*{1em}Eteindre\_voyant(Nstation)\\
+  \hspace*{1em}Etat$\leftarrow$3\\
+  FIN\_SI
+  \end{minipage}
+  \end{center}
+  Noter la \textbf{remise \`a Faux syst\'ematique} de la variable d'\'ev\'enement : sans elle, la condition resterait vraie et l'automate rebouclerait ind\'efiniment sur la m\^eme transition. C'est la traduction logicielle de la consommation d'un \'ev\'enement.
+  \item \textbf{Chronogramme des voyants 5 et 6.} On suit les changements d'\'etat successifs :
+  \begin{center}
+  \begin{tikzpicture}[>=Stealth, scale=0.92, every node/.style={scale=0.92}]
+    % bandes d'etat
+    \foreach \x/\lab in {0.6/3, 3.0/2, 5.4/3, 7.8/4, 10.2/1} {
+      \node[font=\scriptsize,colSlate] at (\x+1.2,4.55) {\'Etat \lab};
+    }
+    \draw[colRule] (0.6,4.3) -- (12.6,4.3);
+    % voyant 5
+    \draw[->] (0.6,2.8) -- (12.9,2.8);
+    \node[left,font=\small] at (0.5,3.05) {V5};
+    % fixe (0.6-3.0) : palier haut plein
+    \draw[very thick,colExo] (0.6,3.4) -- (3.0,3.4);
+    \draw[thick,colExo] (0.6,2.8) -- (0.6,3.4);
+    % clignotant (3.0-5.4) : creneaux
+    \draw[thick,colExo] (3.0,3.4) -- (3.0,2.8);
+    \foreach \x in {3.0,3.6,4.2,4.8} {
+      \draw[thick,colExo] (\x,2.8) -- (\x,3.4) -- (\x+0.3,3.4) -- (\x+0.3,2.8) -- (\x+0.6,2.8);
+    }
+    % eteint (5.4-12.6)
+    \draw[thick,colExo] (5.4,2.8) -- (12.6,2.8);
+    % voyant 6
+    \draw[->] (0.6,1.0) -- (12.9,1.0);
+    \node[left,font=\small] at (0.5,1.25) {V6};
+    % eteint 0.6-7.8 puis clignotant 7.8-12.6
+    \draw[thick,colMeca] (0.6,1.0) -- (7.8,1.0);
+    \foreach \x in {7.8,8.4,9.0,9.6,10.2,10.8,11.4,12.0} {
+      \draw[thick,colMeca] (\x,1.0) -- (\x,1.6) -- (\x+0.3,1.6) -- (\x+0.3,1.0) -- (\x+0.6,1.0);
+    }
+    % evenements
+    \foreach \x/\lab in {3.0/{ouv.\\portes}, 5.4/{ferm.\\portes}, 7.8/{sortie\\station}, 10.2/{entr\'ee\\stat. 6}} {
+      \draw[dotted] (\x,0.4) -- (\x,4.3);
+      \node[below,font=\scriptsize,align=center] at (\x,0.35) {\lab};
+    }
+    \node[right,font=\scriptsize] at (1.0,3.75) {fixe};
+    \node[right,font=\scriptsize] at (3.6,3.75) {clignotant};
+    \node[right,font=\scriptsize] at (5.8,3.1) {\'eteint};
+    \node[right,font=\scriptsize] at (8.4,1.95) {clignotant};
+  \end{tikzpicture}
+  \end{center}
+  Lecture~: \'etat 3 (portes ferm\'ees, \`a quai) voyant 5 \textbf{fixe} ; ouverture des portes $\rightarrow$ \'etat 2, \texttt{Faire\_clignoter(5)} donc voyant 5 \textbf{clignotant} ; fermeture des portes $\rightarrow$ \'etat 3, \texttt{Eteindre\_voyant(5)} donc voyant 5 \textbf{\'eteint} ; sortie de station $\rightarrow$ \'etat 4, \texttt{Faire\_clignoter(6)} donc voyant 6 \textbf{clignotant} ; entr\'ee en station 6 $\rightarrow$ \'etat 1, \texttt{Nstation} passe \`a 6 et le voyant 6 reste clignotant dans l'attente de l'ouverture des portes.
+  \item \textbf{Conformit\'e au cahier des charges.} Les trois \'etats visuels du PLD codent sans ambigu\"it\'e trois situations distinctes :
+  \begin{itemize}
+    \item \textbf{allum\'e fixe} $\rightarrow$ station non encore desservie (\'etat initial de tous les voyants) ;
+    \item \textbf{clignotant} $\rightarrow$ station \emph{courante} ou \emph{prochaine} station, selon que la rame est \`a quai ou en inter-stations ;
+    \item \textbf{\'eteint} $\rightarrow$ station d\'ej\`a desservie et quitt\'ee.
+  \end{itemize}
+  Le voyageur identifie donc \`a tout instant la position de la rame par l'unique voyant clignotant, et il extingue progressivement le trajet parcouru.
+
+  \smallskip
+  \textbf{Conclusion.} Le comportement du PLD est \textbf{conforme} \`a l'exigence : il n'existe jamais deux voyants clignotants simultan\'ement, et le passage clignotant~$\rightarrow$~\'eteint co\"incide exactement avec la fermeture des portes, c'est-\`a-dire avec le dernier instant o\`u le voyageur peut encore descendre. Une r\'eserve subsiste toutefois : la distinction \guillemotleft\ \`a quai \guillemotright\ / \guillemotleft\ inter-stations \guillemotright\ repose sur un \emph{m\^eme} code visuel (clignotement) appliqu\'e \`a deux stations diff\'erentes ; elle n'est lisible que si le voyageur conna\^it le sens de circulation -- ce qui justifie pr\'ecis\'ement l'introduction de la variable \texttt{Sens} dans la suite du sujet.
+
+  \smallskip
+  \textit{Remarque m\'ethodologique.} Ce diagramme \'etats-transitions se traduit sans difficult\'e en GRAFCET : chaque \'etat devient une \'etape, chaque \'ev\'enement une r\'eceptivit\'e, chaque appel de proc\'edure une action associ\'ee \`a l'\'etape. Le sujet 2017 ne demandait pas cette traduction -- elle est propos\'ee ici comme exercice de transposition entre deux langages de description normalis\'es du m\^eme comportement s\'equentiel.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 5 -- docTech -- 2022 EDE ENE 1, question 13
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize 2022, EDE ENE 1 (option IE), question 13 (document technique DT~B6)}
+]
+\CAPETSHOW{
+Une station de relevage de condensats met en \oe uvre des groupes de pompes command\'es depuis des coffrets de puissance. Afin d'optimiser l'encombrement tout en am\'eliorant les performances du mat\'eriel \'electrique, le bureau d'\'etudes remplace la solution conventionnelle -- \textbf{disjoncteur + contacteur + relais de protection} -- par un \textbf{d\'emarreur-contr\^oleur TeSys~U LUB12}.
+
+\begin{tcolorbox}[docTech, title={Document technique DT B6 -- D\'emarreur-contr\^oleur LUB12}]
+\footnotesize
+Les d\'emarreurs en coffret TeSys U sont con\c{c}us pour commander des moteurs \'electriques principalement pour des syst\`emes de convoyage. L'arr\^et du moteur est command\'e par des capteurs de position de 2 mani\`eres diff\'erentes, en fonction du raccordement des capteurs :
+
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item les capteurs sont raccord\'es directement sur le d\'emarreur : \textbf{arr\^et r\'eflexe} ;
+  \item les capteurs sont raccord\'es au d\'emarreur via le bus AS-Interface : \textbf{arr\^et standard}.
+\end{itemize}
+
+\textbf{Fonction \guillemotleft\ Arr\^et standard \guillemotright}\\
+L'arr\^et du moteur est g\'er\'e \`a distance depuis l'automate programmable en fonction de l'\'etat des capteurs transmis sur le bus AS-Interface.
+
+\smallskip
+\textbf{Fonction \guillemotleft\ Arr\^et r\'eflexe \guillemotright}\\
+L'arr\^et du moteur est g\'er\'e localement via les capteurs par action directe sur le d\'emarreur. L'\'etat des capteurs est aussi transmis \`a l'automate programmable par le bus AS-Interface.
+\end{tcolorbox}
+
+L'\'etude du sch\'ema \'electrique du coffret montre que \textbf{les capteurs de position sont raccord\'es au bus AS-Interface}, et non directement sur le d\'emarreur.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever} dans le document technique les deux modes d'arr\^et propos\'es par le TeSys~U, et pour chacun \textbf{indiquer} o\`u est physiquement raccord\'e le capteur de position et qui prend la d\'ecision d'arr\^et. \textbf{En d\'eduire}, \`a partir de l'information de c\^ablage donn\'ee ci-dessus, le mode dans lequel le module LUB12 est configur\'e.
+  \item \textbf{Citer} les fonctions remplies par le TeSys~U LUB12 et les confronter aux trois appareils de la solution conventionnelle qu'il remplace.
+  \item Le convoyeur \'equip\'e de ce d\'emarreur ob\'eit au cahier des charges suivant : au repos, tapis \`a l'arr\^et ; un appui sur $dcy$ lance le tapis en marche avant (action $KM1$) ; le tapis s'arr\^ete quand le capteur de fin de course $fc$ d\'etecte la pi\`ece ; apr\`es une temporisation de \SI{3}{\second} (transfert de la pi\`ece), le tapis repart en marche arri\`ere (action $KM2$) jusqu'au capteur de position initiale $pi$, puis revient au repos. \textbf{Tracer} le GRAFCET correspondant, conforme \`a la norme NF EN 60848.
+  \item Le mode d'arr\^et identifi\'e \`a la question 1 est-il compatible avec un arr\^et d'urgence conforme \`a la cat\'egorie d'arr\^et 0 (coupure imm\'ediate de l'\'energie) ? \textbf{Conclure} sur la pertinence du choix effectu\'e par le bureau d'\'etudes pour cette application.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\textbf{\'Etape 1 -- Extraction des donn\'ees du document technique.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le DT~B6 distingue explicitement deux modes selon le \textbf{raccordement du capteur} :
+  \begin{center}
+  \begin{tabular}{@{}lll@{}}
+  \toprule
+  Mode & Raccordement du capteur & D\'ecision d'arr\^et \\
+  \midrule
+  \textbf{Arr\^et r\'eflexe} & directement sur le d\'emarreur & \textbf{locale}, action directe sur le d\'emarreur \\
+  \textbf{Arr\^et standard} & via le bus AS-Interface & \textbf{\`a distance}, par l'automate programmable \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  Le sch\'ema \'electrique indiquant que les capteurs sont raccord\'es \textbf{au bus AS-Interface}, le module TeSys~U LUB12 est donc configur\'e en \textbf{mode arr\^et standard} : l'arr\^et du moteur est g\'er\'e \`a distance depuis l'automate programmable en fonction de l'\'etat des capteurs transmis sur le bus.
+
+  \smallskip
+  \emph{Pi\`ege de lecture} : les deux modes ne se distinguent \textbf{pas} par la pr\'esence ou l'absence du bus AS-Interface. Dans les \emph{deux} cas l'\'etat des capteurs remonte \`a l'automate ; ce qui change, c'est le \textbf{chemin de la d\'ecision d'arr\^et}. En arr\^et r\'eflexe, le bus ne sert qu'\`a la supervision.
+  \item \textbf{Fonctions du TeSys~U LUB12.} Le d\'emarreur-contr\^oleur int\`egre dans un seul appareil : la \textbf{protection magn\'etique} (court-circuit), la \textbf{commande} (fonction contacteur), la \textbf{protection thermique} (surcharge) et la \textbf{surveillance d'\'etat} (remont\'ee des informations de d\'efaut). Il remplace \`a lui seul les trois appareils de la solution conventionnelle :
+  \begin{center}
+  \begin{tabular}{@{}ll@{}}
+  \toprule
+  Solution conventionnelle & Fonction reprise par le TeSys~U \\
+  \midrule
+  Disjoncteur & protection magn\'etique \\
+  Contacteur & commande \\
+  Relais de protection & protection thermique \\
+  \emph{(aucun \'equivalent)} & \textbf{surveillance d'\'etat} (fonction ajout\'ee) \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  La surveillance d'\'etat est bien la fonction \textbf{suppl\'ementaire} : c'est elle qui justifie la mention \guillemotleft\ tout en am\'eliorant les performances \guillemotright\ du cahier des charges, au-del\`a du seul gain d'encombrement.
+  \item \textbf{GRAFCET du convoyeur.}
+  \begin{center}
+  \begin{tikzpicture}[>=Stealth, scale=1.0, every node/.style={scale=1.0}]
+    \node[etapeInit] (e0) at (0,5.6) {0};
+    \draw[thick] (0,5.2) -- (0,4.8);
+    \draw[very thick] (-0.35,4.8) -- (0.35,4.8);
+    \node[recept] at (0.45,4.8) {$dcy$};
+    \draw[->,thick] (0,4.8) -- (0,4.4);
+    \node[etape] (e1) at (0,4.0) {1};
+    \node[action] at (0.4,4.0) {$KM1$ \ marche avant};
+    \draw[thick] (0,3.6) -- (0,3.2);
+    \draw[very thick] (-0.35,3.2) -- (0.35,3.2);
+    \node[recept] at (0.45,3.2) {$fc$};
+    \draw[->,thick] (0,3.2) -- (0,2.8);
+    \node[etape] (e2) at (0,2.4) {2};
+    \node[action] at (0.4,2.4) {transfert (attente)};
+    \draw[thick] (0,2.0) -- (0,1.6);
+    \draw[very thick] (-0.35,1.6) -- (0.35,1.6);
+    \node[recept] at (0.45,1.6) {$t/X2/\SI{3}{\second}$};
+    \draw[->,thick] (0,1.6) -- (0,1.2);
+    \node[etape] (e3) at (0,0.8) {3};
+    \node[action] at (0.4,0.8) {$KM2$ \ marche arri\`ere};
+    \draw[thick] (0,0.4) -- (0,0.0);
+    \draw[very thick] (-0.35,0.0) -- (0.35,0.0);
+    \node[recept] at (0.45,0.0) {$pi$};
+    \draw[thick] (0,0.0) -- (-2.6,0.0) -- (-2.6,5.6);
+    \draw[->,thick] (-2.6,5.6) -- (e0.west);
+  \end{tikzpicture}
+  \end{center}
+  \textbf{V\'erification du cycle} : $\{0\} \xrightarrow{dcy} \{1\} \xrightarrow{fc} \{2\} \xrightarrow{t/X2/3s} \{3\} \xrightarrow{pi} \{0\}$. Le cycle se referme, aucune \'etape n'est bloquante. On notera l'exclusion mutuelle structurelle entre $KM1$ (\'etape 1) et $KM2$ (\'etape 3) : deux \'etapes d'une m\^eme s\'equence lin\'eaire ne pouvant jamais \^etre actives simultan\'ement, le GRAFCET interdit \textbf{par construction} le court-circuit entre les deux sens de marche -- ce qui ne dispense \'evidemment pas du verrouillage \'electrique c\^abl\'e sur les contacteurs.
+  \item \textbf{Compatibilit\'e avec un arr\^et d'urgence de cat\'egorie 0.} En arr\^et standard, la cha\^ine de d\'ecision est : capteur $\rightarrow$ bus AS-Interface $\rightarrow$ automate $\rightarrow$ bus $\rightarrow$ d\'emarreur. Elle cumule donc le temps de cycle du bus, celui de l'automate et le temps de retour, soit typiquement plusieurs dizaines de millisecondes, et elle d\'epend du bon fonctionnement de trois \'equipements distincts. Un arr\^et de cat\'egorie 0 exige au contraire la \textbf{coupure imm\'ediate de l'\'energie} par un circuit c\^abl\'e ind\'ependant de tout traitement programm\'e.
+
+  \smallskip
+  \textbf{Conclusion.} Le mode arr\^et standard retenu est \textbf{pertinent pour l'arr\^et fonctionnel} du convoyeur -- celui qui stoppe le tapis en fin de course -- car il centralise la logique dans l'automate et facilite les \'evolutions du cycle sans remaniement du c\^ablage. Il est en revanche \textbf{inapte \`a assurer seul la fonction d'arr\^et d'urgence} : la s\'ecurit\'e des personnes impose un circuit d\'edi\'e agissant directement sur l'alimentation de puissance, ind\'ependamment du bus et de l'automate. Le choix du bureau d'\'etudes est donc valid\'e \emph{sous r\'eserve} que la fonction d'arr\^et d'urgence soit trait\'ee par une cha\^ine de s\'ecurit\'e s\'epar\'ee -- confusion entre arr\^et fonctionnel et arr\^et de s\'ecurit\'e que le jury sanctionne r\'eguli\`erement.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2022, commentaire de la deuxi\`eme partie de l'\'epreuve \'ecrite disciplinaire) : \guillemotleft\ La lecture des diagrammes SYSML et l'utilisation de formules fournies sont globalement maitris\'ees. [\dots] La mise en concordance des diff\'erents documents constructeurs et des sch\'emas \'electriques n'a pas \'et\'e r\'eussie pour une part importante des candidats. La lecture et la r\'ealisation de sch\'emas \'electriques est un attendu fondamental d'un candidat au CAPET. \guillemotright}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 6 -- INEDIT -- GRAFCET hierarchise, divergence OU, forcage
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Une machine de conditionnement doit \^etre pilot\'ee selon deux modes de marche s\'electionn\'es par un commutateur : \textbf{cycle unique} ($cu$ = 1) ou \textbf{cycle continu} ($cc$ = 1, avec $cu$ et $cc$ exclusifs). Le cycle de production lui-m\^eme comporte deux \'etapes : remplissage (action $REM$, jusqu'au niveau $n$) puis bouchage (action $BOU$, jusqu'au capteur $fb$).
+
+La machine doit en outre \^etre \'equipable d'un \textbf{arr\^et d'urgence} $AU$ : sur appui, toutes les actions doivent cesser imm\'ediatement et la machine doit se retrouver dans un \'etat s\^ur, quel que soit le point du cycle atteint.
+
+On choisit une structuration en \textbf{deux GRAFCET} : un GRAFCET de \textbf{conduite} (G1) qui g\`ere les modes et la s\'ecurit\'e, et un GRAFCET de \textbf{production} (G2) qui d\'ecrit le cycle. G1 agit sur G2 par \textbf{for\c{c}age}, not\'e $G2\{\,\}$ (for\c{c}age \`a la situation vide, toutes \'etapes d\'esactiv\'ees) ou $G2\{X10\}$ (for\c{c}age \`a la situation o\`u seule l'\'etape 10 est active).
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Dans le GRAFCET de production, le choix entre \guillemotleft\ recommencer un cycle \guillemotright\ et \guillemotleft\ s'arr\^eter \guillemotright\ en fin de bouchage est une alternative. Pr\'eciser la structure normalis\'ee \`a employer, et \'ecrire les deux r\'eceptivit\'es en v\'erifiant qu'elles sont bien \textbf{exclusives}.
+  \item Tracer les deux GRAFCET G1 et G2 conformes \`a la norme NF EN 60848.
+  \item D\'erouler le fonctionnement en cycle continu, puis l'appui sur $AU$ au milieu d'un remplissage. V\'erifier qu'aucune \'etape ne reste bloqu\'ee et que le syst\`eme revient \`a un \'etat s\^ur puis \`a sa situation initiale apr\`es acquittement.
+  \item Un coll\`egue propose de se passer de G1 en ajoutant simplement $\overline{AU}$ dans chaque r\'eceptivit\'e de G2. Analyser cette proposition et conclure sur la structuration retenue.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Structure : divergence en OU} (s\'election de s\'equences). Elle se repr\'esente par une \textbf{simple} barre horizontale, avec une \textbf{transition dans chaque branche} (et non une transition unique avant la barre, qui serait la structure ET). Les deux r\'eceptivit\'es sont :
+  \[ \text{branche \guillemotleft\ recommencer \guillemotright} : \; fb \cdot cc \qquad\qquad \text{branche \guillemotleft\ s'arr\^eter \guillemotright} : \; fb \cdot \overline{cc} \]
+  \textbf{V\'erification de l'exclusivit\'e} : le produit des deux r\'eceptivit\'es vaut $fb \cdot cc \cdot fb \cdot \overline{cc} = fb \cdot cc \cdot \overline{cc} = 0$, puisque $cc \cdot \overline{cc} = 0$. Les deux transitions ne peuvent donc jamais \^etre franchissables simultan\'ement : le GRAFCET reste d\'eterministe. C'est une v\'erification \textbf{obligatoire} sur toute divergence en OU ; deux r\'eceptivit\'es non exclusives activeraient les deux branches \`a la fois, ce qui transformerait sournoisement la s\'election en s\'equences simultan\'ees.
+  \item \textbf{GRAFCET de conduite G1 et de production G2.}
+  \begin{center}
+  \begin{tikzpicture}[>=Stealth, scale=0.92, every node/.style={scale=0.92}]
+    % ================= G1 : conduite =================
+    \node[font=\small\bfseries,colExo] at (-4.3,6.5) {G1 -- conduite};
+    \node[etapeInit] (a0) at (-4.3,5.5) {100};
+    \node[action,font=\scriptsize] at (-3.9,5.5) {$G2\{\,\}$};
+    \draw[thick] (-4.3,5.1) -- (-4.3,4.7);
+    \draw[very thick] (-4.65,4.7) -- (-3.95,4.7);
+    \node[recept] at (-3.85,4.7) {$\overline{AU}\cdot dcy$};
+    \draw[->,thick] (-4.3,4.7) -- (-4.3,4.3);
+    \node[etape] (a1) at (-4.3,3.9) {101};
+    \node[action,font=\scriptsize] at (-3.9,3.9) {$G2\{X10\}$};
+    \draw[thick] (-4.3,3.5) -- (-4.3,3.1);
+    \draw[very thick] (-4.65,3.1) -- (-3.95,3.1);
+    \node[recept] at (-3.85,3.1) {$=1$};
+    \draw[->,thick] (-4.3,3.1) -- (-4.3,2.7);
+    \node[etape] (a2) at (-4.3,2.3) {102};
+    \node[action,font=\scriptsize] at (-3.9,2.3) {production};
+    \draw[thick] (-4.3,1.9) -- (-4.3,1.5);
+    \draw[very thick] (-4.65,1.5) -- (-3.95,1.5);
+    \node[recept] at (-3.85,1.5) {$AU$};
+    \draw[->,thick] (-4.3,1.5) -- (-4.3,1.1);
+    \node[etape] (a3) at (-4.3,0.7) {103};
+    \node[action,font=\scriptsize] at (-3.9,0.7) {$G2\{\,\}$ ; alarme};
+    \draw[thick] (-4.3,0.3) -- (-4.3,-0.1);
+    \draw[very thick] (-4.65,-0.1) -- (-3.95,-0.1);
+    \node[font=\scriptsize,anchor=south] at (-5.7,-0.05) {$\overline{AU}\cdot acq$};
+    % retour de G1 : entierement a gauche, ne croise jamais G2
+    \draw[thick] (-4.3,-0.1) -- (-7.1,-0.1) -- (-7.1,5.5);
+    \draw[->,thick] (-7.1,5.5) -- (a0.west);
+
+    % separation visuelle des deux graphes
+    \draw[colRule,dashed] (-1.9,-0.6) -- (-1.9,6.7);
+
+    % ================= G2 : production =================
+    \node[font=\small\bfseries,colExo] at (2.4,6.5) {G2 -- production};
+    \node[etape] (b0) at (2.4,5.5) {10};
+    \node[font=\scriptsize,colSlate,anchor=south] at (2.4,5.95) {attente};
+    \draw[thick] (2.4,5.1) -- (2.4,4.7);
+    \draw[very thick] (2.05,4.7) -- (2.75,4.7);
+    \node[recept] at (2.85,4.7) {$X102$};
+    \draw[->,thick] (2.4,4.7) -- (2.4,4.3);
+    \node[etape] (b1) at (2.4,3.9) {11};
+    \node[action] at (2.8,3.9) {$REM$ \ remplissage};
+    \draw[thick] (2.4,3.5) -- (2.4,3.1);
+    \draw[very thick] (2.05,3.1) -- (2.75,3.1);
+    \node[recept] at (2.85,3.1) {$n$};
+    \draw[->,thick] (2.4,3.1) -- (2.4,2.7);
+    \node[etape] (b2) at (2.4,2.3) {12};
+    \node[action] at (2.8,2.3) {$BOU$ \ bouchage};
+    % liaison vers la divergence OU
+    \draw[thick] (2.4,1.9) -- (2.4,1.5);
+    % --- DIVERGENCE OU : SIMPLE barre
+    \draw[very thick] (0.4,1.5) -- (4.4,1.5);
+    \node[font=\scriptsize,colSlate,anchor=west] at (4.5,1.5) {divergence OU};
+    % branche gauche : recommencer (fb.cc) -> transition DANS la branche
+    \draw[thick] (0.4,1.5) -- (0.4,1.0);
+    \draw[very thick] (0.05,1.0) -- (0.75,1.0);
+    \node[font=\scriptsize,anchor=east] at (-0.05,1.0) {$fb\cdot cc$};
+    \draw[thick] (0.4,1.0) -- (0.4,0.3) -- (1.1,0.3) -- (1.1,3.9);
+    \draw[->,thick] (1.1,3.9) -- (b1.west);
+    % branche droite : arreter (fb.cc barre) -> transition DANS la branche
+    \draw[thick] (4.4,1.5) -- (4.4,1.0);
+    \draw[very thick] (4.05,1.0) -- (4.75,1.0);
+    \node[recept] at (4.85,1.0) {$fb\cdot \overline{cc}$};
+    \draw[thick] (4.4,1.0) -- (4.4,0.3) -- (6.2,0.3) -- (6.2,5.5);
+    \draw[->,thick] (6.2,5.5) -- (b0.east);
+  \end{tikzpicture}
+  \end{center}
+  Dans G2, l'\'etape 10 est une \'etape d'attente : G2 n'a \textbf{pas} d'\'etape initiale propre puisque sa situation de d\'epart est impos\'ee par le for\c{c}age de G1 (\'etape 101). L'\'etape 102 de G1 reste active pendant toute la production ; la r\'eceptivit\'e $X102$ dans G2 exprime que le cycle n'est autoris\'e que si G1 est effectivement en mode production.
+  \item \textbf{D\'eroulement.}
+
+  \smallskip
+  \emph{(a) D\'emarrage et cycle continu} ($cc = 1$) :
+  \begin{center}
+  \begin{tabular}{@{}lll@{}}
+  \toprule
+  G1 & G2 & \'Ev\'enement \\
+  \midrule
+  \{100\} & $\varnothing$ (forc\'e vide) & \'etat initial, machine \`a l'arr\^et \\
+  \{101\} & \{10\} & appui $dcy$ : G1 force G2 \`a $X10$ \\
+  \{102\} & \{10\} & franchissement imm\'ediat ($=1$) \\
+  \{102\} & \{11\} & $X102$ vraie : remplissage en cours \\
+  \{102\} & \{12\} & niveau $n$ atteint : bouchage \\
+  \{102\} & \{11\} & $fb\cdot cc$ : \textbf{reprise} d'un nouveau cycle \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  En cycle unique ($cc = 0$), c'est la branche $fb\cdot\overline{cc}$ qui est emprunt\'ee : G2 revient \`a l'\'etape 10 et y attend, la machine restant sous tension mais inactive.
+
+  \smallskip
+  \emph{(b) Appui sur $AU$ pendant le remplissage} (G2 en \'etape 11) : la r\'eceptivit\'e $AU$ de la transition aval de l'\'etape 102 devient vraie. G1 passe en \'etape 103, dont l'action $G2\{\,\}$ force G2 \`a la \textbf{situation vide} : l'\'etape 11 est d\'esactiv\'ee \emph{instantan\'ement} et l'action $REM$ cesse, \textbf{quel que soit} le point du cycle atteint. L'alarme est activ\'ee. Apr\`es rel\^achement de l'arr\^et d'urgence et acquittement ($\overline{AU}\cdot acq$), G1 revient \`a l'\'etape 100, qui maintient G2 \`a vide : le syst\`eme est revenu \`a sa \textbf{situation initiale}, pr\^et pour un nouveau $dcy$. Aucune \'etape n'est bloqu\'ee dans l'un ou l'autre graphe.
+  \item \textbf{Analyse de la proposition \guillemotleft\ $\overline{AU}$ dans chaque r\'eceptivit\'e \guillemotright.} Elle est \textbf{inefficace}, pour une raison qui tient \`a la d\'efinition m\^eme de la r\'eceptivit\'e : une r\'eceptivit\'e conditionne le \emph{franchissement d'une transition}, c'est-\`a-dire le \emph{passage} d'une \'etape \`a la suivante. Ajouter $\overline{AU}$ emp\^eche donc le GRAFCET d'\textbf{avancer}, mais ne d\'esactive \textbf{pas} l'\'etape en cours : sur appui de $AU$ pendant le remplissage, l'\'etape 11 resterait active et l'action $REM$ continuerait ind\'efiniment, la cuve d\'ebordant. C'est l'inverse exact du comportement attendu.
+
+  \smallskip
+  Le for\c{c}age agit au contraire sur la \textbf{situation} du GRAFCET forc\'e : il impose l'ensemble des \'etapes actives, donc d\'esactive les actions en cours. C'est l'op\'eration appropri\'ee \`a une fonction de s\'ecurit\'e.
+
+  \smallskip
+  \textbf{Conclusion.} La structuration en deux GRAFCET hi\'erarchis\'es doit \^etre \textbf{conserv\'ee} : elle seule garantit l'exigence \guillemotleft\ toutes les actions cessent imm\'ediatement, quel que soit le point du cycle atteint \guillemotright, parce que le for\c{c}age agit sur les \'etapes actives et non sur les transitions. Elle pr\'esente en outre l'avantage de conception majeur de \textbf{s\'eparer les pr\'eoccupations} : G2 d\'ecrit le proc\'ed\'e et reste lisible, G1 concentre modes de marche et s\'ecurit\'e. Ajouter un troisi\`eme mode (marche pas \`a pas, par exemple) se fera par modification de G1 seul, sans toucher au cycle de production -- crit\`ere de maintenabilit\'e d\'eterminant en exploitation industrielle. On rappellera enfin qu'aucun GRAFCET, f\^ut-il forc\'e, ne remplace la \textbf{cha\^ine d'arr\^et d'urgence c\^abl\'ee} agissant directement sur la puissance.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

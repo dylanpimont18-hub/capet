@@ -1,0 +1,407 @@
+﻿\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colAuto}{T26}} - Modelisation des systemes lineaires (automatique)}
+\fancyhead[R]{\small\textit{CAPET SII IE - Session 2026}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TeTE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colAuto,
+  colframe=colAuto,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T26 \quad Modelisation des systemes lineaires (automatique)}\\[2pt]
+  {\color{colAuto!30!white}\small
+    \textbf{Domaine :} Automatique - Modelisation et analyse des systemes \quad
+    \textbf{Presence :} \textbf{9/13} sujets (2013-2026) - theme \emph{fondamental}
+  }\\[1pt]
+  {\color{colAuto!20!white}\footnotesize
+    Sous-themes : transformee de Laplace - FdT 1\textsuperscript{er}/2\textsuperscript{e} ordre - identification graphique - schema-bloc FTBF - modele MCC - diagramme de Bode - representation d'etat
+  }
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colAuto,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Transformee de Laplace ----------------------------------------
+\textbf{1.1 Transformee de Laplace - transformees usuelles}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lll}
+\toprule
+\textbf{$f(t)$} & \textbf{$F(p)$} & \textbf{Remarque} \\
+\midrule
+echelon $u(t)$ & $1/p$ & \\
+Rampe $t\,u(t)$ & $1/p^2$ & \\
+Exponentielle $e^{-t/\tau}$ & $\dfrac{1}{1+\tau p}$ & \\
+Derivee $f'(t)$ & $p\,F(p)$ & CI nulles (Heaviside) \\
+Integrale $\int_0^t f$ & $F(p)/p$ & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 FdT 1er ordre ------------------------------------------------
+\textbf{1.2 Systeme du 1\textsuperscript{er} ordre - forme canonique}
+
+\[
+  H(p) = \frac{K}{1 + \tau\,p}
+\]
+Reponse indicielle : $s(t) = K\,E_0\,(1 - e^{-t/\tau})$ \quad;\quad $t_{r5\%} \approx 3\tau$
+
+\textbf{Identification sur l'essai indiciel :}
+\begin{itemize}
+  \item $K = s(\infty)/E_0$ (valeur finale / echelon)
+  \item $\tau$ : temps pour atteindre $63{,}2\,\%$ de $K\,E_0$ (methode tangente)
+\end{itemize}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 FdT 2e ordre -------------------------------------------------
+\textbf{1.3 Systeme du 2\textsuperscript{e} ordre - forme canonique}
+
+\[
+  H(p) = \frac{K}{1 + \dfrac{2m}{\omega_0}\,p + \dfrac{p^2}{\omega_0^2}}
+  \qquad
+  D\% = 100\,e^{-m\pi/\sqrt{1-m^2}} \quad (m<1)
+\]
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lll}
+\toprule
+$m > 1$ & Sur-amorti & Pas d'oscillations \\
+$m = 1$ & Critique & Retour le plus rapide sans depassement \\
+$m < 1$ & Sous-amorti & Oscillations et resonance \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 Modele de la MCC ---------------------------------------------
+\textbf{1.4 Modele de la machine - courant continu (MCC)}
+
+\[
+  u(t) = R\,i(t) + L\,\frac{di}{dt} + e(t)
+  \qquad;\qquad
+  e(t) = K_e\,\Omega(t)
+  \qquad;\qquad
+  K_e = K_c
+\]
+
+En regime permanent : $U = R\,I + K_e\,\Omega$ ; fonction de transfert moteur-mecanisme :
+\[
+  \frac{\Omega(p)}{U(p)} = \frac{K_m}{1 + \tau_m\,p}
+  \qquad K_m = \frac{1}{K_e} \qquad \tau_m = \frac{J\,R}{K_e^2 + f_v\,R}
+\]
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.5 Schema-bloc - boucle fermee ----------------------------------
+\textbf{1.5 Schema-bloc - regles de manipulation}
+
+\[
+  H_{BF}(p) = \frac{H_D(p)}{1 + H_D(p)\,H_R(p)} \quad \text{(retour negatif)}
+  \qquad
+  H_{BO}(p) = H_D(p)\,H_R(p)
+\]
+
+Erreur statique en poursuite (classe 0) :
+\[
+  \varepsilon_s = \frac{E}{1 + K_{BO}} \qquad (\text{nulle si integrateur en BO})
+\]
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.6 Representation d'etat -----------------------------------------
+\textbf{1.6 Representation d'etat}
+
+\[
+  \dot{\mathbf{x}}(t) = A\,\mathbf{x}(t) + B\,\mathbf{u}(t)
+  \qquad;\qquad
+  \mathbf{y}(t) = C\,\mathbf{x}(t) + D\,\mathbf{u}(t)
+\]
+Utilisee pour le modele moyen d'un convertisseur elevateur (2025 E1).
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHeTIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colAuto,
+  title={2. Formulaire synthetique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Transformee de Laplace}} \\
+$\mathcal{L}\{f'(t)\} = p\,F(p)$ & CI nulles & - \\
+$\mathcal{L}\{e^{-t/\tau}\} = 1/(1+\tau p)$ & Expo & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{FdT 1\textsuperscript{er} ordre}} \\
+$H(p) = K/(1+\tau p)$ & Forme canon. & - \\
+$t_{r5\%} \approx 3\tau$ & Rapidite & s \\
+$K = s(\infty)/E_0$ & Identification & - \\
+$\tau$ : - $63{,}2\,\%$ de $K\,E_0$ & Identification & s \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{FdT 2\textsuperscript{e} ordre}} \\
+$H = K/(1+2mp/\omega_0+p^2/\omega_0^2)$ & Forme canon. & - \\
+$D\% = 100\,e^{-m\pi/\sqrt{1-m^2}}$ & Depassement & \% \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Boucle fermee}} \\
+$H_{BF} = H_D/(1+H_{BO})$ & FTBF & - \\
+$\varepsilon_s = E/(1+K_{BO})$ & Erreur statique & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{MCC}} \\
+$U = RI + K_e\Omega$ & Regime perm. & V \\
+$K_e = K_c$ & [Ves/rad] = [Nem/A] & \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colAuto,
+  title={3. Questions types - extraites des sujets reels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+% Mini-procedure de resolution type copie concours
+\begin{tcolorbox}[questiontype,title={Procedure type copie concours (5 etapes)}]
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Qualifier le modele} : hypotheses, domaine de validite, grandeurs d'entree/sortie.
+  \item \textbf{Ecrire les lois} : equations de base avec symboles et unites SI.
+  \item \textbf{Isoler l'inconnue} : expression litterale, puis application numerique tracee.
+  \item \textbf{Controler l'ordre de grandeur} : coherence physique et unite finale.
+  \item \textbf{Conclure concours} : phrase courte orientee decision technique.
+\end{enumerate}
+\end{tcolorbox}
+
+% Visuel de methode : chemin de resolution CAPET
+\begin{center}
+\begin{tikzpicture}[font=\small, node distance=7mm and 6mm, >=Stealth]
+  \node[draw, rounded corners, fill=colElec!8, inner sep=4pt] (n1) {Notions};
+  \node[draw, rounded corners, fill=colElec!8, right=of n1, inner sep=4pt] (n2) {Methode};
+  \node[draw, rounded corners, fill=colElec!8, right=of n2, inner sep=4pt] (n3) {Application annale};
+  \node[draw, rounded corners, fill=colElec!8, right=of n3, inner sep=4pt] (n4) {Verification jury};
+  \draw[->, thick, colElec] (n1) -- (n2);
+  \draw[->, thick, colElec] (n2) -- (n3);
+  \draw[->, thick, colElec] (n3) -- (n4);
+\end{tikzpicture}
+\end{center}
+\begin{tcolorbox}[questiontype,
+  title={QT1 - MCC - equation electrique et identification de $K_e$ \hfill\normalfont\footnotesize E1 2026 (A1-A4)}
+]
+\textbf{enonce.}
+MCC d'une porte de bus (R = 6,6 O ; L = 100 mH ; $K_e$ = 1,044 Veserad$^{-1}$). ecrire l'equation electrique de l'induit. Simplifier en regime permanent. Exprimer $R$ - partir d'un essai rotor bloque ($\Omega = 0$). Retrouver $K_e$ - partir des conditions nominales.
+
+\tcbline
+
+\textbf{Corrige.}
+
+equation electrique de l'induit (loi des mailles) :
+\[
+  u(t) = R\,i(t) + L\,\frac{di}{dt} + e(t) \quad;\quad e(t) = K_e\,\Omega(t)
+\]
+
+Regime permanent ($di/dt = 0$) : $U = R\,I + K_e\,\Omega$.
+
+Rotor bloque ($\Omega = 0$, $e = 0$) : $U_{bl} = R\,I_{bl}$ - $R = U_{bl}/I_{bl}$.
+
+$K_e$ - partir du nominal : $K_e = (U_{nom} - R\,I_{nom})/\Omega_{nom}$.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - FdT depuis l'essai indiciel - 1\textsuperscript{er} ordre \hfill\normalfont\footnotesize E1 2026 (C4)}
+]
+\textbf{enonce.}
+L'essai indiciel d'un element de la chaene d'asservissement montre une reponse qui part de 0 et atteint une valeur finale. Proposer un ordre. Construire graphiquement $K$ et $\tau$. Exprimer $H_2(p)$ sous forme canonique.
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{Ordre :} la reponse exponentielle croissante sans oscillation - systeme du \textbf{1\textsuperscript{er} ordre}.
+
+\textbf{Lecture graphique :}
+\begin{itemize}
+  \item $K = s(\infty)/E_0$ : lire la valeur finale divisee par l'echelon.
+  \item $\tau$ : abscisse du point - $63{,}2\,\%$ de $s(\infty)$ (ou intersection de la tangente - l'origine avec le plateau).
+\end{itemize}
+
+\textbf{Forme canonique :} $H_2(p) = \dfrac{K}{1 + \tau\,p}$ avec les valeurs lues numeriquement.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - FTBF du 2\textsuperscript{e} ordre - depassement nul \hfill\normalfont\footnotesize E1 2026 (C7-C8)}
+]
+\textbf{enonce.}
+La FTBF d'un asservissement avec correcteur $K_C$ est :
+$H_{BF}(p) = \dfrac{K_C\,K_m}{1 + (R + K_C\,K_m\,K_{gt})/(K_e)\,\tau_m\,p + \tau_m\,p^2}$.
+Montrer qu'elle se met sous la forme canonique du 2\textsuperscript{e} ordre. Exprimer $m$ en fonction de $K_C$. En deduire $K_C$ assurant $D\% = 0$.
+
+\tcbline
+
+\textbf{Corrige.}
+
+Identification par lecture de la forme canonique :
+\[
+  \omega_0^2 = \frac{K_C\,K_m}{\tau_m} \quad;\quad 2m\,\omega_0 = \frac{R + K_C\,K_m\,K_{gt}}{K_e\,\tau_m}
+\]
+
+$D\% = 0$ - $m \geq 1$. Resoudre $m(K_C) = 1$ - valeur limite $K_{Clim}$.
+
+Pour $K_C \leq K_{Clim}$ : $m \geq 1$ - depassement nul. Verifier aussi $M_\varphi$ (Bode).
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs recurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Maetriser les conditions de Heaviside.} Tout passage equation differentielle - FdT suppose des conditions initiales nulles. Le mentionner explicitement avant d'appliquer la transformee de Laplace.
+
+  \item \textbf{Mettre sous forme canonique avec demonstration.} Recopier la formule finale sans demonstration est sanctionne. Derouler chaque etape d'identification.
+
+  \item \textbf{Identification - $63{,}2\,\%$, pas - $50\,\%$ ni - $90\,\%$.} L'erreur sur la lecture de $\tau$ est frequente - tracer la droite horizontale - $0{,}632 \times K\,E_0$ sur le document reponse.
+
+  \item \textbf{Homogeneite et unites.} $K_e$ [Veserad$^{-1}$] = $K_c$ [NemeA$^{-1}$] numeriquement - ne pas les confondre. Les unites du gain statique $K$ dependent de celles de sortie/entree.
+
+  \item \textbf{Signe du retour dans $H_{BF}$.} $H_{BF} = H_D/(1 + H_{BO})$ : le signe $+$ au denominateur correspond - un retour \textbf{negatif}. Un retour positif donnerait $1 - H_{BO}$ - instabilite.
+
+  \item \textbf{Theme le plus decrie.} Jury 2023 : "L'automatique est un champ disciplinaire auquel les candidats ne peuvent se soustraire. Le jury invite les candidats - revoir les concepts de base." - reviser en priorite.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2025 : "Le jury deplore le manque de maetrise des lois basiques de l'electricite necessaires pour etablir les fonctions de transfert. Les expressions litterales homogenes et les unites correctes sont imperatives."\\
+Rapport jury 2024 : "La mise sous forme canonique du 2\textsuperscript{e} ordre est exigee avec $m$ et $\omega_0$ explicitement identifies. Ne pas se contenter de factoriser sans nommer les parametres."
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PReSENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colGrayLight,
+  colframe=colSeparator,
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+  before skip=4pt, after skip=0pt,
+  fonttitle=\small\bfseries,
+  title={Presence dans les sujets analyses (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Annee} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & - & - & $\checkmark$ & - & $\checkmark$ & $\checkmark$ & - & $\checkmark$ & - & $\checkmark$ & - & $\checkmark$ \\
+E2 discipl. IE & - & $\checkmark$ & - & - & - & - & - & $\checkmark$ & - & - & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+E2 appl. comm. & - & - & - & - & - & - & - & - & - & - & - & $\checkmark$ & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-themes frequents :}
+equation electrique MCC + regime permanent - FdT 1\textsuperscript{er} ordre (identification graphique $K$, $\tau$) - FTBF 2\textsuperscript{e} ordre ($m$, $\omega_0$) - depassement nul - erreur statique (classe 0 vs 1)
+
+\medskip
+\textbf{Ordres de grandeur (reperes rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Reseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, frequence \SI{50}{\hertz}.
+  \item Courants d'etude frequents en sujet : de quelques \si{\ampere} a quelques dizaines de \si{\ampere}.
+  \item En conversion d'energie, un rendement attendu reste generalement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthese express (a refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypotheses du modele et les conventions de signe.
+  \item Ecrire 2 a 4 relations cles avec unites.
+  \item Realiser un calcul numerique complet et verifier l'ordre de grandeur.
+  \item Justifier le resultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE
+
+
+
+
+
+
+
+
+

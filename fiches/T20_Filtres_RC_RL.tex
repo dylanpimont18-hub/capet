@@ -1,0 +1,393 @@
+%% Correction audit de veracite - 2026-09-20 : citations de rapport de jury sans
+%% support textuel dans le corpus (rapports 2018-2025) remplacees par des verbatims
+%% verifies ou supprimees. Detail ci-dessous.
+%% l.336 (ex) : citation attribuee a un "Rapport jury 2026" INEXISTANT (le corpus
+%%   s'arrete a 2025) et INTROUVABLE -> remplacee par RJ2023 l.459 (verbatim, cite 2023).
+%% l.337 (ex) : citation "jury 2024" sur le filtre passe-bas RL des enroulements :
+%%   INTROUVABLE comme commentaire de jury (le fait figure au corrige technique
+%%   RJ2024 l.239) -> requalifiee explicitement en extrait du corrige officiel.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ficheHeaders{T20}{Filtres RC/RL}{colElec}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TETE
+% -----------------------------------------------------------------------
+
+\ficheEntete{T20}{Filtres RC/RL - 1\textsuperscript{er} et 2\textsuperscript{e} ordre}{colElec}%
+  {électronique - Traitement analogique du signal}%
+  {\textbf{Présence :} \textbf{5/13} sujets (2013-2026) - thème \emph{régulier}}%
+  {filtre passe-bas RC - filtre RL passe-bas - diagramme de Bode - gabarit fréquentiel - filtre du 2\textsuperscript{e} ordre (cascade, RLC) - filtre anti-repliement - Shannon}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Filtre passe-bas RC du 1er ordre ------------------------------
+\textbf{1.1 Filtre passe-bas RC - forme canonique}
+
+\smallskip
+Schéma : $R$ en série, $C$ en parallèle avec la sortie.
+\[
+  H(j\omega) = \frac{1}{1 + j\,\dfrac{\omega}{\omega_0}}
+  \qquad \text{avec} \qquad \omega_0 = \frac{1}{RC}
+\]
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lll}
+\toprule
+\textbf{Grandeur} & \textbf{Expression} & \textbf{ $\omega = \omega_0$} \\
+\midrule
+Module $|H|$ & $\dfrac{1}{\sqrt{1+(\omega/\omega_0)^2}}$ & $\dfrac{1}{\sqrt{2}} \approx 0{,}707$ \\[6pt]
+Gain en dB & $-20\log\sqrt{1+(\omega/\omega_0)^2}$ & $-3\,\mathrm{dB}$ \\[4pt]
+Phase $\varphi$ & $-\arctan(\omega/\omega_0)$ & $-45^\circ$ \\[4pt]
+Temps de réponse à 5\,\% & \multicolumn{2}{l}{$t_{r5\,\%} \approx 3\tau = 3\,RC$} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 Diagramme de Bode asymptotique --------------------------------
+\textbf{1.2 Diagramme de Bode - règles asymptotiques}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lll}
+\toprule
+\textbf{Zone} & \textbf{Gain asymptotique} & \textbf{Phase asymptotique} \\
+\midrule
+$\omega \ll \omega_0$ & $0\,\mathrm{dB}$ (plateau) & $0^\circ$ \\
+$\omega = \omega_0$ & $-3\,\mathrm{dB}$ (réel) & $-45^\circ$ (réel) \\
+$\omega \gg \omega_0$ & pente $-20\,\mathrm{dB/decade}$ & $-90^\circ$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\begin{center}
+\begin{tikzpicture}[scale=1, font=\footnotesize]
+  \node[below] at (2.6,-2.15) {\bfseries Gain};
+  \draw[->] (0,0) -- (5.4,0) node[right] {$\log\omega$};
+  \draw[->] (0,-1.8) -- (0,1.3) node[above] {$G_{dB}$};
+  \draw[thick, colElec] (0,0.85) -- (2,0.85);
+  \draw[thick, colElec] (2,0.85) -- (5,-1.4);
+  \draw[dashed] (2,0.85) -- (2,-1.8);
+  \node[below] at (2,-1.8) {$\omega_0$};
+  \node[above] at (0.9,0.85) {$0\,\mathrm{dB}$};
+  \node[colElec] at (4.1,-0.55) {\rotatebox{-27}{$-20\,\mathrm{dB/dec}$}};
+
+  \begin{scope}[xshift=7.4cm]
+    \node[below] at (2.5,-2.15) {\bfseries Phase};
+    \draw[->] (0,0.3) -- (5.4,0.3) node[right] {$\log\omega$};
+    \draw[->] (0,-1.8) -- (0,0.6) node[above] {$\varphi$};
+    \draw[thick, colElec] (0,0.3) .. controls (1.6,0.3) and (2.4,-1.35) .. (4,-1.35);
+    \draw[thick, colElec] (4,-1.35) -- (5,-1.35);
+    \draw[dashed] (2,0.3) -- (2,-1.8);
+    \node[below] at (2,-1.8) {$\omega_0$};
+    \node[left] at (-0.1,-0.68) {$-45^\circ$};
+    \node[left] at (-0.1,-1.35) {$-90^\circ$};
+  \end{scope}
+\end{tikzpicture}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 Filtre RL passe-bas -------------------------------------------
+\textbf{1.3 Filtre RL passe-bas}
+
+\smallskip
+$R$ en parallèle avec $L$ : même forme que RC avec $\tau = L/R$.
+\[
+  H(j\omega) = \frac{1}{1 + j\,\dfrac{\omega}{\omega_0}}
+  \qquad \omega_0 = \frac{R}{L}
+\]
+Les enroulements d'une machine asynchrone se comportent comme un filtre RL passe-bas naturel qui atténue les harmoniques de la MLI.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 Filtre du 2e ordre --------------------------------------------
+\textbf{1.4 Filtre passe-bas du 2\textsuperscript{e} ordre - forme canonique}
+
+\[
+  H(j\omega) = \frac{H_0}{1 + 2m\,\dfrac{j\omega}{\omega_0} + \left(\dfrac{j\omega}{\omega_0}\right)^2}
+\]
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lll}
+\toprule
+\textbf{Paramètre} & \textbf{Signification} & \textbf{Effet} \\
+\midrule
+$\omega_0$ & Pulsation propre (rad/s) & Position de la coupure \\
+$m$ & Facteur d'amortissement & Forme de la réponse \\
+$Q = 1/(2m)$ & Facteur de qualité & Sélectivité \\
+\midrule
+$m > 1$ & Sur-amorti & Pas d'oscillations \\
+$m = 1$ & Critique & Retour le plus rapide sans dépassement \\
+$m < 1$ & Sous-amorti & Résonance, pic à $\omega_r = \omega_0\sqrt{1-2m^2}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.5 Cascade de 2 filtres 1er ordre --------------------------------
+\textbf{1.5 Cascade de deux filtres RC identiques}
+
+\[
+  H(j\omega) = \left(\frac{1}{1 + j\omega/\omega_0}\right)^2
+\]
+Pente asymptotique $-40\,\mathrm{dB/decade}$ ; amortissement $m = 1$ (pas d'oscillations ni de résonance).
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.6 Filtre anti-repliement ----------------------------------------
+\textbf{1.6 Filtre anti-repliement (Shannon)}
+
+Placé avant le CAN pour éliminer les composantes à $f > f_e/2$ :
+\[
+  f_e \geq 2\,f_{max} \qquad \Rightarrow \qquad f_c \leq \frac{f_e}{2}
+\]
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHETIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthétique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.8cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Filtre 1\textsuperscript{er} ordre RC}} \\
+$\omega_0 = 1/(RC)$ & Coupure & rad/s \\
+$|H(\omega_0)| = 1/\sqrt{2}$ & Module à $\omega_0$ & - \\
+$G_{dB}(\omega_0) = -3\,\mathrm{dB}$ & Gain & dB \\
+$\varphi(\omega_0) = -45^\circ$ & Phase & - \\
+$t_{r5\%} \approx 3\,RC$ & Transitoire & s \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Filtre RL}} \\
+$\omega_0 = R/L$ & Coupure & rad/s \\
+$\tau = L/R$ & Cste de temps & s \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.8cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Filtre 2\textsuperscript{e} ordre}} \\
+$H = H_0 / (1 + 2m\,(j\omega/\omega_0) + (j\omega/\omega_0)^2)$ & Forme canon. & - \\
+$Q = 1/(2m)$ & Qualité & - \\
+$\omega_r = \omega_0\sqrt{1-2m^2}$ & Résonance ($m<1/\sqrt{2}$) & rad/s \\
+Pente HF : $-40\,\mathrm{dB/dec}$ & Bode & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Shannon / anti-repliement}} \\
+$f_e \geq 2\,f_{max}$ & Shannon & Hz \\
+$f_c \leq f_e/2$ & Filtre AR & Hz \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Gabarit}} \\
+Atténuation $>100$ ($>40\,\mathrm{dB}$) $\Rightarrow$ 2\textsuperscript{e} ordre & & \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets réels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Filtre RC - fonction de transfert et diagramme de Bode \hfill\normalfont\footnotesize E1 2026 (B3-B4)}
+]
+\textbf{Énoncé.}
+Filtre passe-bas RC avec $R = \SI{1}{\kilo\ohm}$ et $C = \SI{100}{\nano\farad}$. Montrer que $H_{F1}(j\omega) = 1/(1+j\omega/\omega_0)$. Exprimer $\omega_0$. Tracer le diagramme de Bode asymptotique.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Diviseur de tension.} ($Z_C = 1/(jC\omega)$) :
+\[
+  H = \frac{Z_C}{R + Z_C} = \frac{1/(jC\omega)}{R + 1/(jC\omega)} = \frac{1}{1 + jRC\omega}
+  \qquad \Rightarrow \qquad \omega_0 = \frac{1}{RC} = \frac{1}{10^3 \times 10^{-7}} = \SI{10000}{\radian\per\second}
+\]
+
+\textbf{Étape 2 — Bode asymptotique.} Plateau $0\,\mathrm{dB}$ pour $\omega \ll \omega_0$ ; pente $-20\,\mathrm{dB/decade}$ pour $\omega \gg \omega_0$ ; point réel à $\omega_0$ : $-3\,\mathrm{dB}$, $-45^\circ$.
+
+\textbf{Conclusion.} La coupure à $\omega_0 = 10\,000\,\mathrm{rad/s}$ ($f_0 \approx 1592\,\mathrm{Hz}$) situe ce filtre pour couper les harmoniques au-delà du kHz tout en laissant passer le continu et le signal utile en basse fréquence.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Lecture graphique sur le Bode - calcul de $v_3(t)$ \hfill\normalfont\footnotesize E1 2026 (B5-B6)}
+]
+\textbf{Énoncé.}
+Signal d'entrée $v_2(t) = 2 + 0{,}5\sin(2\pi \cdot 900 \cdot t)$. Avec $f_0 = \SI{1592}{\hertz}$ ($\omega_0 = 10^4\,\mathrm{rad/s}$), déterminer le signal de sortie $v_3(t)$ et estimer le temps de réponse à 5\,\%.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Composante DC.} $\omega = 0$ : $|H(0)| = 1$ - $V_{DC} = 2\,\mathrm{V}$.
+
+\textbf{Étape 2 — Composante AC.} $f_2 = 900\,\mathrm{Hz}$ - $\omega_2 = 2\pi \times 900 \approx 5655\,\mathrm{rad/s}$ :
+\[
+  |H(\omega_2)| = \frac{1}{\sqrt{1+(5655/10000)^2}} = \frac{1}{\sqrt{1+0{,}32}} \approx 0{,}870
+  \qquad
+  V_{AC,out} = 0{,}5 \times 0{,}870 \approx 0{,}435\,\mathrm{V}
+\]
+\[
+  v_3(t) \approx 2 + 0{,}435\sin(2\pi \times 900\,t + \varphi) \,\mathrm{V}
+\]
+
+\textbf{Étape 3 — Temps de réponse.} $t_{r5\%} \approx 3\,RC = 3 \times 10^3 \times 10^{-7} = 0{,}3\,\mathrm{ms}$.
+
+\textbf{Conclusion.} Le cahier des charges de rapidité ($< 50\,\mathrm{ms}$) est largement satisfait, mais l'atténuation à 900\,Hz reste insuffisante (filtre du 1\textsuperscript{er} ordre) : un filtre du 2\textsuperscript{e} ordre est nécessaire pour mieux rejeter cette composante.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Filtre du 2\textsuperscript{e} ordre - choix des composants et réponse indicielle \hfill\normalfont\footnotesize E1 2026 (B9)}
+]
+\textbf{Énoncé.}
+On souhaite atténuer $> 40\,\mathrm{dB}$ à $\omega_2 = 5655\,\mathrm{rad/s}$ avec un temps de réponse à 5\,\% $< 50\,\mathrm{ms}$. Proposer $R$ et $C$ pour un filtre 2\textsuperscript{e} ordre (cascade de deux RC). Justifier si la réponse indicielle présente des oscillations.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Condition de gain.} $|H(\omega_2)|^2 = [1/(1+(\omega_2/\omega_0)^2)] \leq 1/100$ - $\omega_0 \leq \omega_2/\sqrt{99} \approx 568\,\mathrm{rad/s}$ - $f_0 \leq 90\,\mathrm{Hz}$.
+
+\textbf{Étape 2 — Condition de rapidité.} $t_{r5\%} \approx 3RC \leq 50\,\mathrm{ms}$ - $RC \leq 16{,}7\,\mathrm{ms}$.
+
+\textbf{Étape 3 — Choix des composants.} $RC = 1/(568) \approx 1{,}76\,\mathrm{ms}$ - par ex. $R = \SI{17{,}6}{\kilo\ohm}$, $C = \SI{100}{\nano\farad}$.
+
+\textbf{Conclusion.} La cascade de deux filtres RC identiques donne $m = 1$ (régime critique) : \textbf{pas d'oscillations} sur la réponse indicielle, ce qui satisfait à la fois le gabarit fréquentiel et la contrainte de stabilité du signal de sortie.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs récurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Maîtriser la forme canonique} $H = 1/(1+j\omega/\omega_0)$ et l'identifier dans tout schéma RC ou RL - ne pas recalculer depuis les équations de circuit si la forme est déjà fournie.
+
+  \item \textbf{Ne pas confondre $\omega_0$ et $f_0$} : $\omega_0 = 2\pi f_0$ en rad/s, $f_0$ en Hz. Donner les unités explicitement dans chaque résultat.
+
+  \item \textbf{Gain à $\omega_0$ vaut $-3\,\mathrm{dB}$, pas 0\,dB.} Erreur fréquente : les candidats écrivent $|H(\omega_0)| = 0$ au lieu de $1/\sqrt{2}$.
+
+  \item \textbf{Justifier l'ordre du filtre depuis le gabarit} : pente disponible par ordre = $-20\,\mathrm{dB/decade}$. Pour atténuer $>40\,\mathrm{dB}$ - 2\textsuperscript{e} ordre minimum. Ne pas choisir l'ordre par intuition.
+
+  \item \textbf{Filtre anti-repliement} : systématiquement mentionné dès qu'un CAN apparaît dans le schéma. Rappeler le théorème de Shannon, puis déduire $f_c \leq f_e/2$.
+
+  \item \textbf{Cascade vs RLC} : deux filtres RC en cascade donnent $m = 1$ (pas de résonance), contrairement à un circuit RLC série ou parallèle.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2023 : «~La quatrième partie portait sur l'asservissement, trop peu de candidats l'ont traitée de manière satisfaisante. [\ldots] Le jury invite les candidats à revoir les concepts de base de ce domaine comme les notions de boucle ouverte, de correcteur ou encore de marge de phase.~»\\
+Corrigé officiel 2024 (question B13), et non commentaire de jury : «~la suppression des harmoniques en haute fréquence est faisable par l'effet inductif des enroulements de la machine.~»
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PRESENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colPresence,
+  title={Présence dans les sujets analysés (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Année} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & - & - & - & - & - & - & - & - & - & $\checkmark$ & - & $\checkmark$ \\
+E2 discipl. IE & - & - & - & - & - & $\checkmark$ & - & $\checkmark$ & - & - & - & $\checkmark$ & - \\
+E2 appl. comm. & - & - & - & - & - & - & - & - & - & - & - & - & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-thèmes fréquents :}
+filtre passe-bas RC ($\omega_0$, Bode) - diagramme de Bode asymptotique + réel - gabarit fréquentiel - filtre anti-repliement + Shannon - cascade de 2 filtres RC
+
+\medskip
+\textbf{Ordres de grandeur (repères rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Réseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, fréquence \SI{50}{\hertz}.
+  \item Courants d'étude fréquents en sujet : de quelques \si{\ampere} à quelques dizaines de \si{\ampere}.
+  \item En conversion d'énergie, un rendement attendu reste généralement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthèse express (à refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypothèses du modèle et les conventions de signe.
+  \item Écrire 2 à 4 relations clés avec unités.
+  \item Réaliser un calcul numérique complet et vérifier l'ordre de grandeur.
+  \item Justifier le résultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE

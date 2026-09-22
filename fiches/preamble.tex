@@ -1,0 +1,280 @@
+% preamble.tex — packages et commandes communes a toutes les fiches CAPET SII IE
+\input{glyphtounicode}
+\pdfgentounicode=1
+\usepackage{cmap}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+% babel[french] active a \begin{document} des raccourcis de ponctuation (:;!?)
+% qui cassent la syntaxe to[...] de circuitikz (erreur "+ or - expected") ;
+% on les desactive, ce qui ne change que l'espacement fin avant ces signes.
+\AtBeginDocument{\shorthandoff{:;!?}}
+\usepackage[a4paper, top=1.6cm, bottom=1.6cm, left=1.4cm, right=1.4cm]{geometry}
+\setlength{\headheight}{14.5pt}
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{siunitx}
+\sisetup{locale=FR, output-decimal-marker={,}, inter-unit-product=\ensuremath{{}\cdot{}},
+         group-minimum-digits=4}
+% Unites non fournies par siunitx, declarees ici une fois pour toutes (fiches + exercices).
+% Les gardes \ifdefined evitent tout conflit avec une redeclaration locale restee dans un
+% fichier : ne pas retirer les gardes, ne pas redeclarer ces unites dans les fichiers.
+\DeclareSIUnit{\jour}{j}
+\ifdefined\var\else\DeclareSIUnit{\var}{var}\fi   % puissance reactive
+\ifdefined\vad\else\DeclareSIUnit{\vad}{VAD}\fi   % puissance deformante
+\ifdefined\tr\else\DeclareSIUnit{\tr}{tr}\fi      % tour (tr/min)
+\usepackage{array, booktabs, multirow, tabularx}
+\usepackage{xcolor}
+\usepackage[most, breakable]{tcolorbox}
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage{lmodern}
+% Refonte visuelle 2026 (direction "moderne coloré") : Lato pour le texte,
+% maths sans-serif assorties via newtxsf (charge apres amsmath/amssymb).
+\usepackage[default]{lato}
+\usepackage{newtxsf}
+\usepackage{microtype}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\usepackage{circuitikz}
+\usepackage{lastpage}
+
+% ── Couleurs par domaine (palette modernisée 2026) ────────────────────
+\definecolor{colElec}{RGB}{29, 78, 216}        % Électrotechnique — bleu vif
+\definecolor{colElecLight}{RGB}{219, 234, 254} % fond bleu clair
+\definecolor{colAuto}{RGB}{21, 128, 61}        % Automatique — vert
+\definecolor{colMeca}{RGB}{194, 65, 12}        % Mécanique — orange
+\definecolor{colTherm}{RGB}{185, 28, 28}       % Thermique — rouge
+\definecolor{colQT}{RGB}{232, 244, 233}        % (hérité, plus utilisé par questiontype)
+\definecolor{colJury}{RGB}{255, 248, 225}      % fond jury (crème)
+\definecolor{colJuryFrame}{RGB}{202, 138, 4}   % bordure/bandeau jury (ambre)
+\definecolor{colGrayLight}{RGB}{245, 245, 247} % fond gris neutre
+\definecolor{colSeparator}{RGB}{180, 180, 180} % gris séparateur
+\definecolor{colExo}{RGB}{8, 145, 178}          % Banque d'exercices — cyan (distinct des fiches)
+% ── Encre et gris de la refonte ───────────────────────────────────────
+\definecolor{colInk}{RGB}{23, 32, 42}          % texte courant (quasi-noir)
+\definecolor{colSlate}{RGB}{83, 98, 118}       % gris ardoise (méta, en-têtes)
+\definecolor{colRule}{RGB}{203, 213, 225}      % filets clairs
+\definecolor{colJuryBg}{RGB}{255, 248, 225}    % fond crème jury
+\definecolor{colPresence}{RGB}{83, 98, 118}    % bloc 5 (présence dans les sujets)
+\AtBeginDocument{\color{colInk}}
+
+% ── Style encadré exercice + corrigé (banque d'exercices) ─────────────
+\tcbset{
+  exoBox/.style={
+    breakable,
+    enhanced,
+    colback=colExo!8!white,
+    colframe=colExo,
+    colbacktitle=colExo,
+    coltitle=white,
+    fonttitle=\bfseries\small,
+    left=4pt, right=4pt, top=3pt, bottom=3pt,
+    before skip=5pt, after skip=5pt,
+  }
+}
+
+% ── Bascule enonce / corrige (banque d'exercices) ─────────────────────
+% \CAPETCORRIGE est defini en ligne de commande (pdflatex "\def\CAPETCORRIGE{1}\input{...}")
+% pour compiler la variante corriges d'un meme fichier source ; par defaut (non defini),
+% la compilation produit la variante enonces. \CAPETSHOW{enonce}{corrige} choisit la branche.
+%
+% TROIS MODES (refonte 2026-09-20, manuel de revision) :
+%   - aucun drapeau   -> imprime l'enonce            (variante enonces, INCHANGE)
+%   - \CAPETCORRIGE   -> imprime le corrige          (variante corriges, INCHANGE)
+%   - \CAPETMANUEL    -> imprime l'enonce ET met le corrige de cote pour l'annexe
+%
+% Le mode manuel stocke chaque corrige dans une macro (\csgdef), sans ecriture
+% fichier ni re-tokenisation : le contenu (circuitikz, accents, %) traverse intact.
+% L'annexe les rejoue ensuite dans l'ordre via \CAPETANNEXE.
+\usepackage{etoolbox}
+
+\newcounter{CAPETexo}          % numero continu d'exercice dans le manuel
+\setcounter{CAPETexo}{0}
+\newcounter{CAPETannexe}       % compteur de relecture en annexe
+
+% Titre courant de la notion en cours (pose par \CAPETNOTION), sert d'intertitre annexe
+\newcommand{\CAPETnotioncode}{}
+\newcommand{\CAPETnotiontitre}{}
+
+% \CAPETNOTION{code}{titre} : ouvre une notion dans le manuel (memorise le libelle,
+% et marque le rang du premier exercice de la notion pour l'intertitre d'annexe).
+\newcommand{\CAPETNOTION}[2]{%
+  \renewcommand{\CAPETnotioncode}{#1}%
+  \renewcommand{\CAPETnotiontitre}{#2}%
+  \csgdef{CAPETnotionstart\the\numexpr\value{CAPETexo}+1\relax}{#1 -- #2}%
+}
+
+% ── \degree robuste ───────────────────────────────────────────────────
+% Certains fichiers d'exercices utilisent \degree. Ni le preambule ni siunitx
+% ne le definissent, et \providecommand local ne suffit pas : sous hyperref,
+% \degree existe deja comme commande factice (\ERROR), donc \providecommand
+% s'abstient et l'appel echoue a la compilation du manuel (erreur invisible
+% en compilation isolee). On le (re)definit donc inconditionnellement ici,
+% apres le chargement des packages, pour tout le corpus.
+\AtBeginDocument{\providecommand{\degree}{}\renewcommand{\degree}{\ensuremath{^\circ}}}
+
+% Libelle decoratif : les fichiers d'exercices utilisent aussi \CAPETSHOW dans
+% leur \fancyhead et leur bloc de titre, pour afficher "(enonces)" ou "(corriges)".
+% Ces appels-la ne sont PAS des exercices : en mode manuel ils ne doivent ni
+% consommer un numero, ni alimenter l'annexe. On les reconnait a leur premier
+% argument, strictement egal au libelle ci-dessous.
+\newcommand{\CAPETLIBELLEENONCES}{(\'enonc\'es)}
+
+\ifdefined\CAPETMANUEL
+  % --- Mode manuel : enonce en place, corrige differe vers l'annexe ---
+  \newcommand{\CAPETSHOW}[2]{%
+    \def\CAPETargun{#1}%
+    \ifx\CAPETargun\CAPETLIBELLEENONCES
+      #1%            appel decoratif : rendu tel quel, hors numerotation
+    \else
+      \CAPETSHOWEXO{#1}{#2}%
+    \fi
+  }
+  \newcommand{\CAPETSHOWEXO}[2]{%
+    \stepcounter{CAPETexo}%
+    \csgdef{CAPETcorrige\theCAPETexo}{#2}%
+    \edef\CAPETtmpnum{\theCAPETexo}%
+    #1%
+    \par\vspace{2pt}%
+    {\footnotesize\itshape\color{colExo}%
+     \hyperref[capet:cor:\CAPETtmpnum]{Corrige de l'exercice \CAPETtmpnum\ $\rightarrow$ p.~\pageref{capet:cor:\CAPETtmpnum}}%
+     \label{capet:eno:\CAPETtmpnum}}%
+  }
+  % \CAPETANNEXE : rejoue tous les corriges captures, dans l'ordre, avec intertitres
+  \newcommand{\CAPETANNEXE}{%
+    \setcounter{CAPETannexe}{0}%
+    \loop\ifnum\value{CAPETannexe}<\value{CAPETexo}%
+      \stepcounter{CAPETannexe}%
+      \edef\CAPETcurnum{\theCAPETannexe}%
+      \ifcsname CAPETnotionstart\CAPETcurnum\endcsname
+        \par\medskip
+        {\normalsize\bfseries\color{colExo}\csuse{CAPETnotionstart\CAPETcurnum}}%
+        \par\nobreak\smallskip
+      \fi
+      \begin{tcolorbox}[exoBox, breakable,
+        title={Corrige de l'exercice \CAPETcurnum\
+               \hfill\normalfont\footnotesize
+               \hyperref[capet:eno:\CAPETcurnum]{enonce p.~\pageref{capet:eno:\CAPETcurnum}}}]%
+      \label{capet:cor:\CAPETcurnum}%
+      \csuse{CAPETcorrige\CAPETcurnum}%
+      \end{tcolorbox}%
+    \repeat
+  }
+\else
+  % --- Modes historiques, comportement strictement inchange ---
+  \newcommand{\CAPETSHOW}[2]{\ifdefined\CAPETCORRIGE #2\else #1\fi}
+  \newcommand{\CAPETANNEXE}{}
+\fi
+
+% ── Difficulté 1 à 3 (étoiles pleines, amssymb) ───────────────────────
+\newcommand{\difficulte}[1]{%
+  \ifcase#1\relax
+  \or $\bigstar$\;niveau 1/3%
+  \or $\bigstar\bigstar$\;niveau 2/3%
+  \or $\bigstar\bigstar\bigstar$\;niveau 3/3%
+  \fi
+}
+
+% ── Style encadré extrait de document technique (banque d'exercices) ──
+\tcbset{
+  docTech/.style={
+    breakable,
+    enhanced,
+    colback=colGrayLight,
+    colframe=colSeparator,
+    fonttitle=\bfseries\small\itshape,
+    coltitle=black,
+    colbacktitle=colGrayLight,
+    left=4pt, right=4pt, top=3pt, bottom=3pt,
+    before skip=4pt, after skip=4pt,
+  }
+}
+
+% ── Style tcolorbox de section principale ────────────────────────────
+% Refonte 2026 : bandeau titre coloré arrondi + fond très pâle, sans cadre.
+\tcbset{
+  ficheSection/.style={
+    breakable, enhanced jigsaw,
+    frame hidden, boxrule=0pt, arc=1.8mm,
+    colback=#1!4!white,
+    colbacktitle=#1,
+    coltitle=white,
+    fonttitle=\sffamily\bfseries,
+    left=7pt, right=7pt, top=5pt, bottom=5pt,
+    toptitle=3pt, bottomtitle=3pt,
+    before skip=10pt, after skip=8pt,
+  }
+}
+
+% ── Style encadré question type ──────────────────────────────────────
+% Carte blanche, bandeau sombre, liseré très clair.
+\tcbset{
+  questiontype/.style={
+    breakable, enhanced jigsaw,
+    colback=white,
+    frame hidden, boxrule=0pt, arc=1.8mm,
+    colbacktitle=colElec!78!black,
+    coltitle=white,
+    fonttitle=\sffamily\bfseries\small,
+    left=7pt, right=7pt, top=4pt, bottom=4pt,
+    toptitle=2.5pt, bottomtitle=2.5pt,
+    before skip=8pt, after skip=8pt,
+    borderline={0.6pt}{0pt}{colElec!12!white},
+  }
+}
+
+% ── Style encadré jury ───────────────────────────────────────────────
+% Bandeau ambre, fond crème, sans cadre.
+\tcbset{
+  jury/.style={
+    breakable, enhanced jigsaw,
+    colback=colJuryBg,
+    frame hidden, boxrule=0pt, arc=1.8mm,
+    colbacktitle=colJuryFrame,
+    coltitle=white,
+    fonttitle=\sffamily\bfseries,
+    left=7pt, right=7pt, top=4pt, bottom=4pt,
+    toptitle=3pt, bottomtitle=3pt,
+    before skip=10pt, after skip=8pt,
+  }
+}
+
+% ── En-tête / pied de page communs (refonte 2026) ─────────────────────
+% #1 code fiche, #2 titre court, #3 couleur domaine
+\newcommand{\ficheHeaders}[3]{%
+  \fancyhead[L]{\small\sffamily{\bfseries\textcolor{#3}{#1}}\hspace{0.7em}\textcolor{colSlate}{#2}}%
+  \fancyhead[R]{\small\sffamily\textcolor{colSlate}{CAPET SII IE\, --- \,Session 2026}}%
+  \fancyfoot[C]{\small\sffamily\textcolor{colSlate}{\thepage\,/\,\pageref{LastPage}}}%
+  \fancyhead[C]{}\fancyfoot[L]{}\fancyfoot[R]{}%
+}
+
+% ── Bloc en-tête de fiche (BLOC 0, refonte 2026) ──────────────────────
+% #1 code  #2 titre  #3 couleur domaine  #4 domaine  #5 ligne présence  #6 sous-thèmes
+\newcommand{\ficheEntete}[6]{%
+  \begin{tcolorbox}[enhanced, breakable,
+    frame hidden, boxrule=0pt, arc=2.5mm,
+    interior style={left color=#3, right color=#3!75!black},
+    left=9pt, right=9pt, top=7pt, bottom=7pt,
+    before skip=0pt, after skip=6pt]
+    {\color{white}\sffamily\bfseries\LARGE #1\quad #2}\\[4pt]
+    {\color{#3!22!white}\sffamily\small \MakeUppercase{#4}\quad\textbar\quad #5}\\[1pt]
+    {\color{#3!35!white}\sffamily\footnotesize Sous-thèmes : #6}
+  \end{tcolorbox}%
+}
+
+% ── Mise en page ─────────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0pt}
+\AtBeginDocument{%
+  \renewcommand{\headrule}{{\color{colRule}\hrule width\headwidth height 0.5pt}}%
+}
+
+\setlist[itemize]{leftmargin=1.2em, itemsep=1pt, topsep=2pt, parsep=0pt}
+\setlist[enumerate]{leftmargin=1.2em, itemsep=3pt, topsep=2pt, parsep=0pt}
+
+\setlength{\parskip}{2pt}
+\setlength{\columnsep}{10pt}

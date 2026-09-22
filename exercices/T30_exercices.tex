@@ -1,0 +1,628 @@
+% T30 -- Mesurage, instrumentation, sch\'ematisation -- banque d'exercices
+%
+% COMPL\'EMENTARIT\'E AVEC LA FICHE fiches/T30_Mesurage_Instrumentation.tex
+% Les trois Questions Types de la fiche sont :
+%   QT1 = sensibilit\'e S = 2,684 /degC de la chaine de mesure de temp\'erature de la pile
+%         \`a combustible + mot num\'erique N_C pour T_C = 55 degC (CAN 8 bits ADS7029-Q1,
+%         U_PE = 3 V)  -- sujet E2 2026, question B11 ;
+%   QT2 = Shannon / filtre anti-repliement, T_e <= t_R5% / 10 = 0,36 s -- E2 2026, B13-B17 ;
+%   QT3 = choix thermocouple J vs T pour une plage -20/+40 degC -- E2 disciplinaire 2024, D1.
+% AUCUN de ces trois travaux n'est refait ici :
+%   - la chaine de mesure 2026 n'est reprise QUE par sa question B12 (erreur de
+%     quantification -> erreur de mesure en degC -> conformit\'e au CDC "erreur < 1 degC"),
+%     qui est un travail distinct de B11 (exercice 4, 2e partie) ;
+%   - le CAN 8 bits / mot num\'erique de QT1 (point signal\'e comme corrig\'e lors de l'audit
+%     du projet) n'est PAS reproduit : aucun exercice ne demande de recalculer S ni N_C ;
+%   - le choix comparatif thermocouple J/T (QT3, question D1 de 2024) n'est PAS reproduit :
+%     l'exercice 5 utilise la M\^EME figure 13 du sujet 2024 mais pour un travail
+%     diff\'erent (extraction de la tol\'erance et propagation dans la chaine 4-20 mA).
+% P\'erim\`etre T30 (pas d'empi\`etement sur T23 "capteurs et conditionnement") : chaine de
+% mesure, incertitudes, classe de pr\'ecision, conformit\'e au cahier des charges,
+% sch\'ematisation des montages de mesure, appareils de mesure. Aucun exercice ne porte sur
+% le principe physique d'un capteur ni sur le dimensionnement d'un conditionneur (pont de
+% Wheatstone, ALI, etc.).
+%
+% SOURCES (toutes relues dans les .md de conversion Marker ; lignes indiqu\'ees) :
+%   - Ex. 1 : 2023, "\'Epreuve \'ecrite disciplinaire" (option IE), questions F1 \`a F4.
+%     \'Enonc\'e : E2_Disciplinaire_IE_2023.md l.529-565 (partie F "Instrumentation du robot
+%     Bakus", CAN de r\'ef\'erence Vref1 = 4 V, N = 10 bits, exigence de pr\'ecision 1 %).
+%     Corrig\'e officiel : Rapport_Jury_2023.md l.413-419 --
+%       F1 : 80 % de d\'echarge -> 22,4 V ;
+%       F2 : R_B = 9 R_A, V_S1 = 2,24 V (80 %) et 2,19 V (90 %) ;
+%       F3 : q = 4/2^10 = 0,0039 V, N = 573 (80 %) et N = 561 (90 %) ;
+%       F4 : pr\'ecision = (90-80)/(573-561) = 0,83 % < 1 %, CDC respect\'e.
+%     Toutes ces valeurs ont \'et\'e recalcul\'ees : q = 3,90625 mV ; 2,24/q = 573,4 -> 573 ;
+%     2,19/q = 560,6 -> 561 ; 10/12 = 0,833 %. Conformes au rapport.
+%   - Ex. 2 : 2023, "\'Epreuve \'ecrite disciplinaire appliqu\'ee" (EDE STI 2, sujet commun
+%     aux cinq options), questions 46, 47 et 49. \'Enonc\'e : E2_Appliquee_Commune_2023.md
+%     l.605-655 (capteur RPU 4-20 mA, d\'ebattement -23 deg / +23 deg, trajet de mesurage,
+%     exigence Id = '60'). Corrig\'e officiel : Rapport_Jury_2023.md l.912-931 --
+%       Q46 : "Une rupture de ligne ou une panne de courant donnent I voisin de z\'ero qui
+%              devient alors un indice de surveillance." (verbatim l.914)
+%       Q49 : "L'erreur maximale est atteinte pour COUV = 50 % [...] est estim\'ee en valeur
+%              absolue \`a 3 deg. L'exigence [...] n'est pas satisfaite car 3 deg > 0,5 deg."
+%              (l.929)
+%       Q50 : apr\`es reprogrammation sur [-23 deg ; 0 deg], erreur <= 0,5 deg (0,3 deg en
+%              simulation) -> exigence pleinement satisfaite (l.931).
+%     Fonction de transfert recalcul\'ee : I = (8/23) alpha + 12 (mA) ; la reprogrammation
+%     SP2' \`a 0 deg double la sensibilit\'e (16/23 mA/deg).
+%   - Ex. 3 : 2021, "\'Etude d'un syst\`eme, d'un proc\'ed\'e ou d'une organisation"
+%     (EDE ENE 2), partie D, questions 21, 22, 23 et 25. \'Enonc\'e :
+%     E2_Sujet_2021.md l.243-285. Corrig\'e officiel : Rapport_Jury_2021.md l.663-679 --
+%       Q21 : non-lin\'earit\'e due \`a la forme de la cuve (bords arrondis) ; \'ecart max
+%             40 m^3 pour H = 90 cm, soit 40/600 = 6,67 % ;
+%       Q22 : V = (100/16) H ;
+%       Q23 : Imes = (16/200) H + 4 et N = (10000/16) Imes - 2500, d'o\`u V_citerne = 0,125 N.
+%     V\'erification ind\'ependante : N = 0 -> H = 0 -> V = 0 ; N = 10000 -> H = 200 cm ->
+%     V = 1250 m^3 ; V = 0,125 N est exact pour toute valeur de N (v\'erifi\'e num\'eriquement).
+%     Citation jury : verbatim exact de Rapport_Jury_2021.md l.772-778 (bilan partie D).
+%   - Ex. 4 : 2025, "\'Epreuve \'ecrite disciplinaire appliqu\'ee" (EDE STI 2), questions 23,
+%     24, 26 et 27. \'Enonc\'e : E2_Appliquee_Commune_2025.md l.374-394. Corrig\'e officiel :
+%     Rapport_Jury_2025.md l.664-687 --
+%       Q23 : delta_theta = 288/2^24 = 1,72e-5 deg ;
+%       Q24 : arc = 1460 x 1,72e-5 x pi/180 = 4,38e-4 mm < 0,1 mm, CDC v\'erifi\'e ;
+%       Q27 : q = delta_v/10 = 6e-8 V, N = 10/q = 1,6e8, N_bits = ceil(log2) = 28 bits.
+%     Recalcul ind\'ependant : 288/2^24 = 1,7166e-5 ; arc = 4,374e-4 mm ; delta_v =
+%     10/2^24 = 5,96e-7 V ; q = 5,96e-8 V ; 10/q = 1,678e8 ; log2 = 27,32 -> 28 bits. OK.
+%     La seconde partie de l'exercice (erreur de quantification -> erreur en degC ->
+%     conformit\'e "erreur de mesure < 1 degC") provient de E2_Sujet_2026_BAC3.md l.340-344
+%     (tableau du cahier des charges) et l.429 (question B12). ATTENTION : les documents
+%     techniques DTB4 et DTB5 du sujet 2026 sont des IMAGES non extraites par Marker ; les
+%     caract\'eristiques du CAN reprises ici (8 bits, U_PE = 3 V, ADS7029-Q1) proviennent de
+%     l'\'enonc\'e lui-m\^eme (l.417-427) et de la pleine \'echelle de 3 V impos\'ee \`a la
+%     sortie du conditionneur (l.395-397). Le contenu exact de DTB5 n'est PAS reproduit.
+%   - Ex. 5 (docTech) : 2024, "\'Epreuve \'ecrite disciplinaire" (EDE ENE 1, option IE),
+%     partie D, questions D4, D6, D7, D10 et D11. Le tableau des thermocouples reproduit dans
+%     le docTech (types T, K, N, J, E avec plages, alliages, tol\'erances, prix, fiabilit\'e)
+%     est TEXTUELLEMENT pr\'esent dans E2_Disciplinaire_IE_2024.md l.465 (figure 13) : rien
+%     n'y est reconstitu\'e. Les points caract\'eristiques du transmetteur (eAB mini = -1 mV,
+%     eAB maxi = 10,8 mV, Is mini = 4 mA, Is maxi = 20 mA, plage -20 / 200 degC) sont ceux de
+%     DT10, l.937-950. Chaine d'acquisition (figure 14, transmetteur KOS 839, module
+%     AI 8xU/I/RTD/TC ST, mots PIW8/MW8) : l.489-540. Corrig\'e officiel :
+%     Rapport_Jury_2024.md l.331 (D6 : 16 bits sign\'es, r\'esolution 15 bits, signe sur le
+%     bit de poids fort) et l.363-377 (D9/D10/D11 : a = 220/27648 = 0,0080 ;
+%     MW8 = (E/27648) PIW8 - 20 ; PIW8 = 6912 pour 35 degC et 8797 pour 50 degC).
+%     Recalcul ind\'ependant : E = 200-(-20) = 220 ; 220/27648 = 7,957e-3 ;
+%     27648/220 x (35+20) = 6912,0 ; 27648/220 x (50+20) = 8797,1. Conformes.
+%     Citation jury : verbatim exact de Rapport_Jury_2024.md l.1326.
+%   - Ex. 6 : EXERCICE IN\'EDIT (aucune r\'ef\'erence de sujet revendiqu\'ee). Il traite les
+%     deux points explicitement absents du corpus CAPET d\'epouill\'e (aucune occurrence de
+%     "incertitude", "classe de pr\'ecision", "oscilloscope", "wattm\`etre" ou "pince
+%     amp\'erom\'etrique" dans les .md 2013-2026) : l'erreur de m\'ethode du montage
+%     amont/aval et le calcul d'incertitude \`a partir de la classe de pr\'ecision.
+%     Toutes les valeurs num\'eriques sont choisies par construction (R = 100 Ohm exact,
+%     R_A = 0,5 Ohm, R_V = 100 kOhm, classes 0,5 sur calibres 300 V et 3 A) et v\'erifi\'ees :
+%       montage aval : R_mes = R_V R/(R_V+R) = 99,9 Ohm, \'ecart -0,1 % ;
+%       montage amont : R_mes = R + R_A = 100,5 Ohm, \'ecart +0,5 % ;
+%       R_critique = sqrt(R_A R_V) = 223,6 Ohm ;
+%       Delta_U = 0,5 x 300/100 = 1,5 V ; Delta_I = 0,5 x 3/100 = 15 mA ;
+%       u(U) = 1,5/sqrt(3) = 0,866 V ; u(I) = 15/sqrt(3) = 8,66 mA ;
+%       u_r(R) = sqrt((0,866/230)^2 + (0,00866/2,30)^2) = 5,325e-3 -> u(R) = 0,533 Ohm ;
+%       U(R) = 2 u(R) = 1,07 Ohm -> R = (100,0 +/- 1,1) Ohm, k = 2.
+%     Les r\`egles de m\'etrologie appliqu\'ees (incertitude d'un appareil analogique
+%     rapport\'ee au CALIBRE et non \`a la lecture ; loi rectangulaire u_B = a/sqrt(3) ;
+%     composition quadratique des incertitudes relatives d'un quotient ; facteur
+%     d'\'elargissement k = 2 pour un niveau de confiance de 95 %) sont les r\`egles du GUM
+%     d\'ej\`a \'enonc\'ees dans le Bloc 2 de la fiche T30 (u_B = a/sqrt(3), U = k u_c, k = 2).
+%
+% PI\`EGES SURVEILL\'ES \`A LA R\'EDACTION (et trait\'es explicitement dans les corrig\'es) :
+%   - incertitude d'un appareil analogique = classe x CALIBRE / 100, JAMAIS classe x lecture ;
+%   - composition QUADRATIQUE des incertitudes-types ind\'ependantes, et somme des
+%     incertitudes RELATIVES (pas absolues) pour un produit ou un quotient ;
+%   - distinction incertitude-type u / incertitude \'elargie U = k u ;
+%   - chiffres significatifs du r\'esultat align\'es sur l'incertitude.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T30}} - Exercices - Instrumentation}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T30 \quad Mesurage, instrumentation, sch\'ematisation}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 1 -- 2023, epreuve ecrite disciplinaire (IE), questions F1 a F4
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2023, \'epreuve \'ecrite disciplinaire (option IE), questions F1 \`a F4}
+]
+\CAPETSHOW{
+Le robot enjambeur viticole \textbf{Bakus} embarque une chaîne de mesure du \textbf{taux de d\'echarge} de sa batterie Lithium-Ion. Afin de pr\'eserver la dur\'ee de vie de la batterie, le retour \`a l'entrep\^ot est d\'eclench\'e lorsque la profondeur de d\'echarge atteint \SI{80}{\percent} ; la courbe de d\'echarge donne alors une tension batterie $V_{e1} = \SI{22,4}{\volt}$, et $V_{e1} = \SI{21,9}{\volt}$ pour un taux de d\'echarge de \SI{90}{\percent}.
+
+La tension batterie \'etant trop \'elev\'ee pour la carte de contr\^ole, elle est d'abord divis\'ee par 10 par un pont diviseur ($R_B = 9\,R_A$), puis num\'eris\'ee par un CAN de tension de r\'ef\'erence $V_{ref1} = \SI{4}{\volt}$ cod\'e sur $N = 10$ bits. On rappelle $q = V_{ref1}/2^N$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.9, every node/.style={scale=0.9}]
+  \draw (0,3.0) node[left,font=\scriptsize,align=right]{$V_{e1}$\\(batterie)} -- (1.6,3.0);
+  \draw (1.6,3.0) to[R, l_=$R_B$] (1.6,1.5);
+  \draw (1.6,1.5) to[R, l_=$R_A$] (1.6,0);
+  \draw (1.6,0) -- (0,0) node[left,font=\scriptsize]{$0\,\si{\volt}$};
+  \node[circ] at (1.6,1.5) {};
+  \draw (1.6,1.5) -- (3.3,1.5);
+  \node[font=\scriptsize, above] at (2.45,1.55) {$V_{S1}$};
+  \node[font=\scriptsize, below] at (2.45,1.45) {$I_{S1}=0$};
+  \node[draw, minimum width=1.8cm, minimum height=1.0cm, align=center, font=\scriptsize] (can) at (4.3,1.5) {CAN\\10 bits\\$V_{ref1}{=}\SI{4}{\volt}$};
+  \node[draw, minimum width=1.9cm, minimum height=1.0cm, align=center, font=\scriptsize] (cc) at (7.1,1.5) {Carte de\\contr\^ole};
+  \draw[->] (can.east) -- (cc.west) node[midway,above,font=\scriptsize]{$N_{10}$};
+\end{circuitikz}
+\end{center}
+
+Le cahier des charges impose une \textbf{pr\'ecision de la mesure du taux de d\'echarge de \SI{1}{\percent}} dans la zone comprise entre \SI{80}{\percent} et \SI{90}{\percent} de d\'echarge. Dans cette zone, la tension batterie est suppos\'ee \'evoluer lin\'eairement avec le taux de d\'echarge.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Calculer les tensions $V_{S1}$ pr\'esent\'ees au CAN pour les taux de d\'echarge de \SI{80}{\percent} et de \SI{90}{\percent}.
+  \item Calculer le quantum $q$ du convertisseur, puis les valeurs d\'ecimales du mot binaire en sortie du CAN pour ces deux taux de d\'echarge.
+  \item En d\'eduire la pr\'ecision de mesure du taux de d\'echarge dans cette zone, exprim\'ee en pourcentage de d\'echarge par LSB. Conclure quant au respect de l'exigence du cahier des charges.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le pont diviseur est non charg\'e ($I_{S1} = 0$), donc $\dfrac{V_{S1}}{V_{e1}} = \dfrac{R_A}{R_A+R_B} = \dfrac{R_A}{R_A+9R_A} = \dfrac{1}{10}$ :
+  \[ V_{S1}(\SI{80}{\percent}) = \frac{22{,}4}{10} = \SI{2,24}{\volt} \qquad V_{S1}(\SI{90}{\percent}) = \frac{21{,}9}{10} = \SI{2,19}{\volt} \]
+  \item Quantum du convertisseur :
+  \[ q = \frac{V_{ref1}}{2^{N}} = \frac{4}{2^{10}} = \frac{4}{1024} = \SI{3,906}{\milli\volt} \approx \SI{0,0039}{\volt} \]
+  Le mot num\'erique est la partie enti\`ere du rapport $V_{S1}/q$ :
+  \[ N_{80} = \frac{2{,}24}{0{,}003906} = 573{,}4 \;\longrightarrow\; \boldsymbol{573_{10}} = 10\,0011\,1101_2 \]
+  \[ N_{90} = \frac{2{,}19}{0{,}003906} = 560{,}6 \;\longrightarrow\; \boldsymbol{561_{10}} = 10\,0011\,0001_2 \]
+  \item Entre \SI{80}{\percent} et \SI{90}{\percent} de d\'echarge, soit \SI{10}{\percent} d'\'etendue, le mot num\'erique ne varie que de $573 - 561 = 12$ pas de quantification. La plus petite variation de taux de d\'echarge que la chaîne puisse distinguer est donc :
+  \[ \Delta_{\text{mesure}} = \frac{90 - 80}{573 - 561} = \frac{10}{12} \approx \boldsymbol{0{,}83\ \%\ \text{de d\'echarge par LSB}} \]
+
+  \smallskip
+  \textbf{Conclusion.} La r\'esolution effective de la chaîne, $0{,}83\ \%$ de d\'echarge, est \textbf{inf\'erieure \`a l'exigence de \SI{1}{\percent}} du cahier des charges : celui-ci est donc \textbf{respect\'e}. Le point d\'eterminant n'est pas la r\'esolution brute du CAN (10 bits, soit 1024 points) mais la \textbf{portion de la pleine \'echelle r\'eellement utilis\'ee} : la zone utile $[2{,}19\ ;\ 2{,}24]\,\si{\volt}$ ne couvre que $50/4000 \approx \SI{1,3}{\percent}$ de la plage $[0\ ;\ 4]\,\si{\volt}$ du convertisseur, ce qui ne laisse que 12 pas exploitables. C'est ce chiffre, et lui seul, qui conditionne la conformit\'e -- la marge est ici tr\`es faible, et un pont diviseur mieux adapt\'e (ou un CAN de plus faible $V_{ref1}$) l'augmenterait sensiblement.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 2 -- 2023, epreuve ecrite disciplinaire appliquee, Q46/47/49
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{1} \hfill\normalfont\footnotesize 2023, \'epreuve \'ecrite disciplinaire appliqu\'ee, questions 46, 47 et 49}
+]
+\CAPETSHOW{
+Les ch\^assis de surpression d'une serre exp\'erimentale sont man\oe uvr\'es par un motor\'educteur \textbf{Ridder RW} dont le d\'ebattement angulaire m\'ecanique maximal est de $-23^\circ$ \`a $+23^\circ$. La position angulaire $\alpha$ des ch\^assis est mesur\'ee par un capteur \textbf{RPU} \`a effet Hall, qui transmet en permanence la position au r\'egulateur climatique par une \textbf{boucle de courant 4 -- 20 mA}.
+
+Le \textbf{trajet de mesurage} du capteur RPU est la plage angulaire que l'on fait apprendre au capteur \`a la mise en service ; elle est d\'efinie par deux positions m\'emoris\'ees $SP1$ et $SP2$. Le technicien programme d'abord $SP1$ et $SP2$ sur les deux fins de course m\'ecaniques, c'est-\`a-dire sur le d\'ebattement complet.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.9, every node/.style={scale=0.9}]
+  \node[draw, minimum width=1.9cm, minimum height=0.9cm, align=center, font=\scriptsize] (rpu) at (0,0) {Capteur RPU\\(effet Hall)};
+  \node[draw, minimum width=2.1cm, minimum height=0.9cm, align=center, font=\scriptsize] (reg) at (4.6,0) {R\'egulateur\\climatique};
+  \draw[->] (rpu.east) -- node[midway,above,font=\scriptsize]{$I$ : 4 -- \SI{20}{\milli\ampere}} node[midway,below,font=\scriptsize]{2 fils} (reg.west);
+  \draw[->] (-2.3,0) -- (rpu.west) node[midway,above,font=\scriptsize]{$\alpha$};
+  \node[font=\scriptsize, align=center] at (-2.9,0) {Ch\^assis\\$-23^\circ\!/\!+23^\circ$};
+\end{tikzpicture}
+\end{center}
+
+Les simulations de l'asservissement donnent, pour diff\'erentes consignes d'ouverture, une \textbf{erreur de positionnement angulaire} $\Delta\alpha = \alpha_{cons} - \alpha$ en r\'egime \'etabli :
+
+\begin{center}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Consigne d'ouverture $C_{OUV}$ & \SI{25}{\percent} & \SI{50}{\percent} & \SI{75}{\percent} & \SI{100}{\percent} \\
+\midrule
+Erreur $\Delta\alpha$ & $-1{,}8^\circ$ & $-3^\circ$ & $-2{,}6^\circ$ & $0^\circ$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+L'exigence \texttt{Id = '60'} du cahier des charges impose une \textbf{pr\'ecision de positionnement angulaire des ch\^assis de $0{,}5^\circ$}.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Justifier l'int\'er\^et de travailler avec la plage 4 -- 20 mA plut\^ot qu'avec la plage 0 -- 20 mA.
+  \item \'Etablir l'expression du courant $I$ d\'elivr\'e par le capteur RPU, en mA, en fonction de la position angulaire $\alpha$ en degr\'es, pour la programmation initiale du technicien. Pr\'eciser la sensibilit\'e de la chaîne de mesure.
+  \item L'exigence \texttt{Id = '60'} est-elle satisfaite avec cette programmation ? Justifier.
+  \item En fonctionnement normal, la consigne n'exc\`ede jamais \SI{50}{\percent} d'ouverture, soit $-23^\circ \leq \alpha_{cons} \leq 0^\circ$. Proposer une reprogrammation du trajet de mesurage et calculer le gain de sensibilit\'e obtenu.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Dans une boucle 4 -- 20 mA, le \textbf{z\'ero de la grandeur mesur\'ee correspond \`a \SI{4}{\milli\ampere} et non \`a \SI{0}{\milli\ampere}} : c'est un \emph{z\'ero vivant} (\emph{live zero}). Une rupture de ligne ou une panne d'alimentation du capteur donnent $I$ voisin de z\'ero, valeur qui n'appartient \`a aucun point de mesure valide : le r\'egulateur distingue donc sans ambiguït\'e une \textbf{panne} d'une position basse l\'egitime. Avec une plage 0 -- 20 mA, un c\^able coup\'e serait interpr\'et\'e comme une mesure de $-23^\circ$ parfaitement plausible, et les ch\^assis seraient pilot\'es sur une information fausse.
+
+  \emph{Corrig\'e officiel (rapport de jury CAPET 2023) :} \guillemotleft\ Une rupture de ligne ou une panne de courant donnent $I$ voisin de z\'ero qui devient alors un indice de surveillance. \guillemotright
+
+  \item La caract\'eristique est lin\'eaire et fait correspondre les deux extr\'emit\'es du trajet de mesurage aux deux extr\'emit\'es de la boucle : $\alpha = -23^\circ \rightarrow I = \SI{4}{\milli\ampere}$ et $\alpha = +23^\circ \rightarrow I = \SI{20}{\milli\ampere}$. En posant $I = a\,\alpha + b$ :
+  \[ a = \frac{20-4}{23-(-23)} = \frac{16}{46} = \frac{8}{23} \approx \SI{0,348}{\milli\ampere\per\degree} \qquad b = 4 - \frac{8}{23}\times(-23) = 4+8 = 12 \]
+  \[ \boxed{\;I = \frac{8}{23}\,\alpha + 12 \quad (\si{\milli\ampere},\ \alpha \text{ en degr\'es})\;} \]
+  V\'erification : $\alpha = 0^\circ \rightarrow I = \SI{12}{\milli\ampere}$ (milieu de la boucle), ce qui est coh\'erent avec un trajet de mesurage sym\'etrique. La \textbf{sensibilit\'e} de la chaîne est $S = \SI{0,348}{\milli\ampere\per\degree}$.
+
+  \item L'erreur de positionnement est maximale en valeur absolue pour $C_{OUV} = \SI{50}{\percent}$ (soit $\alpha_{cons} = 0^\circ$), o\`u elle atteint $|\Delta\alpha| = 3^\circ$.
+  \[ 3^\circ \;>\; 0{,}5^\circ \]
+  L'exigence \texttt{Id = '60'} \textbf{n'est donc pas satisfaite}, et ce constat reste vrai sur une large plage de variation de $C_{OUV}$ (l'erreur d\'epasse $0{,}5^\circ$ pour \SI{25}{\percent}, \SI{50}{\percent} et \SI{75}{\percent} d'ouverture). L'origine de cette erreur n'est pas le capteur lui-m\^eme : le RPU mesure la position angulaire $\beta$ de l'arbre de sortie du motor\'educteur, et la loi entr\'ee-sortie g\'eom\'etrique $\alpha = f(x)$ du tube \og push-pull \fg{} n'\'etant pas lin\'eaire, la conversion $\beta \rightarrow \alpha$ introduit une \textbf{erreur de lin\'earit\'e} qui se reporte int\'egralement sur la position des ch\^assis.
+
+  \item Puisque le fonctionnement normal se limite \`a $-23^\circ \leq \alpha_{cons} \leq 0^\circ$, il suffit de \textbf{raccourcir le trajet de mesurage} en reprogrammant la position finale $SP2' $ sur $\alpha = 0^\circ$ au lieu de $+23^\circ$ : la plage 4 -- 20 mA est alors \'etal\'ee sur $23^\circ$ au lieu de $46^\circ$.
+  \[ a' = \frac{20-4}{0-(-23)} = \frac{16}{23} \approx \SI{0,696}{\milli\ampere\per\degree} \qquad \frac{a'}{a} = \frac{16/23}{8/23} = \boldsymbol{2} \]
+
+  \smallskip
+  \textbf{Conclusion.} En r\'eduisant le trajet de mesurage au seul domaine r\'eellement exploit\'e, on \textbf{double la sensibilit\'e} de la chaîne de mesure sans changer un seul composant : sur $[-23^\circ\ ;\ 0^\circ]$, les courbes $I_{cons} = f(\alpha_{cons})$ et $I_{cons} = g(\alpha)$ sont pratiquement confondues et l'erreur de positionnement ne d\'epasse plus $0{,}5^\circ$ ($0{,}3^\circ$ maximum en simulation) : l'exigence \texttt{Id = '60'} est \textbf{pleinement satisfaite}. C'est la r\`egle g\'en\'erale du mesurage : \textbf{on n'\'etalonne jamais une chaîne sur une \'etendue plus large que celle effectivement utilis\'ee}, sous peine de gaspiller la r\'esolution disponible -- exactement le d\'efaut mis en \'evidence \`a l'exercice 1.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 3 -- 2021, EDE ENE 2, partie D, questions 21, 22, 23 et 25
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize 2021, \'Etude d'un syst\`eme, d'un proc\'ed\'e ou d'une organisation, questions 21 \`a 25}
+]
+\CAPETSHOW{
+Une micro-STEP solaire stocke son \'energie sous forme d'eau dans une citerne haute. Pour conna\^itre la quantit\'e d'\'energie stock\'ee, on mesure la \textbf{hauteur d'eau} $H$ dans la citerne puis on la convertit en \textbf{volume} $V$. Le capteur de niveau \textbf{HITEC CP5220} fonctionne par mesure de pression diff\'erentielle et d\'elivre un signal \textbf{4 -- 20 mA} ; sa valeur pleine \'echelle est r\'egl\'ee \`a $H_{PE} = \SI{2}{\meter}$. La hauteur maximale d'eau est de \SI{1,6}{\meter}.
+
+La chaîne de mesure complète est mod\'elis\'ee par les deux conversions lin\'eaires suivantes ($H$ en cm, $I_{mes}$ en mA, $N$ mot num\'erique) :
+\[ I_{mes} = \frac{16}{200}\,H + 4 \qquad\qquad N = \frac{10\,000}{16}\,I_{mes} - 2\,500 \]
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.9, every node/.style={scale=0.9}]
+  \node[align=center,font=\scriptsize] (h) at (-0.5,0) {$H$\\(cm)};
+  \node[draw,minimum width=1.9cm,minimum height=0.9cm,align=center,font=\scriptsize] (capt) at (1.6,0) {Capteur\\CP5220\\$H_{PE}{=}\SI{2}{\meter}$};
+  \node[draw,minimum width=1.6cm,minimum height=0.9cm,align=center,font=\scriptsize] (can) at (4.6,0) {CAN\\automate};
+  \node[draw,minimum width=2.1cm,minimum height=0.9cm,align=center,font=\scriptsize] (bf) at (7.7,0) {Bloc fonction\\\og Contr\^oler\\le volume \fg};
+  \draw[->] (h) -- (capt.west);
+  \draw[->] (capt.east) -- (can.west) node[midway,above,font=\scriptsize]{$I_{mes}$} node[midway,below,font=\scriptsize]{4--20 mA};
+  \draw[->] (can.east) -- (bf.west) node[midway,above,font=\scriptsize]{$N$};
+  \draw[->] (bf.east) -- (9.6,0) node[right,font=\scriptsize]{$V_{citerne}$};
+\end{tikzpicture}
+\end{center}
+
+Des relev\'es exp\'erimentaux ont donn\'e la caract\'eristique r\'eelle $V = f(H)$ de la citerne. Pour obtenir une relation simple, on la mod\'elise par une \textbf{droite} passant par l'origine. Le plus grand \'ecart entre la courbe r\'eelle et ce mod\`ele est relev\'e pour $H = \SI{90}{\centi\meter}$ : il vaut \SI{40}{\cubic\meter} pour un volume r\'eel de \SI{600}{\cubic\meter}. La droite mod\`ele est d\'efinie par $V = \dfrac{100}{16}\,H$ ($V$ en \si{\cubic\meter}, $H$ en cm).
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Indiquer les raisons physiques de la non-lin\'earit\'e de la courbe r\'eelle $V = f(H)$, puis d\'eterminer en valeur relative le plus grand \'ecart entre le r\'eel et le mod\`ele.
+  \item \'Etablir la relation $V_{citerne} = f(N)$ \`a \'ecrire dans le bloc fonction de l'automate pour m\'emoriser le volume d'eau en \si{\cubic\meter}.
+  \item L'information binaire \emph{R\'es\_plein} passe \`a 1 lorsque le volume atteint \SI{95}{\percent} de sa valeur maximale, \emph{R\'es\_vide} lorsqu'il descend sous \SI{5}{\percent}. D\'eterminer les deux seuils sur $N$ correspondants.
+  \item Conclure quant aux performances de la chaîne de mesure et proposer, sans la d\'evelopper, une solution permettant de r\'eduire l'erreur due \`a la mod\'elisation de $V = f(H)$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item La non-lin\'earit\'e est due \`a la \textbf{forme g\'eom\'etrique de la cuve} : ses bords sont arrondis, donc la section horizontale n'est pas constante sur toute la hauteur. Le volume \'el\'ementaire $\mathrm{d}V = S(H)\,\mathrm{d}H$ n'est proportionnel \`a $\mathrm{d}H$ que si $S$ est constante -- ce qui n'est pas le cas pr\`es du fond ni pr\`es du bord sup\'erieur. L'\'ecart relatif maximal vaut :
+  \[ \frac{\Delta V}{V} = \frac{40}{600} \approx \boldsymbol{6{,}67\ \%} \]
+  \item On inverse la chaîne de mesure. De la seconde relation :
+  \[ I_{mes} = \frac{16\,(N + 2\,500)}{10\,000} \]
+  puis de la premi\`ere :
+  \[ H = \frac{200}{16}\,(I_{mes} - 4) = \frac{200}{16}\left(\frac{16\,(N+2\,500)}{10\,000} - 4\right) = \frac{200\,N}{10\,000} = \frac{N}{50} \quad (\si{\centi\meter}) \]
+  En reportant dans le mod\`ele lin\'eaire $V = \dfrac{100}{16}H$ :
+  \[ V_{citerne} = \frac{100}{16}\times\frac{N}{50} = \frac{N}{8} \qquad\Longrightarrow\qquad \boxed{\;V_{citerne} = 0{,}125\,N \quad (\si{\cubic\meter})\;} \]
+  \emph{V\'erification aux bornes} : $N = 0 \rightarrow I_{mes} = \SI{4}{\milli\ampere} \rightarrow H = 0 \rightarrow V = 0$ \checkmark ; $N = 10\,000 \rightarrow I_{mes} = \SI{20}{\milli\ampere} \rightarrow H = \SI{200}{\centi\meter} \rightarrow V = \SI{1250}{\cubic\meter}$ \checkmark.
+  \item La hauteur maximale d'eau \'etant de \SI{1,6}{\meter} (et non \SI{2}{\meter}, qui est la pleine \'echelle du \emph{capteur}), le volume maximal r\'eellement atteint vaut :
+  \[ V_{max} = \frac{100}{16}\times 160 = \SI{1000}{\cubic\meter} \qquad (\text{soit } N = 8\,000) \]
+  D'o\`u les seuils :
+  \[ \text{\emph{R\'es\_plein}} : V = 0{,}95\times 1\,000 = \SI{950}{\cubic\meter} \;\Rightarrow\; N = \frac{950}{0{,}125} = \boldsymbol{7\,600} \]
+  \[ \text{\emph{R\'es\_vide}} : V = 0{,}05\times 1\,000 = \SI{50}{\cubic\meter} \;\Rightarrow\; N = \frac{50}{0{,}125} = \boldsymbol{400} \]
+  \item Deux sources d'erreur coexistent et il faut les hi\'erarchiser :
+  \begin{itemize}[itemsep=1pt]
+    \item l'erreur de \textbf{quantification} de la chaîne : un LSB correspond \`a $\SI{0,125}{\cubic\meter}$, soit $0{,}125/1\,000 = \SI{0,0125}{\percent}$ du volume utile -- totalement n\'egligeable ;
+    \item l'erreur de \textbf{mod\'elisation} de $V = f(H)$ par une droite : jusqu'\`a \SI{6,67}{\percent}, soit plus de \textbf{500 fois} l'erreur de quantification.
+  \end{itemize}
+  Par ailleurs, la pleine \'echelle du capteur (\SI{2}{\meter}) est mal adapt\'ee \`a la hauteur utile (\SI{1,6}{\meter}) : \SI{20}{\percent} de la plage 4 -- 20 mA, donc \SI{20}{\percent} de la r\'esolution disponible, ne sont jamais exploit\'es.
+
+  \smallskip
+  \textbf{Conclusion.} La performance de la chaîne de mesure n'est \textbf{pas} limit\'ee par l'\'electronique d'acquisition mais par la \textbf{mod\'elisation lin\'eaire de la g\'eom\'etrie de la cuve} : avec \SI{6,67}{\percent} d'erreur, une citerne annonc\'ee pleine \`a \SI{95}{\percent} peut en r\'ealit\'e contenir de \SI{888}{\cubic\meter} \`a \SI{1012}{\cubic\meter}, ce qui est incompatible avec une gestion fine du stock d'\'energie. La solution consiste \`a \textbf{remplacer la droite unique par un mod\`ele non lin\'eaire} -- lin\'earisation par morceaux sur trois ou quatre segments, table de correspondance $(H, V)$ interpol\'ee, ou polyn\^ome d'ordre 2 identifi\'e sur les relev\'es -- op\'eration purement logicielle, r\'ealis\'ee dans le bloc fonction de l'automate, et donc sans aucun surco\^ut mat\'eriel.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2021, bilan de la partie D) : \guillemotleft\ De nombreux candidats ont rencontr\'e des difficult\'es \`a mettre en \'equation la chaîne de mesure et \`a proposer un algorithme qui respecte un langage appropri\'e. Cette partie est le deuxi\`eme gros point noir pour les candidats avec la partie sch\'ema \'electrique pr\'ec\'edente. Les r\'esultats sont tr\`es insuffisants. \guillemotright}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 4 -- 2025, epreuve ecrite disciplinaire appliquee, Q23/24/26/27
+%              + 2026, E2, question B12
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize 2025, \'epreuve \'ecrite disciplinaire appliqu\'ee, questions 23, 24, 26 et 27}
+]
+\CAPETSHOW{
+Un robot \textbf{KUKA KR QUANTEC} positionne des \'ecrans de sc\`ene lors d'un concert. L'\'etude porte sur l'axe 3 : le servomoteur qui l'entra\^ine dispose d'un \textbf{d\'ebattement angulaire de $288^\circ$} en sortie de r\'educteur et re\c{c}oit des consignes de position cod\'ees sur \textbf{24 bits}. La distance du point $M$ (extr\'emit\'e de l'\'ecran) \`a l'axe 3 vaut \SI{1460}{\milli\meter}.
+
+Le cahier des charges sc\'enographique impose de \textbf{garantir le positionnement de l'\'ecran au dixi\`eme de millim\`etre pr\`es}.
+
+La position angulaire du moteur est mesur\'ee par un \textbf{r\'esolveur} ; un circuit de traitement convertit cette information en une tension image \'evoluant lin\'eairement de $\SI{-5}{\volt}$ ($\theta_{min}$) \`a $\SI{+5}{\volt}$ ($\theta_{max}$), num\'eris\'ee ensuite par un CAN de plage $[\SI{-5}{\volt}\,;\,\SI{+5}{\volt}]$. On note $\delta v$ la variation de tension en sortie de la chaîne d'acquisition correspondant \`a une rotation d'un pas $\delta\theta$.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.88, every node/.style={scale=0.88}]
+  \node[draw,minimum width=1.7cm,minimum height=0.9cm,align=center,font=\scriptsize] (res) at (0,0) {R\'esolveur};
+  \node[draw,minimum width=2.0cm,minimum height=0.9cm,align=center,font=\scriptsize] (tr) at (3.9,0) {Circuit de\\traitement};
+  \node[draw,minimum width=1.9cm,minimum height=0.9cm,align=center,font=\scriptsize] (can) at (7.2,0) {CAN\\$[-5;+5]\,\si{\volt}$};
+  \draw[->] (-2.0,0) -- (res.west) node[midway,above,font=\scriptsize]{$\theta$};
+  \draw[->] (res.east) -- (tr.west) node[midway,above,font=\scriptsize]{$\sin\theta,\ \cos\theta$};
+  \draw[->] (tr.east) -- (can.west) node[midway,above,font=\scriptsize]{$v$} node[midway,below,font=\scriptsize]{$\pm\SI{5}{\volt}$};
+  \draw[->] (can.east) -- (9.2,0) node[right,font=\scriptsize]{mot num.};
+  % arc illustrant le point M
+  \draw[thick] (0,-2.3) -- (3.0,-2.3);
+  \draw[fill=black] (0,-2.3) circle (1.6pt) node[below,font=\scriptsize]{axe 3};
+  \draw[fill=black] (3.0,-2.3) circle (1.6pt) node[below,font=\scriptsize]{$M$};
+  \draw[<->] (0,-2.05) -- (3.0,-2.05) node[midway,above,font=\scriptsize]{$R = \SI{1460}{\milli\meter}$};
+  \draw[->,thick] (3.0,-2.3) arc (0:14:3.0);
+  \node[font=\scriptsize,right] at (3.05,-1.75) {$\delta\theta$ (exag\'er\'e)};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Montrer que la pr\'ecision du positionnement angulaire du bras vaut $\delta\theta = 1{,}72\cdot 10^{-5}\,^\circ$.
+  \item Estimer la distance parcourue par le point $M$ lorsque l'axe 3 est pilot\'e avec deux consignes angulaires cons\'ecutives. V\'erifier que le codage sur 24 bits satisfait la pr\'ecision de positionnement attendue.
+  \item \'Etablir la valeur de $\delta v$.
+  \item Le capteur est consid\'er\'e comme suffisamment pr\'ecis si son erreur de quantification $q$ est \textbf{10 fois plus petite} que $\delta v$. D\'eterminer le nombre de bits de codage n\'ecessaire au CAN, et conclure sur la faisabilit\'e de cette exigence.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Un codage sur 24 bits permet $2^{24} = 16\,777\,216$ valeurs de consigne. Le d\'ebattement de $288^\circ$ est donc d\'ecoup\'e en autant de pas :
+  \[ \delta\theta = \frac{288}{2^{24}} = \frac{288}{16\,777\,216} = 1{,}7166\cdot 10^{-5} \approx \boldsymbol{1{,}72\cdot 10^{-5}\,^\circ} \]
+  \item Le point $M$ d\'ecrit un arc de cercle de rayon $R = \SI{1460}{\milli\meter}$. La longueur d'arc associ\'ee \`a $\delta\theta$ (converti en radians) vaut :
+  \[ \ell = R\,\delta\theta\times\frac{\pi}{180} = 1\,460\times 1{,}72\cdot 10^{-5}\times\frac{\pi}{180} \approx \boldsymbol{4{,}38\cdot 10^{-4}\,\si{\milli\meter}} \]
+  Soit environ \SI{0,44}{\micro\meter}.
+  \[ 4{,}38\cdot 10^{-4}\,\si{\milli\meter} \;\ll\; \SI{0,1}{\milli\meter} \]
+  Le pas de positionnement est plus de \textbf{200 fois plus fin} que la tol\'erance exig\'ee : le codage sur 24 bits satisfait tr\`es largement la pr\'ecision de positionnement attendue.
+  \item La chaîne de traitement est lin\'eaire et fait correspondre le d\'ebattement complet de $288^\circ$ \`a l'\'etendue de tension $\SI{10}{\volt}$ ($-5$ \`a $+5\,\si{\volt}$). \`A un pas angulaire $\delta\theta$ correspond donc :
+  \[ \delta v = \frac{10}{288}\,\delta\theta = \frac{10}{288}\times 1{,}7166\cdot 10^{-5} = \frac{10}{2^{24}} \approx \boldsymbol{5{,}96\cdot 10^{-7}\,\si{\volt}} \]
+  (soit \SI{0,596}{\micro\volt} -- on retrouve directement $10/2^{24}$, ce qui est attendu puisque la conversion angle $\rightarrow$ tension est bijective et lin\'eaire.)
+  \item L'exigence impose $q = \delta v / 10$ :
+  \[ q = \frac{5{,}96\cdot 10^{-7}}{10} \approx \SI{5,96e-8}{\volt} \approx \SI{6e-8}{\volt} \]
+  Le CAN doit d\'ecouper l'intervalle $[\SI{-5}{\volt}\,;\,\SI{+5}{\volt}]$, d'\'etendue \SI{10}{\volt}, en segments de largeur $q$ :
+  \[ N = \frac{10}{q} = \frac{10}{5{,}96\cdot 10^{-8}} \approx 1{,}68\cdot 10^{8} \]
+  \[ n_{bits} = \lceil \log_2(1{,}68\cdot 10^{8})\rceil = \lceil 27{,}3 \rceil = \boldsymbol{28\ \text{bits}} \]
+
+  \smallskip
+  \textbf{Conclusion.} L'exigence \og $q$ dix fois plus petit que $\delta v$ \fg{} conduit \`a un \textbf{CAN 28 bits}, valeur qui n'existe pas dans les gammes industrielles courantes (les convertisseurs $\Sigma\Delta$ de haute r\'esolution plafonnent typiquement \`a 24 bits) : le crit\`ere est \textbf{technologiquement irr\'ealiste tel qu'il est pos\'e}. C'est ici le r\'esultat le plus instructif : la question 2 montre que le \emph{codage de consigne} sur 24 bits satisfait largement la pr\'ecision m\'ecanique demand\'ee, mais exiger que la \emph{chaîne de retour} distingue dix fois plus finement que le pas de consigne revient \`a demander \`a la mesure d'\^etre un ordre de grandeur plus pr\'ecise que la commande -- une surqualit\'e sans justification fonctionnelle. Il faut soit relâcher le facteur 10, soit renoncer \`a num\'eriser directement la tension image et exploiter le r\'esolveur via un convertisseur RDC d\'edi\'e.
+
+  \smallskip
+  \textbf{Remarque (validit\'e de la conclusion globale).} Le corrig\'e officiel souligne que cette \'etude ne suffit pas \`a garantir la pr\'ecision de positionnement de l'\'ecran : seule l'erreur d'\textbf{un} axe sur les six a \'et\'e consid\'er\'ee, et la seule source d'erreur prise en compte est la \textbf{quantification} des angles de consigne. Il faudrait encore v\'erifier que le cumul des erreurs des six axes reste acceptable et que la commande de chaque axe conduit \`a une \textbf{erreur statique nulle}.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 5 -- docTech -- 2024, EDE ENE 1 (option IE), partie D
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize 2024, \'epreuve \'ecrite disciplinaire (option IE), questions D4 \`a D11 (figure 13, DT8 et DT10)}
+]
+\CAPETSHOW{
+L'atelier bois d'un lyc\'ee surveille la temp\'erature $T_{ARM}$ \`a l'int\'erieur de l'armoire \'electrique qui contient le variateur de vitesse. La chaîne d'acquisition est la suivante : un \textbf{capteur thermocouple} d\'elivre une f.\'e.m. $e_{AB}$ de quelques millivolts ; un \textbf{transmetteur de temp\'erature} \og TT \fg{} (r\'ef. KOS~839), \'etalonn\'e sur la plage $-20$ \`a $200\,^\circ\mathrm{C}$, la convertit en un courant normalis\'e \textbf{4 -- 20 mA} ; un \textbf{module d'entr\'ees analogiques} AI 8xU/I/RTD/TC ST d'automate S7-1500 le num\'erise dans le mot \texttt{PIW8} ; enfin le programme automate calcule la temp\'erature en $^\circ\mathrm{C}$ dans le mot interne \texttt{MW8}.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.78, every node/.style={scale=0.78}]
+  \node[draw,minimum width=1.8cm,minimum height=1.0cm,align=center,font=\scriptsize] (c) at (0,0) {Thermocouple\\$e_{AB}$ (mV)\\2 fils};
+  \node[draw,minimum width=2.2cm,minimum height=1.0cm,align=center,font=\scriptsize] (tt) at (3.3,0) {Transmetteur TT\\KOS 839\\$-20 \to 200\,^\circ$C};
+  \node[draw,minimum width=2.2cm,minimum height=1.0cm,align=center,font=\scriptsize] (mod) at (7.6,0) {Module AI\\8xU/I/RTD/TC\\entr\'ee CH2};
+  \node[draw,minimum width=1.9cm,minimum height=1.0cm,align=center,font=\scriptsize] (prg) at (10.8,0) {Programme\\automate};
+  \draw[->] (c.east) -- (tt.west) node[midway,above,font=\scriptsize]{$e_{AB}$};
+  \draw[->] (tt.east) -- (mod.west) node[midway,above,font=\scriptsize]{$I_S$} node[midway,below=1pt,font=\scriptsize]{4--20 mA};
+  \draw[->] (mod.east) -- (prg.west) node[midway,above,font=\scriptsize]{\texttt{PIW8}};
+  \draw[->] (prg.east) -- (12.5,0) node[right,font=\scriptsize]{\texttt{MW8}};
+  \draw[->] (-1.7,0) -- (c.west) node[midway,above,font=\scriptsize]{$T_{ARM}$};
+\end{tikzpicture}
+\end{center}
+
+\begin{tcolorbox}[docTech, title={Document technique -- caract\'eristiques des thermocouples (figure 13) et points caract\'eristiques de la chaîne (DT8, DT10)}]
+\footnotesize
+\textbf{Caract\'eristiques en fonction du type de thermocouple :}
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Type & Plage de mesure conseill\'ee ($^\circ$C) & Alliages & Tol\'erance ($^\circ$C) \\
+\midrule
+T & $-200$ \`a $350$   & Cuivre et Constantan  & $\pm 1$ \\
+K & $-10$ \`a $1\,100$ & Chromel et Alumel     & $\pm 2{,}5$ \\
+N & $0$ \`a $1\,250$   & Nicrosil et Nisil     & $\pm 2{,}5$ \\
+J & $-30$ \`a $700$    & Fer et Constantan     & $\pm 1{,}5$ \\
+E & $0$ \`a $800$      & Chromel et Constantan & $\pm 2$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\emph{Le type J s'oxyde rapidement en milieu humide ; le type T pr\'esente une r\'ep\'etabilit\'e exceptionnelle de $\pm 0{,}1\,^\circ$C de $-200$ \`a $200\,^\circ$C mais un prix tr\`es \'elev\'e. Le type J a \'et\'e retenu pour cette application.}
+
+\smallskip
+\textbf{Points caract\'eristiques du capteur et du transmetteur TT (DT10) :}
+
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Temp\'erature mesur\'ee ($^\circ$C) & $-20$ & $200$ \\
+\midrule
+Tension d\'elivr\'ee par le capteur (mV) & $e_{AB\,mini} = -1$ & $e_{AB\,maxi} = 10{,}8$ \\
+Courant d\'elivr\'e par le transmetteur (mA) & $I_{S\,mini} = 4$ & $I_{S\,maxi} = 20$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\textbf{Module d'entr\'ee analogique (DT8).} \emph{Une entr\'ee analogique est cod\'ee sur 2 octets (16 bits sign\'es) ; le bit de poids fort de l'octet de poids fort porte le signe. En calibre courant, la valeur num\'eris\'ee \texttt{PIWi} vaut $0$ pour le courant minimal de la plage et $27\,648$ pour le courant maximal.}
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever} dans le document technique les grandeurs d'entr\'ee et de sortie de la fonction de transfert $I_S = f(T_{ARM})$ du transmetteur, en pr\'ecisant leurs unit\'es et leurs deux points caract\'eristiques ; \textbf{indiquer} sur combien de bits est cod\'ee une entr\'ee analogique et \textbf{pr\'eciser} le r\^ole du bit de poids fort ; \textbf{relever} enfin la tol\'erance du thermocouple retenu.
+  \item \'Etablir l'expression num\'erique de $I_S$ en fonction de $T_{ARM}$, puis celle de \texttt{PIW8} en fonction de $I_S$.
+  \item \textbf{D\'eterminer} l'\'equation de la droite $\texttt{MW8} = f(\texttt{PIW8})$, puis montrer qu'en introduisant l'\'etendue de mesure $E$ elle s'\'ecrit :
+  \[ \texttt{MW8} = \frac{E}{27\,648}\,\texttt{PIW8} - 20 \]
+  \item Le ventilateur de l'armoire est enclench\'e en petite vitesse au-dessus de $C_B = 35\,^\circ\mathrm{C}$ et en grande vitesse au-dessus de $C_H = 50\,^\circ\mathrm{C}$. \textbf{Calculer} les valeurs de \texttt{PIW8} correspondant \`a ces deux consignes.
+  \item \'Evaluer la r\'esolution de la chaîne en $^\circ\mathrm{C}$ par LSB, la comparer \`a la tol\'erance du capteur relev\'ee \`a la question 1 et conclure sur le maillon qui limite la pr\'ecision de la chaîne.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\textbf{\'Etape 1 -- Extraction des donn\'ees.}
+
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item \textbf{Fonction de transfert du transmetteur} $I_S = f(T_{ARM})$ : \emph{entr\'ee} = temp\'erature $T_{ARM}$ en $^\circ\mathrm{C}$, \emph{sortie} = courant $I_S$ en mA. Points caract\'eristiques (DT10) : $T_{ARM} = -20\,^\circ\mathrm{C} \rightarrow I_S = \SI{4}{\milli\ampere}$ ; $T_{ARM} = 200\,^\circ\mathrm{C} \rightarrow I_S = \SI{20}{\milli\ampere}$.
+  \item \textbf{Codage de l'entr\'ee analogique} (DT8) : une entr\'ee analogique est cod\'ee sur \textbf{2 octets, soit 16 bits sign\'es}, donc une \textbf{r\'esolution utile de 15 bits}. Le \textbf{bit de poids fort} de l'octet de poids fort porte le \textbf{signe} (il permet de repr\'esenter les valeurs n\'egatives, notamment un d\'epassement bas de la plage de mesure).
+  \item \textbf{Tol\'erance du thermocouple retenu} : le type J, retenu pour l'application, pr\'esente une tol\'erance de $\pm 1{,}5\,^\circ\mathrm{C}$.
+\end{itemize}
+
+\smallskip
+\textbf{\'Etape 2 -- Fonctions de transfert successives.}
+
+\begin{enumerate}[leftmargin=1.5em, start=2]
+  \item La relation $I_S = f(T_{ARM})$ est lin\'eaire entre les deux points caract\'eristiques :
+  \[ \text{pente} = \frac{20-4}{200-(-20)} = \frac{16}{220} \approx \SI{0,0727}{\milli\ampere\per\celsius} \]
+  \[ \boxed{\;I_S = \frac{16}{220}\,\bigl(T_{ARM} + 20\bigr) + 4 \quad (\si{\milli\ampere})\;} \]
+  Pour le module d'entr\'ee analogique, $\texttt{PIW8} = 0$ \`a \SI{4}{\milli\ampere} et $\texttt{PIW8} = 27\,648$ \`a \SI{20}{\milli\ampere} :
+  \[ \boxed{\;\texttt{PIW8} = \frac{27\,648}{16}\,\bigl(I_S - 4\bigr)\;} \]
+  \item La caract\'eristique $\texttt{MW8} = f(\texttt{PIW8})$ est une droite $\texttt{MW8} = a\,\texttt{PIW8} + b$ avec $\texttt{PIW8}_{min} = 0 \rightarrow \texttt{MW8}_{min} = -20$ et $\texttt{PIW8}_{max} = 27\,648 \rightarrow \texttt{MW8}_{max} = 200$ :
+  \[ a = \frac{\texttt{MW8}_{max} - \texttt{MW8}_{min}}{\texttt{PIW8}_{max}} = \frac{200-(-20)}{27\,648} = \frac{220}{27\,648} \approx 0{,}0080 \qquad b = \texttt{MW8}_{min} = -20 \]
+  \[ \texttt{MW8} = \frac{220}{27\,648}\,\texttt{PIW8} - 20 \]
+  L'\textbf{\'etendue de mesure} $E$ est la diff\'erence entre les temp\'eratures extr\^emes du transmetteur : $E = 200 - (-20) = 220\,^\circ\mathrm{C}$. En l'introduisant :
+  \[ \boxed{\;\texttt{MW8} = \frac{E}{27\,648}\,\texttt{PIW8} - 20\;} \]
+  Cette forme litt\'erale est celle \`a programmer dans l'automate : elle reste valable si l'on \textbf{reconfigure le transmetteur sur une autre \'etendue} (le mot $E$ devient alors un simple param\`etre, ici \texttt{MW14}), sans toucher au reste du programme.
+  \item On isole \texttt{PIW8} dans l'\'equation pr\'ec\'edente :
+  \[ \texttt{PIW8} = \frac{27\,648}{E}\,\bigl(\texttt{MW8} + 20\bigr) \]
+  \[ C_B = 35\,^\circ\mathrm{C} \;\Rightarrow\; \texttt{PIW8} = \frac{27\,648}{220}\times(35+20) = 125{,}67\times 55 = \boldsymbol{6\,912} \]
+  \[ C_H = 50\,^\circ\mathrm{C} \;\Rightarrow\; \texttt{PIW8} = \frac{27\,648}{220}\times(50+20) = 125{,}67\times 70 \approx \boldsymbol{8\,797} \]
+  \item Un LSB du mot \texttt{PIW8} correspond \`a :
+  \[ \Delta T_{LSB} = \frac{E}{27\,648} = \frac{220}{27\,648} \approx \SI{7,96e-3}{\celsius} \approx \SI{0,008}{\celsius} \]
+  \`A comparer \`a la tol\'erance du thermocouple J relev\'ee \`a la question 1 :
+  \[ \SI{0,008}{\celsius} \quad \text{contre} \quad \pm\SI{1,5}{\celsius} \qquad\text{soit un rapport de } \approx 190 \]
+
+  \smallskip
+  \textbf{Conclusion.} La r\'esolution de la partie num\'erique de la chaîne (\SI{0,008}{\celsius} par LSB) est environ \textbf{190 fois plus fine que la tol\'erance du capteur} lui-m\^eme ($\pm\SI{1,5}{\celsius}$). Le maillon limitant la pr\'ecision de la chaîne est donc sans ambiguït\'e le \textbf{thermocouple}, pas le convertisseur : augmenter la r\'esolution du module d'entr\'ees analogiques n'am\'eliorerait en rien la connaissance de $T_{ARM}$. Cette marge est n\'eanmoins pleinement justifi\'ee par l'usage : avec $\pm\SI{1,5}{\celsius}$ d'incertitude autour d'un seuil $C_B = \SI{35}{\celsius}$, le ventilateur peut s'enclencher entre \SI{33,5}{\celsius} et \SI{36,5}{\celsius} -- \'ecart parfaitement acceptable pour une fonction de ventilation d'armoire, qui ne demande pas une mesure de laboratoire. L'exigence de conception est ici la \textbf{fiabilit\'e du seuil}, pas la finesse de la num\'erisation.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2024, \'epreuve d'admission -- travaux pratiques) : \guillemotleft\ La mise en \oe uvre des mat\'eriels de mesure et d'acquisition ne pr\'esente pas de difficult\'es particuli\`eres. Cependant pour certains candidats, les instruments de mesure les plus courants ne sont pas suffisamment connus (nom, utilisation, symbole et unit\'es des grandeurs physiques mesur\'ees). [\dots] Il est attendu du candidat qu'il soit capable de proposer et de justifier des choix de protocoles exp\'erimentaux. \guillemotright}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 6 -- exercice inedit
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+On souhaite \textbf{v\'erifier la valeur d'une r\'esistance chauffante} $R$ d'un pr\'echauffeur industriel, dont la plaque annonce $R = \SI{100}{\ohm} \pm \SI{2}{\percent}$. La mesure est r\'ealis\'ee en atelier par la \textbf{m\'ethode volt-amp\`erem\'etrique}, avec deux appareils \textbf{analogiques} \`a aiguille dont les caract\'eristiques sont :
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Appareil & Calibre utilis\'e & Classe de pr\'ecision & R\'esistance interne \\
+\midrule
+Voltm\`etre & \SI{300}{\volt} & $0{,}5$ & $R_V = \SI{100}{\kilo\ohm}$ \\
+Amp\`erem\`etre & \SI{3}{\ampere} & $0{,}5$ & $R_A = \SI{0,5}{\ohm}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+On rappelle que pour un appareil analogique, la \textbf{classe de pr\'ecision} $c$ d\'efinit l'erreur maximale tol\'er\'ee $\Delta X = c\times\text{calibre}/100$, \textbf{rapport\'ee au calibre et non \`a la valeur lue}.
+
+Deux montages sont possibles :
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.82, every node/.style={scale=0.82}]
+  % ---- Montage AMONT : le voltmetre est branche AVANT l'amperemetre,
+  %      donc aux bornes de {amperemetre + R} : il mesure U_A + U_R.
+  \draw (0,0) to[sV, l=$E$] (0,3.4);
+  \draw (0,3.4) -- (1.2,3.4);
+  \node[circ] at (1.2,3.4) {};
+  \draw (1.2,3.4) -- (2.6,3.4);
+  \draw (2.6,3.4) to[rmeter, t=A] (4.4,3.4);
+  \draw (4.4,3.4) to[R, l=$R$] (4.4,0);
+  \draw (4.4,0) -- (1.2,0);
+  \node[circ] at (1.2,0) {};
+  \draw (1.2,0) -- (0,0);
+  \draw (1.2,3.4) to[rmeter, t=V] (1.2,0);
+  \node[font=\scriptsize, align=center] at (2.2,-0.8) {\textbf{Montage A}};
+  % ---- Montage AVAL : le voltmetre est branche APRES l'amperemetre,
+  %      directement aux bornes de R : l'amperemetre mesure I_R + I_V.
+  \begin{scope}[xshift=7.8cm]
+  \draw (0,0) to[sV, l=$E$] (0,3.4);
+  \draw (0,3.4) -- (0.8,3.4);
+  \draw (0.8,3.4) to[rmeter, t=A] (2.6,3.4);
+  \draw (2.6,3.4) -- (3.4,3.4);
+  \node[circ] at (3.4,3.4) {};
+  \draw (3.4,3.4) -- (4.8,3.4);
+  \draw (4.8,3.4) to[R, l=$R$] (4.8,0);
+  \draw (4.8,0) -- (3.4,0);
+  \node[circ] at (3.4,0) {};
+  \draw (3.4,0) -- (0,0);
+  \draw (3.4,3.4) to[rmeter, t=V] (3.4,0);
+  \node[font=\scriptsize, align=center] at (2.4,-0.8) {\textbf{Montage B}};
+  \end{scope}
+\end{circuitikz}
+\end{center}
+
+Le montage retenu donne les indications suivantes : $U = \SI{230,0}{\volt}$ et $I = \SI{2,30}{\ampere}$.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Identifier lequel des deux montages est le \textbf{montage amont} et lequel est le \textbf{montage aval}. Pour chacun, indiquer quelle grandeur est entach\'ee d'une \textbf{erreur syst\'ematique de m\'ethode} et pourquoi.
+  \item Exprimer l'erreur relative de m\'ethode de chaque montage en fonction de $R$, $R_A$ et $R_V$. En d\'eduire la valeur de $R$ au-del\`a de laquelle le montage amont devient pr\'ef\'erable. Conclure sur le montage \`a retenir ici.
+  \item Calculer la valeur mesur\'ee $R_{mes} = U/I$ et l'\'ecart syst\'ematique introduit par le montage retenu.
+  \item Calculer les incertitudes absolues $\Delta U$ et $\Delta I$ li\'ees aux classes de pr\'ecision, puis les incertitudes-types $u(U)$ et $u(I)$ (loi de probabilit\'e rectangulaire). En d\'eduire l'\textbf{incertitude-type compos\'ee} $u(R)$ puis l'\textbf{incertitude \'elargie} $U(R)$ pour un niveau de confiance de \SI{95}{\percent} ($k = 2$). \'Ecrire le r\'esultat final avec un nombre de chiffres significatifs coh\'erent.
+  \item Conclure : la mesure permet-elle de statuer sur la conformit\'e de la r\'esistance \`a sa tol\'erance de $\pm\SI{2}{\percent}$ ?
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Montage A = montage amont} : le voltm\`etre est branch\'e \emph{en amont} de l'amp\`erem\`etre, c'est-\`a-dire aux bornes de l'ensemble \{amp\`erem\`etre + $R$\}. Il indique donc $U = R_A I + R I$ : la \textbf{tension} est surestim\'ee de la chute $R_A I$ dans l'amp\`erem\`etre, tandis que le \textbf{courant} est exact (tout le courant mesur\'e traverse $R$).
+
+  \textbf{Montage B = montage aval} : le voltm\`etre est branch\'e \emph{en aval}, directement aux bornes de $R$. Il indique la tension exacte, mais l'amp\`erem\`etre mesure $I = I_R + I_V$ : le \textbf{courant} est surestim\'e du courant d\'eriv\'e $I_V = U/R_V$ dans le voltm\`etre.
+
+  Dans les deux cas l'erreur est \textbf{syst\'ematique} (toujours de m\^eme signe, jamais r\'eduite par r\'ep\'etition des mesures) et due \`a l'\textbf{imperfection des appareils} : un amp\`erem\`etre n'a pas une r\'esistance interne nulle, un voltm\`etre n'a pas une r\'esistance interne infinie.
+  \item \textbf{Montage amont} : $R_{mes} = \dfrac{U}{I} = R + R_A$, d'o\`u :
+  \[ \left|\frac{\Delta R}{R}\right|_{amont} = \frac{R_A}{R} \]
+  \textbf{Montage aval} : $R_{mes} = \dfrac{R\,R_V}{R+R_V}$, d'o\`u, pour $R \ll R_V$ :
+  \[ \left|\frac{\Delta R}{R}\right|_{aval} = \frac{R}{R+R_V} \approx \frac{R}{R_V} \]
+  Les deux erreurs sont \'egales lorsque $\dfrac{R_A}{R} = \dfrac{R}{R_V}$, soit :
+  \[ R_{crit} = \sqrt{R_A\,R_V} = \sqrt{0{,}5\times 100\,000} = \SI{223,6}{\ohm} \]
+  \begin{itemize}[itemsep=1pt]
+    \item pour $R < R_{crit}$ : le montage \textbf{aval} est pr\'ef\'erable (\emph{petites r\'esistances}) ;
+    \item pour $R > R_{crit}$ : le montage \textbf{amont} est pr\'ef\'erable (\emph{grandes r\'esistances}).
+  \end{itemize}
+  Ici $R \approx \SI{100}{\ohm} < \SI{223,6}{\ohm}$ : on retient le \textbf{montage aval (montage B)}.
+  \[ \left|\frac{\Delta R}{R}\right|_{aval} = \frac{100}{100\,000} = \SI{0,1}{\percent} \qquad\text{contre}\qquad \left|\frac{\Delta R}{R}\right|_{amont} = \frac{0{,}5}{100} = \SI{0,5}{\percent} \]
+  \item \[ R_{mes} = \frac{U}{I} = \frac{230{,}0}{2{,}30} = \SI{100,0}{\ohm} \]
+  Le montage aval sous-estime la r\'esistance de \SI{0,1}{\percent}, soit $\SI{0,1}{\ohm}$ : la valeur corrig\'ee de l'erreur de m\'ethode serait
+  \[ R_{corr} = \frac{R_{mes}\,R_V}{R_V - R_{mes}} = \frac{100{,}0\times 100\,000}{100\,000-100{,}0} \approx \SI{100,1}{\ohm} \]
+  \item \textbf{Incertitudes absolues issues des classes} -- elles se calculent sur le \textbf{calibre}, jamais sur la lecture :
+  \[ \Delta U = \frac{0{,}5\times 300}{100} = \SI{1,5}{\volt} \qquad \Delta I = \frac{0{,}5\times 3}{100} = \SI{15}{\milli\ampere} \]
+  \emph{Pi\`ege classique} : appliquer la classe \`a la valeur lue donnerait $0{,}5\times 230/100 = \SI{1,15}{\volt}$ et $0{,}5\times 2{,}30/100 = \SI{11,5}{\milli\ampere}$, soit une sous-estimation syst\'ematique de l'incertitude. C'est pr\'ecis\'ement parce que l'erreur est rapport\'ee au calibre qu'il faut toujours \textbf{mesurer sur le plus petit calibre compatible} avec la grandeur.
+
+  \textbf{Incertitudes-types} (loi rectangulaire, \'evaluation de type B, $u_B = a/\sqrt{3}$) :
+  \[ u(U) = \frac{1{,}5}{\sqrt{3}} = \SI{0,866}{\volt} \qquad u(I) = \frac{0{,}015}{\sqrt{3}} = \SI{8,66}{\milli\ampere} \]
+  \textbf{Composition} -- $R = U/I$ est un \textbf{quotient} : ce sont les incertitudes \textbf{relatives} qui se composent, et de mani\`ere \textbf{quadratique} puisque les deux sources sont ind\'ependantes (deux appareils distincts) :
+  \[ \frac{u(R)}{R} = \sqrt{\left(\frac{u(U)}{U}\right)^2 + \left(\frac{u(I)}{I}\right)^2} = \sqrt{\left(\frac{0{,}866}{230{,}0}\right)^2 + \left(\frac{0{,}00866}{2{,}30}\right)^2} \]
+  \[ = \sqrt{(3{,}766\cdot 10^{-3})^2 + (3{,}766\cdot 10^{-3})^2} = 3{,}766\cdot 10^{-3}\sqrt{2} = 5{,}33\cdot 10^{-3} \]
+  \[ u(R) = 5{,}33\cdot 10^{-3}\times 100{,}0 = \SI{0,53}{\ohm} \]
+  \textbf{Incertitude \'elargie} \`a \SI{95}{\percent} de niveau de confiance, $k = 2$ :
+  \[ U(R) = k\,u(R) = 2\times 0{,}53 = \SI{1,1}{\ohm} \qquad\text{soit}\qquad \frac{U(R)}{R} \approx \SI{1,1}{\percent} \]
+  L'incertitude \'etant de l'ordre de l'ohm, il serait \textbf{absurde d'annoncer $R = \SI{100,05}{\ohm}$} : le r\'esultat s'\'ecrit avec le m\^eme rang que son incertitude.
+  \[ \boxed{\;R = (100{,}0 \pm 1{,}1)\,\si{\ohm} \quad (k = 2,\ \text{niveau de confiance } \SI{95}{\percent})\;} \]
+  \emph{Remarque} : l'erreur de m\'ethode du montage aval (\SI{0,1}{\percent}, soit \SI{0,1}{\ohm}) est cinq fois plus petite que $u(R)$ et dix fois plus petite que $U(R)$ ; elle est donc noy\'ee dans l'incertitude et sa correction ne change pas le r\'esultat affich\'e. Si l'on avait choisi le montage amont, son erreur de \SI{0,5}{\percent} (\SI{0,5}{\ohm}) aurait \'et\'e du m\^eme ordre que $u(R)$ et il aurait fallu la corriger explicitement.
+  \item \textbf{Conclusion.} L'intervalle de mesure $[98{,}9\ ;\ 101{,}1]\,\si{\ohm}$ est \textbf{enti\`erement inclus} dans l'intervalle de tol\'erance annonc\'e par le constructeur, $\SI{100}{\ohm}\pm\SI{2}{\percent}$, soit $[98\ ;\ 102]\,\si{\ohm}$ : la r\'esistance est donc d\'eclar\'ee \textbf{conforme}, et la mesure permet effectivement de statuer. Le rapport entre la tol\'erance et l'incertitude \'elargie vaut $2/1{,}1 \approx 1{,}8$ ; il reste inf\'erieur \`a la valeur de 3 \`a 4 usuellement requise pour un contr\^ole de conformit\'e industriel, ce qui signifie qu'une r\'esistance l\'eg\`erement hors tol\'erance (par exemple \SI{102,5}{\ohm}) tomberait dans la \textbf{zone de doute} o\`u le moyen de mesure ne permet pas de conclure. Le choix du calibre est ici le levier d\'ecisif : mesurer la tension sur un calibre \SI{300}{\volt} pour lire \SI{230}{\volt} n'exploite que \SI{77}{\percent} de l'\'echelle, et l'incertitude de \SI{1,5}{\volt} qui en d\'ecoule est deux fois plus grande que celle qu'aurait donn\'ee un calibre \SI{250}{\volt}.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

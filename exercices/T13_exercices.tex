@@ -1,0 +1,395 @@
+% Sources verifiees (regle de verification web, cf. SKILL exercices-capet) :
+% - Ex. 1 : CAPET 2023, epreuve ecrite disciplinaire appliquee (serre semi-fermee), question 18.
+%   Enonce l.313 du sujet ; N = 950 tr/min issu de la figure 6 (image non OCRisee) mais confirme
+%   par le corrige officiel reproduit dans Rapport_Jury_2023 l.720 (p = 3,16 -> p = 3, Ns = 1000).
+%   Citation jury : Rapport_Jury_2023 l.1037 -- VERBATIM verifie.
+% - Ex. 2 (docTech) : CAPET 2024, epreuve ecrite disciplinaire (extracteur d'air), questions A2,
+%   A4, A7 et A8. Toutes les valeurs de l'encadre docTech sont TEXTUELLEMENT presentes dans le
+%   sujet : plaque signaletique l.126-138 (400 V / 230 V / 229 A / cos phi 0,85 / 50 Hz /
+%   1400 tr.min-1 / p = 2), DT1 l.803-807 (R'R = 0,1 ohm, Lf = 3,6 mH), volumes des salles et
+%   10 renouvellements/h l.102, Delta p = 5 297 Pa et eta = 0,78 l.118-120. La MISE EN FORME en
+%   plaque signaletique / extrait DT1 est reconstituee (le schema du modele monophase et le
+%   graphe DR1 sont des images omises par la conversion Markdown). Resultat A8 (Cu = 686 N.m,
+%   Omega = 146,5 rad/s, d = 1 m) : corrige officiel Rapport_Jury_2024 l.163-171.
+% - Ex. 3 : CAPET 2024, epreuve ecrite disciplinaire (extracteur d'air), questions D15, D16 et
+%   D17 (moteur asynchrone monophase a 2 vitesses du ventilateur d'armoire). Enonce l.614-622 ;
+%   corrige officiel Rapport_Jury_2024 l.403-407 (KA1 : 2 enroulements en serie -> p double ->
+%   petite vitesse ; KA2 : 1 enroulement -> 1 paire de poles -> grande vitesse).
+% - Ex. 4 : CAPET 2023, epreuve ecrite disciplinaire appliquee (serre semi-fermee), questions 19
+%   et 20. Enonce l.317-330 du sujet (C = 0,32(Ns - N), Cr = 1,77e-5 N^2, plage 450-800 tr/min) ;
+%   corrige officiel Rapport_Jury_2023 l.722-732 (f = 23,1 Hz et f = 41,8 Hz) -- recalcul
+%   independant conforme (23,06 Hz et 41,77 Hz).
+% - Ex. 5 : Harmoniques caracteristiques d'un onduleur/redresseur "six-step" (pleine onde) :
+%   amplitude relative en 1/n du fondamental pour les rangs non multiples de 3 (5, 7, 11, 13...),
+%   resultat classique de la decomposition de Fourier d'une onde quasi-carree triphasee --
+%   confirme par Fourier Analysis of Six Step Inverter Controlled Three Phase Induction Motor
+%   Drive (ResearchGate, 335501463) et Industrial Monitor Direct, knowledgebase "6-Pulse
+%   Rectifier Harmonic Calculation" (THD ideal proche de 30% pour un six-pulse/six-step).
+%   Norme IEC/EN 61000-2-2 (THD de courant < 25%) : sourcee mot pour mot dans le sujet reel cite
+%   (CAPET 2024, epreuve ecrite disciplinaire, l.301).
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+% Unite non fournie par siunitx (regle projet : jamais d'unite ecrite a la main).
+\ifdefined\tr\else\DeclareSIUnit{\tr}{tr}\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T13}} - Exercices - Machine asynchrone (MAS)}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T13 \quad Machine asynchrone (MAS)}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 5 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+% =====================================================================
+%  EXERCICE 1 -- 2023 Q18 (conserve : disjoint des QT de la fiche)
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2023, \'epreuve \'ecrite disciplinaire appliqu\'ee (serre semi-ferm\'ee), question 18}
+]
+\CAPETSHOW{
+Le syst\`eme de traitement d'air d'une serre semi-ferm\'ee horticole (sujet CAPET 2023) utilise des ventilateurs entra\^in\'es par des moteurs asynchrones triphas\'es aliment\'es par le r\'eseau \`a $f = \SI{50}{\hertz}$. La vitesse de rotation nominale relev\'ee sur la plaque signal\'etique du constructeur est $N_{nom} = \SI{950}{\tr\per\minute}$. On consid\`ere le glissement n\'egligeable au point nominal pour une premi\`ere estimation ($N_s \approx N_{nom}$).
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Calculer $p = \dfrac{60f}{N_{nom}}$. Ce r\'esultat n'est pas un nombre entier : proposer et justifier la valeur \`a retenir pour le nombre de paires de p\^oles de la machine.
+  \item En d\'eduire la vitesse de synchronisme r\'eelle $N_s$ correspondant \`a cette valeur de $p$.
+  \item Calculer le glissement nominal $g$ (valeur d\'ecimale puis en pourcentage).
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item $p = \dfrac{60\times 50}{950} = \dfrac{3\,000}{950} \approx 3{,}16$. Le nombre de paires de p\^oles est n\'ecessairement un entier (nombre d'enroulements physiques) : la valeur exp\'erimentale $3{,}16$ n'est qu'une estimation issue de la vitesse nominale (qui int\`egre d\'ej\`a le glissement, non nul en charge). On retient donc l'entier le plus proche, $p = 3$.
+  \item Avec $p = 3$ : $N_s = \dfrac{60f}{p} = \dfrac{60\times 50}{3} = \SI[group-minimum-digits=4]{1000}{\tr\per\minute}$.
+  \item $g = \dfrac{N_s - N_{nom}}{N_s} = \dfrac{1\,000-950}{1\,000} = 0{,}05 = 5\,\%$.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Un glissement nominal de \SI{5}{\percent} se situe bien dans la plage usuelle d'une MAS en charge ($3$ \`a \SI{8}{\percent}) : le couple d\'elivr\'e reste dans la partie lin\'eaire de la caract\'eristique m\'ecanique, condition de validit\'e de la commande $V/f$ retenue pour ces ventilateurs.
+
+\smallskip
+\textit{Point de vigilance jury (rapport de jury CAPET 2023, \'epreuve \'ecrite disciplinaire appliqu\'ee) : \guillemotleft\ La justification du nombre de paires de p\^oles d'une MAS \`a partir des caract\'eristiques du constructeur est m\'econnue de nombreux candidats \guillemotright. Le raisonnement (calcul de $p$, v\'erification qu'il doit \^etre entier, recalcul de $N_s$) doit \^etre explicit\'e, pas seulement affirm\'e.}
+}
+\end{tcolorbox}
+
+% =====================================================================
+%  EXERCICE 2 -- docTech : 2024 A2/A4/A7/A8
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{2} \hfill\normalfont\footnotesize 2024, \'epreuve \'ecrite disciplinaire (extracteur d'air), questions A2, A4, A7 et A8}
+]
+\CAPETSHOW{
+L'atelier bois et menuiserie du lyc\'ee les Lombards est \'equip\'e d'un moto-extracteur d'air : un moteur asynchrone triphas\'e entra\^ine un ventilateur centrifuge. Il s'agit ici de \emph{valider le choix de la motorisation} \`a partir des documents constructeur, puis de choisir le diam\`etre des p\^ales du ventilateur.
+
+\begin{tcolorbox}[docTech, title={Document technique -- plaque signal\'etique du moteur et extrait du DT1 (mod\`ele monophas\'e \'equivalent)}]
+\textbf{Plaque signal\'etique du moto-extracteur}
+
+\begin{center}\small
+\begin{tabular}{ll@{\hspace{2.2em}}ll}
+\toprule
+Tension compos\'ee $U_S$ & \SI{400}{\volt} & Fr\'equence r\'eseau $f$ & \SI{50}{\hertz} \\
+Tension simple $V_S$ & \SI{230}{\volt} & Vitesse nominale $N$ & \SI[group-minimum-digits=4]{1400}{\tr\per\minute} \\
+Courant nominal $I_S$ & \SI{229}{\ampere} & Paires de p\^oles $p$ & 2 \\
+Facteur de puissance $\cos\varphi_{mot}$ & 0{,}85 & Pulsation & $\omega_s = 2\pi f$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\textbf{Extrait du DT1 -- mod\`ele monophas\'e \'equivalent}
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.78]
+\draw
+(0,0) to[V, l=$V_s$] (0,3)
+to[short, i=$I_s$] (1.3,3) node[circ]{}
+to[R, l=$R_f$] (1.3,0)
+-- (0,0);
+\draw
+(1.3,3) -- (2.8,3) node[circ]{}
+to[cute inductor, l=$jL_M\omega_s$] (2.8,0)
+-- (1.3,0);
+\draw
+(2.8,3) to[cute inductor, l=$jL_f\omega_s$] (5.6,3)
+to[short, i=$\underline{I'_r}$] (6.9,3) node[circ]{}
+to[R, l=$R'_R/g$] (6.9,0)
+-- (2.8,0);
+\end{circuitikz}
+\end{center}
+
+\vspace{-4pt}
+{\small
+$R_f$ : r\'esistance \'equivalente aux pertes fer \quad$\cdot$\quad $L_M$ : inductance magn\'etisante\\
+$R'_R$ : r\'esistance du rotor ramen\'ee au stator, $R'_R = \SI{0,1}{\ohm}$\\
+$L_f$ : inductance rotorique vue du stator, $L_f = \SI{3,6}{\milli\henry}$\\
+$g$ : glissement, $g = \dfrac{\omega_s-\omega}{\omega_s}$ \quad$\cdot$\quad $N_s = \dfrac{60 f}{p}$ (\si{\tr\per\minute})}
+\end{tcolorbox}
+
+\smallskip
+\textbf{Donn\'ees a\'erauliques (partie A du sujet).} Les deux salles du p\^ole bois ont pour volumes $V_1 = \SI{2500}{\meter\cubed}$ et $V_2 = \SI{2750}{\meter\cubed}$ ; le client impose $10$ renouvellements d'air par heure. Compte tenu des coudes, t\'es et r\'eductions du r\'eseau d'aspiration, l'extracteur doit exercer une pression totale $\Delta p = \SI{5297}{\pascal}$, avec $P_{extra} = \Delta p \times D_t$. Le rendement du ventilateur vaut $\eta = 0{,}78$.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Extraction.} Relever dans le document technique ci-dessus les grandeurs n\'ecessaires au calcul de la branche rotorique du mod\`ele : tension appliqu\'ee \`a une phase du stator, r\'esistance rotorique ramen\'ee, inductance de fuite, fr\'equence, nombre de paires de p\^oles et vitesse nominale. Pr\'eciser en particulier laquelle des deux tensions figurant sur la plaque intervient dans le mod\`ele monophas\'e, et pourquoi.
+  \item Calculer le d\'ebit total $D_t$ dans la canalisation principale (en \si{\meter\cubed\per\second}), puis la puissance $P_{extra}$ fournie par l'extracteur et la puissance utile $P_u$ que doit d\'evelopper le moteur.
+  \item \`A partir du mod\`ele du DT1, \'etablir l'expression litt\'erale de la valeur efficace $I'_r$ du courant rotorique ramen\'e en fonction de $V_s$, $R'_R$, $L_f$, $\omega_s$ et $g$ (la branche magn\'etisante \'etant plac\'ee en parall\`ele, elle ne traverse pas cette branche). Calculer $I'_r$ au point nominal.
+  \item Le sujet retient pour la suite $P_u = \SI{100}{\kilo\watt}$. Conclure sur la validit\'e du choix de la motorisation en comparant cette valeur \`a celle obtenue \`a la question 2.
+  \item Calculer le couple utile $C_u$ au point de fonctionnement nominal. Sachant que le couple a\'erodynamique du ventilateur centrifuge varie comme $C_v = k\,d^{5}\Omega^{2}$ ($d$ : diam\`etre des p\^ales), expliquer comment ce point de fonctionnement permet de choisir $d$ sur le r\'eseau de courbes $C_v(\Omega)$ du document r\'eponse DR1 du sujet.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Extraction du document technique.} La branche rotorique est parcourue par $\underline{I'_r}$ et comprend $jL_f\omega_s$ en s\'erie avec $R'_R/g$ ; elle est aliment\'ee, apr\`es la branche magn\'etisante, par la tension $V_s$. On rel\`eve donc :
+  \[ V_s = \SI{230}{\volt}\ (\text{tension \emph{simple}}),\quad R'_R = \SI{0,1}{\ohm},\quad L_f = \SI{3,6}{\milli\henry},\quad f = \SI{50}{\hertz},\quad p = 2,\quad N = \SI[group-minimum-digits=4]{1400}{\tr\per\minute}. \]
+  Le mod\`ele monophas\'e \'equivalent repr\'esente \emph{une phase} de la machine : c'est la tension simple $V_s = \SI{230}{\volt}$ qui lui est appliqu\'ee, et non la tension compos\'ee $U_S = \SI{400}{\volt}$ (avec $U_S = \sqrt{3}\,V_s$). Confondre les deux multiplie le courant calcul\'e par $\sqrt{3}$.
+  \item D\'ebit : $10$ renouvellements par heure du volume total $V_1+V_2 = \SI{5250}{\meter\cubed}$ :
+  \[ D_t = \frac{10\times(2\,500+2\,750)}{3\,600} = \frac{52\,500}{3\,600} \approx \SI{14,58}{\meter\cubed\per\second} \]
+  \[ P_{extra} = \Delta p\,D_t = 5\,297\times 14{,}58 \approx \SI{77,2}{\kilo\watt}
+     \qquad;\qquad P_u = \frac{P_{extra}}{\eta} = \frac{77\,200}{0{,}78} \approx \SI{99,0}{\kilo\watt} \]
+  \item Glissement nominal : $N_s = \dfrac{60\times 50}{2} = \SI[group-minimum-digits=4]{1500}{\tr\per\minute}$, d'o\`u $g = \dfrac{1\,500-1\,400}{1\,500} = 0{,}0\overline{6}$.
+
+  La branche rotorique est une simple association s\'erie soumise \`a $V_s$ :
+  \[ \underline{I'_r} = \frac{\underline{V_s}}{\dfrac{R'_R}{g} + jL_f\omega_s}
+     \qquad\Longrightarrow\qquad
+     I'_r = \frac{V_s}{\sqrt{\left(\dfrac{R'_R}{g}\right)^{2} + \left(L_f\omega_s\right)^{2}}} \]
+  Application num\'erique : $\omega_s = 2\pi\times 50 \approx \SI{314,2}{\radian\per\second}$, donc
+  \[ \frac{R'_R}{g} = \frac{0{,}1}{0{,}0\overline{6}} = \SI{1,5}{\ohm}
+     \qquad;\qquad L_f\omega_s = 3{,}6\times 10^{-3}\times 314{,}2 \approx \SI{1,13}{\ohm} \]
+  \[ I'_r = \frac{230}{\sqrt{1{,}5^{2}+1{,}13^{2}}} = \frac{230}{\sqrt{2{,}25+1{,}28}} = \frac{230}{1{,}879} \approx \SI{122}{\ampere} \]
+  On retrouve bien la valeur $I'_r = \SI{122}{\ampere}$ que le sujet impose pour la suite de l'\'etude.
+  \item Le moteur d\'elivre $P_u = \SI{100}{\kilo\watt}$, l\'eg\`erement sup\'erieure aux \SI{99,0}{\kilo\watt} exig\'es par le besoin a\'eraulique : \textbf{le choix de la motorisation est valid\'e}. La marge, de l'ordre de \SI{1}{\percent}, est faible mais positive ; toute d\'egradation du rendement a\'eraulique (encrassement des filtres, pertes de charge suppl\'ementaires) la consommerait, ce qui justifie le passage en vitesse variable \'etudi\'e dans la suite du sujet.
+  \item Au point nominal, $\Omega = \dfrac{1\,400\times 2\pi}{60} \approx \SI{146,5}{\radian\per\second}$, donc
+  \[ C_u = \frac{P_u}{\Omega} = \frac{100\times 10^{3}}{146{,}5} \approx \SI{686}{\newton\meter} \]
+  Le point $(\Omega = \SI{146,5}{\radian\per\second}\,;\,C_u = \SI{686}{\newton\meter})$ est report\'e sur le r\'eseau de courbes $C_v(\Omega)$ du DR1 : le r\'egime \'etabli s'\'etablit \`a l'\emph{intersection} de la caract\'eristique m\'ecanique du moteur $C_u(\Omega)$ et de la caract\'eristique de charge $C_v(\Omega)$. On retient donc la courbe param\'etr\'ee en $d$ qui passe par ce point, soit un diam\`etre de p\^ales $d = \SI{1}{\meter}$.
+
+  \textbf{Conclusion.} La forte sensibilit\'e du couple a\'erodynamique au diam\`etre ($C_v \propto d^{5}$) rend ce choix critique : un diam\`etre trop grand d\'eplace l'intersection vers les basses vitesses et surcharge la machine (glissement et pertes Joule rotoriques accrus), un diam\`etre trop petit ne permet pas d'atteindre le d\'ebit $D_t$ exig\'e par les $10$ renouvellements horaires du cahier des charges.
+\end{enumerate}
+
+\smallskip
+\textit{Point de vigilance (rapport de jury CAPET 2024, \'epreuve \'ecrite disciplinaire) : \guillemotleft\ le jury regrette le manque de ma\^itrise des formules de base sur les r\'eseaux triphas\'es, le r\'egime sinuso\"idal et les relations d'\'electrocin\'etique telles que la loi des mailles, la loi des n\oe{}uds ou encore la loi d'Ohm \guillemotright. Ici, c'est la simple loi d'Ohm complexe appliqu\'ee \`a la branche rotorique qui donne $I'_r$ : encore faut-il avoir identifi\'e correctement, sur le DT1, quelle tension alimente cette branche.}
+}
+\end{tcolorbox}
+
+% =====================================================================
+%  EXERCICE 3 -- 2024 D15/D16/D17 (MAS monophase 2 vitesses)
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize 2024, \'epreuve \'ecrite disciplinaire (extracteur d'air), questions D15, D16 et D17}
+]
+\CAPETSHOW{
+L'armoire \'electrique qui abrite le variateur de vitesse du moto-extracteur est refroidie par un ventilateur entra\^in\'e par un \textbf{moteur asynchrone monophas\'e \`a deux vitesses}. Son stator comporte deux enroulements principaux identiques ($E_1$ et $E_2$) et un enroulement auxiliaire de d\'emarrage, en s\'erie avec un condensateur permanent $C_p$ qui produit le d\'ephasage n\'ecessaire au lancement du moteur et reste sous tension en permanence.
+
+Deux relais \SI{24}{\volt} continu, $KA_1$ et $KA_2$, s\'electionnent le mode d'alimentation des enroulements principaux, conform\'ement au sch\'ema simplifi\'e ci-dessous :
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+  % reseau
+  \draw (0,3.2) node[left]{\small Phase} -- (0.6,3.2);
+  \draw (0,0) node[left]{\small Neutre} -- (7.6,0);
+  % contact KA1 : alimente E1 et E2 en serie
+  \draw (0.6,3.2) -- (1.4,3.2)
+        to[nos, l=$KA_1$] (2.8,3.2)
+        to[R, l=$E_1$] (2.8,1.6)
+        to[R, l=$E_2$] (2.8,0);
+  % contact KA2 : alimente E1 seul
+  \draw (0.6,3.2) -- (0.6,4.2) -- (4.4,4.2)
+        to[nos, l=$KA_2$] (5.6,4.2);
+  \draw (5.6,4.2) -- (5.6,3.2) to[R, l=$E_1$] (5.6,0);
+  % enroulement auxiliaire permanent
+  \draw (0.6,3.2) -- (0.6,2.0) -- (7.6,2.0)
+        to[C, l=$C_p$] (7.6,1.1)
+        to[R, l=$\mathrm{aux.}$] (7.6,0);
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Rappeler la relation liant la vitesse de synchronisme $N_s$, la fr\'equence $f$ du r\'eseau et le nombre de paires de p\^oles $p$ d'une machine asynchrone. Sur quel param\`etre peut-on agir ici, la fr\'equence r\'eseau \'etant fixe \`a \SI{50}{\hertz} ?
+  \item Le contact $KA_1$ est ferm\'e ($KA_2$ ouvert) : d\'ecrire le sch\'ema \'equivalent de l'alimentation du moteur et indiquer combien d'enroulements principaux sont aliment\'es et selon quel couplage.
+  \item M\^eme question lorsque $KA_2$ est ferm\'e ($KA_1$ ouvert).
+  \item En d\'eduire, pour chacun des deux cas, si le moteur tourne en \guillemotleft\ petite vitesse \guillemotright\ (PV) ou en \guillemotleft\ grande vitesse \guillemotright\ (GV). Justifier par le nombre de paires de p\^oles cr\'e\'ees, puis calculer les deux vitesses de synchronisme sachant que le cas GV correspond \`a $p = 1$.
+  \item Un verrouillage \'electrique est \`a pr\'evoir entre $KA_1$ et $KA_2$. Expliquer quel d\'efaut il pr\'evient et pourquoi un verrouillage \emph{logiciel} dans l'automate ne suffit pas.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item $N_s = \dfrac{60 f}{p}$ (en \si{\tr\per\minute}), soit $\Omega_s = \dfrac{\omega_s}{p} = \dfrac{2\pi f}{p}$ (en \si{\radian\per\second}). Le r\'eseau imposant $f = \SI{50}{\hertz}$ fixe, la seule variable d'action est le \textbf{nombre de paires de p\^oles $p$} : c'est le principe du moteur \`a couplage de p\^oles (\`a distinguer de la variation de fr\'equence par variateur, utilis\'ee pour le moto-extracteur lui-m\^eme).
+  \item $KA_1$ ferm\'e : le courant traverse successivement $E_1$ puis $E_2$. Les \textbf{deux enroulements principaux sont aliment\'es en s\'erie}. L'enroulement auxiliaire et son condensateur $C_p$ restent en parall\`ele sur le r\'eseau (ils sont sous tension en permanence).
+  \item $KA_2$ ferm\'e : la branche court-circuite $E_2$ et n'alimente que $E_1$. \textbf{Un seul enroulement principal est aliment\'e}, directement entre phase et neutre ; l'auxiliaire reste \'egalement aliment\'e.
+  \item Deux enroulements en s\'erie cr\'eent deux fois plus de p\^oles qu'un seul : le nombre de paires de p\^oles est \textbf{doubl\'e}, donc $N_s$ est \textbf{divis\'ee par deux}.
+  \begin{itemize}[leftmargin=1.2em]
+    \item $KA_1$ ferm\'e (2 enroulements en s\'erie) $\Rightarrow$ $p = 2$ $\Rightarrow$ $N_s = \dfrac{60\times 50}{2} = \SI[group-minimum-digits=4]{1500}{\tr\per\minute}$ : \textbf{petite vitesse (PV)}.
+    \item $KA_2$ ferm\'e (1 enroulement) $\Rightarrow$ $p = 1$ $\Rightarrow$ $N_s = \dfrac{60\times 50}{1} = \SI[group-minimum-digits=4]{3000}{\tr\per\minute}$ : \textbf{grande vitesse (GV)}.
+  \end{itemize}
+  \item Le verrouillage emp\^eche l'alimentation \emph{simultan\'ee} de $KA_1$ et $KA_2$ : les deux relais ferm\'es ensemble mettraient $E_2$ en court-circuit franc \`a travers le contact $KA_2$, provoquant un courant destructeur pour l'enroulement et le contact. Un verrouillage logiciel seul ne suffit pas : il ne prot\`ege ni contre un collage m\'ecanique de contact, ni contre un d\'efaut de la carte de sorties TOR, ni pendant les phases o\`u l'automate n'est pas op\'erationnel (d\'emarrage, mode arr\^et, d\'efaut CPU). Le verrouillage doit donc \^etre \emph{c\^abl\'e}, par contacts auxiliaires \guillemotleft\ normalement ferm\'es \guillemotright\ crois\'es entre les bobines des deux relais.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Le rapport $\SI[group-minimum-digits=4]{3000}{\tr\per\minute} / \SI[group-minimum-digits=4]{1500}{\tr\per\minute} = 2$ entre les deux synchronismes est impos\'e par la construction : ce moteur ne conna\^it que deux vitesses discr\`etes, contrairement au moto-extracteur pilot\'e par variateur. C'est acceptable pour une ventilation d'armoire, dont le cahier des charges se limite \`a deux seuils de temp\'erature, mais ce serait insuffisant pour asservir un d\'ebit d'air en continu.
+}
+\end{tcolorbox}
+
+% =====================================================================
+%  EXERCICE 4 -- 2023 Q19 + Q20 (couple linearise + plage de frequence)
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{3} \hfill\normalfont\footnotesize 2023, \'epreuve \'ecrite disciplinaire appliqu\'ee (serre semi-ferm\'ee), questions 19 et 20}
+]
+\CAPETSHOW{
+On reprend les machines asynchrones triphas\'ees de la serre semi-ferm\'ee de l'exercice 1 ($p = 3$). Le r\'eglage de la vitesse $N$ est obtenu en agissant sur la fr\'equence $f$ des courants et tensions statoriques, au moyen d'onduleurs de tension triphas\'es travaillant \`a $V/f = \mathrm{C^{te}}$ et command\'es en MLI.
+
+Dans leur partie utile, les caract\'eristiques m\'ecaniques $C = f(N)$ de la MAS sont alors assimil\'ees \`a des \textbf{segments de droite de m\^eme coefficient directeur}, param\'etr\'es par la fr\'equence $f$ : chacun coupe l'axe des vitesses en $N = N_s$ (couple nul au synchronisme). Le relev\'e des caract\'eristiques donne un coefficient directeur de valeur absolue $0{,}32\ \si{\newton\meter}$ par \si{\tr\per\minute}.
+
+Les ventilateurs opposent un couple r\'esistant $C_r$ (en \si{\newton\meter}) proportionnel au carr\'e de la vitesse $N$ (en \si{\tr\per\minute}) :
+\[ C_r = 1{,}77\times 10^{-5}\cdot N^{2} . \]
+En r\'egime \'etabli, la vitesse de rotation des ventilateurs varie de \SI{450}{\tr\per\minute} (vitesse minimale en hiver) \`a \SI{800}{\tr\per\minute} (vitesse maximale en \'et\'e).
+
+\begin{center}
+\begin{tikzpicture}[scale=1, font=\small]
+  \draw[-latex] (0,0) -- (7.2,0) node[right]{$N$ (\si{\tr\per\minute})};
+  \draw[-latex] (0,0) -- (0,3.4) node[above]{$C$ (\si{\newton\meter})};
+  % caracteristique moteur f1 (Ns1 = 462) et f2 (Ns2 = 836)
+  \draw[colExo, very thick] (1.55,3.0) -- (3.1,0) node[below right, colExo]{\scriptsize $N_{s1}$};
+  \draw[colExo, very thick] (4.05,3.0) -- (5.6,0) node[below right, colExo]{\scriptsize $N_{s2}$};
+  \node[colExo] at (1.4,3.2) {\scriptsize $f_{min}$};
+  \node[colExo] at (3.9,3.2) {\scriptsize $f_{max}$};
+  % courbe Cr parabolique
+  \draw[colMeca, very thick, domain=0:6.3, samples=60, smooth]
+    plot (\x, {0.075*\x*\x}) node[right, colMeca]{\scriptsize $C_r = 1{,}77\cdot 10^{-5}N^2$};
+  % points de fonctionnement
+  \fill (2.62,0.515) circle (1.8pt) node[above right]{\scriptsize $P_1$};
+  \fill (5.12,1.965) circle (1.8pt) node[above left]{\scriptsize $P_2$};
+  \draw[dashed, gray] (2.62,0) -- (2.62,0.515);
+  \draw[dashed, gray] (5.12,0) -- (5.12,1.965);
+  \node[below] at (2.62,0) {\scriptsize 450};
+  \node[below] at (5.12,0) {\scriptsize 800};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Montrer, dans la partie utile, que $C = 0{,}32\,(N_s - N)$. En d\'eduire l'expression du couple $C$ en fonction de $f$, $p$ et $N$.
+  \item \'Ecrire l'\'equation traduisant l'\'equilibre du point de fonctionnement en r\'egime \'etabli, puis en tirer l'expression de la fr\'equence $f$ \`a imposer en fonction de $N$ et $p$.
+  \item D\'eterminer la plage de variation de la fr\'equence $f$ correspondant \`a la plage de vitesse \SIrange{450}{800}{\tr\per\minute}.
+  \item V\'erifier que les vitesses de synchronisme associ\'ees encadrent bien les vitesses de rotation impos\'ees, et commenter la valeur du glissement obtenue \`a chaque extr\'emit\'e de la plage.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Dans la partie utile, $C$ est une fonction affine de $N$ : $C = a\,N + b$, de coefficient directeur $a = -0{,}32$ (le couple d\'ecro\^it quand la vitesse cro\^it). Le couple s'annule au synchronisme, $C = 0$ pour $N = N_s$, d'o\`u $b = -a\,N_s = 0{,}32\,N_s$ :
+  \[ \boxed{C = 0{,}32\,(N_s - N)} \]
+  Comme $N_s = \dfrac{60 f}{p}$, il vient
+  \[ C = 0{,}32\left(\frac{60 f}{p} - N\right) . \]
+  \item En r\'egime \'etabli, le couple moteur \'equilibre le couple r\'esistant, $C = C_r$ :
+  \[ 0{,}32\left(\frac{60 f}{p} - N\right) = 1{,}77\times 10^{-5}\,N^{2} \]
+  \[ \frac{60 f}{p} = \frac{1{,}77\times 10^{-5}\,N^{2}}{0{,}32} + N
+     \qquad\Longrightarrow\qquad
+     \boxed{f = \left(\frac{1{,}77\times 10^{-5}\,N^{2}}{0{,}32} + N\right)\frac{p}{60}} \]
+  \item Avec $p = 3$ :
+
+  \textbf{Hiver}, $N = \SI{450}{\tr\per\minute}$ :
+  \[ C_r = 1{,}77\times 10^{-5}\times 450^{2} = \SI{3,58}{\newton\meter}
+     \quad;\quad
+     f = \left(\frac{3{,}58}{0{,}32} + 450\right)\frac{3}{60} = \left(11{,}2 + 450\right)\times 0{,}05 \approx \SI{23,1}{\hertz} \]
+
+  \textbf{\'Et\'e}, $N = \SI{800}{\tr\per\minute}$ :
+  \[ C_r = 1{,}77\times 10^{-5}\times 800^{2} = \SI{11,33}{\newton\meter}
+     \quad;\quad
+     f = \left(\frac{11{,}33}{0{,}32} + 800\right)\frac{3}{60} = \left(35{,}4 + 800\right)\times 0{,}05 \approx \SI{41,8}{\hertz} \]
+
+  La plage de fr\'equence \`a fournir par les onduleurs est donc \SIrange{23,1}{41,8}{\hertz}.
+  \item Vitesses de synchronisme associ\'ees : $N_{s,min} = \dfrac{60\times 23{,}1}{3} = \SI{462}{\tr\per\minute}$ et $N_{s,max} = \dfrac{60\times 41{,}8}{3} = \SI{836}{\tr\per\minute}$. Elles encadrent bien, par valeurs sup\'erieures, les vitesses impos\'ees \SI{450}{} et \SI{800}{\tr\per\minute} : le fonctionnement est bien moteur ($N < N_s$).
+
+  Glissements : $g_{hiver} = \dfrac{462-450}{462} \approx 2{,}6\,\%$ et $g_{ete} = \dfrac{836-800}{836} \approx 4{,}3\,\%$. Le glissement cro\^it avec la vitesse, ce qui est coh\'erent avec une charge en $N^{2}$ : plus la vitesse est \'elev\'ee, plus le couple demand\'e est grand, donc plus l'\'ecart au synchronisme est important.
+
+  \textbf{Conclusion.} La plage \SIrange{23,1}{41,8}{\hertz} reste enti\`erement inf\'erieure \`a la fr\'equence r\'eseau de \SI{50}{\hertz} : la commande $V/f = \mathrm{C^{te}}$ s'exerce donc toujours \emph{sous} le point nominal, dans la zone o\`u le flux statorique est maintenu constant et le couple maximal disponible pr\'eserv\'e. Aucun d\'eflux\-age n'est n\'ecessaire, et les onduleurs peuvent \^etre dimensionn\'es sans marge de surtension : le choix du r\'eglage par variation de fr\'equence est valid\'e pour cette application.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+%  EXERCICE 5 -- inedit (THD variateur) -- conserve
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize exercice in\'edit (contexte inspir\'e du CAPET 2024, extracteur d'air, questions B10 et B11)}
+]
+\CAPETSHOW{
+Le variateur de vitesse qui alimente le moteur asynchrone triphas\'e peut \^etre command\'e selon deux strat\'egies : une commande en \guillemotleft\ pleine onde \guillemotright\ (cas 1, chaque bras de l'onduleur commute une seule fois par p\'eriode) ou une commande par modulation de largeur d'impulsion (MLI, cas 2) \`a fr\'equence de porteuse $f_p = \SI{6}{\kilo\hertz}$. On souhaite comparer la qualit\'e du courant r\'eseau $I_r$ obtenu dans les deux cas vis-\`a-vis de la norme IEC/EN 61000-2-2, qui fixe un taux de distorsion harmonique (THD) de courant inf\'erieur \`a $25\,\%$.
+
+Le tableau ci-dessous donne les amplitudes efficaces des harmoniques de courant, exprim\'ees en pourcentage du fondamental $I_1$ (les harmoniques multiples de 3 sont nulles en r\'egime triphas\'e \'equilibr\'e) :
+
+\begin{center}
+\begin{tabular}{lccccc}
+\toprule
+Rang $n$ & 1 & 5 & 7 & 11 & 13 \\
+\midrule
+Cas 1 -- pleine onde ($I_n/I_1$, \%) & 100 & 20 & 14,3 & 9,1 & 7,7 \\
+Cas 2 -- MLI, $f_p=\SI{6}{\kilo\hertz}$ ($I_n/I_1$, \%) & 100 & 3 & 2 & 1,5 & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.85]
+  \draw[-latex] (0,0) -- (5,0) node[right]{\footnotesize rang $n$};
+  \draw[-latex] (0,0) -- (0,2.6) node[above]{\footnotesize $I_n/I_1$ (\%)};
+  \draw[fill=colExo!60!white] (0.5,0) rectangle ++(0.5,2.00); \node[below] at (0.75,0) {\footnotesize 5};
+  \draw[fill=colExo!60!white] (1.5,0) rectangle ++(0.5,1.43); \node[below] at (1.75,0) {\footnotesize 7};
+  \draw[fill=colExo!60!white] (2.5,0) rectangle ++(0.5,0.91); \node[below] at (2.75,0) {\footnotesize 11};
+  \draw[fill=colExo!60!white] (3.5,0) rectangle ++(0.5,0.77); \node[below] at (3.75,0) {\footnotesize 13};
+  \node at (2.25,-0.9) {\footnotesize Cas 1 -- pleine onde};
+
+  \begin{scope}[xshift=6.7cm]
+  \draw[-latex] (0,0) -- (5,0) node[right]{\footnotesize rang $n$};
+  \draw[-latex] (0,0) -- (0,2.6) node[above]{\footnotesize $I_n/I_1$ (\%)};
+  \draw[fill=colExo!60!white] (0.5,0) rectangle ++(0.5,0.30); \node[below] at (0.75,0) {\footnotesize 5};
+  \draw[fill=colExo!60!white] (1.5,0) rectangle ++(0.5,0.20); \node[below] at (1.75,0) {\footnotesize 7};
+  \draw[fill=colExo!60!white] (2.5,0) rectangle ++(0.5,0.15); \node[below] at (2.75,0) {\footnotesize 11};
+  \draw[fill=colExo!60!white] (3.5,0) rectangle ++(0.5,0.10); \node[below] at (3.75,0) {\footnotesize 13};
+  \node at (2.25,-0.9) {\footnotesize Cas 2 -- MLI};
+  \end{scope}
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Rappeler la d\'efinition du THD en fonction des valeurs efficaces des harmoniques $I_2, I_3, \ldots, I_n$ et du fondamental $I_1$.
+  \item Calculer le THD du courant $I_r$ dans le cas 1 (pleine onde), en limitant la somme aux harmoniques de rang 5, 7, 11 et 13.
+  \item Calculer le THD dans le cas 2 (MLI), avec les m\^emes rangs.
+  \item Conclure, pour chacun des deux cas, sur la conformit\'e vis-\`a-vis de la norme IEC/EN 61000-2-2. Expliquer pourquoi la MLI ne supprime pas les harmoniques mais les d\'eplace en fr\'equence.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \[ \text{THD} = \frac{\sqrt{I_2^2 + I_3^2 + \cdots + I_n^2}}{I_1} \]
+  \item Cas 1 :
+  \[ \text{THD}_1 = \frac{\sqrt{20^2+14{,}3^2+9{,}1^2+7{,}7^2}}{100} = \frac{\sqrt{400+204{,}5+82{,}8+59{,}3}}{100} = \frac{\sqrt{746{,}6}}{100} \approx \frac{27{,}3}{100} \approx 27{,}3\,\% \]
+  \item Cas 2 :
+  \[ \text{THD}_2 = \frac{\sqrt{3^2+2^2+1{,}5^2+1^2}}{100} = \frac{\sqrt{9+4+2{,}25+1}}{100} = \frac{\sqrt{16{,}25}}{100} \approx \frac{4{,}03}{100} \approx 4{,}0\,\% \]
+  \item $\text{THD}_1 \approx 27{,}3\,\% > 25\,\%$ : la commande en pleine onde \textbf{n'est pas conforme} \`a la norme IEC/EN 61000-2-2. $\text{THD}_2 \approx 4{,}0\,\% < 25\,\%$ : la commande MLI est \textbf{conforme}. La MLI ne fait pas dispara\^itre l'\'energie harmonique : elle la d\'eplace des rangs bas (5, 7, 11, 13, porteurs d'\'echauffements suppl\'ementaires et de pertes fer/couple pulsatoire dans la machine) vers des bandes lat\'erales group\'ees autour de la fr\'equence de d\'ecoupage $f_p$ et de ses multiples, plus faciles \`a filtrer par les inductances de fuite du moteur (effet de filtre passe-bas) ou par une cellule de filtrage suppl\'ementaire c\^ot\'e r\'eseau. Il ne faut donc pas conclure que la MLI \guillemotleft\ \'elimine \guillemotright\ les harmoniques : elle en repousse la majeure partie hors de la bande basse fr\'equence g\^enante pour le r\'eseau et la machine.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

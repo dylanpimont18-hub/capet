@@ -1,0 +1,374 @@
+﻿\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colElec}{T07}} - Hacheurs (1, 2 et 4 quadrants)}
+\fancyhead[R]{\small\textit{CAPET SII IE - Session 2026}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TeTE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colElec,
+  colframe=colElec,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T07 \quad Hacheurs (1, 2 et 4 quadrants)}\\[2pt]
+  {\color{colElec!30!white}\small
+    \textbf{Domaine :} electrotechnique - electronique de puissance \quad
+    \textbf{Presence :} \textbf{9/13} sujets (2013-2026) - theme \emph{tres frequent}
+  }\\[1pt]
+  {\color{colElec!20!white}\footnotesize
+    Sous-themes : hacheur Buck (devolteur) - hacheur Boost (elevateur) - ondulation courant - hacheur 4 quadrants (pont en H) - entrelacement de bras - MPPT
+  }
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Hacheur Buck (devolteur) -------------------------------------
+\textbf{1.1 Hacheur Buck - devolteur (serie)}
+
+\smallskip
+Principe : l'interrupteur commande est ferme pendant $t_{on} = \alpha T$ puis ouvert pendant $t_{off} = (1-\alpha)T$.
+En conduction continue, la loi de la valeur moyenne donne :
+\[
+  \langle u_{sortie} \rangle = \alpha \cdot E \qquad \text{avec}\quad \alpha \in [0\,;\,1]
+\]
+Ondulation de courant dans l'inductance (pire cas - $\alpha = 0{,}5$) :
+\[
+  \Delta i_L = \frac{E \cdot \alpha \cdot (1-\alpha)}{L \cdot f}
+  \qquad\Rightarrow\qquad
+  L_{min} = \frac{E \cdot 0{,}5 \times 0{,}5}{\Delta i_{L,max} \cdot f} = \frac{E}{4 \cdot \Delta i_{L,max} \cdot f}
+\]
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.2 Hacheur Boost (elevateur) ------------------------------------
+\textbf{1.2 Hacheur Boost - elevateur}
+
+\smallskip
+En regime permanent, $\langle v_L \rangle = 0$ sur une periode :
+\[
+  E_b \cdot \alpha + (E_b - V_{DC})(1-\alpha) = 0
+  \quad\Rightarrow\quad
+  \boxed{V_{DC} = \frac{E_b}{1-\alpha}} > E_b
+\]
+Phase $Q_1$ ferme ($t \in [0\,;\,\alpha T[$) : $v_{L} = E_b$ (courant croet).\\
+Phase $Q_1$ ouvert ($t \in [\alpha T\,;\,T[$) : $v_{L} = E_b - V_{DC}$ (courant decroet, diode passe).
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.3 Hacheur 4 quadrants (pont en H) ------------------------------
+\textbf{1.3 Hacheur 4 quadrants - pont en H}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{lll}
+\toprule
+\textbf{Configuration} & \textbf{Tension moyenne} & \textbf{Plage} \\
+\midrule
+Hacheur Buck (1Q) & $\langle u \rangle = \alpha \cdot E$ & $0 \leq \alpha \leq 1$ \\[4pt]
+Pont en H bipolaire (4Q) & $\langle u \rangle = (2\alpha - 1) \cdot E$ & $\alpha = 0{,}5 \to u = 0$ \\[4pt]
+Entrelacement $n$ bras & $\Delta i_{resultante} = \Delta i_L / n$ & Dephasage $T/n$ entre bras \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+Conservation de la puissance (Boost ideal) : $E_b \cdot I_{E} = V_{DC} \cdot I_{DC}$.
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHeTIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthetique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Hacheur Buck}} \\
+$\langle u_s \rangle = \alpha \cdot E$ & Tension sortie & V \\
+$\alpha = \langle u_s \rangle / E$ & Rapport cyclique & - \\
+$\Delta i_L = E\alpha(1-\alpha)/(Lf)$ & Ondulation & A \\
+$L_{min} = E/(4\Delta i_{max} f)$ & Inductance min & H \\
+$t_{on} = \alpha T$ & Duree passant & s \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Hacheur Boost}} \\
+$V_{DC} = E_b/(1-\alpha)$ & Tension sortie & V \\
+$\langle v_L \rangle = 0$ & Regime perm. & - \\
+$E_b I_E = V_{DC} I_{DC}$ & Bilan puiss. & W \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Pont en H (4Q)}} \\
+$\langle u \rangle = (2\alpha-1)E$ & Tens. moy. bip. & V \\
+$\alpha > 0{,}5 \to u > 0$ & Avance & - \\
+$\alpha < 0{,}5 \to u < 0$ & Revers. & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Entrelacement}} \\
+$\Delta i_{res} = \Delta i_L / n$ & Ondulation res. & A \\
+$n$ bras dephases de $T/n$ & Condition & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Donnees typiques}} \\
+$f = 50\,\mathrm{kHz}$ & Freq. comm. & Hz \\
+$\alpha_{max,\Delta i} = 0{,}5$ & Pire cas & - \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets reels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+% Mini-procedure de resolution type copie concours
+\begin{tcolorbox}[questiontype,title={Procedure type copie concours (5 etapes)}]
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Qualifier le modele} : hypotheses, domaine de validite, grandeurs d'entree/sortie.
+  \item \textbf{Ecrire les lois} : equations de base avec symboles et unites SI.
+  \item \textbf{Isoler l'inconnue} : expression litterale, puis application numerique tracee.
+  \item \textbf{Controler l'ordre de grandeur} : coherence physique et unite finale.
+  \item \textbf{Conclure concours} : phrase courte orientee decision technique.
+\end{enumerate}
+\end{tcolorbox}
+
+% Visuel de methode : chemin de resolution CAPET
+\begin{center}
+\begin{tikzpicture}[font=\small, node distance=7mm and 6mm, >=Stealth]
+  \node[draw, rounded corners, fill=colElec!8, inner sep=4pt] (n1) {Notions};
+  \node[draw, rounded corners, fill=colElec!8, right=of n1, inner sep=4pt] (n2) {Methode};
+  \node[draw, rounded corners, fill=colElec!8, right=of n2, inner sep=4pt] (n3) {Application annale};
+  \node[draw, rounded corners, fill=colElec!8, right=of n3, inner sep=4pt] (n4) {Verification jury};
+  \draw[->, thick, colElec] (n1) -- (n2);
+  \draw[->, thick, colElec] (n2) -- (n3);
+  \draw[->, thick, colElec] (n3) -- (n4);
+\end{tikzpicture}
+\end{center}
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Hacheur Buck - rapport cyclique et inductance minimale \hfill\normalfont\footnotesize E2 disciplinaire 2023 (robot Bakus)}
+]
+\textbf{enonce.}
+Un convertisseur devolteur recharge une batterie Li-ion depuis une LiFePO4 ($E = 500\,\mathrm{V}$). Conduction continue, $\langle u_{sortie} \rangle \in [70\,;\,117{,}5]\,\mathrm{V}$, $\Delta i \leq 2\,\mathrm{A}$, $f = 50\,\mathrm{kHz}$.
+\begin{enumerate}[label=(\alph*)]
+  \item Exprimer $\langle u_{sortie} \rangle$ en fonction de $E$ et $\alpha$.
+  \item Donner la plage de $\alpha$.
+  \item Calculer $L_{min}$.
+\end{enumerate}
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{(a)} Pendant $[0;\alpha T[$ l'interrupteur conduit : $u_{sortie} = E$. Pendant $[\alpha T;T[$ la diode roue-libre conduit : $u_{sortie} = 0$.
+\[
+  \langle u_{sortie} \rangle = \alpha \cdot E
+\]
+
+\textbf{(b)} $\alpha_{min} = 70/500 = 0{,}14$ ; $\alpha_{max} = 117{,}5/500 = 0{,}235$.
+
+\textbf{(c)} L'ondulation est maximale pour $\alpha = 0{,}5$ (pire cas) :
+\[
+  L_{min} = \frac{E}{4 \cdot \Delta i_{max} \cdot f} = \frac{500}{4 \times 2 \times 50\,000} = \frac{500}{400\,000} = \mathbf{1{,}25\,\mathrm{mH}}
+\]
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Hacheur Boost - derivation par lois de Kirchhoff \hfill\normalfont\footnotesize Rapport jury 2025 (Q27-Q32)}
+]
+\textbf{enonce.}
+Pour un hacheur elevateur ($E_b$ source, $V_{DC}$ charge) avec interrupteur $Q_1$ et diode $D_1$ : ecrire les lois de Kirchhoff pendant les deux phases. En deduire $V_{DC} = E_b/(1-\alpha)$.
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{Phase 1} ($Q_1$ ferme, $D_1$ bloquee) : $v_L = E_b > 0$ - courant $i_L$ croet.
+
+\textbf{Phase 2} ($Q_1$ ouvert, $D_1$ passante) : $v_L = E_b - V_{DC} < 0$ - courant $i_L$ decroet.
+
+\textbf{Regime permanent} : $\langle v_L \rangle = 0$ sur une periode :
+\[
+  E_b \cdot \alpha T + (E_b - V_{DC})(1-\alpha)T = 0
+  \quad\Rightarrow\quad
+  E_b = V_{DC}(1-\alpha)
+  \quad\Rightarrow\quad
+  \boxed{V_{DC} = \frac{E_b}{1-\alpha}}
+\]
+\textit{Le jury note : "Trop peu de candidats appliquent correctement les lois de Kirchhoff aux deux phases." - ecrire systematiquement $v_L$, $v_D$, $v_Q$ pour chaque etat.}
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Entrelacement de 4 bras - ondulation resultante \hfill\normalfont\footnotesize E2 disciplinaire 2023 (question C7)}
+]
+\textbf{enonce.}
+Le convertisseur Buck du robot Bakus est realise avec 4 bras entrelaces (dephasage $T/4$ entre bras), chaque bras ayant $L = 1{,}25\,\mathrm{mH}$. L'ondulation par bras est $\Delta i_L = 2\,\mathrm{A}$. Quelle est l'ondulation resultante du courant de charge - 
+\tcbline
+
+\textbf{Corrige.}
+
+Avec $n = 4$ bras dephases de $T/4$, les ondulations se compensent partiellement.
+L'ondulation resultante est divisee par $n$ :
+\[
+  \Delta i_{resultante} = \frac{\Delta i_L}{n} = \frac{2}{4} = \mathbf{0{,}5\,\mathrm{A}}
+\]
+\textbf{Avantage :} meme inductance $L$, ondulation 4 fois reduite. Ou bien : meme specification d'ondulation, inductance 4 fois reduite.\\
+\textit{Condition necessaire : dephasage exactement $T/4$ entre chaque bras. Sans dephasage, les ondulations s'additionnent.}
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs recurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Confondre Buck et Boost.}
+  Buck (devolteur) : $V_{out} = \alpha E < E$ (rapport cyclique $< 1$).
+  Boost (elevateur) : $V_{out} = E/(1-\alpha) > E$. L'erreur classique est d'appliquer la formule Buck - un schema Boost.
+
+  \item \textbf{Signe de $v_L$ en phase OFF du Boost.}
+  $v_L = E_b - V_{DC} < 0$ : le courant \textbf{decroet}. Beaucoup de candidats obtiennent un courant croissant dans les deux phases en inversant le signe.
+
+  \item \textbf{La condition $\langle v_L \rangle = 0$ est la cle.}
+  Sans cette condition de regime permanent, il est impossible de deriver les formules de tension moyenne. L'enoncer explicitement avant tout calcul.
+
+  \item \textbf{Ondulation maximale - $\alpha = 0{,}5$, pas - $\alpha$ nominal.}
+  Calculer $L_{min}$ pour $\alpha = 0{,}5$ (pire cas), meme si le point de fonctionnement nominal est $\alpha = 0{,}14$.
+
+  \item \textbf{Identifier la nature du convertisseur depuis le schema.}
+  Le jury apprecie de nommer Buck/Boost/4Q et de justifier par le sens du flux d'energie (sens courant, rapport $V_{out}/V_{in}$).
+
+  \item \textbf{Entrelacement : dephasage obligatoire.}
+  L'ondulation est divisee par $n$ \textbf{seulement si} les bras sont dephases de $T/n$.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2025 : "Q27-Q32 : trop peu de candidats appliquent correctement les lois de Kirchhoff aux deux phases de commutation - ecrire systematiquement $v_L$, $v_D$, $v_Q$ pour les deux etats."\\
+Rapport jury 2025 : "Q14 : CV1 = Hacheur, CV2 = Redresseur, CV3 = Onduleur - les fonctions explicites doivent etre nommees et justifiees."
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PReSENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colGrayLight,
+  colframe=colSeparator,
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+  before skip=4pt, after skip=0pt,
+  fonttitle=\small\bfseries,
+  title={Presence dans les sujets analyses (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Annee} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & - & $\checkmark$ & - & $\checkmark$ & - & - & $\checkmark$ & - & $\checkmark$ & - & - & $\checkmark$ \\
+E2 discipl. IE & $\checkmark$ & - & - & $\checkmark$ & - & $\checkmark$ & $\checkmark$ & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-themes frequents :}
+hacheur Buck - rapport cyclique (8/13) - inductance minimale (5/13) - Boost / MPPT (4/13) - hacheur 4 quadrants / pont en H (3/13) - entrelacement de bras (2/13)
+
+\medskip
+\textbf{Ordres de grandeur (reperes rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Reseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, frequence \SI{50}{\hertz}.
+  \item Courants d'etude frequents en sujet : de quelques \si{\ampere} a quelques dizaines de \si{\ampere}.
+  \item En conversion d'energie, un rendement attendu reste generalement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthese express (a refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypotheses du modele et les conventions de signe.
+  \item Ecrire 2 a 4 relations cles avec unites.
+  \item Realiser un calcul numerique complet et verifier l'ordre de grandeur.
+  \item Justifier le resultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE
+
+
+
+
+
+
+
+
+

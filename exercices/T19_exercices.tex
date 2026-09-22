@@ -1,0 +1,406 @@
+% T19 -- AOP (amplificateur op\'erationnel) -- banque d'exercices
+% Ordre des exercices : gradation croissante 1,1,2,2,2,3
+% Principe : banque COMPLEMENTAIRE de la fiche T19_AOP.tex -- aucun exercice ne
+% reprend les donnees ni le travail des Questions Types QT1 (2024 E1-E3, G1=3,4,
+% gain global 340), QT2 (2023 F6-F8, seuils 2,50/2,30 V) et QT3 (2024 E9, Is=V4/R5).
+% Sources :
+%   - Exercice 1 : E2_Sujet_2026_BAC3 (questions B4 et B5) : conditionneur de sonde de
+%     temp\'erature Jumo par source de courant constant I=10 mA et montage suiveur, RT=R0(1+aT).
+%     Cahier des charges du sujet (avant Q.B1) : \'etendue de mesure -5 \`a 90 degC,
+%     erreur de mesure < 1 degC. Q.B5 demande vT aux DEUX temp\'eratures extr\^emes du CDC
+%     (-5 et 90 degC). Q.B6 : la plage de tension exig\'ee en entr\'ee du CAN est de 3 V.
+%     R0=100 Ohm et a=3,85e-3 /K sont donn\'es ici comme valeurs typiques (le sujet les fait
+%     extraire du document technique DTB2, non reproduit) : aucune attribution au sujet.
+%   - Exercice 2 (docTech) : E1_Sujet_2024 (= E2_Disciplinaire_IE_2024, doublon de conversion ;
+%     \'epreuve \'ecrite disciplinaire ; extracteur d'air), question E5 + document technique DT10.
+%     TOUT le contenu de l'encadr\'e docTech est TEXTUELLEMENT pr\'esent dans le .md du sujet :
+%     "thermocouple type J", plage -20 \`a 200 degC, tableau des points caract\'eristiques
+%     (eABmini = -1 mV, eABmaxi = 10,8 mV), profil du courant Is mini = 4 mA / Is maxi = 20 mA,
+%     raccordement 2 fils (capteur) et 4 fils (sortie), lin\'earit\'e des profils (\'enonc\'ee
+%     avant Q.E1). La relation V4 = 337,7*eAB + 1,34 est donn\'ee par le sujet lui-m\^eme
+%     (juste avant E5). RECONSTITUE : seule la mise en forme (tableau LaTeX au lieu de la
+%     figure) -- l'image du DT10 n'est pas restitu\'ee par l'OCR. Les r\'esultats V4 = 1 V et
+%     V4 = 5 V sont confirm\'es par le Rapport_Jury_2024 (corrig\'e officiel E5).
+%   - Exercice 3 : m\^eme sujet 2024, question E4 seule : \'etage de d\'ecalage en tension,
+%     th\'eor\`eme de Millman, V4 = V3 + Ve -- relations de Millman donn\'ees par la figure 23
+%     du sujet (texte OCR restitu\'e).
+%   - Exercice 4 (tableau comparatif des montages) : exercice in\'edit de synth\`ese.
+%   - Exercice 5 : E2_Sujet_2026_BAC3, questions B7 et B8 + document
+%     technique DTB3. Les quatre montages et leurs fonctions de transfert sont TEXTUELLEMENT
+%     pr\'esents dans le .md (bloc "Document technique DTB3", montages 1 \`a 4 : vS/vE=(R1+R0)/R1,
+%     vS/vE=-R0/R1, vS=(R0/R1)(v2-v1), et montage 4 \`a R1/R2/R3/R0). RECONSTITUE : la colonne
+%     "c\^ablage", d\'eduite sans ambigu\"it\'e de chaque fonction de transfert (les figures ne
+%     sont pas restitu\'ees par l'OCR). Le sujet indique lui-m\^eme (avant B9) que "le montage 3
+%     est finalement retenu", ce qui valide la r\'eponse attendue en B8.
+%   - Exercice 6 : E2_Disciplinaire_IE_2023 (robot Bakus, questions F9 et F10), pris ici sous
+%     l'angle du DIMENSIONNEMENT (probl\`eme inverse) et non du calcul direct des seuils, qui
+%     est le travail de la QT2 de la fiche. Donn\'ees du sujet : sorties inertielles 0-5 V pour
+%     0-50 % de pente ; basculement autonome->manuel au-dessus de 25 % ; retour au mode
+%     autonome seulement en dessous de 23 % ; ALI aliment\'e en 15 V, tensions de saturation
+%     15 V ; valeurs retenues par le concepteur R1=1 kOhm, R2=150 kOhm, Vref2=2,42 V.
+%     Figure 23 du sujet : Vref2 est reli\'ee au noeud V+ par R1 (1 kOhm) et la sortie Vs2 par
+%     R2 (150 kOhm) -- orientation conserv\'ee du lot 2, coh\'erente avec le corrig\'e officiel
+%     F7/F8 (V+ = 378/151 = 2,5 V et 348/151 = 2,3 V) et avec F10 (conformit\'e, retour au
+%     mode autonome en dessous de 23 % de pente). R2 = 149 kOhm et Vref2 = 2,416 V sont les
+%     valeurs THEORIQUES recalcul\'ees ici \`a partir des seuils 2,5/2,3 V du cahier des
+%     charges ; elles ne sont pas attribu\'ees au sujet, qui ne donne que les valeurs
+%     normalis\'ees finales.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T19}} - Exercices - AOP (amplificateur op\'erationnel)}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T19 \quad AOP (amplificateur op\'erationnel)}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2026, \'epreuve BAC3, questions B4 et B5}
+]
+\CAPETSHOW{
+Un capteur de temp\'erature Jumo est mod\'elis\'e par une r\'esistance $R_T = R_0(1+aT)$, aliment\'ee par une source de courant constant $I = \SI{10}{\milli\ampere}$. La tension aux bornes de $R_T$ attaque l'entr\'ee non-inverseuse d'un AOP suppos\'e id\'eal, c\^abl\'e comme indiqu\'e ci-dessous~; sa sortie $v_T$ est transmise aux \'etages suivants. Le cahier des charges de la mesure impose une \'etendue de mesure de $\SI{-5}{\celsius}$ \`a $\SI{90}{\celsius}$ et une erreur de mesure inf\'erieure \`a $\SI{1}{\celsius}$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\coordinate (LO) at (0,2.05);
+\draw (0,0) to[I, l=$I$] (0,2.5) to[R, l=$R_T$] (0,5) coordinate(T);
+\draw (0,0) node[ground]{};
+\draw (4,3.75) node[op amp, yscale=-1] (U) {};
+\draw (T) -- (2.2,5) |- (U.+);
+\draw (U.out) -- ++(1.2,0) coordinate(S) node[circ]{} -- ++(0.9,0) node[right]{$v_T$};
+\draw (U.-) -- ++(-1.5,0) coordinate(Nn) -- (Nn |- LO) -- (S |- LO) -- (S);
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Exprimer $v_T$ en fonction de $I$, $R_0$ et $a\cdot T$, sous la forme $v_T = U_0(1+aT)$ en pr\'ecisant $U_0$.
+  \item Quel est le nom de ce montage \`a AOP, et quel est son r\^ole fonctionnel dans cette cha\^ine de conditionnement~?
+  \item Sachant que $R_0 = \SI{100}{\ohm}$ et $a = \SI{3,85e-3}{\per\kelvin}$ (valeurs typiques d'une sonde platine), calculer $v_T$ pour les deux temp\'eratures extr\^emes du cahier des charges.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item La source de courant $I$ impose $I$ dans $R_T$ (l'AOP suiveur ne pr\'el\`eve aucun courant sur son entr\'ee $+$, donc tout $I$ traverse bien $R_T$) : par la loi d'Ohm,
+  \[ v_T = R_T\cdot I = I\cdot R_0(1+aT) = \underbrace{I\cdot R_0}_{U_0}\,(1+aT) \]
+  soit $U_0 = I\cdot R_0$.
+  \item C'est un montage \textbf{suiveur} (buffer, gain unitaire $v_T=V_+$). Son r\^ole est l'\textbf{adaptation d'imp\'edance} : il isole le capteur $R_T$ (imp\'edance de sortie non nulle) de l'\'etage suivant, en pr\'esentant une imp\'edance d'entr\'ee quasi infinie \`a $R_T$ (aucun courant pr\'elev\'e, la mesure n'est donc pas perturb\'ee) et une imp\'edance de sortie quasi nulle pour attaquer la suite de la cha\^ine sans chute de tension suppl\'ementaire.
+  \item $U_0 = I\cdot R_0 = 0{,}010\times 100 = \SI{1}{\volt}$.
+
+  Pour $T=\SI{-5}{\celsius}$ : $v_T = 1\times(1-3{,}85\times10^{-3}\times 5) = 1\times(1-0{,}01925) \approx \SI{0,981}{\volt}$.
+
+  Pour $T=\SI{90}{\celsius}$ : $v_T = 1\times(1+3{,}85\times10^{-3}\times 90) = 1\times(1+0{,}3465) \approx \SI{1,347}{\volt}$.
+\end{enumerate}
+
+\textbf{Conclusion.} Sur l'\'etendue de mesure $-5$ \`a $\SI{90}{\celsius}$ fix\'ee par le cahier des charges, la tension image de la temp\'erature ne balaie que $\SI{0,981}{\volt}$ \`a $\SI{1,347}{\volt}$, soit une sensibilit\'e $U_0\,a = \SI{3,85}{\milli\volt\per\kelvin}$ et une dynamique utile de $\SI{0,366}{\volt}$ seulement. Le suiveur garantit que cette faible tension est pr\'elev\'ee \textbf{sans charger la sonde} -- donc sans erreur syst\'ematique de mesure, condition n\'ecessaire pour tenir l'exigence d'erreur inf\'erieure \`a $\SI{1}{\celsius}$ --, mais il n'apporte aucun gain : la plage de $\SI{3}{\volt}$ exig\'ee en entr\'ee du convertisseur analogique-num\'erique impose donc, en aval, un \'etage amplificateur-conditionneur.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{1} \hfill\normalfont\footnotesize 2024, \'epreuve \'ecrite disciplinaire, question E5 (document technique DT10)}
+]
+\CAPETSHOW{
+Un transmetteur de temp\'erature convertit la tension $e_{AB}$ d\'elivr\'ee par un capteur en un courant normalis\'e $I_s$ exploitable par l'entr\'ee analogique d'un automate. Il encha\^ine trois fonctions : \emph{amplifier} ($\times G$), \emph{d\'ecaler} ($+V_d$) puis \emph{convertir} la tension en courant. \`A l'issue des deux premi\`eres, la tension $V_4$ v\'erifie la relation, donn\'ee par le sujet :
+\[ V_4 = 337{,}7\ e_{AB} + 1{,}34 \qquad (e_{AB}\ \text{en volts}) \]
+
+\begin{tcolorbox}[docTech, title={Document technique DT10 -- Profil de la tension fournie par le capteur de temp\'erature}]
+\footnotesize
+Capteur de temp\'erature de type \textbf{thermocouple type J}, \'etalonn\'e sur la plage $-20$ \`a $\SI{200}{\celsius}$, raccord\'e 2 fils. Le profil $e_{AB}(T_{ARM})$ est \textbf{lin\'eaire} entre les deux points caract\'eristiques ci-dessous.
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Points caract\'eristiques maximaux} & & \\
+\midrule
+Temp\'erature mesur\'ee ($\si{\celsius}$) & $-20$ & $200$ \\
+Tension d\'elivr\'ee par le capteur ($\si{\milli\volt}$) & $e_{AB\,mini} = -1$ & $e_{AB\,maxi} = 10{,}8$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+Profil du courant d\'elivr\'e par le transmetteur $TT$ : lin\'eaire \'egalement, de $I_{s\,mini} = \SI{4}{\milli\ampere}$ (\`a $\SI{-20}{\celsius}$) \`a $I_{s\,maxi} = \SI{20}{\milli\ampere}$ (\`a $\SI{200}{\celsius}$), sortie 4 fils.
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever} dans le document technique DT10 : la nature du transducteur, l'\'etendue de mesure en temp\'erature, et les deux valeurs extr\^emes de la tension $e_{AB}$ d\'elivr\'ee par le capteur.
+  \item Calculer la tension $V_4$ pour chacune de ces deux tensions extr\^emes de $e_{AB}$.
+  \item En d\'eduire la sensibilit\'e $\Delta V_4/\Delta T_{ARM}$ de la cha\^ine \{capteur + amplification + d\'ecalage\}, exprim\'ee en $\si{\milli\volt\per\celsius}$.
+  \item Quel est le r\^ole du terme constant $1{,}34$ dans la relation $V_4 = 337{,}7\,e_{AB} + 1{,}34$~? Que vaudrait $V_4$ \`a $\SI{-20}{\celsius}$ sans ce terme, et pourquoi serait-ce r\'edhibitoire pour la suite de la cha\^ine~?
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Extraction du DT10.}
+  \begin{itemize}
+    \item Transducteur : \textbf{thermocouple de type J} -- capteur \textbf{actif} (il g\'en\`ere lui-m\^eme une f.\'e.m. par effet Seebeck, sans alimentation externe), ce qui explique que la tension utile ne soit que de quelques millivolts.
+    \item \'Etendue de mesure : $T_{ARM} \in [-20\,;\,200]\ \si{\celsius}$, soit une \'etendue de $\SI{220}{\celsius}$.
+    \item Tensions extr\^emes : $e_{AB\,mini} = \SI{-1}{\milli\volt}$ (\`a $\SI{-20}{\celsius}$) et $e_{AB\,maxi} = \SI{10,8}{\milli\volt}$ (\`a $\SI{200}{\celsius}$), soit une dynamique utile de $\SI{11,8}{\milli\volt}$ seulement.
+  \end{itemize}
+  \item Application de la relation fournie, en convertissant les millivolts en volts :
+  \[ V_4(e_{AB}{=}\SI{-1}{\milli\volt}) = 337{,}7\times(-0{,}001) + 1{,}34 = -0{,}3377 + 1{,}34 \approx \SI{1}{\volt} \]
+  \[ V_4(e_{AB}{=}\SI{10,8}{\milli\volt}) = 337{,}7\times 0{,}0108 + 1{,}34 = 3{,}647 + 1{,}34 \approx \SI{5}{\volt} \]
+  \item Le profil \'etant lin\'eaire (hypoth\`ese explicite du DT10), la sensibilit\'e est constante :
+  \[ \dfrac{\Delta V_4}{\Delta T_{ARM}} = \dfrac{5-1}{200-(-20)} = \dfrac{4}{220} \approx \SI{18,2}{\milli\volt\per\celsius} \]
+  \item Le terme $1{,}34$ est la tension de \textbf{d\'ecalage} $V_d$ apport\'ee par le deuxi\`eme \'etage. Sans lui, on aurait $V_4(\SI{-20}{\celsius}) = 337{,}7\times(-0{,}001) = \SI{-0,338}{\volt}$ : une tension \textbf{n\'egative}, que l'\'etage de conversion tension-courant qui suit ne peut pas transformer en un courant positif, et qui sortirait de la plage $1$--$\SI{5}{\volt}$ attendue en entr\'ee de cet \'etage. Le d\'ecalage translate donc toute la caract\'eristique vers les tensions positives.
+\end{enumerate}
+
+\textbf{Conclusion.} Une dynamique de capteur de $\SI{11,8}{\milli\volt}$ seulement est transform\'ee, par amplification puis d\'ecalage, en la fen\^etre $1$--$\SI{5}{\volt}$ exactement : c'est la condition pour que l'\'etage suivant d\'elivre la plage normalis\'ee $4$--$\SI{20}{\milli\ampere}$ annonc\'ee par le DT10, courant de repos de $\SI{4}{\milli\ampere}$ compris. Sans lecture pr\'ealable du document technique (nature du capteur, bornes de la plage), aucun des deux \'etages ne peut \^etre dimensionn\'e.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize 2024, Extracteur d'air, partie E, question E4}
+]
+\CAPETSHOW{
+La tension $V_3$ obtenue en sortie de l'\'etage d'amplification du transmetteur fait office d'entr\'ee $V_e$ pour un \'etage de d\'ecalage en tension. Ce montage, construit autour d'un AOP suppos\'e id\'eal, produit une tension $V_4$ qui d\'ecale $V_e$ d'une valeur de r\'ef\'erence not\'ee $V_3'$ (notation locale, \`a ne pas confondre avec le $V_3$ de l'\'etage d'amplification). L'entr\'ee non-inverseuse re\c coit les tensions $V_3'$ et $V_e$ chacune \`a travers une r\'esistance $R$, l'entr\'ee inverseuse est reboucl\'ee sur la sortie $V_4$ \`a travers une r\'esistance $R$ et reli\'ee \`a la masse \`a travers une r\'esistance $R$ \'egalement.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw (4,0) node[op amp, yscale=-1] (U) {};
+\draw (U.+) -- ++(-1,0) coordinate(P) node[circ]{};
+\node[above right=1pt and 2pt] at (P) {$V_+$};
+\draw (P) ++(0,0.6) coordinate(P1) -- ++(-2,0) to[R, l=$R$] ++(-2,0) node[left]{$V_3'$};
+\draw (P) ++(0,-0.6) coordinate(P2) -- ++(-2,0) to[R, l=$R$] ++(-2,0) node[left]{$V_e$};
+\draw (P1) -- (P2);
+\draw (U.out) -- ++(1,0) coordinate(S) node[right]{$V_4$};
+\draw (U.-) -- ++(-2.6,0) coordinate(N);
+\node[below left=1pt and 1pt] at (N) {$V_-$};
+\draw (S) to[R, l=$R$] ++(0,-2) coordinate(M) node[circ]{};
+\draw (N) -- (N |- M) -- (M);
+\draw (M) to[R, l=$R$] ++(0,-1.6) node[ground]{};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item En appliquant le th\'eor\`eme de Millman au n\oe ud $V_+$ (deux r\'esistances $R$, l'AOP ne tirant aucun courant), exprimer $V_+$ en fonction de $V_3'$ et $V_e$.
+  \item En appliquant le th\'eor\`eme de Millman (ou le diviseur de tension) au n\oe ud $V_-$, exprimer $V_-$ en fonction de $V_4$.
+  \item Montrer qu'en r\'egime lin\'eaire, $V_4 = V_3' + V_e$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le n\oe ud $V_+$ re\c coit deux branches de m\^eme r\'esistance $R$ (depuis $V_3'$ et depuis $V_e$), et aucun courant ne p\'en\`etre dans l'AOP par $V_+$ :
+  \[ V_+ = \dfrac{\dfrac{V_3'}{R} + \dfrac{V_e}{R}}{\dfrac{1}{R}+\dfrac{1}{R}} = \dfrac{V_3' + V_e}{2} \]
+  \item De m\^eme, $V_-$ est le point milieu d'un diviseur \`a deux r\'esistances \'egales $R$ entre $V_4$ (sortie) et la masse :
+  \[ V_- = \dfrac{\dfrac{V_4}{R} + \dfrac{0}{R}}{\dfrac{1}{R}+\dfrac{1}{R}} = \dfrac{V_4}{2} \]
+  \item En r\'egime lin\'eaire (contre-r\'eaction n\'egative sur $V_-$), $V_+ = V_-$ :
+  \[ \dfrac{V_3'+V_e}{2} = \dfrac{V_4}{2} \quad\Longrightarrow\quad V_4 = V_3' + V_e \]
+\end{enumerate}
+
+\textbf{Conclusion.} L'\'etage r\'ealise une addition exacte, \`a gain unitaire, du signal amplifi\'e $V_e$ et de la r\'ef\'erence $V_3'$ : c'est ce d\'ecalage qui translate la sortie de l'amplificateur vers la fen\^etre $1$--$\SI{5}{\volt}$ exig\'ee \`a l'entr\'ee du convertisseur tension-courant. Sans lui, la temp\'erature minimale du capteur correspondrait \`a $\SI{0}{\milli\ampere}$, indiscernable d'une rupture de la ligne de transmission, alors que la boucle normalis\'ee impose un courant de repos de $\SI{4}{\milli\ampere}$.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Pour chacun des besoins fonctionnels list\'es dans le tableau ci-dessous, identifier le montage \`a AOP le plus adapt\'e parmi : suiveur, amplificateur inverseur, amplificateur non-inverseur, soustracteur (diff\'erentiel), comparateur \`a hyst\'er\'esis.
+
+\begin{center}
+\begin{tabular}{p{8.5cm}p{4.5cm}}
+\toprule
+\textbf{Besoin fonctionnel} & \textbf{Montage \`a choisir} \\
+\midrule
+Isoler un capteur haute imp\'edance sans att\'enuer ni inverser le signal & \dotfill \\
+Amplifier une tension diff\'erentielle issue d'un pont de mesure (deux bornes flottantes) & \dotfill \\
+Basculer une sortie logique en \'evitant les oscillations autour d'un seuil bruit\'e & \dotfill \\
+Amplifier un signal en inversant sa phase, avec une imp\'edance d'entr\'ee fix\'ee et connue & \dotfill \\
+Amplifier un signal en conservant sa phase, avec une imp\'edance d'entr\'ee tr\`es \'elev\'ee & \dotfill \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Pour chaque r\'eponse, justifier bri\`evement le choix en une phrase.
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{center}
+\begin{tabular}{p{8.5cm}p{4.5cm}}
+\toprule
+\textbf{Besoin fonctionnel} & \textbf{Montage} \\
+\midrule
+Isoler un capteur haute imp\'edance sans att\'enuer ni inverser le signal & Suiveur \\
+Amplifier une tension diff\'erentielle issue d'un pont de mesure (deux bornes flottantes) & Soustracteur \\
+Basculer une sortie logique en \'evitant les oscillations autour d'un seuil bruit\'e & Comparateur \`a hyst\'er\'esis \\
+Amplifier un signal en inversant sa phase, avec une imp\'edance d'entr\'ee fix\'ee et connue & Amplificateur inverseur \\
+Amplifier un signal en conservant sa phase, avec une imp\'edance d'entr\'ee tr\`es \'elev\'ee & Amplificateur non-inverseur \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{itemize}
+  \item Le \textbf{suiveur} ($V_s=V_e$, gain unitaire) a pour seul r\^ole l'adaptation d'imp\'edance : imp\'edance d'entr\'ee infinie, imp\'edance de sortie nulle, aucune att\'enuation ni inversion.
+  \item Le \textbf{soustracteur} calcule directement $V_s = (R_2/R_1)\,(V_2-V_1)$ : c'est le seul montage de base qui traite nativement deux entr\'ees flottantes (aucune des deux n'est r\'ef\'erenc\'ee \`a la masse), typique d'un pont de Wheatstone.
+  \item Le \textbf{comparateur \`a hyst\'er\'esis} introduit deux seuils distincts (contre-r\'eaction positive) : contrairement \`a un comparateur simple \`a seuil unique, un bruit de faible amplitude autour du seuil ne provoque plus de basculements r\'ep\'et\'es intempestifs.
+  \item L'\textbf{amplificateur inverseur} a une imp\'edance d'entr\'ee \'egale \`a $R_1$ (fix\'ee par le concepteur), ce qui est parfois recherch\'e (par exemple pour sommer plusieurs signaux sur un m\^eme n\oe ud avec des poids connus), au prix d'une inversion de phase.
+  \item L'\textbf{amplificateur non-inverseur} pr\'esente une imp\'edance d'entr\'ee quasi infinie (entr\'ee directement sur $V_+$) tout en amplifiant (gain $\geq 1$) sans inverser la phase, contrairement \`a l'inverseur.
+\end{itemize}
+
+\textbf{Conclusion.} Le choix d'un montage ne se d\'eduit pas d'une formule mais du couple \guillemotleft\ imp\'edance vue par la source / traitement attendu du signal \guillemotright\ : c'est ce raisonnement, et non le seul calcul de gain, qui est \'evalu\'e \`a l'\'ecrit lorsqu'une question demande de justifier une structure de conditionnement.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{2} \hfill\normalfont\footnotesize 2026, \'epreuve BAC3, questions B7 et B8 (document technique DTB3)}
+]
+\CAPETSHOW{
+Poursuite de l'\'etude de la cha\^ine d'acquisition de temp\'erature de la pile \`a combustible (exercice 1). En sortie du conditionneur du capteur, la tension disponible est $v_T = U_0\,(1+a\,T)$, avec $U_0 = \SI{1}{\volt}$, qui \'evolue donc autour de $\SI{1}{\volt}$ avec une faible dynamique. Le convertisseur analogique-num\'erique plac\'e en fin de cha\^ine impose en revanche, \`a l'entr\'ee, une tension $v_A$ \emph{directement proportionnelle} \`a la temp\'erature, $v_A = c\cdot T$ avec $c>0$, \'evoluant sur une plage de $\SI{3}{\volt}$. On doit donc ins\'erer un ensemble \{amplificateur + conditionneur\} construit \`a partir des montages du document technique ci-dessous.
+
+\begin{center}
+\footnotesize
+\textbf{\itshape Document technique DTB3 -- Montages \`a ALI disponibles (ALI id\'eaux, $\varepsilon = 0$)}
+\smallskip
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}llp{5.4cm}@{}}
+\toprule
+\textbf{Montage} & \textbf{Fonction de transfert} & \textbf{C\^ablage} \\
+\midrule
+Montage 1 & $\dfrac{v_S}{v_E} = \dfrac{R_1+R_0}{R_1}$ & $v_E$ sur l'entr\'ee $+$ ; pont $R_0$ (contre-r\'eaction) -- $R_1$ (vers la masse) sur l'entr\'ee $-$ \\
+Montage 2 & $\dfrac{v_S}{v_E} = -\dfrac{R_0}{R_1}$ & $v_E$ via $R_1$ sur l'entr\'ee $-$ ; $R_0$ en contre-r\'eaction ; entr\'ee $+$ \`a la masse \\
+Montage 3 & $v_S = \dfrac{R_0}{R_1}\,(v_2 - v_1)$ & deux entr\'ees $v_1$ et $v_2$, quatre r\'esistances appari\'ees $R_1$ et $R_0$ \\
+Montage 4 & (quatre r\'esistances $R_1$, $R_2$, $R_3$, $R_0$, deux entr\'ees $v_1$, $v_2$) & structure diff\'erentielle \`a r\'esistances non appari\'ees \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{D\'emontrer} la fonction de transfert du montage 1 \`a partir des hypoth\`eses de l'ALI id\'eal. En d\'eduire le nom et le r\^ole de ce type de montage.
+  \item Le montage 1 permet-il, \`a lui seul, d'obtenir $v_A = c\cdot T$ \`a partir de $v_T = U_0(1+aT)$~? Justifier par le calcul de $v_A$ qu'il produirait.
+  \item Choisir, en justifiant, le montage du document technique DTB3 qui permet de r\'ealiser l'ensemble \{amplificateur + conditionneur\}. Pr\'eciser ce qu'il faut appliquer sur chacune de ses entr\'ees.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Montage 1 :} $\dfrac{v_S}{v_E} = \dfrac{R_1+R_0}{R_1}$.
+
+  \textbf{D\'emonstration.} La sortie est reboucl\'ee sur l'entr\'ee $-$ : contre-r\'eaction n\'egative, donc r\'egime lin\'eaire et $V_+ = V_-$. Or $V_+ = v_E$ (branchement direct). Comme $I_- = 0$, $R_0$ et $R_1$ forment un simple diviseur de tension non charg\'e entre $v_S$ et la masse :
+  \[ V_- = v_S\,\dfrac{R_1}{R_1+R_0} \]
+  L'\'egalit\'e $V_+ = V_-$ donne $v_E = v_S\dfrac{R_1}{R_1+R_0}$, soit
+  \[ \dfrac{v_S}{v_E} = \dfrac{R_1+R_0}{R_1} = 1 + \dfrac{R_0}{R_1} \]
+  C'est l'\textbf{amplificateur non-inverseur} : il amplifie d'un gain toujours $\geq 1$ sans inverser la phase, en pr\'esentant une imp\'edance d'entr\'ee quasi infinie (entr\'ee directement sur $V_+$) -- il ne charge donc pas l'\'etage amont.
+  \item \textbf{Non.} En posant $G = 1+R_0/R_1 > 0$, ce montage donnerait
+  \[ v_A = G\cdot v_T = G\,U_0(1+aT) = \underbrace{G\,U_0}_{\text{terme constant}} + \underbrace{G\,U_0\,a}_{\text{pente}}\;T \]
+  La sortie contient un \textbf{terme constant non nul} $G\,U_0$ (l'\og\ offset\ \fg{} de la sonde \`a $\SI{0}{\celsius}$), alors que le cahier des charges exige $v_A = c\cdot T$, c'est-\`a-dire une caract\'eristique passant par l'origine. De plus, $G$ ne peut pas \^etre choisi librement : le rendre assez grand pour couvrir $\SI{3}{\volt}$ de dynamique utile amplifierait d'autant le terme constant et saturerait l'ALI. Un montage \`a une seule entr\'ee ne peut donc pas r\'ealiser simultan\'ement l'amplification \emph{et} la soustraction de l'offset.
+  \item Il faut le \textbf{montage 3}, le soustracteur (amplificateur diff\'erentiel \`a r\'esistances appari\'ees), de fonction de transfert $v_S = \dfrac{R_0}{R_1}(v_2 - v_1)$. Il r\'ealise en un seul \'etage les deux fonctions attendues :
+  \begin{itemize}
+    \item on applique sur $v_2$ la tension issue du conditionneur, $v_T$ ;
+    \item on applique sur $v_1$ une \textbf{source de tension de r\'ef\'erence constante} \'egale \`a $U_0$ (la valeur de $v_T$ \`a $\SI{0}{\celsius}$), ce qui \'elimine exactement le terme constant : $v_2-v_1 = U_0(1+aT) - U_0 = U_0\,a\,T$ ;
+    \item le rapport $R_0/R_1$ assure ensuite l'\textbf{amplification} : $v_A = \dfrac{R_0}{R_1}U_0\,a\,T$, qui est bien de la forme $c\cdot T$ avec $c>0$.
+  \end{itemize}
+  Le montage 2 est \'ecart\'e (une seule entr\'ee, et surtout gain n\'egatif incompatible avec $c>0$), le montage 1 par la question pr\'ec\'edente, et le montage 4 -- diff\'erentiel \`a r\'esistances non appari\'ees -- n'apporte ici aucun degr\'e de libert\'e utile tout en d\'egradant la r\'ejection de mode commun.
+\end{enumerate}
+
+\textbf{Conclusion.} Le choix ne se fait pas sur la seule valeur de gain, mais sur la \emph{forme} de la relation entr\'ee-sortie exig\'ee : seule une structure diff\'erentielle permet d'annuler l'offset $U_0$ de la sonde tout en amplifiant sa variation, condition n\'ecessaire pour que la tension $v_A = c\,T$ balaie toute la plage de $\SI{3}{\volt}$ du convertisseur et que la r\'esolution de la mesure -- donc l'exigence d'erreur inf\'erieure \`a $\SI{1}{\celsius}$ -- soit tenue.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize 2023, \'epreuve \'ecrite disciplinaire, questions F9 et F10 (dimensionnement)}
+]
+\CAPETSHOW{
+Le robot enjambeur Bakus \'evolue dans des vignes de coteau. Deux centrales inertielles mesurent son assiette : leurs sorties analogiques, une fois trait\'ees, \'evoluent \textbf{proportionnellement} entre $\SI{0}{\volt}$ et $\SI{5}{\volt}$ pour des inclinaisons comprises entre $0\,\%$ et $+50\,\%$ de pente. Cette tension constitue l'entr\'ee $V_{e2}$ du montage ci-dessous.
+
+\smallskip
+Le cahier des charges de s\'ecurit\'e impose deux basculements \emph{distincts} : le robot passe du mode autonome au mode manuel d\`es qu'une pente sup\'erieure \`a $\mathbf{25\,\%}$ est d\'etect\'ee, et le retour au mode autonome n'est possible qu'apr\`es intervention humaine \emph{et} retour sur un terrain de pente inf\'erieure \`a $\mathbf{23\,\%}$. On r\'ealise cette fonction par un comparateur inverseur \`a hyst\'er\'esis \`a ALI id\'eal, dont les tensions de saturation en sortie valent $\pm\SI{15}{\volt}$. On rappelle que pour ce montage
+\[ V_+ = \frac{R_2\,V_{ref2} + R_1\,V_{s2}}{R_1+R_2} \]
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw (4,0) node[op amp, yscale=-1] (U) {};
+\draw (U.-) -- ++(-1.6,0) node[left]{$V_{e2}$};
+\draw (U.+) -- ++(-1,0) coordinate(P) node[circ]{};
+\node[above right=1pt and 2pt] at (P) {$V_+$};
+\draw (P) to[R, l=$R_1$] ++(-2.6,0) coordinate(REF);
+\draw (REF) to[V, l_=$V_{ref2}$] ++(0,-2.6) node[ground]{};
+\draw (U.out) -- ++(1,0) coordinate(S) node[circ]{} -- ++(0.9,0) node[right]{$V_{s2}$};
+\draw (S) to[R, l_=$R_2$] ++(0,2.2) coordinate(F) -- (F -| P) -- (P);
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \'Etablir la relation lin\'eaire liant la tension $V_{e2}$ \`a la pente $p$ (en \%), puis en d\'eduire les deux tensions de seuil $V_H$ et $V_B$ qu'impose le cahier des charges de s\'ecurit\'e.
+  \item En partant de l'expression rappel\'ee de $V_+$, exprimer la \textbf{largeur d'hyst\'er\'esis} $V_H - V_B$ en fonction de $R_1$, $R_2$ et $V_{sat}$. En prenant $R_1 = \SI{1}{\kilo\ohm}$, en d\'eduire la valeur de $R_2$ n\'ecessaire.
+  \item Exprimer la \textbf{valeur moyenne} $(V_H+V_B)/2$ des deux seuils en fonction de $R_1$, $R_2$ et $V_{ref2}$, et en d\'eduire la valeur que doit prendre la source $V_{ref2}$.
+  \item Le concepteur retient finalement les valeurs normalis\'ees $R_2 = \SI{150}{\kilo\ohm}$ et $V_{ref2} = \SI{2,42}{\volt}$. V\'erifier que le montage reste conforme au cahier des charges, puis tracer l'allure de la caract\'eristique $V_{s2} = f(V_{e2})$ en indiquant le sens de parcours.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item La proportionnalit\'e $0$--$\SI{5}{\volt}$ pour $0$--$50\,\%$ donne une pente de conversion de $\SI{0,1}{\volt}$ par point de pente :
+  \[ V_{e2} = \dfrac{5}{50}\,p = 0{,}1\,p \quad (p \text{ en \%}) \]
+  Le basculement vers le mode manuel se produit \`a $p = 25\,\%$ et le retour au mode autonome \`a $p = 23\,\%$, d'o\`u les deux seuils vis\'es :
+  \[ V_H = 0{,}1\times 25 = \SI{2,5}{\volt} \qquad V_B = 0{,}1\times 23 = \SI{2,3}{\volt} \]
+  \item Les deux seuils correspondent aux deux \'etats de saturation de la sortie, $V_{s2} = \pm V_{sat}$ :
+  \[ V_H = \dfrac{R_2 V_{ref2} + R_1 V_{sat}}{R_1+R_2} \qquad V_B = \dfrac{R_2 V_{ref2} - R_1 V_{sat}}{R_1+R_2} \]
+  Par diff\'erence, le terme en $V_{ref2}$ dispara\^it :
+  \[ V_H - V_B = \dfrac{2\,R_1\,V_{sat}}{R_1+R_2} \]
+  La largeur d'hyst\'er\'esis ne d\'epend donc que du rapport des r\'esistances et de $V_{sat}$. En imposant $V_H-V_B = 2{,}5-2{,}3 = \SI{0,2}{\volt}$ avec $V_{sat}=\SI{15}{\volt}$ :
+  \[ \dfrac{R_1}{R_1+R_2} = \dfrac{0{,}2}{2\times 15} = \dfrac{1}{150} \quad\Longrightarrow\quad R_2 = 149\,R_1 = \SI{149}{\kilo\ohm} \]
+  \item Par demi-somme, cette fois c'est le terme en $V_{sat}$ qui dispara\^it :
+  \[ \dfrac{V_H+V_B}{2} = \dfrac{R_2\,V_{ref2}}{R_1+R_2} \]
+  Le centre de l'hyst\'er\'esis vis\'e vaut $(2{,}5+2{,}3)/2 = \SI{2,4}{\volt}$, d'o\`u :
+  \[ V_{ref2} = \SI{2,4}{\volt}\times\dfrac{R_1+R_2}{R_2} = 2{,}4\times\dfrac{150\,000}{149\,000} \approx \SI{2,416}{\volt} \]
+  \item Avec les valeurs normalis\'ees $R_1 = \SI{1}{\kilo\ohm}$, $R_2 = \SI{150}{\kilo\ohm}$ et $V_{ref2} = \SI{2,42}{\volt}$ :
+  \[ V_H = \dfrac{150\,000\times 2{,}42 + 1\,000\times 15}{151\,000} = \dfrac{378\,000}{151\,000} \approx \SI{2,503}{\volt} \]
+  \[ V_B = \dfrac{150\,000\times 2{,}42 - 1\,000\times 15}{151\,000} = \dfrac{348\,000}{151\,000} \approx \SI{2,305}{\volt} \]
+  Ramen\'es en pente par $p = V/0{,}1$ : $p_H \approx 25{,}0\,\%$ et $p_B \approx 23{,}0\,\%$. Les deux exigences sont donc tenues, l'\'ecart aux valeurs th\'eoriques ($+0{,}03$ point de pente) \'etant tr\`es inf\'erieur \`a la dispersion des composants.
+
+  \textbf{Caract\'eristique} (comparateur \emph{inverseur} : $V_{e2}$ attaque l'entr\'ee \guillemotleft\ -- \guillemotright, donc $V_{s2}$ \textbf{d\'ecro\^it} quand $V_{e2}$ cro\^it -- caract\'eristique descendante) :
+  \begin{center}
+  \begin{tikzpicture}[scale=0.95, font=\footnotesize]
+    \draw[->] (0,0) -- (5.6,0) node[right] {$V_{e2}$ (V)};
+    \draw[->] (0,-1.9) -- (0,1.9) node[above] {$V_{s2}$ (V)};
+    \draw[thick, colExo] (0.3,1.3) -- (3.4,1.3);
+    \draw[thick, colExo, ->] (3.4,1.3) -- (3.4,-1.3);
+    \draw[thick, colExo] (3.4,-1.3) -- (5.2,-1.3);
+    \draw[thick, colExo!55] (1.6,-1.3) -- (3.4,-1.3);
+    \draw[thick, colExo!55, ->] (1.6,-1.3) -- (1.6,1.3);
+    \draw[thick, colExo!55] (0.3,1.3) -- (1.6,1.3);
+    \draw[dashed] (3.4,0) -- (3.4,1.3);
+    \draw[dashed] (1.6,0) -- (1.6,-1.3);
+    \node[below right] at (3.4,0) {\scriptsize $V_H = 2{,}50$};
+    \node[above left] at (1.6,0) {\scriptsize $V_B = 2{,}31$};
+    \node[left] at (0,1.3) {\scriptsize $+15$};
+    \node[left] at (0,-1.3) {\scriptsize $-15$};
+  \end{tikzpicture}
+  \end{center}
+  Trajet fonc\'e : $V_{e2}$ croissant (pente augmentant), basculement vers $-V_{sat}$ en $V_H$ -- passage en mode manuel. Trajet clair : $V_{e2}$ d\'ecroissant, retour \`a $+V_{sat}$ seulement en $V_B$.
+\end{enumerate}
+
+\textbf{Conclusion.} La d\'emarche de dimensionnement se lit directement sur les deux combinaisons des seuils : la \textbf{diff\'erence} $V_H-V_B$ ne fixe que le rapport $R_1/R_2$, la \textbf{demi-somme} ne fixe que $V_{ref2}$ -- les deux exigences du cahier des charges (basculement \`a $25\,\%$, retour \`a $23\,\%$) sont donc r\'eglables ind\'ependamment. C'est cet \'ecart de 2 points de pente, et non un seuil unique, qui interdit au robot de basculer sans fin entre mode autonome et mode manuel lorsqu'il roule au voisinage de la pente critique.
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

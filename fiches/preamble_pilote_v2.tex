@@ -1,0 +1,89 @@
+% preamble_pilote_v2.tex — PILOTE JETABLE — direction "moderne coloré"
+% Lato + maths sans (newtxsf) ; identité couleur conservée mais modernisée :
+% bandeaux propres arrondis, une seule famille de fonds pâles, pas de double cadre.
+\input{preamble}
+
+% ── Polices ──────────────────────────────────────────────────────────
+\usepackage[default]{lato}
+\usepackage{newtxsf}
+
+% ── Palette modernisée ───────────────────────────────────────────────
+\definecolor{colElec}{RGB}{29, 78, 216}     % bleu plus vif (remplace le bleu terne)
+\definecolor{colElecLight}{RGB}{219, 234, 254}
+\definecolor{colInk}{RGB}{23, 32, 42}
+\definecolor{colSlate}{RGB}{83, 98, 118}
+\definecolor{colJuryBg}{RGB}{255, 248, 225}
+\definecolor{colJuryFrame}{RGB}{202, 138, 4}
+\AtBeginDocument{\color{colInk}}
+
+% ── En-tête / pied de page ───────────────────────────────────────────
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0pt}
+\newcommand{\ficheHeaders}[3]{%
+  \fancyhead[L]{\small\sffamily{\bfseries\textcolor{#3}{#1}}\hspace{0.7em}\textcolor{colSlate}{#2}}%
+  \fancyhead[R]{\small\sffamily\textcolor{colSlate}{CAPET SII IE\, --- \,Session 2026}}%
+  \fancyfoot[C]{\small\sffamily\textcolor{colSlate}{\thepage\,/\,\pageref{LastPage}}}%
+  \fancyhead[C]{}\fancyfoot[L]{}\fancyfoot[R]{}%
+}
+
+% ── Bloc en-tête de fiche : bandeau plein arrondi, dégradé discret ───
+\newcommand{\ficheEntete}[6]{%
+  \begin{tcolorbox}[enhanced, breakable,
+    frame hidden, boxrule=0pt, arc=2.5mm,
+    interior style={left color=#3, right color=#3!75!black},
+    left=9pt, right=9pt, top=7pt, bottom=7pt,
+    before skip=0pt, after skip=6pt]
+    {\color{white}\sffamily\bfseries\LARGE #1\quad #2}\\[4pt]
+    {\color{#3!22!white}\sffamily\small \MakeUppercase{#4}\quad\textbar\quad #5}\\[1pt]
+    {\color{#3!35!white}\sffamily\footnotesize Sous-thèmes : #6}
+  \end{tcolorbox}%
+}
+
+% ── Sections : bandeau titre coloré arrondi + fond très pâle ─────────
+\tcbset{
+  ficheSection/.style={
+    breakable, enhanced jigsaw,
+    frame hidden, boxrule=0pt, arc=1.8mm,
+    colback=#1!4!white,
+    colbacktitle=#1,
+    coltitle=white,
+    fonttitle=\sffamily\bfseries,
+    left=7pt, right=7pt, top=5pt, bottom=5pt,
+    toptitle=3pt, bottomtitle=3pt,
+    before skip=10pt, after skip=8pt,
+  }
+}
+
+% ── Questions types : carte blanche, bandeau sombre du domaine ───────
+\tcbset{
+  questiontype/.style={
+    breakable, enhanced jigsaw,
+    colback=white,
+    frame hidden, boxrule=0pt, arc=1.8mm,
+    colbacktitle=colElec!78!black,
+    coltitle=white,
+    fonttitle=\sffamily\bfseries\small,
+    left=7pt, right=7pt, top=4pt, bottom=4pt,
+    toptitle=2.5pt, bottomtitle=2.5pt,
+    before skip=8pt, after skip=8pt,
+    borderline={0.6pt}{0pt}{colElec!12!white},
+  }
+}
+
+% ── Jury : bandeau ambre, fond crème ─────────────────────────────────
+\tcbset{
+  jury/.style={
+    breakable, enhanced jigsaw,
+    colback=colJuryBg,
+    frame hidden, boxrule=0pt, arc=1.8mm,
+    colbacktitle=colJuryFrame,
+    coltitle=white,
+    fonttitle=\sffamily\bfseries,
+    left=7pt, right=7pt, top=4pt, bottom=4pt,
+    toptitle=3pt, bottomtitle=3pt,
+    before skip=10pt, after skip=8pt,
+  }
+}
+
+% couleur du bloc 5 (présence)
+\definecolor{colPresence}{RGB}{83, 98, 118}

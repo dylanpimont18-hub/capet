@@ -1,0 +1,297 @@
+% =====================================================================
+%  MANUEL DE REVISION CAPET SII IE — SESSION 2026
+%  Assemblage entrelace : cours (fiches/) + exercices (exercices/),
+%  corriges regroupes en annexe.
+%
+%  COMPILATION (depuis manuel/, 3 passes pour sommaire + renvois) :
+%    pdflatex -interaction=nonstopmode main.tex   (x3)
+%
+%  Ce fichier n'est qu'un ASSEMBLAGE : il ne duplique aucun contenu.
+%  Chaque fiche et chaque banque d'exercices reste sa propre source,
+%  compilable seule exactement comme avant.
+%
+%  \subimport (package import) permet aux sources incluses de garder
+%  leurs \input relatifs (\input{preamble} cote fiches,
+%  \input{../fiches/preamble} cote exercices).
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+
+\def\CAPETMANUEL{1}                 % mode manuel : corriges differes vers l'annexe
+\newcommand{\CAPETINCLUDEMODE}{1}   % les sources n'ouvrent pas leur propre document
+
+\usepackage{import}
+\input{../fiches/preamble}
+
+\usepackage[hidelinks, bookmarks=true, bookmarksnumbered=true]{hyperref}
+\hypersetup{
+  pdftitle={Manuel de revision CAPET SII IE - Session 2026},
+  pdfsubject={Preparation au CAPET SII option Ingenierie electrique},
+  pdfcreator={LaTeX},
+}
+\usepackage{bookmark}
+
+\input{parties.tex}
+
+% --- Ouverture d'une notion dans le manuel -----------------------------
+% #1 code, #2 titre, #3 couleur : saut de page + entree de sommaire +
+% memorisation de la notion pour les intertitres d'annexe.
+\newcommand{\CAPETOUVRENOTION}[3]{%
+  \clearpage
+  \phantomsection
+  \addcontentsline{toc}{subsection}{\texorpdfstring{\textcolor{#3}{#1}}{#1} --- #2}%
+  \CAPETNOTION{#1}{#2}%
+}
+
+% --- Bandeau d'ouverture de la section exercices d'une notion ----------
+\newcommand{\CAPETBANDEAUEXOS}[2]{%
+  \par\medskip
+  \begin{tcolorbox}[enhanced, breakable, colback=colExo, colframe=colExo,
+    left=6pt, right=6pt, top=4pt, bottom=4pt, arc=1.5mm,
+    before skip=8pt, after skip=6pt]
+    {\color{white}\bfseries\large Exercices --- #1\quad #2}
+  \end{tcolorbox}
+}
+
+\begin{document}
+\pagenumbering{gobble}
+
+% =====================================================================
+%  COUVERTURE
+% =====================================================================
+\begin{titlepage}
+\thispagestyle{empty}
+\begin{tikzpicture}[remember picture,overlay]
+  \fill[colGrayLight] (current page.south west) rectangle (current page.north east);
+  \fill[colElec] (current page.south west) rectangle ([xshift=3.8cm]current page.north west);
+  \fill[colAuto] ([xshift=3.8cm,yshift=-4.2cm]current page.north west) rectangle ([xshift=5.1cm]current page.south west);
+  \fill[colTherm] ([xshift=5.1cm,yshift=-8.2cm]current page.north west) rectangle ([xshift=6.3cm]current page.south west);
+  \fill[colMeca] ([xshift=6.3cm,yshift=-11.2cm]current page.north west) rectangle ([xshift=7.2cm]current page.south west);
+  \draw[colElec!35, line width=1.2pt] ([xshift=8.2cm,yshift=-2.0cm]current page.north west) rectangle ([xshift=-1.2cm,yshift=2.0cm]current page.south east);
+\end{tikzpicture}
+
+\vspace*{1.8cm}
+\hspace*{4.9cm}
+\begin{minipage}{0.68\textwidth}
+  {\color{colElec}\Large\bfseries CAPET SII}\\[3pt]
+  {\color{black!70}\large Option Ing\'enierie \'electrique}\\[1.2cm]
+  {\fontsize{28}{32}\selectfont\bfseries Manuel de r\'evision}\\[0.25cm]
+  {\fontsize{17}{21}\selectfont\bfseries Cours, exercices et corrig\'es}\\[0.8cm]
+  {\large Session 2026}\\[0.35cm]
+  {\normalsize 30 notions : \'electrotechnique, \'electronique, automatique,
+   m\'ecanique appliqu\'ee et thermique. Chaque notion associe la fiche de
+   synth\`ese et ses exercices d'entra\^inement ; les corrig\'es sont
+   regroup\'es en annexe.}
+\end{minipage}
+
+\vfill
+
+\hspace*{4.9cm}
+\begin{minipage}{0.68\textwidth}
+\begin{tcolorbox}[enhanced, colback=white, colframe=colElec, boxrule=0.8pt,
+  arc=2mm, left=8pt, right=8pt, top=8pt, bottom=8pt]
+\textbf{Mode d'emploi}\\[4pt]
+Chaque notion se lit dans l'ordre : \textbf{la fiche de cours}, puis
+\textbf{les exercices}. Travaillez chaque exercice avant d'ouvrir son
+corrig\'e : le renvoi en fin d'\'enonc\'e donne sa page en annexe.
+\end{tcolorbox}
+{\large\bfseries CAPET SII IE}\\[2pt]
+{\normalsize Base documentaire \LaTeX{} pour impression}
+\end{minipage}
+\end{titlepage}
+
+% =====================================================================
+%  SOMMAIRE
+% =====================================================================
+\clearpage
+\pdfbookmark[1]{Sommaire}{toc}
+{\renewcommand{\contentsname}{Sommaire}
+ \tableofcontents}
+
+\clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% =====================================================================
+%  PARTIE I — ELECTROTECHNIQUE (T01 a T17)
+% =====================================================================
+\phantomsection\addcontentsline{toc}{section}{Partie I --- \'Electrotechnique}
+\CAPETPARTIE{I}{\'Electrotechnique}{Grandeurs, puissance, conversion statique, machines, \'energie et distribution --- notions T01 \`a T17}{colElec}
+
+\CAPETOUVRENOTION{T01}{Grandeurs \'electriques et \'electrocin\'etique}{colElec}
+\subimport{../fiches/}{T01_Grandeurs_Electrocinetique}
+\CAPETBANDEAUEXOS{T01}{Grandeurs \'electriques et \'electrocin\'etique}
+\subimport{../exercices/}{T01_exercices}
+
+\CAPETOUVRENOTION{T02}{Puissance en r\'egime alternatif sinuso\"idal}{colElec}
+\subimport{../fiches/}{T02_Puissance_AC}
+\CAPETBANDEAUEXOS{T02}{Puissance en r\'egime alternatif sinuso\"idal}
+\subimport{../exercices/}{T02_exercices}
+
+\CAPETOUVRENOTION{T03}{Repr\'esentation complexe, imp\'edances}{colElec}
+\subimport{../fiches/}{T03_Representations_Complexes_Impedances}
+\CAPETBANDEAUEXOS{T03}{Repr\'esentation complexe, imp\'edances}
+\subimport{../exercices/}{T03_exercices}
+
+\CAPETOUVRENOTION{T04}{Harmoniques r\'eseau, THD}{colElec}
+\subimport{../fiches/}{T04_Harmoniques_THD}
+\CAPETBANDEAUEXOS{T04}{Harmoniques r\'eseau, THD}
+\subimport{../exercices/}{T04_exercices}
+
+\CAPETOUVRENOTION{T05}{Ph\'enom\`enes thermiques}{colTherm}
+\subimport{../fiches/}{T05_Phenomenes_Thermiques}
+\CAPETBANDEAUEXOS{T05}{Ph\'enom\`enes thermiques}
+\subimport{../exercices/}{T05_exercices}
+
+\CAPETOUVRENOTION{T06}{Transformateur}{colElec}
+\subimport{../fiches/}{T06_Transformateur}
+\CAPETBANDEAUEXOS{T06}{Transformateur}
+\subimport{../exercices/}{T06_exercices}
+
+\CAPETOUVRENOTION{T07}{Hacheurs}{colElec}
+\subimport{../fiches/}{T07_Hacheurs}
+\CAPETBANDEAUEXOS{T07}{Hacheurs}
+\subimport{../exercices/}{T07_exercices}
+
+\CAPETOUVRENOTION{T08}{Redresseurs}{colElec}
+\subimport{../fiches/}{T08_Redresseurs}
+\CAPETBANDEAUEXOS{T08}{Redresseurs}
+\subimport{../exercices/}{T08_exercices}
+
+\CAPETOUVRENOTION{T09}{Onduleurs}{colElec}
+\subimport{../fiches/}{T09_Onduleurs}
+\CAPETBANDEAUEXOS{T09}{Onduleurs}
+\subimport{../exercices/}{T09_exercices}
+
+\CAPETOUVRENOTION{T10}{M\'ecanique et transmissions}{colMeca}
+\subimport{../fiches/}{T10_Mecanique}
+\CAPETBANDEAUEXOS{T10}{M\'ecanique et transmissions}
+\subimport{../exercices/}{T10_exercices}
+
+\CAPETOUVRENOTION{T11}{Machine \`a courant continu}{colElec}
+\subimport{../fiches/}{T11_Machine_CC}
+\CAPETBANDEAUEXOS{T11}{Machine \`a courant continu}
+\subimport{../exercices/}{T11_exercices}
+
+\CAPETOUVRENOTION{T12}{Machine synchrone et brushless}{colElec}
+\subimport{../fiches/}{T12_Machine_Synchrone}
+\CAPETBANDEAUEXOS{T12}{Machine synchrone et brushless}
+\subimport{../exercices/}{T12_exercices}
+
+\CAPETOUVRENOTION{T13}{Machine asynchrone}{colElec}
+\subimport{../fiches/}{T13_Machine_Asynchrone}
+\CAPETBANDEAUEXOS{T13}{Machine asynchrone}
+\subimport{../exercices/}{T13_exercices}
+
+\CAPETOUVRENOTION{T14}{Variation de vitesse et de couple}{colElec}
+\subimport{../fiches/}{T14_Variation_Vitesse}
+\CAPETBANDEAUEXOS{T14}{Variation de vitesse et de couple}
+\subimport{../exercices/}{T14_exercices}
+
+\CAPETOUVRENOTION{T15}{Stockage d'\'energie \'electrique}{colElec}
+\subimport{../fiches/}{T15_Stockage_Energie}
+\CAPETBANDEAUEXOS{T15}{Stockage d'\'energie \'electrique}
+\subimport{../exercices/}{T15_exercices}
+
+\CAPETOUVRENOTION{T16}{\'Energies renouvelables}{colElec}
+\subimport{../fiches/}{T16_Energies_Renouvelables}
+\CAPETBANDEAUEXOS{T16}{\'Energies renouvelables}
+\subimport{../exercices/}{T16_exercices}
+
+\CAPETOUVRENOTION{T17}{Distribution et s\'ecurit\'e \'electrique}{colElec}
+\subimport{../fiches/}{T17_Distribution_Securite}
+\CAPETBANDEAUEXOS{T17}{Distribution et s\'ecurit\'e \'electrique}
+\subimport{../exercices/}{T17_exercices}
+
+% =====================================================================
+%  PARTIE II — ELECTRONIQUE (T18 a T25)
+% =====================================================================
+\phantomsection\addcontentsline{toc}{section}{Partie II --- \'Electronique}
+\CAPETPARTIE{II}{\'Electronique}{Composants, amplification, filtrage, num\'erisation, capteurs, embarqu\'e et transmission --- notions T18 \`a T25}{colElec}
+
+\CAPETOUVRENOTION{T18}{Composants \'electroniques}{colElec}
+\subimport{../fiches/}{T18_Composants_Electroniques}
+\CAPETBANDEAUEXOS{T18}{Composants \'electroniques}
+\subimport{../exercices/}{T18_exercices}
+
+\CAPETOUVRENOTION{T19}{Amplificateur op\'erationnel}{colElec}
+\subimport{../fiches/}{T19_AOP}
+\CAPETBANDEAUEXOS{T19}{Amplificateur op\'erationnel}
+\subimport{../exercices/}{T19_exercices}
+
+\CAPETOUVRENOTION{T20}{R\'egime sinuso\"idal et filtres}{colElec}
+\subimport{../fiches/}{T20_Filtres_RC_RL}
+\CAPETBANDEAUEXOS{T20}{R\'egime sinuso\"idal et filtres}
+\subimport{../exercices/}{T20_exercices}
+
+\CAPETOUVRENOTION{T21}{Fonctions de transfert, Bode}{colElec}
+\subimport{../fiches/}{T21_Fonctions_Transfert_Bode}
+\CAPETBANDEAUEXOS{T21}{Fonctions de transfert, Bode}
+\subimport{../exercices/}{T21_exercices}
+
+\CAPETOUVRENOTION{T22}{CAN/CNA et num\'erisation}{colElec}
+\subimport{../fiches/}{T22_CAN_CNA_Numerisation}
+\CAPETBANDEAUEXOS{T22}{CAN/CNA et num\'erisation}
+\subimport{../exercices/}{T22_exercices}
+
+\CAPETOUVRENOTION{T23}{Capteurs et conditionnement}{colElec}
+\subimport{../fiches/}{T23_Capteurs_Conditionnement}
+\CAPETBANDEAUEXOS{T23}{Capteurs et conditionnement}
+\subimport{../exercices/}{T23_exercices}
+
+\CAPETOUVRENOTION{T24}{Syst\`emes embarqu\'es}{colElec}
+\subimport{../fiches/}{T24_Systemes_Embarques}
+\CAPETBANDEAUEXOS{T24}{Syst\`emes embarqu\'es}
+\subimport{../exercices/}{T24_exercices}
+
+\CAPETOUVRENOTION{T25}{Transmission num\'erique}{colElec}
+\subimport{../fiches/}{T25_Transmission_Numerique}
+\CAPETBANDEAUEXOS{T25}{Transmission num\'erique}
+\subimport{../exercices/}{T25_exercices}
+
+% =====================================================================
+%  PARTIE III — AUTOMATIQUE (T26 a T29)
+% =====================================================================
+\phantomsection\addcontentsline{toc}{section}{Partie III --- Automatique}
+\CAPETPARTIE{III}{Automatique}{Mod\'elisation, asservissement, correcteurs et logique --- notions T26 \`a T29}{colAuto}
+
+\CAPETOUVRENOTION{T26}{Mod\'elisation des syst\`emes lin\'eaires}{colAuto}
+\subimport{../fiches/}{T26_Modelisation_Systemes}
+\CAPETBANDEAUEXOS{T26}{Mod\'elisation des syst\`emes lin\'eaires}
+\subimport{../exercices/}{T26_exercices}
+
+\CAPETOUVRENOTION{T27}{Syst\`emes boucl\'es et correcteurs}{colAuto}
+\subimport{../fiches/}{T27_Systemes_Boucles_Correcteurs}
+\CAPETBANDEAUEXOS{T27}{Syst\`emes boucl\'es et correcteurs}
+\subimport{../exercices/}{T27_exercices}
+
+\CAPETOUVRENOTION{T28}{Logique combinatoire}{colAuto}
+\subimport{../fiches/}{T28_Logique_Combinatoire}
+\CAPETBANDEAUEXOS{T28}{Logique combinatoire}
+\subimport{../exercices/}{T28_exercices}
+
+\CAPETOUVRENOTION{T29}{Logique s\'equentielle, GRAFCET}{colAuto}
+\subimport{../fiches/}{T29_Logique_Sequentielle_GRAFCET}
+\CAPETBANDEAUEXOS{T29}{Logique s\'equentielle, GRAFCET}
+\subimport{../exercices/}{T29_exercices}
+
+% =====================================================================
+%  PARTIE IV — MESURAGE ET INSTRUMENTATION (T30)
+% =====================================================================
+\phantomsection\addcontentsline{toc}{section}{Partie IV --- Mesurage et instrumentation}
+\CAPETPARTIE{IV}{Mesurage et instrumentation}{Cha\^ine de mesure, incertitudes et sch\'ematisation normalis\'ee --- notion T30}{colElec}
+
+\CAPETOUVRENOTION{T30}{Mesurage et instrumentation}{colElec}
+\subimport{../fiches/}{T30_Mesurage_Instrumentation}
+\CAPETBANDEAUEXOS{T30}{Mesurage et instrumentation}
+\subimport{../exercices/}{T30_exercices}
+
+% =====================================================================
+%  ANNEXE A — CORRIGES
+% =====================================================================
+\phantomsection\addcontentsline{toc}{section}{Annexe A --- Corrig\'es des exercices}
+\CAPETPARTIE{A}{Corrig\'es des exercices}{Corrig\'es d\'etaill\'es de tous les exercices du manuel, dans l'ordre des notions}{colExo}
+
+\ficheHeaders{Annexe A}{Corrig\'es des exercices}{colExo}
+\CAPETANNEXE
+
+\end{document}

@@ -1,0 +1,357 @@
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ifdefined\tr\else\DeclareSIUnit{\tr}{tr}\fi
+
+% =====================================================================
+% TRACABILITE DES SOURCES (revision complementarite, 2026-09-02)
+% ---------------------------------------------------------------------
+% Ex. 2 -- 2024, epreuve ecrite disciplinaire SII option IE, partie B, Q B5 a B9.
+%   DU SUJET (E2_Disciplinaire_IE_2024.md l.231-263) : Pcharge = 178,3 kW, Fp = 1,
+%   l = 850 m, Ru = 20 mOhm/km, Lu = 1,2 mH/km, Ur = 400 V, Itot pose a 258 A,
+%   enonces de B5 a B9 (dont le renvoi au DT2 et la categorie "autres usages").
+%   RECONSTITUE : le tableau du DT2 lui-meme. Le sujet ne contient que le titre
+%   "DT2 : Extrait de la norme NF C 15-100" (l.875), la table etant une image omise
+%   par la conversion Marker. Valeurs (type A 3%/5%, type B 6%/8%) = table standard
+%   NF C 15-100, verifiee par WebSearch (fr.electrical-installation.org, Prysmian,
+%   Miguelez).
+%   /!\ LIMITE APPLICABLE ICI = 5 % (type A, "autres usages"), PAS 8 %. Le sujet
+%   precise "sachant que le transformateur est du domaine public" (B9) et le corrige
+%   officiel tranche : Rapport_Jury_2024.md l.223 "La chute de tension n'est pas
+%   respectee. En effet, dans le domaine public pour un 'autre usage', la norme
+%   NFC 15-100 impose une chute de tension inferieure a 5%." Le piege de la question
+%   est justement de croire que la presence d'un poste de transformation suffit a
+%   classer l'installation en type B. Ne pas re-basculer cette conclusion vers 8 %.
+%
+% Ex. 4 -- 2018, CAPET SII option IE, epreuve EDE ENE 2, partie B, Q10 et Q11.
+%   DU SUJET (E2_Sujet_2018.md l.210-230) : principe du COMPACTO II, tension injectee
+%   x(t) en opposition de phase, u(t) = Umax.sin(wt), x(t) = Xmax.sin(wt+phi),
+%   v(t) = u(t)+x(t), Umax = 230*sqrt(2) V a 50 Hz, cible V = 190 V. Citation jury
+%   verbatim : Rapport_Jury_2018.md l.2498 (commentaires PARTIE B, questions 10-11).
+%   POSE POUR L'EXERCICE (signale comme tel dans l'enonce) : I = 12 A, question 4.
+%
+% Ex. 5 -- 2024, epreuve ecrite disciplinaire SII option IE, partie C, Q C5 a C8.
+%   DU SUJET (E2_Disciplinaire_IE_2024.md l.365-385) : structure figure 9 (boucle
+%   interne Kp, boucle externe Ki), Hm(p) = Kmeca/(1+tau_meca.p), forme canonique
+%   imposee, m = 1, Tr = 1 s, w0 = 5/Tr, Kmeca = 250, tau_meca = 8,5 s, enonces
+%   C5 a C8. Citation jury verbatim : Rapport_Jury_2024.md l.505.
+% =====================================================================
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T03}} - Exercices - Repr\'esentation complexe, imp\'edances}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T03 \quad Repr\'esentation complexe, imp\'edances}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 5 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Un circuit RLC s\'erie est constitu\'e d'une r\'esistance $R = \SI{10}{\ohm}$, d'une inductance $L = \SI{50}{\milli\henry}$ et d'un condensateur $C = \SI{100}{\micro\farad}$, aliment\'e par une tension sinuso\"idale $u(t)$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw
+(0,0) to[sV, l=$u(t)$] (0,3)
+to[R, l=$R$] (3,3)
+to[cute inductor, l=$L$] (5,3)
+to[C, l=$C$] (5,0)
+-- (0,0);
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Exprimer l'imp\'edance complexe $\underline{Z}(j\omega) = R + jL\omega + \dfrac{1}{jC\omega}$ du circuit.
+  \item Pour $f = \SI{50}{\hertz}$, calculer num\'eriquement le module $|\underline{Z}|$ et l'argument $\varphi$ de $\underline{Z}$. Le circuit est-il inductif ou capacitif \`a cette fr\'equence~?
+  \item D\'eterminer la pulsation de r\'esonance $\omega_0$ (et la fr\'equence $f_0$ correspondante), puis calculer le facteur de qualit\'e $Q$ du circuit.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item En notation complexe, les imp\'edances des trois \'el\'ements s'ajoutent en s\'erie :
+  \[ \underline{Z}(j\omega) = R + jL\omega + \frac{1}{jC\omega} = R + j\left(L\omega - \frac{1}{C\omega}\right) \]
+  \item \`A $f = \SI{50}{\hertz}$, $\omega = 2\pi f \approx \SI{314,16}{\radian\per\second}$ :
+  \[ L\omega = 0{,}05 \times 314{,}16 \approx \SI{15,71}{\ohm} \qquad \frac{1}{C\omega} = \frac{1}{100\times10^{-6} \times 314{,}16} \approx \SI{31,83}{\ohm} \]
+  \[ \underline{Z} = 10 + j(15{,}71 - 31{,}83) = 10 - j16{,}12 \]
+  \[ |\underline{Z}| = \sqrt{10^2 + 16{,}12^2} \approx \SI{18,97}{\ohm} \qquad \varphi = \arctan\!\left(\frac{-16{,}12}{10}\right) \approx -58{,}2\,\text{\textdegree} \]
+  L'argument est n\'egatif ($\varphi < 0$) : le courant est en avance sur la tension, le circuit est donc \textbf{capacitif} \`a cette fr\'equence.
+  \item La r\'esonance s\'erie annule la partie imaginaire de $\underline{Z}$ :
+  \[ \omega_0 = \frac{1}{\sqrt{LC}} = \frac{1}{\sqrt{0{,}05 \times 100\times10^{-6}}} = \frac{1}{\sqrt{5\times10^{-6}}} \approx \SI{447,2}{\radian\per\second} \quad\Rightarrow\quad f_0 = \frac{\omega_0}{2\pi} \approx \SI{71,2}{\hertz} \]
+  \[ Q = \frac{L\omega_0}{R} = \frac{0{,}05 \times 447{,}2}{10} \approx 2{,}24 \]
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} \`A $\SI{50}{\hertz}$ le circuit est capacitif et pr\'esente une imp\'edance de $\SI{18,97}{\ohm}$, pr\`es du double de celle qu'il pr\'esenterait \`a la r\'esonance ($|\underline{Z}| = R = \SI{10}{\ohm}$ \`a $f_0 = \SI{71,2}{\hertz}$). Avec $Q = 2{,}24$, la bande passante \`a $\SI{-3}{\decibel}$ vaut $\Delta f = f_0/Q \approx \SI{31,8}{\hertz}$ : la s\'electivit\'e est faible, ce circuit ne conviendrait donc pas comme filtre s\'electif autour de $\SI{71}{\hertz}$ (il faudrait $Q \gg 10$, obtenu en r\'eduisant $R$ ou en augmentant le rapport $L/C$).
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{2} \hfill\normalfont\footnotesize d'apr\`es 2024, \'epreuve \'ecrite disciplinaire (SII option ing\'enierie \'electrique), partie B, questions B5 \`a B9 et DT2}
+]
+\CAPETSHOW{
+Un atelier de menuiserie, d\'ej\`a compens\'e en \'energie r\'eactive, est assimil\'e \`a une charge triphas\'ee \'equilibr\'ee de puissance active $P_{\text{charge}} = \SI{178,3}{\kilo\watt}$ et de facteur de puissance $F_p = 1$. Il est aliment\'e depuis le secondaire d'un transformateur abaisseur suppos\'e parfait \emph{du domaine public}, par une ligne triphas\'ee de longueur $\ell = \SI{850}{\metre}$. Chaque fil de ligne est mod\'elis\'e par une r\'esistance $R_L$ en s\'erie avec une inductance $L_L$, de valeurs lin\'e\"iques $R_u = \SI{20}{\milli\ohm\per\kilo\metre}$ et $L_u = \SI{1,2}{\milli\henry\per\kilo\metre}$. La tension compos\'ee du r\'eseau alimentant l'atelier est $U_r = \SI{400}{\volt}$ \`a $f = \SI{50}{\hertz}$. On note $U_D$ la tension compos\'ee au secondaire du transformateur, $\Delta U = U_D - U_r$ la chute de tension compos\'ee et $I_{tot}$ le courant efficace dans un conducteur de phase.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw (0,0) to[sV, l=$\underline{V}_D$] (0,3)
+  to[R, l=$R_L$] (2.8,3)
+  to[cute inductor, l=$L_L$] (5.4,3)
+  to[generic, l_=$\underline{Z}_{ch}$] (5.4,0)
+  -- (0,0);
+\draw[->] (1.0,4.0) -- (2.0,4.0) node[midway,above]{\footnotesize $\underline{I}_{tot}$};
+\node[right, align=left] at (5.75,1.5) {\footnotesize charge :\\\footnotesize $P_{\text{charge}}$, $F_p = 1$};
+\node[below] at (2.7,-0.5) {\footnotesize sch\'ema \'equivalent monophas\'e (une phase sur trois)};
+\end{circuitikz}
+\end{center}
+
+\begin{tcolorbox}[docTech, title={Document technique DT2 -- Extrait de la norme NF C 15-100 : chutes de tension maximales admissibles}]
+\centering
+\small
+\begin{tabular}{p{0.52\linewidth}cc}
+\toprule
+\textbf{Type d'installation} & \textbf{\'Eclairage} & \textbf{Autres usages} \\
+\midrule
+\textbf{Type A} -- installation aliment\'ee directement par un branchement \`a basse tension du r\'eseau de distribution public & $3\,\%$ & $5\,\%$ \\
+\addlinespace[3pt]
+\textbf{Type B} -- installation aliment\'ee par un poste de livraison ou de transformation \`a partir du r\'eseau HTA & $6\,\%$ & $8\,\%$ \\
+\bottomrule
+\end{tabular}
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever dans le document technique DT2} la chute de tension maximale admissible applicable ici, sachant que le sujet pr\'ecise que le transformateur rel\`eve du \textbf{domaine public} et que l'installation appartient \`a la cat\'egorie \guillemotleft\ autres usages \guillemotright. \emph{Attention : c'est le statut du r\'eseau amont, et non la seule pr\'esence d'un poste de transformation, qui fixe la ligne du tableau \`a retenir.}
+  \item Calculer $R_L$ et $L_L$ pour chaque fil de ligne, puis en d\'eduire la r\'eactance $X_L = L_L\omega$ et l'imp\'edance complexe de ligne $\underline{Z}_L$ (module et argument).
+  \item Exprimer puis calculer la valeur efficace $I_{tot}$ du courant dans un conducteur de phase. \emph{Pour la suite, on prendra $I_{tot} = \SI{258}{\ampere}$.}
+  \item Pour l'ensemble \guillemotleft\ ligne + r\'ecepteur \guillemotright, exprimer et calculer la puissance active totale $P_T$, la puissance r\'eactive totale $Q_T$ et la puissance apparente $S_T$ vues du secondaire du transformateur.
+  \item En d\'eduire $U_D$, puis $\Delta U$ exprim\'ee en proportion de $U_D$. Conclure quant \`a la conformit\'e vis-\`a-vis du DT2 et, le cas \'ech\'eant, proposer une solution pour diminuer la chute de tension.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le sujet pr\'ecise que le transformateur est \textbf{du domaine public} : l'installation rel\`eve donc du \textbf{type A} du DT2 (aliment\'ee par le r\'eseau de distribution public), et non du type B. Pour la cat\'egorie \guillemotleft\ autres usages \guillemotright, la limite admissible est donc de $\boldsymbol{5\,\%}$. C'est le \emph{statut du r\'eseau amont} qui d\'ecide, non la seule pr\'esence d'un poste de transformation~: c'est le pi\`ege de cette question, et le jury 2024 tranche explicitement en faveur des $5\,\%$. La valeur relev\'ee dans le tableau est donc $\Delta U_{\max} = 5\,\%$ ; les $8\,\%$ de la ligne \guillemotleft\ type B \guillemotright\ ne s'appliqueraient qu'\`a une installation aliment\'ee par un poste \emph{priv\'e}.
+  \item Pour $\ell = \SI{850}{\metre} = \SI{0,850}{\kilo\metre}$ :
+  \[ R_L = R_u\,\ell = 20\times10^{-3} \times 0{,}850 = \SI{17}{\milli\ohm} \qquad L_L = L_u\,\ell = 1{,}2\times10^{-3} \times 0{,}850 = \SI{1,02}{\milli\henry} \]
+  Avec $\omega = 2\pi \times 50 \approx \SI{314,16}{\radian\per\second}$ :
+  \[ X_L = L_L\,\omega = 1{,}02\times10^{-3} \times 314{,}16 \approx \SI{320}{\milli\ohm} \]
+  \[ \underline{Z}_L = R_L + jX_L = 0{,}017 + j\,0{,}320 \qquad |\underline{Z}_L| = \sqrt{0{,}017^2 + 0{,}320^2} \approx \SI{0,321}{\ohm}, \quad \arg\underline{Z}_L \approx 87{,}0\,\text{\textdegree} \]
+  La ligne est donc tr\`es majoritairement \emph{inductive} ($X_L \approx 19\,R_L$) : c'est la r\'eactance, et non la r\'esistance, qui gouverne son comportement.
+  \item La charge \'etant compens\'ee \`a $F_p = 1$, sa puissance apparente se confond avec sa puissance active :
+  \[ P_{\text{charge}} = \sqrt{3}\,U_r\,I_{tot}\,F_p \quad\Longrightarrow\quad I_{tot} = \frac{P_{\text{charge}}}{\sqrt{3}\,U_r\,F_p} = \frac{178\,300}{\sqrt{3} \times 400 \times 1} \approx \SI{257}{\ampere} \]
+  valeur que le sujet arrondit \`a $\SI{258}{\ampere}$ pour la suite de l'\'etude.
+  \item Les pertes de la ligne s'ajoutent \`a la puissance de la charge, sur les \emph{trois} conducteurs de phase :
+  \[ P_T = P_{\text{charge}} + 3R_L I_{tot}^2 = 178\,300 + 3 \times 0{,}017 \times 258^2 \approx \SI{181,7}{\kilo\watt} \]
+  \[ Q_T = Q_{\text{charge}} + 3X_L I_{tot}^2 = 0 + 3 \times 0{,}320 \times 258^2 \approx \SI{64,0}{\kilo\var} \]
+  \[ S_T = \sqrt{P_T^2 + Q_T^2} = \sqrt{181{,}7^2 + 64{,}0^2} \approx \SI{192,6}{\kilo\volt\ampere} \]
+  Bien que la charge soit compens\'ee \`a $F_p = 1$, la ligne appelle n\'eanmoins $\SI{64}{\kilo\var}$ : la batterie de condensateurs est plac\'ee \emph{en aval} de la ligne, elle ne compense donc pas la r\'eactance de celle-ci.
+  \item De $S_T = \sqrt{3}\,U_D\,I_{tot}$ on tire :
+  \[ U_D = \frac{S_T}{\sqrt{3}\,I_{tot}} = \frac{192\,600}{\sqrt{3} \times 258} \approx \SI{431}{\volt} \]
+  \[ \Delta U = U_D - U_r = 431 - 400 = \SI{31}{\volt} \qquad \frac{\Delta U}{U_D} = \frac{31}{431} \approx 7{,}2\,\% \]
+  $7{,}2\,\% > 5\,\%$ : l'installation n'est \textbf{pas conforme} \`a la limite relev\'ee au DT2. Pour r\'eduire $\Delta U$, on peut augmenter la section des conducteurs (ce qui diminue $R_u$ mais tr\`es peu $L_u$), rapprocher le poste de transformation de l'atelier pour raccourcir $\ell$, ou reporter la compensation d'\'energie r\'eactive en amont de la ligne.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} La chute de tension atteint $7{,}2\,\%$ de $U_D$ pour une limite normative de $5\,\%$ (DT2, type A, autres usages) : l'exigence n'est \textbf{pas} satisfaite, le d\'epassement atteignant $2{,}2$ points. C'est aussi la conclusion du corrig\'e officiel du jury 2024, qui pr\'econise de modifier $R_u$ et $L_u$ \guillemotleft\ en augmentant la section du c\^able \guillemotright. Le calcul montre toutefois que la marge de manœuvre est limit\'ee : la chute \'etant domin\'ee par le terme r\'eactif ($X_L \approx 19\,R_L$), augmenter la section ne fait baisser que $R_u$ et laisse $L_u$ quasi inchang\'ee~; ramener $\Delta U$ sous $5\,\%$ suppose donc aussi de r\'eduire la longueur de ligne ou de rapprocher le poste de transformation.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize exercice in\'edit (valeurs adapt\'ees), inspir\'e de 2024, \'epreuve \'ecrite disciplinaire (SII option ing\'enierie \'electrique), partie D, questions D15-D17 (figure 17 : moteur monophas\'e du ventilateur, $C_p$ en s\'erie avec l'enroulement auxiliaire)}
+]
+\CAPETSHOW{
+Un moteur asynchrone monophas\'e comporte un enroulement principal et un enroulement auxiliaire, tous deux aliment\'es sous $u(t)$ efficace $\SI{230}{\volt}$, $f = \SI{50}{\hertz}$. L'enroulement auxiliaire, de r\'esistance $R_a = \SI{20}{\ohm}$, est mont\'e en s\'erie avec un condensateur de d\'emarrage $C_p$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.8]
+\draw (0,0) to[sV, l=$u(t)$] (0,3) -- (3,3);
+\draw (3,3) -- (8,3);
+\draw (3,3) to[R, l=$R_p$] (3,1.8) to[cute inductor, l=$L_p$] (3,0);
+\draw (8,3) to[R, l=$R_a$] (8,1.8) to[C, l=$C_p$] (8,0);
+\draw (8,0) -- (3,0) -- (0,0);
+\node[circ] at (3,3) {};
+\node[circ] at (3,0) {};
+\node[below] at (3,-0.4) {\footnotesize enroulement principal};
+\node[below] at (8,-0.4) {\footnotesize enroulement auxiliaire};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Rappeler qualitativement le r\^ole du condensateur de d\'emarrage $C_p$ dans la cr\'eation du champ tournant d'un moteur asynchrone monophas\'e.
+  \item Calculer la valeur de $C_p$ n\'ecessaire pour obtenir, aux bornes de la branche auxiliaire (r\'esistance $R_a$ en s\'erie avec $C_p$), un d\'ephasage courant/tension $\varphi_{aux} = -60\,\text{\textdegree}$ (courant en avance sur la tension).
+  \item En d\'eduire le courant efficace $I_{aux}$ absorb\'e par la branche auxiliaire.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Seul, l'enroulement principal (r\'esistif-inductif) cr\'ee un champ pulsatoire, insuffisant pour d\'emarrer seul le moteur. Le condensateur $C_p$, en s\'erie avec l'enroulement auxiliaire, d\'ephase le courant auxiliaire par rapport au courant principal. La combinaison des deux champs magn\'etiques d\'ephas\'es dans le temps et dans l'espace (les deux enroulements sont d\'ecal\'es g\'eom\'etriquement) cr\'ee un champ tournant elliptique, suffisant pour d\'emarrer le moteur de mani\`ere autonome.
+  \item Pour la branche $R_a$--$C_p$ s\'erie, l'imp\'edance complexe est $\underline{Z}_{aux} = R_a - j/(C_p\omega)$, d'argument $\varphi_{aux} = -\arctan\!\left(\dfrac{1}{R_a C_p \omega}\right)$. On veut $\varphi_{aux} = -60\,\text{\textdegree}$, soit $\tan(60\,\text{\textdegree}) = 1{,}732 = \dfrac{1}{R_a C_p \omega}$ :
+  \[ C_p = \frac{1}{R_a \cdot \omega \cdot \tan(60\,\text{\textdegree})} = \frac{1}{20 \times 314{,}16 \times 1{,}732} \approx 9{,}19\times10^{-5}\ \si{\farad} = \SI{91,9}{\micro\farad} \]
+  \item Le module de l'imp\'edance auxiliaire est $|\underline{Z}_{aux}| = R_a/\cos(60\,\text{\textdegree}) = 20/0{,}5 = \SI{40}{\ohm}$, d'o\`u :
+  \[ I_{aux} = \frac{u}{|\underline{Z}_{aux}|} = \frac{230}{40} = \SI{5,75}{\ampere} \]
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} La branche auxiliaire doit donc \^etre \'equip\'ee d'un condensateur d'environ $\SI{92}{\micro\farad}$ (premi\`ere valeur normalis\'ee sup\'erieure : $\SI{100}{\micro\farad}$), tenant une tension de service \emph{permanente} de $\SI{230}{\volt}$ efficace -- le sujet pr\'ecise en effet que $C_p$ \guillemotleft\ reste sous tension en permanence \guillemotright\ -- et supportant un courant de $\SI{5,75}{\ampere}$. C'est bien ce d\'ephasage impos\'e au courant auxiliaire (en avance sur la tension, alors que le courant de l'enroulement principal est en retard) qui cr\'ee le champ tournant : sans lui, le moteur monophas\'e ne d\'emarrerait pas de lui-m\^eme.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize d'apr\`es 2018, CAPET SII option ing\'enierie \'electrique, \'epreuve EDE ENE 2, partie B, questions 10 et 11}
+]
+\CAPETSHOW{
+Un r\'egulateur de tension d'\'eclairage public de type COMPACTO~II\textsuperscript{\textregistered} abaisse la tension appliqu\'ee aux luminaires sans d\'eformer le courant appel\'e au r\'eseau. Pour cela, il ajoute en s\'erie sur la ligne une tension alternative sinuso\"idale suppl\'ementaire $x(t)$, dite \emph{tension inject\'ee}, plac\'ee en opposition de phase avec la tension du r\'eseau $u(t)$. La tension instantan\'ee appliqu\'ee aux luminaires est alors $v(t) = u(t) + x(t)$.
+
+Le r\'eseau fran\c{c}ais est caract\'eris\'e par une tension efficace $U = \SI{230}{\volt}$ (soit $U_{\max} = 230\sqrt{2}$ volts) \`a la fr\'equence $f = \SI{50}{\hertz}$. On pose :
+\[ u(t) = U_{\max}\sin(\omega t) \qquad x(t) = X_{\max}\sin(\omega t + \varphi) \]
+
+\begin{center}
+\begin{tikzpicture}[scale=1.05,>=latex]
+\draw[->] (-0.4,0) -- (4.0,0) node[right]{\footnotesize axe r\'eel};
+\draw[->] (0,-0.5) -- (0,1.3) node[above]{\footnotesize axe imaginaire};
+\draw[very thick,->,colExo] (0,0) -- (3.25,0) node[midway,above]{\footnotesize $\underline{U}$};
+\draw[very thick,->,colTherm] (3.25,0) -- (2.68,0) ;
+\node[above,colTherm] at (2.95,0.08) {\footnotesize $\underline{X}$};
+\draw[very thick,->,colAuto] (0,-0.35) -- (2.68,-0.35) node[midway,below]{\footnotesize $\underline{V}$};
+\node[right] at (3.4,-0.35) {\footnotesize (diagramme de Fresnel, \'echelle libre)};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item D\'eterminer la valeur de l'angle $\varphi$ dans l'expression de $x(t)$ pour que cette tension soit en opposition de phase par rapport \`a la tension $u(t)$ du r\'eseau.
+  \item En repr\'esentation complexe, exprimer le vecteur de Fresnel $\underline{V}$ associ\'e \`a $v(t)$ en fonction de $\underline{U}$ et $\underline{X}$, et justifier que les trois tensions restent align\'ees sur un m\^eme axe. En d\'eduire une relation \emph{alg\'ebrique} entre les valeurs efficaces $V$, $U$ et $X$.
+  \item D\'eterminer l'expression compl\`ete de la tension inject\'ee $x(t)$ pour que la tension efficace aux bornes des luminaires soit $V = \SI{190}{\volt}$ (tension dite \guillemotleft\ \'economique \guillemotright).
+  \item \emph{(prolongement au-del\`a du sujet 2018 ; valeur de courant pos\'ee pour l'exercice)} Le r\'egulateur ne peut d\'elivrer $x(t)$ que si l'enroulement qui la produit est dimensionn\'e pour la puissance correspondante. En supposant un courant de ligne $I = \SI{12}{\ampere}$ en phase avec $\underline{V}$ (charge d'\'eclairage assimil\'ee r\'esistive), comparer la puissance apparente trait\'ee par cet enroulement d'injection \`a celle que traiterait un dispositif plac\'e en s\'erie sur la pleine tension. Conclure sur l'int\'er\^et du principe.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Deux sinuso\"ides de m\^eme pulsation sont en opposition de phase lorsque leur d\'ephasage vaut une demi-p\'eriode :
+  \[ \varphi = \pi\ \si{\radian} = 180\,\text{\textdegree} \]
+  On a alors $x(t) = X_{\max}\sin(\omega t + \pi) = -X_{\max}\sin(\omega t)$ : la tension inject\'ee se \emph{retranche} instantan\'ement de la tension r\'eseau.
+  \item En repr\'esentation complexe (vecteurs de Fresnel), l'addition temporelle devient une addition vectorielle : $\underline{V} = \underline{U} + \underline{X}$. Comme $\arg\underline{X} = \arg\underline{U} + 180\,\text{\textdegree}$, les deux vecteurs sont \textbf{colin\'eaires et de sens oppos\'es} : la somme reste port\'ee par le m\^eme axe, et $\underline{V}$ est en phase avec $\underline{U}$. La relation vectorielle se r\'eduit donc \`a une soustraction alg\'ebrique de valeurs efficaces :
+  \[ V = U - X \]
+  C'est pr\'ecis\'ement parce que $\varphi = 180\,\text{\textdegree}$ (et non une valeur quelconque) que l'on peut \'ecrire une simple soustraction ; pour tout autre $\varphi$, il faudrait composer les modules par le th\'eor\`eme d'Al-Kashi.
+  \item De $V = U - X$ on tire la valeur efficace de la tension inject\'ee :
+  \[ X = U - V = 230 - 190 = \SI{40}{\volt} \quad\Longrightarrow\quad X_{\max} = 40\sqrt{2} \approx \SI{56,6}{\volt} \]
+  Avec $\omega = 2\pi \times 50 \approx \SI{314,16}{\radian\per\second}$ et $\varphi = \pi$, l'expression analytique compl\`ete est :
+  \[ x(t) = 40\sqrt{2}\,\sin\!\left(314{,}16\,t + \pi\right) \approx 56{,}6\,\sin\!\left(314{,}16\,t + \pi\right) \qquad (x \text{ en volts},\ t \text{ en secondes}) \]
+  soit, de mani\`ere \'equivalente, $x(t) \approx -56{,}6\,\sin(314{,}16\,t)$.
+  \item L'enroulement d'injection est travers\'e par le courant de ligne $I = \SI{12}{\ampere}$ mais ne supporte que la tension $X = \SI{40}{\volt}$ :
+  \[ S_{\text{inj}} = X\,I = 40 \times 12 = \SI{480}{\volt\ampere} \]
+  Un dispositif plac\'e en s\'erie sur la pleine tension devrait traiter :
+  \[ S_{\text{total}} = V\,I = 190 \times 12 = \SI[group-minimum-digits=4]{2280}{\volt\ampere} \]
+  Le rapport vaut $480/2\,280 \approx 21\,\%$ : l'enroulement d'injection n'a \`a traiter qu'environ un cinqui\`eme de la puissance apparente de la charge.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Le r\'eglage de la tension d'\'eclairage de $\SI{230}{\volt}$ \`a $\SI{190}{\volt}$ s'obtient en injectant seulement $\SI{40}{\volt}$ efficaces en opposition de phase, ce qui ne mobilise que $\SI{480}{\volt\ampere}$ sur les $\SI[group-minimum-digits=4]{2280}{\volt\ampere}$ de la charge, soit $21\,\%$. Le r\'egulateur est donc bien plus compact et moins co\^uteux qu'un dispositif plac\'e sur la pleine tension ; surtout, l'injection restant \emph{sinuso\"idale}, le courant appel\'e au r\'eseau n'est pas d\'ecoup\'e : c'est ce qui valide l'exigence de fonctionnement \guillemotleft\ sans pollution harmonique \guillemotright\ annonc\'ee par le constructeur.
+
+\smallskip
+\textit{Point de vigilance jury (rapport de jury CAPET 2018, commentaires de la \textbf{partie B}, questions 10 et 11) : \guillemotleft\ Pour les questions 10 et 11 l'objectif \'etait de valider le principe technologique du r\'egulateur par une d\'emarche analytique simple. Si beaucoup de candidats ont su donner la valeur du d\'ephasage, peu d'entre eux ont obtenu une expression analytique correcte de la tension \guillemotright. Trouver $\varphi = 180\,\text{\textdegree}$ ne rapporte donc qu'une fraction des points : c'est l'\'ecriture compl\`ete de $x(t)$, amplitude \emph{et} phase, qui est attendue.}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize d'apr\`es 2024, \'epreuve \'ecrite disciplinaire (SII option ing\'enierie \'electrique), partie C, questions C5 \`a C8}
+]
+\CAPETSHOW{
+L'autopilotage du moto-extracteur d'air d'un atelier repose sur un asservissement de vitesse \`a deux boucles imbriqu\'ees (figure ci-dessous) : une boucle interne de gain proportionnel $K_p$ referm\'ee sur le mod\`ele du moteur associ\'e \`a son variateur, et une boucle externe d'action int\'egrale de gain $K_i$. Le mod\`ele scalaire de la motorisation est du premier ordre :
+\[ H_m(p) = \frac{K_{\text{meca}}}{1 + \tau_{\text{meca}}\,p} \]
+
+\begin{center}
+\begin{tikzpicture}[scale=1,>=latex, box/.style={draw, minimum width=1.5cm, minimum height=0.75cm, fill=white}, sum/.style={draw, circle, inner sep=1.2pt}]
+\draw[->] (-1.1,0) -- (-0.35,0);
+\node[above] at (-0.9,0.18) {\footnotesize $\Omega_{\text{ref}}(p)$};
+\node[sum] (s1) at (-0.15,0) {};
+\node at (-0.38,0.24) {\tiny $+$};
+\node at (-0.38,-0.30) {\tiny $-$};
+\draw[->] (s1) -- (1.0,0);
+\node[above] at (0.45,0.02) {\footnotesize $\varepsilon$};
+\node[box] (ki) at (1.75,0) {\footnotesize $K_i/p$};
+\draw[->] (ki) -- (2.85,0);
+\node[sum] (s2) at (3.05,0) {};
+\node at (2.82,0.24) {\tiny $+$};
+\node at (2.82,-0.30) {\tiny $-$};
+\draw[->] (s2) -- (3.85,0);
+\node[box] (kp) at (4.6,0) {\footnotesize $K_p$};
+\draw[->] (kp) -- (5.5,0);
+\node[box] (hm) at (6.5,0) {\footnotesize $H_m(p)$};
+\draw[->] (hm) -- (8.6,0);
+\node[right] at (8.6,0) {\footnotesize $\Omega(p)$};
+\draw[->] (7.6,0) -- (7.6,-1.05) -- (3.05,-1.05) -- (s2);
+\draw[->] (8.1,0) -- (8.1,-1.75) -- (-0.15,-1.75) -- (s1);
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item D\'eterminer la fonction de transfert de la boucle interne $H_1(p) = \dfrac{\Omega(p)}{\varepsilon_1(p)}$, o\`u $\varepsilon_1$ d\'esigne la sortie du bloc int\'egral. Montrer qu'elle reste du premier ordre et identifier son gain statique et sa constante de temps.
+  \item En d\'eduire la fonction de transfert en boucle ferm\'ee compl\`ete $H_{bf}(p) = \dfrac{\Omega(p)}{\Omega_{\text{ref}}(p)}$ en fonction de $K_p$, $K_i$, $K_{\text{meca}}$ et $\tau_{\text{meca}}$, et la mettre sous la forme canonique :
+  \[ H_{bf}(p) = \frac{1}{1 + \dfrac{2m}{\omega_0}\,p + \dfrac{1}{\omega_0^{\,2}}\,p^2} \]
+  \item Donner les expressions de $\omega_0$ et de $m$ en fonction de $K_p$, $K_i$, $K_{\text{meca}}$ et $\tau_{\text{meca}}$.
+  \item \`A l'aide du th\'eor\`eme de la valeur finale, montrer que l'erreur statique de la boucle de vitesse est nulle lorsque l'entr\'ee est un \'echelon de vitesse d'amplitude $\Omega_0$.
+  \item Le cahier des charges impose un amortissement $m = 1$ et un temps de r\'eponse $T_r = \SI{1}{\second}$, li\'e \`a la pulsation propre par $\omega_0 = 5/T_r$. Les param\`etres du moteur sont $K_{\text{meca}} = 250$ et $\tau_{\text{meca}} = \SI{8,5}{\second}$. Exprimer $K_p$ et $K_i$ en fonction de $m$, $K_{\text{meca}}$, $\tau_{\text{meca}}$ et $\omega_0$, puis calculer leurs valeurs num\'eriques.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Boucle interne \`a retour unitaire, de cha\^ine directe $K_p H_m(p)$ :
+  \[ H_1(p) = \frac{K_p H_m(p)}{1 + K_p H_m(p)} = \frac{\dfrac{K_p K_{\text{meca}}}{1+\tau_{\text{meca}}p}}{1 + \dfrac{K_p K_{\text{meca}}}{1+\tau_{\text{meca}}p}} = \frac{K_p K_{\text{meca}}}{1 + K_p K_{\text{meca}} + \tau_{\text{meca}}\,p} \]
+  En factorisant le d\'enominateur par $(1 + K_p K_{\text{meca}})$ :
+  \[ H_1(p) = \frac{K_1}{1 + \tau_1 p} \quad\text{avec}\quad K_1 = \frac{K_p K_{\text{meca}}}{1 + K_p K_{\text{meca}}}, \qquad \tau_1 = \frac{\tau_{\text{meca}}}{1 + K_p K_{\text{meca}}} \]
+  Le syst\`eme reste du premier ordre : la boucle interne \emph{acc\'el\`ere} le moteur, puisqu'elle divise sa constante de temps par $1 + K_p K_{\text{meca}}$, au prix d'un gain statique $K_1$ l\'eg\`erement inf\'erieur \`a 1.
+  \item Boucle externe, de cha\^ine directe $(K_i/p)\,H_1(p)$ et de retour unitaire :
+  \[ H_{bf}(p) = \frac{\dfrac{K_i}{p}\,H_1(p)}{1 + \dfrac{K_i}{p}\,H_1(p)} = \frac{K_i K_p K_{\text{meca}}}{p\left(1 + K_p K_{\text{meca}} + \tau_{\text{meca}}\,p\right) + K_i K_p K_{\text{meca}}} \]
+  En divisant num\'erateur et d\'enominateur par $K_i K_p K_{\text{meca}}$ :
+  \[ H_{bf}(p) = \frac{1}{1 + \dfrac{1 + K_p K_{\text{meca}}}{K_i K_p K_{\text{meca}}}\,p + \dfrac{\tau_{\text{meca}}}{K_i K_p K_{\text{meca}}}\,p^2} \]
+  Le num\'erateur est bien une constante, sans z\'ero : c'est la structure \emph{imbriqu\'ee} qui le garantit, l\`a o\`u un correcteur PI parall\`ele $K_p + K_i/p$ en ferait appara\^itre un.
+  \item Par identification terme \`a terme avec la forme canonique :
+  \[ \frac{1}{\omega_0^{\,2}} = \frac{\tau_{\text{meca}}}{K_i K_p K_{\text{meca}}} \quad\Longrightarrow\quad \omega_0 = \sqrt{\frac{K_i K_p K_{\text{meca}}}{\tau_{\text{meca}}}} \]
+  \[ \frac{2m}{\omega_0} = \frac{1 + K_p K_{\text{meca}}}{K_i K_p K_{\text{meca}}} \quad\Longrightarrow\quad m = \frac{\omega_0\left(1 + K_p K_{\text{meca}}\right)}{2\,K_i K_p K_{\text{meca}}} = \frac{1 + K_p K_{\text{meca}}}{2\,\tau_{\text{meca}}\,\omega_0} \]
+  la seconde forme s'obtenant en rempla\c{c}ant $K_i K_p K_{\text{meca}}$ par $\tau_{\text{meca}}\,\omega_0^{\,2}$.
+  \item Pour un \'echelon d'amplitude $\Omega_0$, $\Omega_{\text{ref}}(p) = \Omega_0/p$ et l'erreur vaut $\varepsilon(p) = \Omega_{\text{ref}}(p)\left[1 - H_{bf}(p)\right]$. Le th\'eor\`eme de la valeur finale donne :
+  \[ \varepsilon_v = \lim_{t\to\infty}\varepsilon(t) = \lim_{p\to 0}\, p\,\varepsilon(p) = \lim_{p\to 0}\, p \cdot \frac{\Omega_0}{p}\left[1 - H_{bf}(p)\right] = \Omega_0\left[1 - H_{bf}(0)\right] \]
+  Or la forme canonique donne $H_{bf}(0) = 1$, donc $\varepsilon_v = \Omega_0\,(1-1) = 0$. L'erreur statique est \textbf{nulle}, cons\'equence directe de l'int\'egrateur pur $K_i/p$ plac\'e dans la cha\^ine directe, qui rend la boucle ouverte de classe 1.
+  \item Le cahier des charges donne $\omega_0 = 5/T_r = 5/1 = \SI{5}{\radian\per\second}$ et $m = 1$. L'expression de $m$ fournit d'abord $K_p$ :
+  \[ m = \frac{1 + K_p K_{\text{meca}}}{2\,\tau_{\text{meca}}\,\omega_0} \quad\Longrightarrow\quad K_p = \frac{2\,m\,\tau_{\text{meca}}\,\omega_0 - 1}{K_{\text{meca}}} \]
+  \[ K_p = \frac{2 \times 1 \times 8{,}5 \times 5 - 1}{250} = \frac{85 - 1}{250} = \frac{84}{250} = 0{,}336 \]
+  Puis l'expression de $\omega_0$ fournit $K_i$ :
+  \[ K_i = \frac{\tau_{\text{meca}}\,\omega_0^{\,2}}{K_p\,K_{\text{meca}}} = \frac{8{,}5 \times 5^2}{0{,}336 \times 250} = \frac{212{,}5}{84} \approx 2{,}53 \]
+  \emph{V\'erification :} $K_i K_p K_{\text{meca}} = 2{,}53 \times 84 \approx 212{,}5 = \tau_{\text{meca}}\,\omega_0^{\,2}$, et $m = \dfrac{1 + 84}{2 \times 8{,}5 \times 5} = \dfrac{85}{85} = 1$. Les deux conditions sont satisfaites simultan\'ement.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Le r\'eglage $K_p = 0{,}336$ et $K_i \approx 2{,}53$ place la boucle de vitesse \`a $m = 1$ : le r\'egime est critique, donc \emph{sans aucun d\'epassement}, et l'exigence $D\,\% \le 5\,\%$ du cahier des charges est satisfaite avec la marge maximale. Il fixe simultan\'ement $\omega_0 = \SI{5}{\radian\per\second}$, soit le temps de r\'eponse \`a $5\,\%$ de $\SI{1}{\second}$ exig\'e. Quant \`a la troisi\`eme exigence, l'erreur statique nulle, elle est garantie \emph{structurellement} par l'int\'egrateur (question 4), ind\'ependamment du r\'eglage num\'erique : elle ne co\^ute donc rien en rapidit\'e ni en amortissement.
+
+\smallskip
+\textit{Point de vigilance. Le pi\`ege de cette partie est de traiter la structure comme un correcteur PI parall\`ele : la boucle ferm\'ee pr\'esenterait alors un z\'ero au num\'erateur et ne se mettrait pas sous la forme canonique demand\'ee, rendant impossible l'identification de $m$ et $\omega_0$. Il faut imp\'erativement r\'eduire la boucle interne \emph{d'abord}, puis la boucle externe. Les rapports de jury confirment la difficult\'e de cette partie : \guillemotleft\ la partie C a \'et\'e abord\'ee par $79\,\%$ des candidats. Elle a \'et\'e trait\'ee correctement par seulement $31\,\%$ des candidats \guillemotright\ (rapport de jury CAPET 2024, analyse globale des r\'esultats de l'\'epreuve \'ecrite disciplinaire).}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

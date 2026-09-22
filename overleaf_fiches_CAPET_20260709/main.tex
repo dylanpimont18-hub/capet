@@ -1,0 +1,111 @@
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\newcommand{\CAPETINCLUDEMODE}{1}
+
+\begin{document}
+\pagenumbering{gobble}
+
+\begin{titlepage}
+\thispagestyle{empty}
+
+\begin{tikzpicture}[remember picture,overlay]
+	\fill[colGrayLight] (current page.south west) rectangle (current page.north east);
+	\fill[colElec] (current page.south west) rectangle ([xshift=3.8cm]current page.north west);
+	\fill[colAuto] ([xshift=3.8cm,yshift=-4.2cm]current page.north west) rectangle ([xshift=5.1cm]current page.south west);
+	\fill[colTherm] ([xshift=5.1cm,yshift=-8.2cm]current page.north west) rectangle ([xshift=6.3cm]current page.south west);
+	\fill[colMeca] ([xshift=6.3cm,yshift=-11.2cm]current page.north west) rectangle ([xshift=7.2cm]current page.south west);
+	\draw[colElec!35, line width=1.2pt] ([xshift=8.2cm,yshift=-2.0cm]current page.north west) rectangle ([xshift=-1.2cm,yshift=2.0cm]current page.south east);
+\end{tikzpicture}
+
+\vspace*{1.8cm}
+\hspace*{4.9cm}
+\begin{minipage}{0.68\textwidth}
+	{\color{colElec}\Large\bfseries CAPET SII}\\[3pt]
+	{\color{black!70}\large Option Ingenierie electrique}\\[1.2cm]
+
+	{\fontsize{28}{32}\selectfont\bfseries Manuel de revision}\\[0.25cm]
+	{\fontsize{18}{22}\selectfont\bfseries Fiches de synthese et entrainement}\\[0.8cm]
+
+	{\large Session 2026}\\[0.35cm]
+	{\normalsize 30 fiches couvrant l'electrotechnique, l'electronique, l'automatique, la mecanique appliquee et la thermique.}
+\end{minipage}
+
+\vspace{1.3cm}
+
+\hspace*{4.9cm}
+\begin{minipage}{0.68\textwidth}
+\begin{tcolorbox}[
+	enhanced,
+	colback=white,
+	colframe=colElec,
+	boxrule=0.8pt,
+	arc=2mm,
+	left=8pt, right=8pt, top=8pt, bottom=8pt
+]
+\textbf{Contenu du manuel}\\[4pt]
+\begin{tabular}{p{0.28\linewidth}p{0.66\linewidth}}
+\textcolor{colElec}{\textbf{T01 a T17}} & Electrotechnique, conversion, machines, energie, distribution \\
+\textcolor{colTherm}{\textbf{T05}} & Thermique et capteurs de temperature \\
+\textcolor{colMeca}{\textbf{T10}} & Mecanique et chaines de transmission \\
+\textcolor{colElec}{\textbf{T18 a T25}} & Electronique, AOP, filtres, numerisation, embarque, transmission \\
+\textcolor{colAuto}{\textbf{T26 a T29}} & Automatique, correcteurs, logique combinatoire et sequentielle
+\end{tabular}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+
+\hspace*{4.9cm}
+\begin{minipage}{0.68\textwidth}
+\begin{tcolorbox}[
+	enhanced,
+	colback=colElec!6!white,
+	colframe=colElec!45,
+	boxrule=0.5pt,
+	arc=2mm,
+	left=8pt, right=8pt, top=6pt, bottom=6pt
+]
+\textbf{Usage cible} : revision rapide, consolidation du cours, preparation aux questions types et alignement avec les attentes recurrentes du jury.
+\end{tcolorbox}
+
+\vspace{0.5cm}
+{\large\bfseries CAPET SII IE}\\[2pt]
+{\normalsize Base documentaire LaTeX pour impression et Overleaf}
+\end{minipage}
+\end{titlepage}
+
+\clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\include{T01_Grandeurs_Electrocinetique}
+\include{T02_Puissance_AC}
+\include{T03_Representations_Complexes_Impedances}
+\include{T04_Harmoniques_THD}
+\include{T05_Phenomenes_Thermiques}
+\include{T06_Transformateur}
+\include{T07_Hacheurs}
+\include{T08_Redresseurs}
+\include{T09_Onduleurs}
+\include{T10_Mecanique}
+\include{T11_Machine_CC}
+\include{T12_Machine_Synchrone}
+\include{T13_Machine_Asynchrone}
+\include{T14_Variation_Vitesse}
+\include{T15_Stockage_Energie}
+\include{T16_Energies_Renouvelables}
+\include{T17_Distribution_Securite}
+\include{T18_Composants_Electroniques}
+\include{T19_AOP}
+\include{T20_Filtres_RC_RL}
+\include{T21_Fonctions_Transfert_Bode}
+\include{T22_CAN_CNA_Numerisation}
+\include{T23_Capteurs_Conditionnement}
+\include{T24_Systemes_Embarques}
+\include{T25_Transmission_Numerique}
+\include{T26_Modelisation_Systemes}
+\include{T27_Systemes_Boucles_Correcteurs}
+\include{T28_Logique_Combinatoire}
+\include{T29_Logique_Sequentielle_GRAFCET}
+\include{T30_Mesurage_Instrumentation}
+\end{document}

@@ -1,0 +1,360 @@
+% Sources verifiees WebSearch 2026-07-15 : tension de court-circuit Ucc typique 4-6% pour
+% transformateurs de distribution MT/BT <= 20 kV (electrical-installation.org, se.com FAQ Schneider)
+% Correction 2026-08-25 (audit AUDIT_EXERCICES_2026.md) : exercice "essai a vide" remis sur les
+% valeurs authentiques du sujet E2 BAC+3 2026 (V = 230 V, I0 = 42,5 A, P0 = 7,82 kW, questions
+% A12-A13, verifiees dans le PDF original) ; exercices reordonnes par difficulte croissante.
+% Passe "complementarite fiche <-> exercices" du 2026-09-02 : les deux exercices qui
+% reproduisaient les Questions Types de la fiche T06 ont ete remplaces (voir les commentaires
+% detailles en tete des exercices 2 et 4).
+%   - ancien Ex. 2 (2026 E1, partie E, questions E4 et E10 : P3 vs PD3, m = 2,23 / 1,12)
+%     = doublon exact des QT1 et QT2 de la fiche, et empietement sur la notion T08
+%     -> remplace par le SEUL exercice docTech de la notion : 2018, EDE ENE 2, questions 13
+%        a 15, choix du calibre d'un regulateur abaisseur COMPACTO II dans la gamme
+%        constructeur (documents ressources DRS 4 section 8 et DRS 6).
+%   - ancien Ex. 4 (2026 E2 BAC+3, questions A12-A13 : essai a vide, Rf = 20,3 ohms,
+%     Xm = 5,62 ohms) = doublon exact de la QT3 de la fiche (meme source, memes valeurs)
+%     -> remplace par un exercice inedit de dimensionnement du circuit magnetique
+%        (formule de Boucherot), travail intellectuel absent des trois QT.
+% Les exercices 1, 3 et 5 (inedits : chute de tension par epsilon_cc, couplages Yy/Yd,
+% rendement et taux de charge optimal) sont disjoints des QT et n'ont pas ete touches.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ifdefined\var\else\DeclareSIUnit{\var}{var}\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T06}} - Exercices - Transformateur}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T06 \quad Transformateur (monophas\'e et triphas\'e)}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 5 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Un transformateur triphas\'e de distribution $S_n = \SI{250}{\kilo\volt\ampere}$, $\SI{20000}{\volt}/\SI{400}{\volt}$ (couplage \'etoile-\'etoile), a pour caract\'eristiques d'essai en court-circuit : tension de court-circuit relative $\varepsilon_{cc} = \dfrac{U_{cc}}{U_{1n}} = 4\,\%$, pertes cuivre nominales (mesur\'ees \`a $I_{cc}=I_{2n}$) $P_{cc} = \SI{3,5}{\kilo\watt}$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw
+(0,0) node[left]{$V_{2n}$}
+to[R, l=$R_s$] (2.5,0)
+to[cute inductor, l=$X_s$] (5,0)
+to[short, -*] (6,0) node[right]{$V_2$}
+;
+\draw (0,0) -- (0,-1.2) -- (6,-1.2) -- (6,0);
+\node at (3,-1.5) {charge $\cos\varphi$};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Calculer la composante r\'esistive relative $\varepsilon_R = P_{cc}/S_n$.
+  \item En admettant l'approximation usuelle $\varepsilon_X \approx \varepsilon_{cc}$ (valable lorsque $R_s \ll X_s$, cas courant pour cette gamme de puissance), calculer la chute de tension relative $\Delta U/U_{2n} \approx \varepsilon_R\cos\varphi + \varepsilon_X\sin\varphi$ pour une charge \`a pleine puissance, $\cos\varphi = 0{,}8$ (inductif).
+  \item En d\'eduire la tension secondaire en charge $U_2$, et commenter sa conformit\'e avec la tol\'erance usuelle de $\pm 5\,\%$ sur la tension de distribution basse tension.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item $\varepsilon_R = \dfrac{P_{cc}}{S_n} = \dfrac{3\,500}{250\,000} = 0{,}014 = 1{,}4\,\%$.
+  \item Avec $\varepsilon_X \approx \varepsilon_{cc} = 4\,\%$ et $\sin\varphi = \sqrt{1-0{,}8^2} = 0{,}6$ :
+  \[ \dfrac{\Delta U}{U_{2n}} \approx \varepsilon_R\cos\varphi + \varepsilon_X\sin\varphi = 0{,}014\times0{,}8 + 0{,}04\times0{,}6 = 0{,}0112 + 0{,}024 = 0{,}0352 = 3{,}52\,\% \]
+  \item $\Delta U = 0{,}0352 \times 400 \approx \SI{14,1}{\volt}$, donc $U_2 \approx 400 - 14{,}1 = \SI{385,9}{\volt}$.
+
+  \textbf{Conclusion.} L'\'ecart relatif \`a $U_{2n}$ est de $3{,}52\,\%$, inf\'erieur \`a la tol\'erance usuelle de $\pm5\,\%$ admise sur la tension de distribution BT : le transformateur tient l'exigence de tension jusqu'\`a sa pleine puissance, sans qu'il soit n\'ecessaire d'agir sur le changeur de prises \`a vide.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% Exercice 2 -- docTech -- 2018, epreuve E2 (EDE ENE 2), questions 13 a 15.
+% Remplace (passe complementarite 2026-09-02) l'ancien Ex.2 "P3 vs PD3 / rapport m"
+% (2026 E1 partie E, questions E4 et E10) qui reproduisait a l'identique les QT1 et QT2 de la
+% fiche T06 (memes valeurs 513 V, m = 2,23, 631 V, 446 V, m = 1,12) et empietait de surcroit
+% sur la notion T08 (Redresseurs), qui traite la meme partie E questions E8 a E10.
+% Tracabilite des donnees de l'encadre docTech (toutes textuellement presentes dans
+% docs/.../06_PDFs_Originaux/2018/E2_Sujet_2018/E2_Sujet_2018.md) :
+%   - Tableau "Tensions et Puissances pour le COMPACTO II(R)" : DRS 4 section 8, lignes 662 et
+%     669 du .md (lignes kVA et A des gammes monophasee 230-240 V et triphasee 400-410 V).
+%   - Lampe MASTER SON-T PIA Plus 150W : DRS 6, lignes 758-790 du .md (puissance nominale
+%     154,0 W, courant lampe 1,8 A, tension 230 V, tension d'amorcage 2800 V, amorceur externe).
+%   - Rendement > 98,5 % : DRS 4 section 9, ligne 700 du .md.
+%   - Donnees d'enonce : 46 luminaires (l. 131), lampes SHP SON T PIA Plus 150 W avec amorceurs
+%     Pa = 50 W et facteur de puissance 0,84 (l. 248-250), questions 13 a 15 (l. 255-259).
+% Rien n'est invente : l'encadre ne fait que remettre en forme des valeurs textuellement
+% presentes dans le .md du sujet. DRS 5 (releve sur 15 luminaires) est une image omise par la
+% conversion Markdown : il n'est donc PAS reproduit, la question 1 s'appuie sur DRS 6 et DRS 4.
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{2} \hfill\normalfont\footnotesize 2018, EDE ENE 2, questions 13 \`a 15 (documents ressources DRS 4 et DRS 6)}
+]
+\CAPETSHOW{
+Une municipalit\'e r\'enove l'\'eclairage public de la \guillemotleft\ rue des f\^etes \guillemotright, qui compte \textbf{46 luminaires} r\'epartis \'equitablement sur les trois phases d'un r\'eseau $230/\SI{400}{\volt}$. Chaque luminaire est constitu\'e d'une lampe au sodium haute pression SHP SON-T PIA Plus $\SI{150}{\watt}$ associ\'ee \`a un amorceur externe de puissance $P_a = \SI{50}{\watt}$ ; l'ensemble pr\'esente un facteur de puissance $\cos\varphi = 0{,}84$.
+
+Pour abaisser la tension d'alimentation des lampes en nuit profonde, l'armoire est \'equip\'ee d'un \emph{r\'egulateur abaisseur de tension} COMPACTO II\textsuperscript{\textregistered} : un transformateur \`a rapport variable ins\'er\'e apr\`es le contacteur d'\'eclairage public. Il s'agit d'en choisir le calibre dans la gamme du constructeur.
+
+\begin{center}
+\begin{tikzpicture}[scale=1, >=Stealth, node distance=1.0cm]
+  \node[draw, align=center, minimum width=2.0cm, minimum height=0.95cm] (res) {R\'eseau\\$230/\SI{400}{\volt}$};
+  \node[draw, align=center, minimum width=1.7cm, minimum height=0.95cm, right=0.8cm of res] (kc) {Contacteur\\KC};
+  \node[draw, align=center, minimum width=2.5cm, minimum height=0.95cm, right=0.8cm of kc] (reg) {R\'egulateur\\abaisseur $S_n = ?$};
+  \node[draw, align=center, minimum width=2.3cm, minimum height=0.95cm, right=0.8cm of reg] (lum) {46 luminaires\\$\cos\varphi = 0{,}84$};
+  \draw[-latex] (res) -- (kc);
+  \draw[-latex] (kc) -- (reg);
+  \draw[-latex] (reg) -- (lum);
+\end{tikzpicture}
+\end{center}
+
+\begin{tcolorbox}[docTech, title={Document technique -- DRS 6 (lampe MASTER SON-T PIA Plus 150W) et DRS 4 \S 8 (gamme COMPACTO II\textsuperscript{\textregistered})}]
+\small
+\textbf{DRS 6 -- MASTER SON-T PIA Plus 150W/220 E40}, caract\'eristiques \'electriques :
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Tension d'alimentation de la lampe & $\SI{230}{\volt}$ \\
+Puissance (valeur nominale) & $\SI{154,0}{\watt}$ \\
+Courant lampe (EM) (nom.) & $\SI{1,8}{\ampere}$ \\
+Tension d'amor\c{c}age (max.) & $\SI{2800}{\volt}$ \\
+Description du syst\`eme & amorceur externe (E) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\textbf{DRS 4 \S 8 -- Tensions et puissances pour le COMPACTO II\textsuperscript{\textregistered}} (rendement annonc\'e $> 98{,}5\,\%$) :
+\begin{center}
+\begin{tabular}{llrrrrr}
+\toprule
+\textbf{Monophas\'e 230--240 V} & (kVA) & 3 & 4 & 6 & 9 & 12 \\
+                                & (A)   & 14 & 17 & 26 & 40 & 53 \\
+\midrule
+\textbf{Triphas\'e 400--410 V}  & (kVA) & 9 & 12 & 18 & 27 & 36 \\
+                                & (A)   & 14 & 17 & 26 & 40 & 53 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever dans le document technique DRS 6} la puissance nominale r\'eellement absorb\'ee par la lampe seule, et la comparer aux $\SI{150}{\watt}$ de la d\'esignation commerciale. En d\'eduire la puissance active $P_{1L}$ d'un luminaire complet (lampe $+$ amorceur), puis calculer sa puissance r\'eactive $Q_{1L}$ et sa puissance apparente $S_{1L}$.
+  \item Calculer la puissance apparente totale $S_{TL}$ appel\'ee par les 46 luminaires de la rue, puis la puissance apparente et le courant appel\'es \emph{par phase}.
+  \item \`A l'aide du tableau DRS 4 \S 8, \textbf{choisir} le mod\`ele et le calibre du r\'egulateur abaisseur. Justifier le choix \`a la fois sur le crit\`ere de puissance apparente et sur le crit\`ere de courant, et pr\'eciser lequel des deux crit\`eres est ici le plus contraignant.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \emph{Lecture du DRS 6.} La d\'esignation commerciale annonce $\SI{150}{\watt}$, mais la ligne \guillemotleft\ Puissance (valeur nominale) \guillemotright\ du document constructeur indique $\SI{154,0}{\watt}$ : la lampe absorbe en r\'ealit\'e $2{,}7\,\%$ de plus que sa d\'esignation. Le dimensionnement du sujet retient la valeur de d\'esignation $P_{\text{lampe}} = \SI{150}{\watt}$ ; l'\'ecart de $\SI{4}{\watt}$ par lampe sera reconsid\'er\'e au moment de valider la marge du calibre choisi.
+  \[ P_{1L} = P_{\text{lampe}} + P_a = 150 + 50 = \SI{200}{\watt} \]
+  Avec $\cos\varphi = 0{,}84$, soit $\varphi = \arccos 0{,}84 \approx 32{,}9\,\text{\textdegree}$ et $\tan\varphi \approx 0{,}646$ :
+  \[ S_{1L} = \frac{P_{1L}}{\cos\varphi} = \frac{200}{0{,}84} \approx \SI{238}{\volt\ampere}
+     \qquad Q_{1L} = P_{1L}\tan\varphi \approx 200 \times 0{,}646 \approx \SI{129}{\var} \]
+  \emph{V\'erification :} $\sqrt{200^2 + 129^2} \approx 238$, coh\'erent.
+  \item Pour les 46 luminaires :
+  \[ S_{TL} = 46 \times S_{1L} = 46 \times 238 \approx \SI{10,95}{\kilo\volt\ampere} \approx \SI{11,0}{\kilo\volt\ampere} \]
+  R\'epartis \'equitablement sur trois phases, sous la tension simple $V = \SI{230}{\volt}$ :
+  \[ S_{\text{phase}} = \frac{S_{TL}}{3} = \frac{10\,950}{3} \approx \SI{3,65}{\kilo\volt\ampere}
+     \qquad I_{\text{phase}} = \frac{S_{\text{phase}}}{V} = \frac{3\,650}{230} \approx \SI{15,9}{\ampere} \]
+  \item \emph{Lecture de la gamme DRS 4 \S 8.} Deux crit\`eres doivent \^etre satisfaits simultan\'ement.
+  \begin{itemize}[leftmargin=1.2em]
+    \item \emph{Crit\`ere en puissance apparente} : le r\'egulateur triphas\'e doit tenir $S_{TL} \approx \SI{11,0}{\kilo\volt\ampere}$. Dans la gamme triphas\'ee 400--410 V, le calibre $\SI{9}{\kilo\volt\ampere}$ est insuffisant ($9 < 11{,}0$) ; le calibre $\SI{12}{\kilo\volt\ampere}$ convient, avec une marge de $(12-11{,}0)/11{,}0 \approx 9\,\%$.
+    \item \emph{Crit\`ere en courant} : chaque phase appelle $\SI{15,9}{\ampere}$. La ligne \guillemotleft\ (A) \guillemotright\ du tableau donne $\SI{14}{\ampere}$ pour le calibre $\SI{9}{\kilo\volt\ampere}$ -- insuffisant, le courant admissible serait d\'epass\'e de $14\,\%$ -- et $\SI{17}{\ampere}$ pour le calibre $\SI{12}{\kilo\volt\ampere}$, soit une marge de $(17-15{,}9)/15{,}9 \approx 7\,\%$.
+  \end{itemize}
+  On retient donc le \textbf{COMPACTO II\textsuperscript{\textregistered} triphas\'e 400--410 V de $\SI{12}{\kilo\volt\ampere}$, $\SI{17}{\ampere}$}, \'equivalent \`a trois modules monophas\'es de $\SI{4}{\kilo\volt\ampere}$ (m\^eme ligne de courant $\SI{17}{\ampere}$ dans la gamme monophas\'ee 230--240 V).
+
+  Les deux crit\`eres \'ecartent le calibre inf\'erieur, mais c'est le \textbf{courant} qui est ici le plus contraignant : sa marge ($7\,\%$) est plus faible que celle en puissance apparente ($9\,\%$).
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} La marge de $7\,\%$ en courant du calibre $\SI{12}{\kilo\volt\ampere}$ couvre pr\'ecis\'ement l'\'ecart relev\'e \`a la question 1 entre les $\SI{150}{\watt}$ commerciaux et les $\SI{154}{\watt}$ r\'eels du DRS 6 ($+2{,}7\,\%$) : le choix reste valide m\^eme en retenant la puissance constructeur, ce qui n'aurait pas \'et\'e le cas du calibre $\SI{9}{\kilo\volt\ampere}$. La le\c{c}on de dimensionnement est g\'en\'erale -- un transformateur, ou tout appareil \`a rapport variable qui en d\'erive, se choisit sur sa \emph{puissance apparente} et son \emph{courant admissible}, jamais sur la seule puissance active de la charge : ici l'\'ecart entre les deux atteint $19\,\%$ ($\SI{200}{\watt}$ contre $\SI{238}{\volt\ampere}$ par luminaire).
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Un transformateur triphas\'e peut \^etre coupl\'e \'etoile-\'etoile (Yy) ou \'etoile-triangle (Yd). Le couplage Yd introduit un d\'ephasage de $30^\circ$ entre tensions primaires et secondaires, et pr\'esente la propri\'et\'e de bloquer la circulation des courants harmoniques de rang multiple de 3 (rang 3, 9, 15...) entre les deux c\^ot\'es du transformateur.
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9, >=Stealth]
+  \node at (0,2.6) {\textbf{Primaire (\'etoile Y)}};
+  \draw (0,2) -- (0,1) (0,1) -- (-0.87,0.5) (0,1) -- (0.87,0.5) (0,1) -- (0,0);
+  \node[circ] at (0,1) {};
+  \node[above] at (0,2) {$a$};
+  \node[below left] at (-0.87,0.5) {$b$};
+  \node[below right] at (0.87,0.5) {$c$};
+  \node[below] at (0,0) {$N$};
+
+  \node at (5,2.6) {\textbf{Secondaire (triangle d)}};
+  \draw (4.2,0.3) -- (5.8,0.3) -- (5,1.8) -- (4.2,0.3);
+  \node[below left] at (4.2,0.3) {$a'$};
+  \node[below right] at (5.8,0.3) {$b'$};
+  \node[above] at (5,1.8) {$c'$};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Rappeler la relation entre tension compos\'ee et tension simple pour un enroulement coupl\'e en \'etoile, puis pour un enroulement coupl\'e en triangle.
+  \item Un redresseur en aval du transformateur g\'en\`ere des harmoniques de courant de rang 3 c\^ot\'e secondaire. Expliquer pourquoi un couplage Yd (avec triangle c\^ot\'e g\'en\'erateur d'harmoniques) emp\^eche ces harmoniques de rang 3 de remonter c\^ot\'e r\'eseau primaire.
+  \item Quel est l'inconv\'enient pratique du couplage Yd par rapport au couplage Yy lorsqu'il s'agit de d\'eterminer le rapport de transformation $m$ \`a partir d'un cahier des charges exprim\'e en tensions secondaires ?
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Couplage \'etoile : $U_{\text{compos\'ee}} = \sqrt{3}\,V_{\text{simple}}$ (les trois enroulements partagent un point neutre commun). Couplage triangle : chaque enroulement est directement soumis \`a la tension compos\'ee, donc $U_{\text{compos\'ee}} = V_{\text{enroulement}}$ (pas de facteur $\sqrt{3}$).
+  \item Les courants harmoniques de rang 3 (et multiples de 3) sont en phase dans les trois enroulements (composante homopolaire). Dans un enroulement en triangle, ces courants homopolaires peuvent circuler en boucle ferm\'ee \`a l'int\'erieur du triangle sans emprunter les fils de ligne : ils restent donc confin\'es c\^ot\'e triangle et ne se retrouvent pas c\^ot\'e \'etoile (primaire), qui ne voit que les rangs non multiples de 3.
+  \item En couplage Yd, le rapport $m$ relie une tension simple (c\^ot\'e \'etoile) \`a une tension compos\'ee (c\^ot\'e triangle) : il faut donc explicitement convertir les tensions du cahier des charges (souvent donn\'ees en tensions compos\'ees) avant d'appliquer $m$, sous peine d'une erreur de facteur $\sqrt{3}$. En Yy, cette conversion n'est pas n\'ecessaire car $m$ s'applique indiff\'eremment aux tensions simples ou compos\'ees (le facteur $\sqrt{3}$ se simplifie des deux c\^ot\'es).
+\end{enumerate}
+
+\textbf{Conclusion.} Le couplage n'est donc pas un simple d\'etail de c\^ablage : d\`es que la charge aval est polluante en harmoniques de rang 3 (ponts redresseurs, r\'ecepteurs monophas\'es r\'epartis sur les trois phases), le couplage Yd est impos\'e par l'exigence de qualit\'e de l'\'energie au point de livraison, au prix d'une conversion suppl\'ementaire en $\sqrt{3}$ dans le calcul de $m$ et d'un indice horaire ($30^\circ$) \`a respecter pour toute mise en parall\`ele avec un autre transformateur.
+}
+\end{tcolorbox}
+
+% Exercice 4 -- inedit -- dimensionnement du circuit magnetique (formule de Boucherot).
+% Remplace (passe complementarite 2026-09-02) l'ancien Ex.4 "essai a vide, calcul de Rf et Xm"
+% (2026 E2 BAC+3, questions A12-A13) qui reproduisait a l'identique la QT3 de la fiche T06
+% (meme source, memes donnees V = 230 V, I0 = 42,5 A, P0 = 7,82 kW, memes resultats
+% Rf = 20,3 ohms et Xm = 5,62 ohms). Le corpus de sujets 2013-2026 ne contient que deux etudes
+% de transformateur (2026 E1 partie E, deja QT1/QT2 et reservee a T08 ; 2024 E1 partie B, deja
+% utilisee par T06 ex. 2 anterieurement et surtout par T03 ex. 2) : le remplacant est donc un
+% exercice INEDIT, conformement au dernier recours prevu par le protocole.
+% Il porte sur un travail intellectuel absent des trois QT de la fiche : le dimensionnement du
+% circuit magnetique (nombre de spires a partir de l'induction admissible), et non le calcul
+% d'un rapport de transformation ni l'identification d'un modele a vide.
+% Ordres de grandeur verifies (WebSearch 2026-09-02) : formule de Boucherot V = 4,44 N f Bmax S
+% (le coefficient 4,44 vaut pi*racine(2)) ; les aciers au silicium a grains orientes utilises
+% dans les transformateurs de distribution saturent vers 2,0 T, d'ou une induction
+% d'exploitation usuelle de 1,6 a 1,7 T (fr.wikipedia.org/wiki/Formule_de_Boucherot ;
+% donnees de saturation des toles a grains orientes).
+% Le transformateur 250 kVA 20 kV/400 V est celui des exercices 1 et 5 de cette meme notion,
+% pour assurer la coherence interne du fichier.
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+On reprend le transformateur triphas\'e de distribution des exercices 1 et 5 : $S_n = \SI{250}{\kilo\volt\ampere}$, $\SI{20000}{\volt}/\SI{400}{\volt}$, couplage \'etoile-\'etoile, $f = \SI{50}{\hertz}$. Il s'agit maintenant d'en dimensionner le \emph{circuit magn\'etique}, c'est-\`a-dire de d\'eterminer le nombre de spires de chaque enroulement.
+
+La loi de Faraday appliqu\'ee \`a un enroulement de $N$ spires embrassant un flux sinuso\"idal d'amplitude $\Phi_{max} = B_{max}\,S$ dans un noyau de section $S$ conduit \`a la \textbf{formule de Boucherot} :
+\[ V = \frac{2\pi}{\sqrt{2}}\,N\,f\,B_{max}\,S = 4{,}44\,N\,f\,B_{max}\,S \]
+o\`u $V$ est la valeur efficace de la tension aux bornes de l'enroulement.
+
+Le constructeur emploie des t\^oles d'acier au silicium \`a grains orient\'es, dont l'induction de saturation avoisine $\SI{2,0}{\tesla}$. Pour \'eviter tout risque de saturation en r\'egime nominal, il impose une induction maximale d'exploitation $B_{max} \le \SI{1,6}{\tesla}$. La section utile d'un noyau vaut $S = \SI{150}{\centi\metre\squared}$.
+
+\begin{center}
+\begin{tikzpicture}[scale=0.85, >=Stealth]
+  % noyau trois colonnes
+  \draw[line width=2.2pt, colSlate] (0,0) rectangle (7,4);
+  \draw[line width=2.2pt, colSlate] (3.5,0) -- (3.5,4);
+  % enroulements schematises sur la colonne centrale
+  \foreach \y in {1.1,1.5,1.9,2.3,2.7} {
+    \draw[colElec, line width=1pt] (3.15,\y) arc (270:90:0.18);
+    \draw[colExo, line width=1pt] (3.85,\y) arc (270:450:0.18);
+  }
+  \node[colElec, left]  at (2.85,2.6) {\footnotesize $N_1$ (HTA)};
+  \node[colExo,  right] at (4.15,2.6) {\footnotesize $N_2$ (BT)};
+  \draw[<->, thick] (0.55,4.35) -- (2.95,4.35);
+  \node[above] at (1.75,4.3) {\footnotesize colonne, section $S$};
+  \draw[->, thick] (5.6,2.6) -- (5.6,1.4);
+  \node[right] at (5.65,2.0) {\footnotesize $\Phi(t)$, $B_{max}$};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le couplage \'etant \'etoile des deux c\^ot\'es, exprimer la tension $V_2$ aux bornes d'un enroulement secondaire (donc d'une colonne) en fonction de la tension compos\'ee secondaire $U_2 = \SI{400}{\volt}$, et la calculer. Faire de m\^eme pour $V_1$ au primaire.
+  \item En d\'eduire le nombre de spires secondaire $N_2$ strictement n\'ecessaire pour ne pas d\'epasser $B_{max} = \SI{1,6}{\tesla}$. Le nombre de spires \'etant entier, indiquer -- en le justifiant physiquement -- s'il faut arrondir \`a l'entier inf\'erieur ou sup\'erieur, puis donner la valeur retenue et l'induction maximale r\'eellement atteinte.
+  \item En d\'eduire le nombre de spires primaire $N_1$, et v\'erifier que l'induction calcul\'ee c\^ot\'e primaire est bien la m\^eme (les deux enroulements embrassent le m\^eme flux).
+  \item Calculer le courant nominal secondaire par phase. Sachant que la densit\'e de courant admissible dans les conducteurs de cuivre refroidis par bain d'huile est de l'ordre de $J = \SI{3}{\ampere\per\milli\metre\squared}$, en d\'eduire la section de cuivre d'un conducteur secondaire.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item En couplage \'etoile, chaque enroulement (une colonne) est soumis \`a la \emph{tension simple} :
+  \[ V_2 = \frac{U_2}{\sqrt{3}} = \frac{400}{\sqrt{3}} \approx \SI{231}{\volt}
+     \qquad V_1 = \frac{U_1}{\sqrt{3}} = \frac{20\,000}{\sqrt{3}} \approx \SI{11547}{\volt} \]
+  C'est la premi\`ere source d'erreur du calcul : appliquer Boucherot avec la tension compos\'ee $\SI{400}{\volt}$ conduirait \`a un nombre de spires surestim\'e d'un facteur $\sqrt{3}$.
+  \item Avec $S = \SI{150}{\centi\metre\squared} = \SI{150e-4}{\metre\squared}$ :
+  \[ N_2 = \frac{V_2}{4{,}44\,f\,B_{max}\,S} = \frac{230{,}9}{4{,}44 \times 50 \times 1{,}6 \times 150\times10^{-4}} = \frac{230{,}9}{5{,}328} \approx 43{,}3 \text{ spires} \]
+  \emph{Sens de l'arrondi.} \`A tension et section impos\'ees, $B_{max}$ varie en $1/N_2$ : \emph{diminuer} le nombre de spires \emph{augmente} l'induction. Arrondir \`a 43 spires ferait donc d\'epasser la limite de $\SI{1,6}{\tesla}$. Il faut arrondir \`a l'entier \textbf{sup\'erieur} :
+  \[ \boxed{N_2 = 44 \text{ spires}} \qquad
+     B_{max,\text{r\'eel}} = \frac{V_2}{4{,}44\,f\,N_2\,S} = \frac{230{,}9}{4{,}44 \times 50 \times 44 \times 150\times10^{-4}} \approx \SI{1,58}{\tesla} \]
+  soit une marge de $\SI{0,42}{\tesla}$ (environ $21\,\%$) vis-\`a-vis de la saturation \`a $\SI{2,0}{\tesla}$.
+  \item Le rapport de transformation, identique en tensions simples ou compos\'ees puisque les deux c\^ot\'es sont en \'etoile :
+  \[ m = \frac{V_2}{V_1} = \frac{U_2}{U_1} = \frac{400}{20\,000} = 0{,}02
+     \qquad N_1 = \frac{N_2}{m} = \frac{44}{0{,}02} = \boxed{2\,200 \text{ spires}} \]
+  \emph{V\'erification c\^ot\'e primaire :}
+  \[ B_{max} = \frac{V_1}{4{,}44\,f\,N_1\,S} = \frac{11\,547}{4{,}44 \times 50 \times 2\,200 \times 150\times10^{-4}} \approx \SI{1,58}{\tesla} \]
+  On retrouve bien la m\^eme valeur : les deux enroulements sont travers\'es par le m\^eme flux, l'induction est une propri\'et\'e du \emph{noyau}, pas de l'enroulement.
+  \item Courant nominal secondaire (ligne, donc \'egal au courant d'enroulement en \'etoile) :
+  \[ I_{2n} = \frac{S_n}{\sqrt{3}\,U_2} = \frac{250\,000}{\sqrt{3} \times 400} \approx \SI{361}{\ampere} \]
+  \[ s_{cu} = \frac{I_{2n}}{J} = \frac{361}{3} \approx \SI{120}{\milli\metre\squared} \]
+  soit, pour un conducteur m\'eplat, une section de l'ordre de $\SI{120}{\milli\metre\squared}$ par spire secondaire -- d'o\`u le recours \`a des barres de cuivre m\'eplates et non \`a du fil rond \`a ce niveau de courant.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Le dimensionnement retenu ($N_1 = 2\,200$, $N_2 = 44$, $S = \SI{150}{\centi\metre\squared}$) conduit \`a $B_{max} \approx \SI{1,58}{\tesla}$, en de\c{c}\`a de la limite d'exploitation de $\SI{1,6}{\tesla}$ fix\'ee par le constructeur : le crit\`ere de non-saturation est satisfait. Cette marge n'est pas un luxe -- la norme admet une surtension permanente de $10\,\%$ sur le r\'eseau de distribution, qui porterait l'induction \`a $1{,}58 \times 1{,}1 \approx \SI{1,74}{\tesla}$, encore inf\'erieure aux $\SI{2,0}{\tesla}$ de saturation. Arrondir $N_2$ \`a 43 spires aurait au contraire donn\'e $B_{max} \approx \SI{1,61}{\tesla}$ en r\'egime nominal et $\SI{1,77}{\tesla}$ \`a $+10\,\%$, avec un courant magn\'etisant fortement d\'eform\'e par l'approche de la saturation.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Le transformateur de l'exercice 1 ($S_n = \SI{250}{\kilo\volt\ampere}$, $P_{cc} = \SI{3,5}{\kilo\watt}$ \`a pleine charge) a des pertes fer constantes $P_{fer} = \SI{800}{\watt}$ (ind\'ependantes de la charge, li\'ees uniquement \`a $V_1$). On note $k$ le taux de charge ($k=1$ \`a pleine charge), de sorte que les pertes cuivre valent $P_{cu}(k) = k^2 P_{cc}$.
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9, >=Stealth]
+  \draw[-latex, thick] (0,0) -- (2.5,0) node[midway, above]{$P_1$};
+  \node[draw, minimum height=1.2cm, minimum width=1cm] at (3,0) {};
+  \draw[-latex, thick] (3.5,0) -- (6,0) node[midway, above]{$P_2$};
+  \draw[-latex, thick] (3,-0.6) -- (3,-1.8) node[midway, right]{$P_{fer}+P_{cu}(k)$};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Exprimer le rendement $\eta(k)$ en fonction de $k$, $S_n$, $\cos\varphi$, $P_{fer}$ et $P_{cc}$.
+  \item Calculer $\eta$ \`a pleine charge ($k=1$), pour $\cos\varphi = 0{,}8$.
+  \item Montrer que le rendement est maximal lorsque $P_{fer} = P_{cu}(k)$, en d\'eduire le taux de charge optimal $k_{opt}$ et le rendement maximal correspondant.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Puissance utile $P_2 = k\,S_n\cos\varphi$, pertes totales $P_{fer} + k^2 P_{cc}$ :
+  \[ \eta(k) = \dfrac{k\,S_n\cos\varphi}{k\,S_n\cos\varphi + P_{fer} + k^2 P_{cc}} \]
+  \item \`A $k=1$ : $P_2 = 250\,000\times0{,}8 = \SI{200}{\kilo\watt}$, pertes $= 800+3\,500 = \SI{4,3}{\kilo\watt}$.
+  \[ \eta(1) = \dfrac{200\,000}{200\,000+4\,300} = \dfrac{200\,000}{204\,300} \approx 0{,}9789 = 97{,}89\,\% \]
+  \item $\eta(k)$ est maximal lorsque $\dfrac{\mathrm{d}\eta}{\mathrm{d}k}=0$, ce qui \'equivaut (apr\`es calcul, num\'erateur de la d\'eriv\'ee nul) \`a $P_{fer} = k^2 P_{cc}$, soit pertes fixes = pertes variables. D'o\`u :
+  \[ k_{opt} = \sqrt{\dfrac{P_{fer}}{P_{cc}}} = \sqrt{\dfrac{800}{3\,500}} = \sqrt{0{,}2286} \approx 0{,}478 \]
+  Soit environ $47{,}8\,\%$ de la charge nominale. \`A ce point : $P_2 = 0{,}478\times250\,000\times0{,}8 \approx \SI{95,6}{\kilo\watt}$, pertes totales $= 2\times800 = \SI{1,6}{\kilo\watt}$ :
+  \[ \eta_{max} = \dfrac{95\,600}{95\,600+1\,600} = \dfrac{95\,600}{97\,200} \approx 0{,}9835 = 98{,}35\,\% \]
+\end{enumerate}
+
+\textbf{Conclusion.} Le rendement maximal est obtenu \`a $k_{opt} \approx 48\,\%$ de charge, et non \`a pleine charge : c'est ce qui justifie le \emph{surdimensionnement} volontaire des transformateurs de distribution, choisis pour que leur taux de charge moyen r\'eel (de l'ordre de $50\,\%$) co\"incide avec l'optimum de rendement -- crit\`ere repris par les exigences d'\'eco-conception europ\'eennes sur les pertes des transformateurs de puissance.
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

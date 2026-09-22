@@ -1,0 +1,362 @@
+%% Correction audit de veracite - 2026-09-20 : citations de rapport de jury sans
+%% support textuel dans le corpus (rapports 2018-2025) remplacees par des verbatims
+%% verifies ou supprimees. Detail ci-dessous.
+%% l.306 (ex) : citation "jury 2024" reformulee (lois fondamentales / composants
+%%   elementaires) INTROUVABLE telle quelle -> remplacee par RJ2024 l.511 (verbatim).
+%% l.307 (ex) : citation "jury 2025" reformulee et completee d'une phrase ("Dessiner les
+%%   schemas equivalents pour chaque intervalle de commutation") INTROUVABLE
+%%   -> remplacee par le verbatim exact de RJ2025 l.486.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ficheHeaders{T18}{Composants électroniques}{colElec}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TETE
+% -----------------------------------------------------------------------
+
+\ficheEntete{T18}{Circuits électroniques - composants (diode, transistor)}{colElec}%
+  {électronique - Composants et convertisseurs}%
+  {\textbf{Présence :} \textbf{4/13} sujets (2013-2026) - thème \emph{occasionnel}}%
+  {diode (modèle idéal, seuil, droite de charge) - transistor BJT (3 régimes) - MOSFET et IGBT - hacheur abaisseur (courant inductance, ondulation) - diode de roue libre - rapport cyclique}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Diode --------------------------------------------------------
+\textbf{1.1 La diode}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{lll}
+\toprule
+\textbf{Modèle} & \textbf{État conducteur ($V_{AK}>0$)} & \textbf{État bloqué ($V_{AK}<0$)} \\
+\midrule
+Idéal & $V_{AK} = 0$, $i \geq 0$ & $i = 0$ \\
+Avec seuil & $V_{AK} = V_{seuil}$ (Si : 0{,}6\,V) & $i = 0$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\textbf{Droite de charge et point de fonctionnement Q :}
+\begin{center}
+\begin{tikzpicture}[scale=0.9, font=\footnotesize]
+  \draw[->] (0,0) -- (5.2,0) node[right] {$V_{AK}$};
+  \draw[->] (0,-0.3) -- (0,3.2) node[above] {$i$};
+  \draw[thick, colElec] (0,2.8) -- (4.6,0);
+  \node[left] at (0,2.8) {\scriptsize $E/R$};
+  \node[below] at (4.6,0) {\scriptsize $E$};
+  \draw[thick, colElec!55, domain=0.9:1.3, smooth, samples=30] plot (\x, {(\x-0.9)*8});
+  \draw[thick, colElec!55] (1.3,2.9) -- (1.3,3.15);
+  \fill (1.05,1.2) circle (1.5pt);
+  \node[right] at (1.12,1.2) {\scriptsize $Q$};
+\end{tikzpicture}
+\end{center}
+\textbf{Droite de charge} pour un circuit $E = R\,i + V_{AK}$ : pente $= -1/R$, intersection axe $i$ en $E/R$ et axe $V$ en $E$. Le \emph{point de fonctionnement} Q est l'intersection avec la caractéristique $i(V_{AK})$.
+
+\textbf{Diode de roue libre} : placée en anti-parallèle avec une charge inductive. À l'ouverture de l'interrupteur, elle assure la continuité du courant dans l'inductance et protège le composant actif contre les surtensions $L\,di/dt$.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 Transistor bipolaire (BJT) -----------------------------------
+\textbf{1.2 Transistor bipolaire (BJT) - trois régimes}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{llll}
+\toprule
+\textbf{Régime} & \textbf{Condition} & \textbf{Courant $I_C$} & \textbf{Usage} \\
+\midrule
+Bloqué & $V_{BE} < 0{,}6\,\mathrm{V}$ & $\approx 0$ & Interrupteur ouvert \\
+Actif (linéaire) & $V_{BE} \approx 0{,}6\,\mathrm{V}$, $V_{CE} > V_{CE(sat)}$ & $\beta I_B$ & Amplification \\
+Saturé & $V_{BE} \approx 0{,}6\,\mathrm{V}$, $V_{CE} \approx 0{,}2\,\mathrm{V}$ & Limité par circuit & Interrupteur fermé \\
+\bottomrule
+\end{tabular}
+\end{center}
+En saturation, $I_C = \beta I_B$ n'est \emph{plus} valable.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 MOSFET, IGBT et hacheur abaisseur ----------------------------
+\textbf{1.3 MOSFET et IGBT - hacheur abaisseur}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lll}
+\toprule
+\textbf{Composant} & \textbf{Commande} & \textbf{Usage} \\
+\midrule
+MOSFET & Tension $V_{GS}$ & Haute fréquence, BT \\
+IGBT & Tension $V_{GE}$ (+ diode anti-parallèle) & Variateurs, onduleurs HT \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Hacheur abaisseur (Buck) - états :}
+\begin{itemize}[itemsep=1pt]
+  \item $t \in [0\,;\,\alpha T]$ : $Q_1$ fermé, $D_1$ bloquée - $v_{Q1} = 0$, $v_{D1} = -V_{DC}$, $v_L = V_{DC} - V_s$ - $i_L$ croît
+  \item $t \in [\alpha T\,;\,T]$ : $Q_1$ ouvert, $D_1$ passante (roue libre) - $v_{Q1} = V_{DC}$, $v_{D1} = 0$, $v_L = -V_s$ - $i_L$ décroît
+\end{itemize}
+\[
+  \langle V_{sortie} \rangle = \alpha \cdot V_{DC}
+  \qquad;\qquad
+  \Delta i_L = \frac{V_{DC}\,\alpha\,(1-\alpha)\,T}{L}
+  \qquad;\qquad
+  \Delta i_{L,max} \text{ pour } \alpha = 0{,}5
+\]
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHETIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthétique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Diode}} \\
+$V_{seuil,Si} = 0{,}6\,\mathrm{V}$ & Seuil & V \\
+$E = Ri + V_{AK}$ & Droite de charge & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{BJT}} \\
+$I_C = \beta I_B$ (régime actif) & Amplification & A \\
+$V_{CE,sat} \approx 0{,}2\,\mathrm{V}$ & Saturation & V \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Hacheur}} \\
+$\langle V_s \rangle = \alpha V_{DC}$ & Tension moy. & V \\
+$\Delta i_L = V_{DC}\alpha(1-\alpha)T/L$ & Ondulation & A \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Courant inductance}} \\
+$i_L(t) = i_0 + (V_{DC}-V_s)t/L$ & $Q_1$ fermé & A \\
+$i_L(t) = i_{max} - V_s(t-\alpha T)/L$ & $D_1$ passante & A \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Inductance min.}} \\
+$L_{min} = V_{DC}\alpha(1-\alpha)T/\Delta i_{max}$ & Contin. condu. & H \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Données typiques}} \\
+$V_{DC} = 750\,\mathrm{V}$ (traction 2019) & Bus DC & V \\
+$V_{DC} = 48\,\mathrm{V}$ (Bakus 2023) & Bus DC & V \\
+$\beta \approx 50\text{ à }500$ & BJT & - \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets réels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Courant dans l'inductance d'un hacheur abaisseur \hfill\normalfont\footnotesize E2 disc. 2025 (Q27-Q28)}
+]
+\textbf{Énoncé.}
+Hacheur abaisseur avec $Q_1$ (IGBT) et $D_1$ (roue libre). $V_{DC} = 48\,\mathrm{V}$, $V_s = 24\,\mathrm{V}$, $L = 2\,\mathrm{mH}$, $\alpha = 0{,}6$, $T = 100\,\mu\mathrm{s}$.
+Exprimer $i_{L1}(t)$ sur chaque intervalle par les lois de Kirchhoff.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Intervalle $t \in [0\,;\,\alpha T]$ ($Q_1$ fermé, $D_1$ bloquée).}
+Maille : $V_{DC} = v_L + V_s \Rightarrow v_L = V_{DC} - V_s = 48 - 24 = 24\,\mathrm{V}$
+\[
+  v_L = L\,\frac{di_L}{dt} \;\Rightarrow\; i_L(t) = i_0 + \frac{V_{DC} - V_s}{L}\,t = i_0 + \frac{24}{2\times10^{-3}}\,t \quad\text{(croissant)}
+\]
+
+\textbf{Étape 2 — Intervalle $t \in [\alpha T\,;\,T]$ ($Q_1$ ouvert, $D_1$ passante).}
+Maille : $0 = v_L + V_s \Rightarrow v_L = -V_s = -24\,\mathrm{V}$
+\[
+  i_L(t) = i_{max} - \frac{V_s}{L}\,(t - \alpha T) = i_{max} - \frac{24}{2\times10^{-3}}\,(t - 60\,\mu\mathrm{s}) \quad\text{(décroissant)}
+\]
+Ondulation : $\Delta i_L = \frac{48 \times 0{,}6 \times (1-0{,}6) \times 100\times10^{-6}}{2\times10^{-3}} = \mathbf{0{,}576\,\mathrm{A}}$
+
+\textbf{Conclusion.} Les expressions temporelles et l'ondulation calculée sont cohérentes avec un fonctionnement en conduction continue : le dimensionnement de $L$ est conforme au cahier des charges de commande du hacheur.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Rapport cyclique d'ondulation maximale et inductance minimale \hfill\normalfont\footnotesize E2 disc. 2023 (Q C6, robot Bakus)}
+]
+\textbf{Énoncé.}
+Hacheur abaisseur : $V_{DC} = 48\,\mathrm{V}$, $T = 100\,\mu\mathrm{s}$, ondulation maximale admissible $\Delta i_{max} = 4\,\mathrm{A}$.
+(a) Trouver le rapport cyclique $\alpha$ qui maximise $\Delta i_L$. (b) Calculer l'inductance minimale $L_{min}$.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 (a) — Rapport cyclique critique.} $\Delta i_L = V_{DC}\,\alpha(1-\alpha)T/L$. Maximiser $\alpha(1-\alpha)$ - dériver par rapport à $\alpha$ et annuler :
+\[
+  \frac{d}{d\alpha}[\alpha(1-\alpha)] = 1 - 2\alpha = 0 \;\Rightarrow\; \alpha^* = \mathbf{0{,}5}
+\]
+
+\textbf{Étape 2 (b) — Inductance minimale.} En $\alpha = 0{,}5$ :
+\[
+  L_{min} = \frac{V_{DC} \times 0{,}5 \times 0{,}5 \times T}{\Delta i_{max}} = \frac{48 \times 0{,}25 \times 100 \times 10^{-6}}{4} = \frac{1{,}2 \times 10^{-3}}{4} = \mathbf{0{,}3\,\mathrm{mH}}
+\]
+
+\textbf{Conclusion.} $L_{min} = 0{,}3\,\mathrm{mH}$ n'est valable que pour le pire cas $\alpha = 0{,}5$ : en pratique on choisit $L$ strictement supérieure à cette valeur pour garantir la conduction continue quel que soit le point de fonctionnement réel.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Diode de protection - entrée analogique d'un CAN \hfill\normalfont\footnotesize E2 disciplinaire 2022 (Q26-Q27)}
+]
+\textbf{Énoncé.}
+La charge des accumulateurs est mesurée au travers d'une résistance de shunt $R_0$, dont la tension image est appliquée sur l'entrée analogique ADC1 du CAN ($V_{ref} = \SI{3,5}{\volt}$). Une diode $D_1$ (Si) protège cette entrée. Expliquer le rôle de $R_0$, puis le principe de la protection.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Rôle de $R_0$.} $R_0$ est une \textbf{résistance de shunt} : le courant des accumulateurs la traverse et y développe une tension \emph{image de ce courant}, seule grandeur exploitable par une entrée du CAN, qui ne mesure que des tensions.
+
+\textbf{Étape 2 — Charge des accumulateurs.} Le courant circule de la borne $+$ vers la borne $-$~: la tension aux bornes du shunt est \textbf{positive}, la diode est \textbf{bloquée} et n'a aucune influence sur la mesure.
+
+\textbf{Étape 3 — Décharge : le cas dangereux.} Lorsque les accumulateurs débitent vers le système, le courant \textbf{change de sens} : la tension appliquée sur l'entrée devient \textbf{négative}, ce qui est nuisible pour le CAN (mise en conduction des diodes de structure du microcontrôleur). La diode devient alors passante ($V_{AK} > \SI{0,6}{\volt}$) et écrête cette tension :
+\[
+  V_{ADC1} \geq -V_{seuil} = \SI{-0,6}{\volt}
+\]
+
+\textbf{Conclusion.} La protection joue donc \emph{par le bas}, contre une tension \textbf{négative} née de l'inversion du courant, et non contre une surtension : l'entrée du CAN ne peut pas descendre sous $\SI{-0,6}{\volt}$, conformément à l'exigence de robustesse du cahier des charges.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs récurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Oublier la diode de roue libre.}
+  Sans $D_1$ en anti-parallèle avec la charge inductive, la tension aux bornes du transistor diverge à l'ouverture ($v = L\,di/dt \to \infty$) et le détruit. Toujours justifier sa présence.
+
+  \item \textbf{Ondulation maximale à $\alpha = 0{,}5$.}
+  $\Delta i_L \propto \alpha(1-\alpha)$ est maximisée pour $\alpha = 0{,}5$, pas pour $\alpha = 1$. Erreur classique dans la formule.
+
+  \item \textbf{Rapport cyclique et tension moyenne.}
+  $\langle V_s \rangle = \alpha V_{DC}$ n'est valable qu'en \emph{conduction continue} ($i_L > 0$ en permanence). En conduction discontinue, la relation change.
+
+  \item \textbf{Saturation du BJT $\neq$ régime actif.}
+  En saturation, $I_C = \beta I_B$ n'est plus valable et $V_{CE} \approx 0{,}2\,\mathrm{V}$. Le transistor se comporte comme un interrupteur fermé.
+
+  \item \textbf{Signe de $V_{AK}$ pour la diode.}
+  En passant, $V_{AK} > 0$. En bloquée, $V_{AK} < 0$. L'erreur de signe est la faute la plus fréquente.
+
+  \item \textbf{Schémas équivalents pour chaque intervalle.}
+  Le jury attend que le candidat dessine le circuit équivalent ($Q_1$ ouvert ou fermé, $D_1$ passante ou bloquée) avant d'appliquer les lois de Kirchhoff.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2024 : «~Le jury regrette le manque de maîtrise des formules de base sur les réseaux triphasés, le régime sinusoïdal et les relations d'électrocinétique telles que la loi des mailles, la loi des nœuds ou encore la loi d'Ohm.~»\\
+Rapport jury 2025 : «~Des résultats donnés directement, sans calcul et sans justification ne répondent pas aux attendus de l'épreuve.~»
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PRESENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colPresence,
+  title={Présence dans les sujets analysés (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Année} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & $\checkmark$ & - & - & - & - & - & - & - & - & - & - & - & $\checkmark$ \\
+E2 discipl. IE & - & - & - & - & - & - & - & - & - & $\checkmark$ & $\checkmark$ & - & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-thèmes fréquents :}
+hacheur abaisseur - courant et ondulation dans $L$ (3/13) - rapport cyclique et tension moyenne (4/13) - diode de roue libre (4/13) - IGBT/MOSFET en convertisseurs (3/13) - diode de protection CAN (2/13)
+
+\medskip
+\textbf{Ordres de grandeur (repères rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Réseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, fréquence \SI{50}{\hertz}.
+  \item Courants d'étude fréquents en sujet : de quelques \si{\ampere} à quelques dizaines de \si{\ampere}.
+  \item En conversion d'énergie, un rendement attendu reste généralement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthèse express (à refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypothèses du modèle et les conventions de signe.
+  \item Écrire 2 à 4 relations clés avec unités.
+  \item Réaliser un calcul numérique complet et vérifier l'ordre de grandeur.
+  \item Justifier le résultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE

@@ -1,0 +1,446 @@
+% T18 -- Circuits \'electroniques, composants (diode, transistor) -- banque d'exercices
+% Sources (v\'erifi\'ees dans le texte extrait des PDF originaux) :
+%   - Exercice 1 : E2_Disciplinaire_IE_2022, questions 26 ET 27 (module TRT200, surveillance des
+%     accumulateurs). \'Epreuve intitul\'ee EDE ENE 1 "\'epreuve \'ecrite disciplinaire" (et NON
+%     "appliqu\'ee" : l'\'epreuve appliqu\'ee commune 2022 porte sur le banc \`a rouleaux AutoScan Fi).
+%     Donn\'ees du sujet : tension de seuil des diodes 0,6 V et V_ref du CAN = 3,5 V
+%     (E2_Disciplinaire_IE_2022.md l.453 et l.455) ; \'enonc\'es Q26 et Q27 l.473 et l.475.
+%     LOT 3 -- CET EXERCICE A \'ET\'E ENTI\`EREMENT R\'E\'ECRIT. L'ancienne version (protection contre
+%     une SURtension, \'ecr\^etage \`a V_ref + 0,6 = 4,1 V) \'etait un doublon exact de la QT3 de la
+%     fiche T18 ET reprenait son interpr\'etation physique, laquelle est CONTREDITE par le corrig\'e
+%     officiel : Rapport_Jury_2022.md l.343 -- "Lorsque les accumulateurs sont en charge, le courant
+%     de charge circule de la borne + vers la borne - des accumulateurs. La diode est ainsi bloqu\'ee.
+%     Lorsque les accumulateurs d\'ebitent vers le syst\`eme le courant change de sens induisant une
+%     tension n\'egative qui peut \^etre nuisible pour l'entr\'ee du CAN. La diode devient ainsi
+%     passante (VAK > 0,6V). La tension ainsi appliqu\'ee sur l'entr\'ee du CAN [...] ne pourra
+%     d\'epasser -0,6V." La protection est donc un \'ecr\^etage \`a -0,6 V (tension N\'EGATIVE), pas
+%     \`a +4,1 V. R\^ole de R0 : Rapport_Jury_2022.md l.339 -- "R0 est une r\'esistance de shunt. On
+%     r\'ecup\`ere une tension image du courant de charge."
+%   - Exercice 2 : E1_Sujet_2013_commun_SII, question 48 ("\'epreuve de synth\`ese de sciences
+%     industrielles", commune aux options) : r\^ole de l'onduleur photovolta\"ique, 24 onduleurs
+%     EI3300. La r\'eponse attendue (commande MLI des transistors) est celle du corrig\'e officiel
+%     E1_Corrige_2013_commun_SII question 48 ; elle a \'et\'e retir\'ee de l'\'enonc\'e, o\`u elle \'etait
+%     donn\'ee, pour redevenir une v\'eritable question
+%   - Exercice 3 (droite de charge diode) : exercice in\'edit, caract\'eristique statique
+%     g\'en\'erique (non issue d'un composant commercial pr\'ecis)
+%   - Exercice 4 (hacheur, viabilit\'e des \'etats $Q_1$/$D_1$, lois de Kirchhoff) : exercice IN\'EDIT
+%     inspir\'e du convertisseur CV3-1 du sujet 2025 (E2_Disciplinaire_IE_2025, DT10, Q24 \`a Q32).
+%     Dans ce sujet, CV3-1 est un convertisseur \'EL\'EVATEUR (point de repos
+%     $E_{b0}/V_{DC0} = 1-\alpha_0 = 48/230$) ; l'exercice traite ici la structure duale, d\'evoltrice.
+%     La r\'ef\'erence "questions 24 \`a 27" a \'et\'e retir\'ee du titre au profit d'une mention
+%     "inspir\'e de", et une remarque du corrig\'e explicite le passage \`a la relation \'el\'evatrice.
+%     LOT 3 -- la question 2 demandait pr\'ec\'edemment les \'equations diff\'erentielles de $i_{L1}$ sur
+%     $]0;\alpha T]$ et $]\alpha T;T]$, c'est-\`a-dire mot pour mot le travail de la QT1 de la fiche
+%     (2025 Q27-Q28). Elle a \'et\'e remplac\'ee par les lois g\'en\'erales de Kirchhoff (2025 Q26,
+%     E2_Disciplinaire_IE_2025.md l.312), non trait\'ees par la fiche, et le sch\'ema a re\c cu le
+%     fl\'echage complet de Q25 ($v_{Q1}$, $v_{D1}$, $i_{Q1}$, $i_{D1}$).
+%   - Exercice 5 (transistor bipolaire en commutation, pilotage relais) : exercice IN\'EDIT.
+%     LOT 3 -- converti en exercice de LECTURE DE DOCUMENT TECHNIQUE (seul docTech de la notion).
+%     L'extrait de datasheet est celui du BC337-25 (Fairchild Semiconductor, "NPN General Purpose
+%     Amplifier", r\'ef. document 33716-25 Rev. B, (c) 1997), r\'ecup\'er\'e et v\'erifi\'e par WebSearch
+%     puis lecture du PDF constructeur (datasheet.octopart.com/BC337-Fairchild-Semiconductor-
+%     datasheet-10379962.pdf), recoup\'e avec la version Fairchild BC337/338 Rev. A2 (ao\^ut 2002).
+%     TOUTES les valeurs de l'encadr\'e docTech sont des valeurs constructeur relev\'ees, AUCUNE
+%     n'est invent\'ee : V_CEO=45 V, V_CES=50 V, V_EBO=5,0 V, I_C continu=1,0 A, P_D=625 mW,
+%     T_J/T_stg=-55..+150 degC ; h_FE 160..400 (V_CE=1,0 V, I_C=100 mA) et h_FE min 40
+%     (V_CE=1,0 V, I_C=500 mA) ; V_CE(sat) max 0,7 V (I_C=500 mA, I_B=50 mA) ; V_BE(on) max 1,2 V
+%     (V_CE=1,0 V, I_C=500 mA). Les valeurs d'application (V_cc=12 V, R_relais=100 ohm, V_cmd=5 V)
+%     restent celles, in\'edites, de l'\'enonc\'e.
+%   - Exercice 6 (thyristor, pont P1) : formule $\langle u_S\rangle = \frac{V_m}{2\pi}(1+\cos\alpha)$
+%     red\'emontr\'ee ici -- corrige un facteur 2 manquant dans fiches/T18_contenu.md (la forme qui y
+%     figure, $V_m(1+\cos\alpha)/\pi$, ne redonne pas la valeur moyenne usuelle $V_m/\pi$ du
+%     redressement demi-onde non command\'e $\alpha=0$, ce qui la rend incoh\'erente)
+% Ordre des exercices : gradation croissante 1-1-2-2-2-3. L'exercice photovolta\"ique (niveau 1) a
+% \'et\'e remont\'e en 2e position ; il figurait en 4e, apr\`es deux exercices de niveau 2.
+% Sch\'emas (contr\^ole visuel sur rendu PNG) : ex. 4 -- $D_1$ retourn\'ee (cathode au n\oe ud de
+%   commutation, anode au rail 0 V) : dessin\'ee en sens inverse, elle court-circuitait $V_{DC}$ \`a
+%   l'amor\c cage de $Q_1$ et contredisait le corrig\'e ; fl\'echage des tensions $V_{DC}$, $u_{L1}$,
+%   $E_b$ ajout\'e (questions 2 et 3 exigent une convention explicite). Ex. 3 -- caract\'eristique de
+%   la diode recal\'ee (coude 0,54 V au lieu de 0,62 V) pour que l'intersection avec la droite de
+%   charge tombe r\'eellement sur le point $Q$ annonc\'e (0,66 V ; 20 mA) : le point trac\'e \'etait
+%   auparavant hors de la courbe.
+% Sens des diodes (contr\^ole LOT 3, les 4 diodes du fichier) : ex.1 $D_1$ anode au 0 V / cathode
+%   \`a l'entr\'ee ADC1 (\'ecr\^etage des tensions N\'EGATIVES, conforme au corrig\'e jury 2022) ;
+%   ex.3 $D$ anode en haut / cathode vers la masse (sens direct du courant de la maille) ;
+%   ex.4 $D_1$ cathode au n\oe ud de commutation (roue libre d'un Buck, INCHANG\'E depuis le lot 2) ;
+%   ex.5 $D$ anode au collecteur / cathode \`a $V_{cc}$ (roue libre, INCHANG\'E depuis le lot 2).
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T18}} - Exercices - Circuits \'electroniques, composants}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T18 \quad Circuits \'electroniques, composants (diode, transistor)}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2022, \'epreuve \'ecrite disciplinaire, questions 26 et 27}
+]
+\CAPETSHOW{
+Le module de surveillance TRT200 est secouru par des accumulateurs. Le courant de charge/d\'echarge de ces accumulateurs traverse une r\'esistance $R_0$ de faible valeur, dont la tension est appliqu\'ee \`a l'entr\'ee analogique ADC1 du convertisseur analogique-num\'erique (CAN) du microcontr\^oleur. Une diode $D_1$ relie cette entr\'ee au $\SI{0}{\volt}$, anode c\^ot\'e $\SI{0}{\volt}$, cathode c\^ot\'e entr\'ee du CAN. La tension de seuil des diodes est prise \'egale \`a \SI{0,6}{\volt} et la tension de r\'ef\'erence du CAN vaut \SI{3,5}{\volt}.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.8]
+\draw (0,3) node[left]{accumulateurs} -- (1.2,3)
+to[R, l=$R_0$, i>^=$i_{ch}$] (4.2,3) node[circ]{}
+-- (5.6,3) node[ocirc]{} node[above=5pt]{\footnotesize vers ADC1};
+\draw (4.2,3) to[empty diode, l_=$D_1$, invert] (4.2,0.6) -- (4.2,0.4) node[ground]{};
+\draw (1.2,3) -- (1.2,0.6) -- (1.2,0.4) node[ground]{};
+\draw[-latex] (5.6,2.7) -- (5.6,0.9) node[midway, right]{\footnotesize $v_{ADC1}$};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Quelle fonction $R_0$ remplit-elle dans la mesure de la charge des accumulateurs~? Pr\'eciser la grandeur physique r\'eellement image de la tension pr\'elev\'ee \`a ses bornes.
+  \item Les accumulateurs sont d'abord en \emph{charge}. Indiquer le sens du courant $i_{ch}$ dans $R_0$, en d\'eduire le signe de $v_{ADC1}$, puis l'\'etat (passante / bloqu\'ee) de $D_1$.
+  \item Les accumulateurs d\'ebitent ensuite vers le syst\`eme (\emph{d\'echarge}). Reprendre le raisonnement de la question pr\'ec\'edente et en d\'eduire la valeur limite que peut atteindre $v_{ADC1}$.
+  \item Contre quel type d'agression \'electrique $D_1$ prot\`ege-t-elle donc l'entr\'ee du CAN~? Justifier en une phrase pourquoi cette agression serait critique pour le microcontr\^oleur.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item $R_0$ est une \textbf{r\'esistance de shunt} : elle est ins\'er\'ee en s\'erie sur le circuit de charge/d\'echarge et la tension pr\'elev\'ee \`a ses bornes, $v = R_0\,i_{ch}$, est une \textbf{image du courant} de charge des accumulateurs (et non de leur tension, surveill\'ee s\'epar\'ement sur ADC0). La mesure d'un courant est ainsi ramen\'ee \`a une mesure de tension, seule grandeur que le CAN sait num\'eriser.
+  \item En charge, le courant circule de la borne $+$ vers la borne $-$ des accumulateurs, c'est-\`a-dire dans le sens positif de $i_{ch}$ sur le sch\'ema : $v_{ADC1} = R_0\,i_{ch} > 0$. La diode $D_1$, dont l'anode est au $\SI{0}{\volt}$ et la cathode sur l'entr\'ee, voit alors $V_{AK} = 0 - v_{ADC1} < 0$ : elle est \textbf{bloqu\'ee} et n'a aucune influence sur la mesure.
+  \item En d\'echarge, le courant change de sens : $i_{ch} < 0$ et $v_{ADC1} = R_0\,i_{ch}$ devient \textbf{n\'egative}. D\`es que $v_{ADC1}$ descend sous $-V_{seuil}$, on a $V_{AK} = 0 - v_{ADC1} > \SI{0,6}{\volt}$ : $D_1$ devient \textbf{passante} et \'ecr\^ete la tension. L'entr\'ee du CAN ne peut donc pas descendre en dessous de
+  \[ v_{ADC1,min} = -V_{seuil} = \SI{-0,6}{\volt} \]
+  \item $D_1$ prot\`ege l'entr\'ee analogique contre une \textbf{tension n\'egative}, apparue par simple inversion du sens du courant lors de la d\'echarge. C'est critique car la plage d'entr\'ee admissible du CAN est born\'ee par ses rails d'alimentation ($\SI{0}{\volt}$ \`a $V_{ref} = \SI{3,5}{\volt}$) : une tension n\'egative significative polarise en direct les diodes de structure internes du microcontr\^oleur, injecte un courant dans le substrat et peut d\'et\'eriorer d\'efinitivement l'\'etage d'entr\'ee.
+\end{enumerate}
+
+\textbf{Conclusion.} L'association $R_0 + D_1$ satisfait deux exigences \`a la fois : $R_0$ rend le courant d'accumulateur observable par un CAN qui ne mesure que des tensions, et $D_1$ garantit que la grandeur pr\'esent\'ee \`a ADC1 ne franchit jamais $\SI{-0,6}{\volt}$ malgr\'e l'inversion de sens du courant en d\'echarge -- donc reste dans la plage admissible de l'entr\'ee analogique du PIC. Sans cette diode, le simple passage du TRT200 sur son alimentation de secours suffirait \`a d\'et\'eriorer le microcontr\^oleur de surveillance.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{1} \hfill\normalfont\footnotesize 2013, \'epreuve commune de synth\`ese de sciences industrielles, question 48}
+]
+\CAPETSHOW{
+Une installation photovolta\"ique raccord\'ee au r\'eseau comporte 24 onduleurs de r\'ef\'erence EI3300. Chaque onduleur transforme la tension continue issue des panneaux en une tension alternative sinuso\"idale de valeur efficace \SI{230}{\volt} et de fr\'equence \SI{50}{\hertz}, compatible avec le r\'eseau EDF. Ses interrupteurs de puissance sont des IGBT.
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9, >=Stealth, node distance=1cm]
+  \node[draw, minimum width=2cm, minimum height=1.2cm] (pv) {champ PV};
+  \node[draw, minimum width=2.6cm, minimum height=1.2cm, right=1.5cm of pv] (ond) {onduleur (IGBT)};
+  \node[draw, minimum width=2cm, minimum height=1.2cm, right=2.6cm of ond] (res) {r\'eseau EDF};
+  \draw[-latex] (pv) -- node[above]{$U_{DC}$} (ond);
+  \draw[-latex] (ond) -- node[above, font=\footnotesize]{\SI{230}{\volt}, \SI{50}{\hertz}} (res);
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Pr\'eciser le r\^ole fonctionnel de l'onduleur dans cette cha\^ine (deux fonctions \`a distinguer).
+  \item Quel type de commande est utilis\'e pour les transistors de puissance~? Pourquoi ce choix est-il pr\'ef\'er\'e \`a une commande dite \guillemotleft\ pleine onde \guillemotright\ pour une injection sur le r\'eseau~?
+  \item La tension continue en entr\'ee de l'onduleur (c\^ot\'e panneaux) est sup\'erieure \`a l'amplitude cr\^ete de la tension r\'eseau. Justifier pourquoi des transistors command\'es (IGBT), et non de simples diodes, sont indispensables ici.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item L'onduleur assure deux fonctions : convertir la tension continue issue des panneaux en tension alternative, et rendre cette tension compatible avec le r\'eseau (valeur efficace \SI{230}{\volt}, fr\'equence \SI{50}{\hertz}, synchronisation en phase) afin de permettre l'injection de l'\'energie produite chez EDF.
+  \item La commande est de type \textbf{MLI} (modulation de largeur d'impulsion, ou PWM) : le d\'ecoupage \`a haute fr\'equence permet d'obtenir en sortie une tension dont le fondamental est quasi-sinuso\"idal, avec un spectre d'harmoniques repouss\'e vers les hautes fr\'equences (donc facile \`a filtrer), contrairement \`a une commande pleine onde dont les harmoniques de rang faible restent proches du fondamental. C'est n\'ecessaire pour respecter les exigences de qualit\'e de l'onde inject\'ee sur le r\'eseau.
+  \item Un pont \`a diodes est un convertisseur unidirectionnel : le courant ne peut circuler que dans un seul sens impos\'e par les diodes, ce qui interdit tout transfert command\'e de puissance active du c\^ot\'e continu vers le c\^ot\'e alternatif. Des transistors command\'es (IGBT) permettent au contraire de piloter le sens et l'instant du transfert d'\'energie : c'est cette r\'eversibilit\'e command\'ee qui rend possible l'injection de puissance sur le r\'eseau.
+\end{enumerate}
+
+\textbf{Conclusion.} Structure \`a interrupteurs command\'es et commande MLI ne sont pas ici des choix de confort~: ce sont les deux conditions pour que les 24 onduleurs EI3300 satisfassent le crit\`ere de raccordement au r\'eseau de distribution (onde \SI{230}{\volt} / \SI{50}{\hertz} synchronis\'ee et faiblement distordue), sans lequel l'\'energie produite ne pourrait pas \^etre revendue.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Une diode au silicium est mont\'ee en s\'erie avec une r\'esistance $R = \SI{220}{\ohm}$, l'ensemble \'etant aliment\'e par une source id\'eale $E = \SI{5}{\volt}$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw
+(0,0) to[V, l=$E$] (0,3)
+to[R, l=$R$] (3,3)
+to[empty diode, l=$D$, *-*] (3,0)
+-- (0,0);
+\end{circuitikz}
+\end{center}
+
+La caract\'eristique statique $i(V_{AK})$ de la diode est donn\'ee ci-dessous (axes gradu\'es en volts et milliamp\`eres).
+
+\begin{center}
+\begin{tikzpicture}[scale=1, >=Stealth]
+  \draw[-latex] (0,0) -- (6,0) node[right]{$V_{AK}$ (V)};
+  \draw[-latex] (0,0) -- (0,5) node[above]{$i$ (mA)};
+  \foreach \x in {1,2,3,4,5} \draw (\x,0.05) -- (\x,-0.05) node[below]{\x};
+  \foreach \y/\lbl in {1/5,2/10,3/15,4/20} \draw (0.05,\y) -- (-0.05,\y) node[left]{\lbl};
+  \draw[thick, colExo] (0,0) -- (0.54,0) .. controls (0.60,0) and (0.64,3.3) .. (0.68,4.55) -- (0.82,4.85);
+  \node[colExo, right] at (1.05,4.5) {caract\'eristique diode};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \'Etablir l'\'equation de la droite de charge $i = f(V_{AK})$ impos\'ee par le circuit ext\'erieur ($E$ et $R$).
+  \item Tracer cette droite de charge sur le graphe et d\'eterminer graphiquement le point de fonctionnement $Q$ (coordonn\'ees approximatives $V_{AK,Q}$ et $I_Q$).
+  \item Retrouver $I_Q$ par le calcul en utilisant le mod\`ele \`a seuil $V_{seuil} = \SI{0,6}{\volt}$, et comparer au r\'esultat graphique.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Loi des mailles : $E = R\cdot i + V_{AK}$, soit :
+  \[ i = \dfrac{E - V_{AK}}{R} \]
+  C'est l'\'equation d'une droite d'ordonn\'ee \`a l'origine $E/R = 5/220 \approx \SI{22,7}{\milli\ampere}$ (en $V_{AK}=0$) et d'abscisse \`a l'origine $E = \SI{5}{\volt}$ (en $i=0$), de pente $-1/R$.
+
+  \item On trace la droite de charge en joignant ces deux points ; le point de fonctionnement $Q$ est son intersection avec la caract\'eristique statique de la diode :
+
+  \begin{center}
+  \begin{tikzpicture}[scale=1, >=Stealth]
+    \draw[-latex] (0,0) -- (6,0) node[right]{$V_{AK}$ (V)};
+    \draw[-latex] (0,0) -- (0,5) node[above]{$i$ (mA)};
+    \foreach \x in {1,2,3,4,5} \draw (\x,0.05) -- (\x,-0.05) node[below]{\x};
+    \foreach \y/\lbl in {1/5,2/10,3/15,4/20} \draw (0.05,\y) -- (-0.05,\y) node[left]{\lbl};
+    \draw[thick, colExo] (0,0) -- (0.54,0) .. controls (0.60,0) and (0.64,3.3) .. (0.68,4.55) -- (0.82,4.85);
+    \draw[thick, dashed] (0,4.55) -- (5,0) node[pos=0.55, above]{droite de charge};
+    \filldraw (0.664,3.947) circle (1.7pt) node[right=3pt, yshift=3pt]{$Q$};
+    \draw[dotted] (0.664,0) -- (0.664,3.947);
+    \draw[dotted] (0,3.947) -- (0.664,3.947);
+  \end{tikzpicture}
+  \end{center}
+  Graphiquement, l'intersection $Q$ de la droite de charge et de la caract\'eristique se situe vers $V_{AK,Q} \approx \SI{0,66}{\volt}$, $I_Q \approx \SI{20}{\milli\ampere}$.
+
+  \item Avec le mod\`ele \`a seuil, $V_{AK} = V_{seuil} = \SI{0,6}{\volt}$ quel que soit $i>0$, donc :
+  \[ I_Q = \dfrac{E - V_{seuil}}{R} = \dfrac{5 - 0{,}6}{220} \approx \SI{20,0}{\milli\ampere} \]
+  Ce r\'esultat est tr\`es proche de la lecture graphique : le mod\`ele \`a seuil est une bonne approximation d\`es lors que $R$ est suffisamment grande devant la r\'esistance dynamique de la diode au voisinage de $Q$ (la droite de charge est alors peu pentue, et $V_{AK,Q}$ reste proche de $V_{seuil}$).
+\end{enumerate}
+
+\textbf{Conclusion.} L'\'ecart entre les deux m\'ethodes reste inf\'erieur au pour-cent sur $I_Q$ : pour dimensionner le circuit (choix du calibre de $R$, v\'erification du courant direct admissible de la diode), le mod\`ele \`a seuil suffit et dispense du trac\'e graphique ; la r\'esolution graphique ne redevient n\'ecessaire que si la r\'esistance dynamique de la diode cesse d'\^etre n\'egligeable devant $R$.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize exercice in\'edit, inspir\'e du convertisseur CV3-1 (2025, \'epreuve \'ecrite disciplinaire)}
+]
+\CAPETSHOW{
+On \'etudie un hacheur inspir\'e du convertisseur CV3-1 d'un sous-r\'eseau d'\'electrification aliment\'e par pile \`a combustible : il recharge ici une batterie \`a partir du bus continu $V_{DC}$. Le sch\'ema simplifi\'e comporte un transistor $Q_1$ command\'e (rapport cyclique $\alpha$, p\'eriode $T$) et une diode $D_1$, tous deux suppos\'es parfaits, une inductance $L_1$ parcourue par $i_{L1}$, et la batterie mod\'elis\'ee par une f.\'e.m. $E_b$. Les tensions $V_{DC}$, $u_{L1}$, $v_{Q1}$, $v_{D1}$ et $E_b$, ainsi que les courants $i_{L1}$, $i_{Q1}$ et $i_{D1}$, sont orient\'es selon les fl\`eches du sch\'ema ($u_{L1}$, $v_{Q1}$ et $v_{D1}$ en convention r\'ecepteur par rapport aux courants correspondants).
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.8]
+\draw
+(0,0) to[V] (0,4)
+(0,4) to[normal open switch, l=$Q_1$] (3,4)
+(3,0) to[empty diode, l=$D_1$] (3,4)
+(3,0) -- (0,0)
+(3,4) to[cute inductor, l=$L_1$] (6,4)
+(6,4) to[battery2] (6,0)
+(6,0) -- (3,0)
+;
+\draw (3,4) node[circ]{};
+\draw (3,0) node[circ]{};
+\draw[-latex] (-0.95,0.8) -- (-0.95,3.2) node[midway, left]{$V_{DC}$};
+\draw[-latex] (6.95,0.8) -- (6.95,3.2) node[midway, right]{$E_b$};
+\draw[-latex, dashed] (1.5,4.75) -- (1.5,4.15);
+\node[above] at (1.5,4.75) {\footnotesize commande ($\alpha$, $T$)};
+\draw[-latex] (5.7,6.5) -- (3.3,6.5) node[midway, above]{$u_{L1}$};
+\draw[-latex] (4.3,3.55) -- (5.3,3.55) node[midway, below]{$i_{L1}$};
+\draw[-latex] (2.6,6.5) -- (0.4,6.5) node[midway, above]{\footnotesize $v_{Q1}$};
+\draw[-latex] (0.35,3.6) -- (1.05,3.6) node[midway, below]{\footnotesize $i_{Q1}$};
+\draw[-latex] (1.75,1.15) -- (1.75,2.85) node[midway, left]{\footnotesize $v_{D1}$};
+\draw[-latex] (3.75,1.35) -- (3.75,2.65) node[midway, right]{\footnotesize $i_{D1}$};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Pour chacune des quatre combinaisons possibles des \'etats de $Q_1$ (ouvert/ferm\'e) et $D_1$ (bloqu\'ee/passante), indiquer si elle est physiquement viable, en justifiant \`a partir du sens de conduction impos\'e \`a $D_1$ et de la continuit\'e du courant $i_{L1}$ dans l'inductance.
+  \item \'Ecrire les lois g\'en\'erales de Kirchhoff (loi des n\oe uds et loi des mailles) qui lient entre elles les grandeurs fl\'ech\'ees $V_{DC}$, $u_{L1}$, $v_{Q1}$, $v_{D1}$, $E_b$ d'une part, et les courants $i_{L1}$, $i_{Q1}$, $i_{D1}$ d'autre part. Ces relations doivent \^etre valables \`a tout instant, ind\'ependamment de l'\'etat des interrupteurs.
+  \item Justifier que la valeur moyenne de la tension aux bornes de $L_1$ est nulle en r\'egime \'etabli, puis en d\'eduire la relation entre $E_b$, $V_{DC}$ et $\alpha$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Les quatre combinaisons :
+  \begin{itemize}
+    \item $Q_1$ ferm\'e, $D_1$ bloqu\'ee : \textbf{viable}. $Q_1$ ferm\'e impose le n\oe ud commun au potentiel $V_{DC}$ ; $D_1$, dont la cathode est reli\'ee \`a ce n\oe ud et l'anode au rail $\SI{0}{\volt}$, voit alors une tension inverse et reste naturellement bloqu\'ee.
+    \item $Q_1$ ferm\'e, $D_1$ passante : \textbf{impossible}. $D_1$ passante imposerait le n\oe ud \`a un potentiel proche de $0$, en contradiction directe avec $Q_1$ ferm\'e qui l'impose \`a $V_{DC}$ -- cela court-circuiterait la source.
+    \item $Q_1$ ouvert, $D_1$ bloqu\'ee : \textbf{impossible} en conduction continue. Le courant $i_{L1}$ dans une inductance ne peut subir de discontinuit\'e ; si $Q_1$ s'ouvre et qu'aucun chemin n'est disponible pour $i_{L1}$, une surtension destructrice appara\^itrait aux bornes de $L_1$ ($di/dt$ infini). $D_1$ doit donc devenir passante pour assurer la continuit\'e du courant.
+    \item $Q_1$ ouvert, $D_1$ passante : \textbf{viable}. C'est la phase de roue libre : $D_1$ assure la continuit\'e de $i_{L1}$ pendant le blocage de $Q_1$.
+  \end{itemize}
+  \item \textbf{Loi des n\oe uds} au point de commutation (n\oe ud commun \`a $Q_1$, $D_1$ et $L_1$) : le courant apport\'e par $Q_1$ et celui apport\'e par $D_1$ se rejoignent dans l'inductance, donc \`a tout instant
+  \[ i_{L1} = i_{Q1} + i_{D1} \]
+  \textbf{Loi des mailles.} Maille source-transistor-diode (source $V_{DC}$, $Q_1$, $D_1$, retour par le rail $\SI{0}{\volt}$) :
+  \[ V_{DC} = v_{Q1} + v_{D1} \]
+  Maille diode-inductance-batterie ($D_1$, $L_1$, $E_b$) :
+  \[ v_{D1} = u_{L1} + E_b \quad\text{avec}\quad u_{L1} = L_1\dfrac{di_{L1}}{dt} \]
+  Par \'elimination de $v_{D1}$, on obtient la relation valable \`a tout instant :
+  \[ V_{DC} - v_{Q1} = L_1\dfrac{di_{L1}}{dt} + E_b \]
+  Ces trois relations sont bien ind\'ependantes de l'\'etat des interrupteurs : ce sont les \'etats de $Q_1$ et $D_1$ qui viennent ensuite fixer les valeurs particuli\`eres de $v_{Q1}$ et $v_{D1}$ (interrupteur ferm\'e $\Rightarrow$ tension nulle, interrupteur ouvert/bloqu\'e $\Rightarrow$ courant nul).
+  \item En r\'egime p\'eriodique \'etabli, $i_{L1}(T) = i_{L1}(0)$, donc :
+  \[ \left\langle L_1\dfrac{di_{L1}}{dt}\right\rangle = \dfrac{L_1}{T}\big[i_{L1}(T)-i_{L1}(0)\big] = 0 \]
+  On moyenne alors sur une p\'eriode la relation \'etablie \`a la question pr\'ec\'edente, $V_{DC} - v_{Q1} = L_1\,di_{L1}/dt + E_b$. D'apr\`es la question 1, seuls deux \'etats sont visit\'es : $Q_1$ ferm\'e ($v_{Q1}=0$) pendant $\alpha T$, puis $Q_1$ ouvert avec $D_1$ passante ($v_{D1}=0$, donc $v_{Q1}=V_{DC}$) pendant $(1-\alpha)T$. La grandeur $V_{DC}-v_{Q1}$ vaut donc $V_{DC}$ pendant $\alpha T$ et $0$ pendant $(1-\alpha)T$, soit une valeur moyenne $\alpha V_{DC}$ :
+  \[ \alpha V_{DC} = E_b + \left\langle L_1\dfrac{di_{L1}}{dt}\right\rangle = E_b \quad\Longrightarrow\quad E_b = \alpha \cdot V_{DC} \]
+\end{enumerate}
+
+\textbf{Conclusion.} Comme $0 \leq \alpha \leq 1$, la structure impose $E_b \leq V_{DC}$ : il s'agit d'un hacheur d\'evolteur (Buck), dont le rapport cyclique est le seul param\`etre de r\'eglage de la tension de charge de la batterie. Le crit\`ere de dimensionnement en d\'ecoule directement : le bus continu doit rester au-dessus de la tension de fin de charge de la batterie, faute de quoi aucune valeur de $\alpha$ ne permet d'atteindre la consigne.
+
+\emph{Remarque -- lien avec le convertisseur CV3-1 du sujet 2025.} Dans le convertisseur r\'eel, les r\^oles de $Q_1$ et $D_1$ sont \'echang\'es ($Q_1$ en parall\`ele sur le rail, $D_1$ en s\'erie vers le bus) : la m\^eme m\'ethode ($\langle u_{L1}\rangle = 0$) conduit alors \`a la relation \'el\'evatrice $V_{DC} = E_b/(1-\alpha)$, coh\'erente avec le point de repos donn\'e par le sujet, $E_{b0}/V_{DC0} = 1-\alpha_0 = 48/230$.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{2} \hfill\normalfont\footnotesize lecture de document technique -- exercice in\'edit}
+]
+\CAPETSHOW{
+Un microcontr\^oleur commande, via sa sortie logique $V_{cmd}$ (0 ou $\SI{5}{\volt}$), la bobine d'un relais \'electrom\'ecanique (r\'esistance $R_{relais} = \SI{100}{\ohm}$, aliment\'ee sous $V_{cc} = \SI{12}{\volt}$) par l'interm\'ediaire d'un transistor bipolaire NPN mont\'e en \'emetteur commun. Une r\'esistance de base $R_B$ limite le courant de base $I_B$, et une diode de roue libre $D$ est plac\'ee en antiparall\`ele sur la bobine. Le composant retenu est un \textbf{BC337-25} en bo\^itier TO-92, dont un extrait de la fiche constructeur est reproduit ci-dessous.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw (0,0) node[npn] (Q1) {};
+\node[right=8pt] at (Q1.E) {$Q_1$};
+\draw (Q1.B) -- ++(-2,0) to[R, l=$R_B$] ++(-2,0) node[left]{$V_{cmd}$};
+\draw (Q1.E) -- ++(0,-1) node[ground]{};
+\draw (Q1.C) -- ++(0,1.5) coordinate (A);
+\draw (A) node[circ]{} to[R, l_=$R_{relais}$] ++(3,0) coordinate (T1);
+\draw (A) -- ++(0,1.8) coordinate (A2);
+\draw (A2) to[empty diode, l=$D$] ++(3,0) coordinate (T2);
+\draw (T1) node[circ]{} -- (T2);
+\draw (T1) to[V, l_=$V_{cc}$] ++(0,-2.9) node[ground]{};
+\end{circuitikz}
+\end{center}
+
+\begin{tcolorbox}[docTech, title={Document technique -- BC337-25, NPN General Purpose Amplifier (extrait)}]
+\footnotesize
+\textbf{Absolute Maximum Ratings} ($T_A = \SI{25}{\degreeCelsius}$)
+
+\begin{center}
+\begin{tabular}{llcc}
+\toprule
+\textbf{Symbol} & \textbf{Parameter} & \textbf{Value} & \textbf{Units} \\
+\midrule
+$V_{CEO}$ & Collector-Emitter Voltage & 45 & V \\
+$V_{CES}$ & Collector-Base Voltage & 50 & V \\
+$V_{EBO}$ & Emitter-Base Voltage & 5,0 & V \\
+$I_C$ & Collector Current -- Continuous & 1,0 & A \\
+$P_D$ & Total Device Dissipation ($T_A = \SI{25}{\degreeCelsius}$) & 625 & mW \\
+$T_J$, $T_{stg}$ & Operating and Storage Junction Temp. Range & $-55$ \`a $+150$ & \si{\degreeCelsius} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Electrical Characteristics} -- \emph{ON characteristics} ($T_A = \SI{25}{\degreeCelsius}$)
+
+\begin{center}
+\begin{tabular}{llccc}
+\toprule
+\textbf{Symbol} & \textbf{Parameter} / \textbf{Test Conditions} & \textbf{Min} & \textbf{Max} & \textbf{Units} \\
+\midrule
+$h_{FE}$ & DC Current Gain -- $V_{CE} = \SI{1,0}{\volt}$, $I_C = \SI{100}{\milli\ampere}$ & 160 & 400 & \\
+         & \hspace{1.2em} $V_{CE} = \SI{1,0}{\volt}$, $I_C = \SI{500}{\milli\ampere}$ & 40 & -- & \\
+$V_{CE(sat)}$ & Collector-Emitter Saturation Voltage & -- & 0,7 & V \\
+              & \hspace{1.2em} $I_C = \SI{500}{\milli\ampere}$, $I_B = \SI{50}{\milli\ampere}$ & & & \\
+$V_{BE(on)}$ & Base-Emitter On Voltage -- $V_{CE} = \SI{1,0}{\volt}$, $I_C = \SI{500}{\milli\ampere}$ & -- & 1,2 & V \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever dans l'extrait} les trois valeurs n\'ecessaires au dimensionnement de cette commande : la tension collecteur-\'emetteur maximale admissible, le courant collecteur continu maximal et la valeur \emph{minimale} garantie du gain statique $h_{FE}$ pour $I_C = \SI{100}{\milli\ampere}$.
+  \item Calculer le courant de collecteur $I_{C,sat}$ appel\'e par la bobine lorsque le transistor est satur\'e, en prenant $V_{CE(sat)}$ \'egal \`a la valeur maximale annonc\'ee par le constructeur. V\'erifier que $I_C$ et $V_{CE}$ restent dans les limites relev\'ees \`a la question 1.
+  \item On impose un facteur de sursaturation $k = \beta_{min}\,I_B / I_{C,sat} = 2$. En prenant pour $\beta_{min}$ la valeur relev\'ee \`a la question 1 et $V_{BE} = \SI{0,6}{\volt}$, calculer le courant de base n\'ecessaire puis la valeur maximale de $R_B$ qui garantit cette sursaturation. Proposer une valeur normalis\'ee de la s\'erie E12.
+  \item V\'erifier que la puissance dissip\'ee par le transistor en conduction reste inf\'erieure \`a la dissipation maximale $P_D$ du bo\^itier.
+  \item Sans la diode de roue libre $D$, quelle grandeur du document technique serait d\'epass\'ee \`a l'ouverture de $Q_1$~? Conclure sur le caract\`ere obligatoire de $D$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Lecture directe de l'extrait : $V_{CEO} = \SI{45}{\volt}$ (tension collecteur-\'emetteur maximale), $I_{C,max} = \SI{1,0}{\ampere}$ en continu, et $h_{FE} \geq 160$ pour $V_{CE} = \SI{1,0}{\volt}$, $I_C = \SI{100}{\milli\ampere}$ (classe $-25$). On retiendra donc $\beta_{min} = 160$.
+  \item En saturation, la maille collecteur donne $V_{cc} = R_{relais}\,I_{C,sat} + V_{CE(sat)}$ :
+  \[ I_{C,sat} = \dfrac{V_{cc} - V_{CE(sat)}}{R_{relais}} = \dfrac{12 - 0{,}7}{100} = \SI{113}{\milli\ampere} \]
+  Ce courant est tr\`es inf\'erieur au calibre continu $I_{C,max} = \SI{1,0}{\ampere}$ (marge $\times 8{,}8$). \`A l'\'etat bloqu\'e, le transistor supporte au plus $V_{CE} = V_{cc} = \SI{12}{\volt}$, tr\`es inf\'erieur \`a $V_{CEO} = \SI{45}{\volt}$. Les deux limites du document technique sont donc respect\'ees.
+
+  \emph{Remarque}~: le point de fonctionnement $I_C \approx \SI{113}{\milli\ampere}$ est proche de la condition de test du gain ($\SI{100}{\milli\ampere}$), ce qui l\'egitime l'emploi de $\beta_{min} = 160$.
+  \item La condition de sursaturation impose $\beta_{min}\,I_B = k\,I_{C,sat}$, soit :
+  \[ I_B = \dfrac{k\,I_{C,sat}}{\beta_{min}} = \dfrac{2\times 113\times 10^{-3}}{160} \approx \SI{1,41}{\milli\ampere} \]
+  La maille de base donne $V_{cmd} = R_B\,I_B + V_{BE}$, d'o\`u :
+  \[ R_{B,max} = \dfrac{V_{cmd} - V_{BE}}{I_B} = \dfrac{5 - 0{,}6}{1{,}41\times 10^{-3}} \approx \SI{3,12}{\kilo\ohm} \]
+  Toute r\'esistance inf\'erieure convient (elle augmente $I_B$, donc $k$). On retient la valeur normalis\'ee E12 imm\'ediatement inf\'erieure : $R_B = \SI{2,7}{\kilo\ohm}$, qui donne $I_B = (5-0{,}6)/2\,700 \approx \SI{1,63}{\milli\ampere}$, soit $k = 160\times 1{,}63/113 \approx 2{,}3$.
+  \item En conduction, la puissance dissip\'ee dans le transistor vaut essentiellement celle du jonction collecteur-\'emetteur :
+  \[ P = V_{CE(sat)}\cdot I_{C,sat} + V_{BE}\cdot I_B = 0{,}7\times 0{,}113 + 0{,}6\times 1{,}63\times 10^{-3} \approx \SI{80}{\milli\watt} \]
+  soit environ \SI{13}{\percent} de la dissipation maximale $P_D = \SI{625}{\milli\watt}$ du bo\^itier TO-92 : aucun radiateur n'est n\'ecessaire.
+  \item \`A l'ouverture de $Q_1$, la bobine du relais impose la continuit\'e de son courant : la tension $v = L\,di/dt$ qui appara\^it \`a ses bornes s'ajoute \`a $V_{cc}$ sur le collecteur et d\'epasse tr\`es largement la limite $V_{CEO} = \SI{45}{\volt}$ relev\'ee dans le document technique -- c'est un claquage par avalanche du transistor. La diode $D$, en offrant un chemin de roue libre, borne cette tension \`a $V_{cc} + V_{seuil} \approx \SI{12,6}{\volt}$.
+\end{enumerate}
+
+\textbf{Conclusion.} Avec $R_B = \SI{2,7}{\kilo\ohm}$, les quatre limites du constructeur sont simultan\'ement respect\'ees~: $I_C = \SI{113}{\milli\ampere} \ll \SI{1}{\ampere}$, $V_{CE} \leq \SI{12,6}{\volt} \ll \SI{45}{\volt}$ gr\^ace \`a $D$, $P = \SI{80}{\milli\watt} \ll \SI{625}{\milli\watt}$, et le facteur de sursaturation $k \approx 2{,}3$ garantit la saturation m\^eme pour un exemplaire de gain minimal. Le BC337-25 est donc valid\'e pour cette commande de relais, \`a la condition imp\'erative de conserver la diode de roue libre, seul \'el\'ement qui emp\^eche le d\'epassement de $V_{CEO}$.
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Un redresseur monophas\'e demi-onde \`a un seul thyristor (montage P1) alimente une charge r\'esistive pure $R$ \`a partir d'une tension sinuso\"idale $v(t) = V_m\sin(\theta)$, avec $\theta = \omega t$. Le thyristor $Th$ est amorc\'e avec un retard angulaire $\alpha$ \`a chaque alternance positive, et se bloque naturellement lorsque le courant (donc la tension, charge r\'esistive) s'annule.
+
+\begin{center}
+\begin{tikzpicture}[scale=0.85, >=Stealth]
+  \draw[-latex] (0,-2.1) -- (0,2.1) node[above]{$u_S,\,v$};
+  \draw[-latex] (-0.3,0) -- (12.3,0) node[right]{$\theta$};
+  \draw[dashed, gray] plot[domain=0:465, samples=140] ({\x/40}, {1.5*sin(\x)});
+  \draw[thick, colExo] plot[domain=60:180, samples=60] ({\x/40}, {1.5*sin(\x)});
+  \draw[thick, colExo] (4.5,0) -- (10.5,0);
+  \draw[thick, colExo] plot[domain=420:465, samples=30] ({\x/40}, {1.5*sin(\x)});
+  \draw[dotted] (1.5,0) -- (1.5,{1.5*sin(60)}) node[above]{} ; \node[below] at (1.5,-0.1) {$\alpha$};
+  \draw[dotted] (4.5,0) -- (4.5,1.6); \node[below] at (4.5,-0.1) {$\pi$};
+  \draw[dotted] (9,0) -- (9,1.6); \node[below] at (9,-0.1) {$2\pi$};
+  \draw[dotted] (10.5,0) -- (10.5,{1.5*sin(60)}); \node[below] at (10.5,-0.1) {$2\pi{+}\alpha$};
+  \node[left] at (0,1.5) {$V_m$};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item D'apr\`es le chronogramme, pr\'eciser l'intervalle angulaire de conduction de $Th$ sur une p\'eriode $[0\,;\,2\pi]$, et justifier pourquoi le blocage a lieu pr\'ecis\'ement en $\theta = \pi$ pour une charge r\'esistive.
+  \item Montrer que la valeur moyenne de $u_S(\theta)$ s'\'ecrit $\displaystyle\langle u_S\rangle = \dfrac{V_m}{2\pi}(1+\cos\alpha)$.
+  \item Calculer $\langle u_S\rangle$ pour $V_m = \SI{325}{\volt}$ (secteur \SI{230}{\volt} efficace) et $\alpha = \SI{60}{\degree}$. Comparer au cas $\alpha = 0$ et conclure sur le r\^ole de l'angle d'amor\c cage.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item $Th$ conduit sur $\theta\in[\alpha\,;\,\pi]$. Pour $\theta > \pi$, $v(\theta) = V_m\sin\theta$ devient n\'egative ; avec une charge r\'esistive pure, le courant $i(\theta) = u_S(\theta)/R$ est proportionnel \`a la tension et s'annulerait donc en changeant de signe en $\theta=\pi$. Or un thyristor ne peut conduire un courant n\'egatif : il se bloque exactement au passage par z\'ero du courant, soit $\theta = \pi$ (blocage naturel, comme pour une diode).
+  \item Sur une p\'eriode $2\pi$, $u_S(\theta) = V_m\sin\theta$ pour $\theta\in[\alpha\,;\,\pi]$ et $u_S(\theta)=0$ ailleurs :
+  \[
+  \langle u_S \rangle = \dfrac{1}{2\pi}\int_{\alpha}^{\pi} V_m\sin\theta\,d\theta
+  = \dfrac{V_m}{2\pi}\Big[-\cos\theta\Big]_{\alpha}^{\pi}
+  = \dfrac{V_m}{2\pi}\big(-\cos\pi + \cos\alpha\big)
+  = \dfrac{V_m}{2\pi}(1+\cos\alpha)
+  \]
+  \item Pour $\alpha = \SI{60}{\degree}$ : $\langle u_S\rangle = \dfrac{325}{2\pi}(1+\cos 60^\circ) = 51{,}7\times(1+0{,}5) \approx \SI{77,6}{\volt}$.
+
+  Pour $\alpha = 0$ (\'equivalent \`a une diode non command\'ee) : $\langle u_S\rangle = \dfrac{325}{2\pi}(1+1) = \dfrac{325}{\pi} \approx \SI{103,5}{\volt}$, qui est bien la valeur moyenne classique d'un redressement demi-onde \`a diode. Retarder l'amor\c cage ($\alpha$ croissant) r\'eduit donc la dur\'ee de conduction et, par cons\'equent, la valeur moyenne d\'elivr\'ee \`a la charge~: l'angle d'amor\c cage $\alpha$ est le param\`etre de r\'eglage continu de $\langle u_S\rangle$ entre $V_m/\pi$ (pour $\alpha=0$) et $0$ (pour $\alpha=\pi$).
+\end{enumerate}
+
+\textbf{Conclusion.} Le montage P1 command\'e r\`egle donc la tension moyenne de charge de \SI{103,5}{\volt} \`a $0$ sans aucun organe dissipatif, mais au prix d'une ondulation tr\`es forte (conduction sur moins d'une demi-p\'eriode) : ce crit\`ere de qualit\'e de l'onde interdit son emploi d\`es qu'une tension continue liss\'ee est exig\'ee, et impose alors un montage PD2 ou PD3 command\'e associ\'e \`a un filtrage.
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

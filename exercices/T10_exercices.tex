@@ -1,0 +1,389 @@
+% Sources verifiees pour les donnees numeriques (passe complementarite 2026-09-02) :
+% Objectif de cette passe : supprimer les recouvrements avec les Questions Types de
+% fiches/T10_Mecanique.tex (QT1 metro 2019 Q25-27, QT2 KUKA 2025 Q9-11 Jeq, QT3 Urbanloop
+% 2024 Q17 freinage) et ajouter l'exercice docTech manquant.
+%
+% - Exercice 1 (2014, E1 corrige commun, Q16) : inchange, disjoint des QT de la fiche.
+%   Verifie : E1_Corrige_2014_commun_SII.md (Dt=1,7 m ; Nm=980 tr/min ; Vmax=0,074 m/s ; R1=20).
+% - Exercice 2 (2024, E2 appliquee commune Urbanloop, Q16 puis Q18) : REMPLACE l'ancien
+%   exercice Q16-Q17 (doublon strict de QT3). La question retenue est desormais Q18
+%   (defaillance d'un frein avant + rechoix des freins dans DT2), non traitee par la fiche.
+%   DOCTECH : le tableau du "Document technique DT2 : choix de freins" est reproduit
+%   VERBATIM depuis E2_Appliquee_Commune_2024.md ligne 838-843 (couples 60/100/150/250/500 N.m,
+%   poids 7,4/13,6/19,2/33,3/38 kg). Le tableau 3 (freins avant 150 N.m / arriere 60 N.m) et
+%   Rroue = 20 cm proviennent du meme .md (lignes 340-347). Aucune valeur reconstituee.
+%   Corrige officiel verifie : Rapport_Jury_2024.md l.701-707 (TF = -1350 N ; aC = -1,35 m/s2 ;
+%   cahier des charges non respecte ; choix propose 150 N.m avant / 100 N.m arriere -> -1,75 m/s2).
+% - Exercice 3 (train d'engrenages, inedit) : inchange, disjoint. Nombres de dents, inerties et
+%   rendement sont des donnees d'enonce construites pour l'exercice (pas de fait normatif a sourcer).
+% - Exercice 4 (2019, E2, Q23-24 puis Q30) : REMPLACE l'ancien exercice Q25-26 (doublon strict
+%   de QT1 : memes rho=0,17, eta=97 %, de=0,86 m, Fe1=14,9 kN / Fe2=9,2 kN). Le nouveau porte sur
+%   l'aptitude a la traction (adherence roue/rail), partie 4.1 du sujet, non traitee par la fiche.
+%   Verifie dans E2_Sujet_2019.md : Fin = 128,5 kN (l.421) ; 2 motrices, 4 essieux motorises par
+%   motrice (l.423) ; m1 = 38 120 kg ; mu_r = 0,12 ; i = 40 %o ; g = 9,81 m/s2 (tableau l.445-450) ;
+%   condition Fe < mu_r.Ne et enonce de Q30 (l.548-556). Aucun corrige officiel 2019 disponible :
+%   le resultat (condition NON verifiee) est etabli par recalcul direct et assume comme tel,
+%   ce qui est precisement l'objet de Q30 ("sur quels parametres agir").
+%   NB coordination : le couple thermique equivalent Cth de ce meme sujet (Q27) est traite en T05,
+%   il n'est volontairement pas repris ici.
+% - Exercice 5 (2023, E2 disciplinaire IE, robot Bakus, Q A1-A4) : inchange, disjoint des QT.
+%   Relation d'enonce du sujet officiel : ||T_AR|| = 5 x ||T_AV|| (et non l'inverse). La question A4
+%   officielle demande le couple des DEUX motoreducteurs arriere ; le couple par motoreducteur
+%   en est la moitie (correction de facteur 2 deja appliquee lors d'une passe precedente).
+% - Exercice 6 (2025, E2 appliquee commune, robots KUKA, Q10-Q11) : REMPLACE l'ancien exercice
+%   Q6/8/9 (doublon de QT2, qui calcule deja Jeq par Huygens). Le nouveau part de la valeur
+%   officielle Jeq = 0,0118 kg.m2 -- imposee textuellement par le sujet lui-meme avant Q11
+%   ("Pour les questions suivantes, Jeq = 0,0118 kg.m2 et le couple resistif Cr est neglige",
+%   E2_Appliquee_Commune_2025.md l.307) -- et traite le PFD en rotation, non traite par la fiche.
+%   Corrige officiel verifie : Rapport_Jury_2025.md l.610-612 (Q10 : a = 517,31/1,2 = 431,1 rad/s2 ;
+%   Q11 : Cm = 0,0118 x 431,1 = 5,086 N.m). La figure 12 etant une image omise par la conversion
+%   Markdown, les deux points de lecture (Vmot = 517,31 rad/s atteinte en 1,2 s) sont repris du
+%   corrige officiel du rapport de jury, et l'enonce le dit explicitement au candidat.
+%   Citation jury : Rapport_Jury_2025.md l.986, verbatim exact.
+% - Ordre des exercices : gradation croissante 1, 1, 2, 2, 3, 3.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T10}} - Exercices - M\'ecanique~: cin\'ematique, forces, moments, r\'educteurs}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T10 \quad M\'ecanique~: cin\'ematique, forces, moments, r\'educteurs}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2014, Corrig\'e \'Epreuve 1 (tronc commun), pont Chaban-Delmas, Question 16}
+]
+\CAPETSHOW{
+Le pont lev\'e Jacques-Chaban-Delmas (Bordeaux) est manoeuvr\'e par une cha\^ine d'\'energie comportant un moteur, un r\'educteur primaire (10) de rapport $R_1$, un r\'educteur secondaire (11) de rapport $R_2$, puis un tambour d'entra\^inement (5) de diam\`etre $D_t$ sur lequel s'enroule le c\^able de man\oe uvre. On donne :
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Diam\`etre du tambour & $D_t = \SI{1,7}{\meter}$ \\
+Fr\'equence de rotation nominale du moteur & $N_m = \SI{980}{tr\per\minute}$ \\
+Vitesse lin\'eaire maximale de la trav\'ee & $V_{max} = \SI{0,074}{\meter\per\second}$ \\
+Rapport de r\'eduction du r\'educteur primaire & $R_1 = 20$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Exprimer la fr\'equence de rotation du tambour $N_t$ en fonction de $V_{max}$ et $D_t$, puis la calculer.
+  \item En d\'eduire le rapport de r\'eduction total $R_{tot} = N_m / N_t$ de la cha\^ine d'\'energie.
+  \item Calculer le rapport de r\'eduction $R_2$ du r\'educteur secondaire, sachant que $R_{tot} = R_1 \cdot R_2$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Un tour de tambour fait avancer le c\^able d'une longueur $\pi D_t$ (circonf\'erence), donc :
+  \[ N_t = \dfrac{V_{max}}{\pi D_t} = \dfrac{0{,}074}{\pi \times 1{,}7} \approx \SI{0,01385}{tr\per\second} \]
+  \item En convertissant $N_m$ en tr/s ($N_m = 980/60 = \SI{16,33}{tr\per\second}$) :
+  \[ R_{tot} = \dfrac{N_m}{N_t} = \dfrac{980/60}{0{,}01385} \approx 1\,178{,}8 \]
+  \item \[ R_2 = \dfrac{R_{tot}}{R_1} = \dfrac{1\,178{,}8}{20} \approx 58{,}9 \]
+  \textbf{Conclusion.} Ce rapport tr\`es \'elev\'e (pr\`es de $1\,200$ au total) est caract\'eristique d'un syst\`eme de levage lent et fortement r\'educteur~: il permet d'obtenir la vitesse de trav\'ee impos\'ee par le cahier des charges ($V_{max} = \SI{0,074}{\meter\per\second}$, soit moins de \SI{8}{\centi\meter\per\second}) \`a partir d'un moteur tournant \`a sa vitesse nominale, tout en amplifiant d'autant le couple disponible pour vaincre l'inertie de la trav\'ee.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{1} \hfill\normalfont\footnotesize 2024, \'epreuve \'ecrite disciplinaire appliqu\'ee (Urbanloop), Questions 16 et 18 -- lecture de document technique}
+]
+\CAPETSHOW{
+L'Urbanloop est un syst\`eme de transport public sur rail par capsules autonomes. Le freinage d'urgence d'une capsule (masse $M_C = \SI{1000}{\kilo\gram}$) est assur\'e par des freins \`a disque, un par roue (deux roues \`a l'avant, deux roues \`a l'arri\`ere), de rayon $R_{roue} = \SI{20}{\centi\meter}$. Le cahier des charges impose une d\'ec\'el\'eration $a_C = \SI{-1,4}{\meter\per\second\squared}$. Les freins install\'es d\'eveloppent \SI{150}{\newton\meter} \`a l'avant et \SI{60}{\newton\meter} \`a l'arri\`ere (tableau 3 du sujet).
+
+Pour des raisons de s\'ecurit\'e, le freinage doit rester assur\'e \emph{m\^eme en cas de d\'efaillance d'un des quatre freins}. Le catalogue du fournisseur est reproduit ci-dessous.
+
+\begin{tcolorbox}[docTech, title={Document technique DT2 -- choix de freins (extrait, sujet 2024)}]
+\begin{center}
+\begin{tabular}{lccccc}
+\toprule
+Couple de freinage (\si{\newton\meter}) & 60 & 100 & 150 & 250 & 500 \\
+\midrule
+Poids (\si{\kilo\gram}) & 7,4 & 13,6 & 19,2 & 33,3 & 38 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Relever dans le document technique DT2 les couples de freinage disponibles au catalogue, et pr\'eciser lesquels sont effectivement mont\'es sur la capsule (avant et arri\`ere). Indiquer la masse totale des quatre freins ainsi install\'es.
+  \item \'Etablir l'expression de la r\'esultante tangentielle $T_F$ d'un frein en fonction du couple de freinage $C_{frein}$ et du rayon de roue $R_{roue}$.
+  \item Identifier la situation de d\'efaillance la plus d\'efavorable (perte d'un seul frein), puis calculer la r\'esultante tangentielle $T_F$ et la d\'ec\'el\'eration $a_C$ correspondantes. Conclure sur le respect du cahier des charges.
+  \item Si le cahier des charges n'est pas respect\'e, proposer \`a partir de DT2 un nouveau choix de freins qui le satisfasse dans cette m\^eme situation d\'egrad\'ee, en limitant l'augmentation de masse embarqu\'ee. Chiffrer la masse ajout\'ee.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Extraction du document technique.} DT2 propose cinq r\'ef\'erences de couple de freinage~: \SI{60}{\newton\meter} (\SI{7,4}{\kilo\gram}), \SI{100}{\newton\meter} (\SI{13,6}{\kilo\gram}), \SI{150}{\newton\meter} (\SI{19,2}{\kilo\gram}), \SI{250}{\newton\meter} (\SI{33,3}{\kilo\gram}) et \SI{500}{\newton\meter} (\SI{38}{\kilo\gram}). La capsule utilise la r\'ef\'erence \SI{150}{\newton\meter} pour les deux freins avant et la r\'ef\'erence \SI{60}{\newton\meter} pour les deux freins arri\`ere, soit une masse install\'ee de
+  \[ 2 \times 19{,}2 + 2 \times 7{,}4 = 38{,}4 + 14{,}8 = \SI{53,2}{\kilo\gram} \]
+  \item Le couple de freinage s'exerce sur la roue avec pour bras de levier son rayon~:
+  \[ T_F = \dfrac{C_{frein}}{R_{roue}} \]
+  Soit $T_{FAV} = 150/0{,}20 = \SI{750}{\newton}$ par roue avant et $T_{FAR} = 60/0{,}20 = \SI{300}{\newton}$ par roue arri\`ere.
+  \item \textbf{Situation la plus d\'efavorable.} La perte d'un frein \emph{avant} est plus p\'enalisante que celle d'un frein arri\`ere, puisqu'elle retire \SI{750}{\newton} au lieu de \SI{300}{\newton}. Il reste alors un frein avant et les deux freins arri\`ere~:
+  \[ T_F = T_{FAV} + 2\,T_{FAR} = 750 + 2 \times 300 = \SI{1350}{\newton} \]
+  \[ |a_C| = \dfrac{T_F}{M_C} = \dfrac{1\,350}{1\,000} = \SI{1,35}{\meter\per\second\squared} < \SI{1,4}{\meter\per\second\squared} \]
+  \textbf{Le cahier des charges n'est pas respect\'e} en mode d\'egrad\'e~: il manque \SI{0,05}{\meter\per\second\squared}, soit \SI{50}{\newton} d'effort tangentiel. Le dimensionnement nominal (\SI{2,1}{\meter\per\second\squared} avec les quatre freins) masquait cette insuffisance.
+  \item Il faut renforcer les freins \emph{arri\`ere}, puisque ce sont les deux qui restent syst\'ematiquement disponibles quelle que soit la roue avant perdue. En rempla\c{c}ant les \SI{60}{\newton\meter} arri\`ere par la r\'ef\'erence imm\'ediatement sup\'erieure de DT2, \SI{100}{\newton\meter}~:
+  \[ T_{FAR}' = \dfrac{100}{0{,}20} = \SI{500}{\newton} \qquad T_F = 750 + 2 \times 500 = \SI{1750}{\newton} \]
+  \[ |a_C| = \dfrac{1\,750}{1\,000} = \SI{1,75}{\meter\per\second\squared} > \SI{1,4}{\meter\per\second\squared} \quad \checkmark \]
+  Le surco\^ut de masse se lit directement dans DT2~: $2 \times (13{,}6 - 7{,}4) = \SI{12,4}{\kilo\gram}$, soit une masse de freins port\'ee de \SI{53,2}{\kilo\gram} \`a \SI{65,6}{\kilo\gram}.
+
+  \textbf{Conclusion.} Retenir \SI{150}{\newton\meter} \`a l'avant et \SI{100}{\newton\meter} \`a l'arri\`ere satisfait l'exigence de d\'ec\'el\'eration \emph{y compris avec un frein avant hors service}, pour \SI{12,4}{\kilo\gram} embarqu\'es en plus (soit $1{,}2\,\%$ de la masse de la capsule) -- une p\'enalit\'e n\'egligeable au regard de l'exigence de s\'ecurit\'e. Passer directement \`a la r\'ef\'erence \SI{250}{\newton\meter} arri\`ere aurait co\^ut\'e \SI{51,8}{\kilo\gram} suppl\'ementaires sans b\'en\'efice fonctionnel~: le crit\`ere de choix est la premi\`ere r\'ef\'erence du catalogue qui satisfait l'exigence, pas la plus performante.
+\end{enumerate}
+
+\smallskip
+\textit{Point de vigilance jury (rapport de jury CAPET 2024, Commentaires du jury, Partie 2 -- \'epreuve \'ecrite disciplinaire appliqu\'ee, support Urbanloop) : \guillemotleft\ Le jury regrette la confusion trop fr\'equente entre couple et force et rappelle aux candidats que la formule $v=d/t$ n'est applicable que si la vitesse est constante. Il invite les candidats \`a v\'erifier l'homog\'en\'eit\'e et la coh\'erence de leurs r\'esultats. \guillemotright\ -- ici $T_F$ (en newtons) et $C_{frein}$ (en newton-m\`etres) ne sont jamais interchangeables~: le passage de l'un \`a l'autre exige toujours le rayon de roue.}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Un motor\'educteur entra\^ine l'orientation d'une tourelle industrielle par un train d'engrenages \`a deux \'etages : un pignon $Z_1$ (solidaire de l'arbre moteur) engr\`ene avec une roue $Z_2$ (arbre interm\'ediaire) ; sur ce m\^eme arbre interm\'ediaire, un second pignon $Z_3$ engr\`ene avec une roue de sortie $Z_4$ (solidaire de la charge).
+
+\begin{center}
+\begin{tikzpicture}[scale=0.85]
+  \draw[thick] (0,0) circle (0.5);
+  \node at (-0.25,0) {\footnotesize $Z_1$};
+  \draw[dashed] (0,-1.1) -- (0,1.1);
+  \node[below] at (0,-1.15) {\footnotesize arbre moteur};
+
+  \draw[thick] (1.9,0) circle (1.4);
+  \node at (1.30,0.95) {\footnotesize $Z_2$};
+  \draw[thick, dashed] (1.9,0) circle (0.6);
+  \node at (1.48,-0.28) {\footnotesize $Z_3$};
+  \draw[dashed] (1.9,-1.9) -- (1.9,1.5);
+  \node[below] at (1.9,-1.95) {\footnotesize arbre interm\'ediaire};
+
+  \draw[thick] (4.1,0) circle (1.6);
+  \node at (3.55,1.15) {\footnotesize $Z_4$};
+  \draw[dashed] (4.1,-2.55) -- (4.1,1.75);
+  \node[below] at (4.1,-2.6) {\footnotesize arbre de sortie (charge)};
+\end{tikzpicture}
+\end{center}
+
+On donne : $Z_1 = 18$ dents, $Z_2 = 90$ dents, $Z_3 = 20$ dents, $Z_4 = 100$ dents. Le moment d'inertie de l'ensemble moteur + pignon $Z_1$ ramen\'e \`a l'arbre moteur est $J_{mot} = \SI{0,004}{\kilo\gram\meter\squared}$. Le moment d'inertie de la charge (tourelle), ramen\'e \`a l'arbre de sortie (roue $Z_4$), est $J_{charge} = \SI{3,2}{\kilo\gram\meter\squared}$.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Pour un engrenage \`a denture identique de part et d'autre, le rapport des vitesses angulaires est l'inverse du rapport des nombres de dents. Exprimer et calculer le rapport de r\'eduction de chaque \'etage, $r_1 = \Omega_{Z_2}/\Omega_{Z_1}$ et $r_2 = \Omega_{Z_4}/\Omega_{Z_3}$, puis le rapport de r\'eduction total $r = r_1 \cdot r_2 = \Omega_{sortie}/\Omega_{moteur}$.
+  \item En d\'eduire le moment d'inertie \'equivalent $J_{eq}$ ramen\'e \`a l'arbre moteur, et pr\'eciser laquelle des deux contributions y est majoritaire.
+  \item On donne un rendement global du train d'engrenages $\eta = 0{,}95$. Si la charge n\'ecessite un couple r\'esistant $C_{charge} = \SI{45}{\newton\meter}$ pour tourner \`a vitesse constante, calculer le couple moteur $C_m$ n\'ecessaire.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Pour un engrenage simple, $\Omega_{roue}/\Omega_{pignon} = Z_{pignon}/Z_{roue}$ :
+  \[ r_1 = \dfrac{Z_1}{Z_2} = \dfrac{18}{90} = 0{,}2 \qquad r_2 = \dfrac{Z_3}{Z_4} = \dfrac{20}{100} = 0{,}2 \]
+  \[ r = r_1 \cdot r_2 = 0{,}2 \times 0{,}2 = 0{,}04 \]
+  La charge tourne donc 25 fois plus lentement que le moteur.
+  \item Par conservation de l'\'energie cin\'etique (le moment d'inertie de la charge, vu depuis l'arbre moteur, est pond\'er\'e par le carr\'e du rapport de r\'eduction) :
+  \[ J_{eq} = J_{mot} + r^2 \cdot J_{charge} = 0{,}004 + (0{,}04)^2 \times 3{,}2 = 0{,}004 + 0{,}00512 = \SI{0,00912}{\kilo\gram\meter\squared} \]
+  Le facteur $r^2 = 1{,}6\times10^{-3}$ divise par 625 l'inertie de la charge : les \SI{3,2}{\kilo\gram\meter\squared} de la tourelle ne p\`esent plus que \SI{0,00512}{\kilo\gram\meter\squared} vus de l'arbre moteur -- c'est tout l'int\'er\^et du r\'educteur. Attention cependant \`a la lecture du r\'esultat : ce terme repr\'esente encore $0{,}00512/0{,}00912 \approx 56\,\%$ de $J_{eq}$, c'est-\`a-dire la contribution \emph{majoritaire}. Malgr\'e la r\'eduction, c'est bien la charge qui impose l'inertie \'equivalente vue par le moteur.
+  \item En raisonnant sur les puissances (le couple c\^ot\'e charge est transmis au moteur, divis\'e par le rendement, et proportionnellement au rapport de r\'eduction) :
+  \[ C_m = \dfrac{C_{charge} \cdot r}{\eta} = \dfrac{45 \times 0{,}04}{0{,}95} \approx \SI{1,89}{\newton\meter} \]
+  \textbf{Conclusion.} Le moteur ne doit fournir que \SI{1,89}{\newton\meter} en r\'egime \'etabli, soit environ 24 fois moins que le couple r\'esistant de la tourelle : le train \`a deux \'etages ram\`ene le besoin dans la plage d'un servomoteur de faible couple nominal. Le crit\`ere de choix reste toutefois le couple total $C_m + J_{eq}\,\dot{\Omega}_{mot}$ en phase d'acc\'el\'eration, puisque $J_{eq}$ est domin\'e (56~\%) par l'inertie de la charge.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize 2019, E2 (Transformation d'une rame de m\'etro), Questions 23, 24 et 30}
+]
+\CAPETSHOW{
+D'anciennes motrices de rame de m\'etro MF67 sont transform\'ees en v\'ehicules de maintenance industriels. On v\'erifie ici l'\emph{aptitude \`a la traction} du convoi~: pour que la rame puisse d\'emarrer sans patinage, la condition de roulement sans glissement doit \^etre satisfaite au niveau de chaque essieu moteur.
+
+L'\'etude de la partie pr\'ec\'edente a \'etabli que l'effort total de traction de la rame n\'ecessaire au d\'emarrage \`a $\gamma = \SI{0,2}{\meter\per\second\squared}$, arrachement compris, vaut $F_{in} = \SI{128,5}{\kilo\newton}$. La rame est compos\'ee de \textbf{deux motrices et trois wagons} ; chaque motrice, de masse $m_1$, poss\`ede \textbf{quatre essieux motoris\'es}. On suppose la charge li\'ee au poids $P$ d'une motrice uniform\'ement r\'epartie sur ses quatre essieux moteurs.
+
+\begin{center}
+\begin{tikzpicture}[scale=1.0, >=Stealth]
+  % voie
+  \draw[thick] (-0.5,0) -- (7.4,0);
+  \foreach \x in {-0.3,0.1,...,7.2} { \draw[gray] (\x,0) -- ++(-0.18,-0.24); }
+  % caisse de la motrice
+  \draw[thick, fill=gray!12] (0.6,1.15) rectangle (6.4,2.55);
+  \node at (3.5,2.15) {\footnotesize motrice~: masse $m_1$, 4 essieux moteurs};
+  % essieux
+  \foreach \x in {1.7,3.0,4.3,5.6} { \draw[thick, fill=white] (\x,0.55) circle (0.55); }
+  \node[below] at (5.6,-0.35) {\footnotesize essieu moteur};
+  % efforts sur l'essieu de gauche
+  \draw[->, very thick, teal] (1.7,0.02) -- ++(0,1.05);
+  \node[teal, left] at (1.62,0.62) {\footnotesize $\vec N_e$};
+  \draw[->, very thick, red] (1.7,0.02) -- ++(1.05,0);
+  \node[red, below] at (2.45,0.0) {\footnotesize $\vec F_e$};
+  % poids de la caisse
+  \draw[->, very thick, blue] (3.65,1.12) -- ++(0,-0.42);
+  \node[blue] at (3.65,1.62) {\footnotesize $\vec P = m_1 \vec g$};
+\end{tikzpicture}
+\end{center}
+
+Donn\'ees~: $m_1 = \SI{38120}{\kilo\gram}$ (motrice sans batterie), coefficient d'adh\'erence roue/rail $\mu_r = 0{,}12$, $g = \SI{9,81}{\meter\per\second\squared}$. La condition de roulement sans glissement s'\'ecrit $F_e < \mu_r \cdot N_e$, o\`u $N_e$ est l'effort normal au niveau d'un essieu et $F_e$ l'effort de traction g\'en\'er\'e par un moteur.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item D\'eterminer le nombre total d'essieux moteurs du convoi, puis l'effort de traction $F_e$ g\'en\'er\'e par un moteur lors d'un d\'eplacement.
+  \item D\'eterminer l'effort normal $N_e$ au niveau d'un essieu, puis v\'erifier la condition de roulement sans glissement.
+  \item Calculer le coefficient d'adh\'erence minimal $\mu_{r,min}$ qui rendrait la condition satisfaite.
+  \item Indiquer sur quels param\`etres il est possible d'agir pour v\'erifier la condition de roulement sans glissement.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Deux motrices \`a quatre essieux motoris\'es chacune donnent $2 \times 4 = 8$ essieux moteurs. L'effort total de traction se r\'epartit \'equitablement entre eux~:
+  \[ F_e = \dfrac{F_{in}}{8} = \dfrac{128\,500}{8} = \SI{16062}{\newton} \approx \SI{16,1}{\kilo\newton} \]
+  \item Le poids d'une motrice est r\'eparti sur ses quatre essieux~:
+  \[ N_e = \dfrac{m_1 \, g}{4} = \dfrac{38\,120 \times 9{,}81}{4} = \dfrac{373\,957}{4} \approx \SI{93489}{\newton} \approx \SI{93,5}{\kilo\newton} \]
+  \[ \mu_r \cdot N_e = 0{,}12 \times 93\,489 \approx \SI{11219}{\newton} \approx \SI{11,2}{\kilo\newton} \]
+  Or $F_e \approx \SI{16,1}{\kilo\newton} > \mu_r \cdot N_e \approx \SI{11,2}{\kilo\newton}$~: \textbf{la condition de roulement sans glissement n'est pas v\'erifi\'ee} avec ces hypoth\`eses. L'effort demand\'e d\'epasse de $43\,\%$ l'effort d'adh\'erence disponible~: les roues motrices patineraient au d\'emarrage.
+  \item Le coefficient d'adh\'erence minimal s'obtient en \'ecrivant l'\'egalit\'e~:
+  \[ \mu_{r,min} = \dfrac{F_e}{N_e} = \dfrac{16\,062}{93\,489} \approx 0{,}172 \]
+  Il faudrait donc une adh\'erence de $0{,}17$ au lieu des $0{,}12$ retenus. Cette valeur correspond \`a un rail sec et propre, alors que $\mu_r = 0{,}12$ mod\'elise des conditions d\'egrad\'ees (rail humide, feuilles, graisse) -- pr\'ecis\'ement le cas dimensionnant en exploitation nocturne de maintenance.
+  \item Trois leviers, lisibles directement dans l'in\'egalit\'e $F_e < \mu_r N_e$~:
+  \begin{itemize}[leftmargin=1.2em, itemsep=1pt]
+    \item \textbf{Augmenter $N_e$} -- augmenter la charge par essieu moteur (lestage de la motrice, report de charge des wagons sur les essieux moteurs) ou, ce qui revient au m\^eme pour $F_e$, \textbf{augmenter le nombre d'essieux motoris\'es} afin de r\'epartir $F_{in}$ sur davantage de roues.
+    \item \textbf{Augmenter $\mu_r$} -- sablage des rails, dispositifs anti-patinage, entretien de l'\'etat de surface du rail.
+    \item \textbf{Diminuer $F_e$} -- r\'eduire l'acc\'el\'eration de d\'emarrage $\gamma$, all\'eger le convoi ou r\'eduire le nombre de wagons remorqu\'es, ce qui abaisse directement $F_{in}$.
+  \end{itemize}
+  \textbf{Conclusion.} Avec l'adh\'erence d\'egrad\'ee $\mu_r = 0{,}12$, l'architecture \`a huit essieux moteurs ne permet pas de transmettre au rail les \SI{128,5}{\kilo\newton} exig\'es~: le facteur limitant du d\'emarrage n'est pas le couple des moteurs mais le \emph{contact roue/rail}. C'est le crit\`ere d'adh\'erence, et non le dimensionnement \'electrique, qui gouverne ici la faisabilit\'e de la transformation~: sans anti-patinage ni sablage, le cahier des charges d'acc\'el\'eration $\gamma = \SI{0,2}{\meter\per\second\squared}$ n'est pas tenable sur voie humide.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize 2023, \'epreuve \'ecrite disciplinaire (robot Bakus), Questions A1 \`a A4}
+]
+\CAPETSHOW{
+Le robot Bakus (soci\'et\'e Vitibot) est un enjambeur viticole \'electrique autonome de masse $M = \SI{2500}{\kilo\gram}$, \'equip\'e d'un moteur d'avancement par roue. On \'etudie le d\'emarrage du robot, initialement \`a l'arr\^et, sur une pente \`a $35\%$. Le probl\`eme est suppos\'e plan ; le robot se d\'eplace selon l'axe $\vec x$ avec une acc\'el\'eration $a_X$.
+
+\begin{center}
+\begin{tikzpicture}[scale=0.85, >=Stealth]
+  \def\ang{20}
+  \draw[dashed] (-0.6,0) -- (1.2,0);
+  \draw (1.0,0) arc (0:\ang:1.0);
+  \node at (1.6,0.28) {\footnotesize $\theta$};
+  \draw[thick] (0,0) -- ({6.5*cos(\ang)},{6.5*sin(\ang)});
+  \coordinate (C) at ({3.5*cos(\ang)},{3.5*sin(\ang)});
+  \begin{scope}[shift={(C)}, rotate=\ang]
+    \draw[thick, fill=gray!12] (-1.1,0) rectangle (1.1,0.9);
+    \node at (0,0.62) {\footnotesize Bakus};
+    \draw[->, thick, red] (-1.15,-0.12) -- (0.45,-0.12) node[midway, below]{\footnotesize $\vec{T}_{AR}$};
+    \draw[->, thick, red] (1.15,-0.12) -- (1.55,-0.12) node[midway, below]{\footnotesize $\vec{T}_{AV}$};
+    \draw[->, thick, teal] (-0.25,0.22) -- (-2.1,0.22) node[pos=0.8, above]{\footnotesize $\vec{F}_{outils}$};
+  \end{scope}
+  \draw[->, thick, blue] (C) -- ++(0,-1.7) node[below]{\footnotesize $\vec P$};
+\end{tikzpicture}
+\end{center}
+
+Les forces ext\'erieures sont : le poids $\vec P$, la force du sol sur les outils $\vec F_{outils}$, et les forces du sol sur les roues avant et arri\`ere, de composantes tangentielles $\vec T_{AV}$ et $\vec T_{AR}$ sur l'axe $\vec x$. On donne : $g = \SI{9,81}{\meter\per\second\squared}$, la pente correspond \`a $\theta = \arctan(0{,}35) \approx 19{,}3^\circ$, $a_X = \SI{0,1}{\meter\per\second\squared}$, $\|\vec F_{outils}\| = \SI{2000}{\newton}$, $\|\vec T_{AR}\| = 5 \times \|\vec T_{AV}\|$, rayon de roue $R = \SI{368}{\milli\meter}$.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Exprimer la projection du poids $\vec P$ sur l'axe $\vec x$ en fonction de $M$, $g$ et $\theta$.
+  \item Appliquer le principe fondamental de la dynamique au robot en translation sur l'axe $\vec x$ pour \'etablir l'expression de $a_X$ en fonction de $M$, $g$, $\theta$, $\|\vec T_{AV}\|$, $\|\vec T_{AR}\|$ et $\|\vec F_{outils}\|$.
+  \item En utilisant la relation $\|\vec T_{AR}\| = 5\|\vec T_{AV}\|$, d\'eterminer la valeur num\'erique de $\|\vec T_{AR}\|$ permettant au robot de d\'emarrer avec l'acc\'el\'eration voulue.
+  \item En d\'eduire le couple que doivent fournir les deux motor\'educteurs des roues arri\`ere, puis le couple fourni par chacun d'eux.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le poids fait un angle $\theta$ avec la normale au plan inclin\'e ; sa projection sur l'axe de la pente (orient\'e vers le haut de la pente) s'oppose au mouvement :
+  \[ P_x = -M g \sin\theta \]
+  \item PFD en projection sur $\vec x$ (les forces de traction $\vec T_{AV}$ et $\vec T_{AR}$ poussent le robot vers le haut de la pente, $\vec F_{outils}$ et le poids s'y opposent) :
+  \[ M a_X = \|\vec T_{AV}\| + \|\vec T_{AR}\| - M g \sin\theta - \|\vec F_{outils}\| \]
+  \item Avec $\|\vec T_{AR}\| = 5\|\vec T_{AV}\|$, donc $\|\vec T_{AV}\| = \|\vec T_{AR}\|/5$, l'\'equation devient :
+  \[ M a_X = \dfrac{6}{5}\|\vec T_{AR}\| - Mg\sin\theta - \|\vec F_{outils}\| \quad \Longrightarrow \quad \|\vec T_{AR}\| = \dfrac{5}{6}\Big[M(a_X + g\sin\theta) + \|\vec F_{outils}\|\Big] \]
+  Une pente de $35\%$ correspond \`a $\tan\theta = 0{,}35$, donc $\sin\theta = \dfrac{0{,}35}{\sqrt{1+0{,}35^2}} \approx 0{,}3304$ :
+  \[ \|\vec T_{AR}\| = \dfrac{5}{6}\Big[2\,500 \times (0{,}1 + 9{,}81 \times 0{,}3304) + 2\,000\Big] = \dfrac{5}{6}\big(8\,353 + 2\,000\big) = \dfrac{5}{6} \times 10\,353 \approx \SI{8628}{\newton} \]
+  V\'erification : $\|\vec T_{AV}\| = 8\,628/5 \approx \SI{1726}{\newton}$ et $\|\vec T_{AV}\| + \|\vec T_{AR}\| \approx \SI{10353}{\newton}$, conforme au PFD.
+  \item $\vec T_{AR}$ est la \emph{r\'esultante} des actions tangentielles du sol sur les \emph{deux} roues arri\`ere. Le couple total \`a fournir par les deux motor\'educteurs s'obtient donc en multipliant cette r\'esultante par le rayon de roue :
+  \[ C_{AR} = \|\vec T_{AR}\| \times R = 8\,628 \times 0{,}368 \approx \SI{3175}{\newton\meter} \]
+  La r\'epartition entre les deux roues motrices \'etant sym\'etrique, chaque motor\'educteur fournit la moiti\'e de ce couple :
+  \[ C_{\text{mot}} = \dfrac{C_{AR}}{2} \approx \SI{1588}{\newton\meter} \]
+  \textbf{Conclusion.} Chaque motor\'educteur de roue arri\`ere doit d\'elivrer environ \SI{1588}{\newton\meter} au d\'emarrage dans une pente \`a 35~\%. C'est bien cette valeur \emph{par motor\'educteur} -- et non le couple total $C_{AR}$ des deux roues -- qui doit \^etre confront\'ee aux courbes couple/vitesse des r\'ef\'erences de motor\'educteurs (figure 4 du sujet, question A5)~: toute r\'ef\'erence dont le couple maximal en sortie est inf\'erieur \`a \SI{1600}{\newton\meter} environ est \'elimin\'ee.
+\end{enumerate}
+
+\smallskip
+\textit{Point de vigilance : deux piliers ici. (1) Ne pas confondre l'effort tangentiel $\|\vec T_{AR}\|$ (en newtons, r\'esultante des forces de contact roue/sol) avec le couple moteur \`a fournir (en newton-m\`etres) -- le passage de l'un \`a l'autre n\'ecessite toujours le bras de levier, ici le rayon de roue $R$. (2) Bien identifier le p\'erim\`etre de la grandeur demand\'ee : $\vec T_{AR}$ porte sur \emph{l'essieu arri\`ere complet}, donc $C_{AR}$ est le couple des \emph{deux} motor\'educteurs ; omettre la division par 2 conduit \`a surdimensionner chaque motor\'educteur d'un facteur 2.}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize 2025, \'epreuve \'ecrite disciplinaire appliqu\'ee (robots KUKA), Questions 10 et 11}
+]
+\CAPETSHOW{
+Dix robots KUKA animent une structure sc\'enique portant des \'ecrans vid\'eo. L'axe 6 du robot est le plus sollicit\'e~: son moment d'inertie \'equivalent ramen\'e \`a l'arbre moteur a \'et\'e \'etabli \`a la question pr\'ec\'edente du sujet et vaut $J_{eq} = \SI{0,0118}{\kilo\gram\meter\squared}$. Le rendement du r\'educteur est pris \'egal \`a 1 et le couple r\'esistif $C_r$ est n\'eglig\'e.
+
+La figure 12 du sujet donne l'\'evolution temporelle de la vitesse du moteur de l'axe 6 lors d'une phase de mise en mouvement~: partant de l'arr\^et, le moteur atteint sa vitesse de $\SI{517,31}{\radian\per\second}$ au bout de $\SI{1,2}{\second}$, la mont\'ee en vitesse \'etant lin\'eaire.
+
+\begin{center}
+\begin{tikzpicture}[scale=1.0, >=Stealth]
+  \draw[->] (0,0) -- (5.4,0) node[right]{\footnotesize $t$ (\si{\second})};
+  \draw[->] (0,0) -- (0,2.9) node[above]{\footnotesize $V_{mot}$ (\si{\radian\per\second})};
+  \draw[very thick, colExo] (0,0) -- (2.4,2.3) -- (4.8,2.3);
+  \draw[dashed, gray] (0,2.3) -- (2.4,2.3);
+  \draw[dashed, gray] (2.4,0) -- (2.4,2.3);
+  \node[left] at (0,2.3) {\footnotesize $517{,}31$};
+  \node[below] at (2.4,0) {\footnotesize $1{,}2$};
+  \node[below left] at (0,0) {\footnotesize $0$};
+  \node[above left] at (1.7,1.2) {\footnotesize pente $=\alpha$};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Rappeler la relation liant l'acc\'el\'eration angulaire $\alpha$ \`a la vitesse angulaire dans le cas d'une rampe lin\'eaire, puis d\'eterminer $\alpha$ \`a partir de la figure, en pr\'ecisant son unit\'e.
+  \item \'Enoncer le principe fondamental de la dynamique appliqu\'e \`a un solide en rotation autour d'un axe fixe, et en d\'eduire le couple moteur maximal $C_m$ n\'ecessaire pour mouvoir la structure embarqu\'ee.
+  \item Le constructeur propose deux r\'ef\'erences de robot dont le moteur d'axe 6 d\'eveloppe respectivement un couple maximal de $\SI{3,83}{\newton\meter}$ et de $\SI{8,21}{\newton\meter}$. Conclure sur le choix du robot.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item L'acc\'el\'eration angulaire est la d\'eriv\'ee de la vitesse angulaire par rapport au temps. Sur une rampe lin\'eaire partant de l'arr\^et, elle se confond avec la pente du segment~:
+  \[ \alpha = \dfrac{\Delta V_{mot}}{\Delta t} = \dfrac{517{,}31 - 0}{1{,}2} \approx \SI{431,1}{\radian\per\second\squared} \]
+  L'unit\'e est bien le \si{\radian\per\second\squared} (et non le \si{\radian\per\second}~: c'est la variation d'une vitesse angulaire par unit\'e de temps).
+  \item Le principe fondamental de la dynamique en rotation autour d'un axe fixe s'\'ecrit~: la somme des moments des actions ext\'erieures selon l'axe est \'egale au produit du moment d'inertie par l'acc\'el\'eration angulaire,
+  \[ \sum M_{/axe} = J \cdot \dfrac{\mathrm{d}\Omega}{\mathrm{d}t} \quad \Longrightarrow \quad C_m - C_r = J_{eq}\,\alpha \]
+  Le couple r\'esistif \'etant n\'eglig\'e ($C_r = 0$), le couple moteur maximal est atteint pendant la phase d'acc\'el\'eration~:
+  \[ C_m = J_{eq} \cdot \alpha = 0{,}0118 \times 431{,}1 \approx \SI{5,086}{\newton\meter} \]
+  Noter que $J_{eq}$ est bien l'inertie \emph{ramen\'ee \`a l'arbre moteur}~: $\alpha$ doit donc \^etre l'acc\'el\'eration angulaire \emph{du moteur}, et non celle de l'axe 6 en sortie de r\'educteur. M\'elanger les deux c\^ot\'es du r\'educteur conduirait \`a une erreur d'un facteur $1/r \approx 165$.
+  \item Le couple n\'ecessaire pour mouvoir la structure est de $\SI{5,086}{\newton\meter}$.
+  \begin{itemize}[leftmargin=1.2em, itemsep=1pt]
+    \item R\'ef\'erence \`a $\SI{3,83}{\newton\meter}$~: $3{,}83 < 5{,}086$, le moteur d'axe 6 est \textbf{sous-dimensionn\'e}, cette r\'ef\'erence est \'elimin\'ee.
+    \item R\'ef\'erence \`a $\SI{8,21}{\newton\meter}$~: $8{,}21 > 5{,}086$, l'exigence est satisfaite avec une marge de $(8{,}21-5{,}086)/5{,}086 \approx 61\,\%$.
+  \end{itemize}
+  \textbf{Conclusion.} Seule la r\'ef\'erence \`a $\SI{8,21}{\newton\meter}$ satisfait le crit\`ere dynamique de l'axe 6~: c'est elle qu'il faut retenir. La marge de $61\,\%$ n'est pas un surdimensionnement gratuit -- elle couvre le couple r\'esistif n\'eglig\'e ici (frottements du r\'educteur, effet de la gravit\'e selon l'orientation de la structure) et laisse une r\'eserve pour un accroissement \'eventuel de la charge embarqu\'ee. La validation reste toutefois partielle~: elle ne porte que sur l'axe 6, suppos\'e le plus p\'enalisant, et doit \^etre confirm\'ee par le diagramme de charges du constructeur, qui borne la masse admissible en fonction de la position du centre de gravit\'e.
+\end{enumerate}
+
+\smallskip
+\textit{Point de vigilance jury (rapport de jury CAPET 2025, Commentaires du jury, Partie 2 -- \'epreuve \'ecrite disciplinaire appliqu\'ee) : \guillemotleft\ Le jury appr\'ecie dans l'ensemble la qualit\'e du d\'ecodage des informations mais regrette observer des confusions dans les unit\'es ou dans la d\'efinition d'une acc\'el\'eration angulaire. \guillemotright}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

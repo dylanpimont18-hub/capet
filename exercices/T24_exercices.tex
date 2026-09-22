@@ -1,0 +1,828 @@
+% T24 -- Systemes embarques, reseaux de terrain et trames -- banque d'exercices
+%
+% ===================================================================================
+% COMPLEMENTARITE AVEC LA FICHE fiches/T24_Systemes_Embarques.tex
+% ===================================================================================
+% Les trois Questions Types du Bloc 3 de la fiche sont :
+%   QT1 = registre ADCON0 du PIC 18F8723, selection de la voie AN2 + GO/DONE
+%         (= 2022, epreuve ecrite disciplinaire, question 25) ;
+%   QT2 = PWM servomoteur 50 Hz, N = 1800 positions, f_ech = 90 kHz
+%         (= 2025, epreuve ecrite disciplinaire appliquee, question 21) ;
+%   QT3 = mise a l'echelle automate S7-1500, PIW8 / 27 648 -> [-20 ; +200] degC.
+% Le Bloc 1 (§1.6) et le Bloc 2 de la fiche traitent en outre la TAILLE de la trame
+% CAN (108 bits = 1+11+1+2+4+64+15+1+2+7), corrigee lors de l'audit 2026-08-24.
+%
+% AUCUN des six exercices ci-dessous ne refait ce travail intellectuel :
+%   - pas de configuration de registre ADCON0 (ni d'aucun registre de CAN interne) ;
+%   - pas de calcul de f_ech d'un PWM servomoteur ni de rapport cyclique ;
+%   - pas de mise a l'echelle d'entree analogique d'automate ;
+%   - pas de RECOMPTAGE de la taille d'une trame CAN a partir de sa structure
+%     (c'est exactement la question D4 du sujet 2026, laissee a la fiche) ;
+%     l'exercice 3 part au contraire des 111 bits DONNES par l'enonce du sujet et
+%     porte sur la couche physique et le chronogramme, travail different.
+%
+% ===================================================================================
+% SOURCES (toutes relues dans les .md de conversion Marker, chemin
+%   docs/CAPET_Markdown-20260629T134311Z-3-001/CAPET_Markdown/docs/CAPET_SII_IE/
+%   06_PDFs_Originaux/{annee}/{fichier}.md)
+% ===================================================================================
+%   - Ex. 1 : 2019, "EDE ENE 2" (code d'epreuve lu l.27 et l.656 du sujet ; le sujet
+%     ne porte pas d'autre intitule exploitable, voir la note d'honnetete plus bas),
+%     questions 15, 16 et 17. Contexte (reseau CANopen d'un bloc batteries de
+%     locotracteur VMI) : E2_Sujet_2019.md l.322-324. Trame capturee
+%     (ID 182h, DLC 05h, Data1..6 = 7Eh 01h F1h FFh BAh C2h) : l.324 (tableau).
+%     Regles de decodage TPDO, formats Temp/Amp/Volt et les TROIS exemples de
+%     verification (200,8 degC -> D8h/07h ; 100 A -> 64h/00h ; 515,34 V -> 4Eh/C9h) :
+%     annexe A5, l.640-652. Structure de trame CAN 2.0A : l.612-636.
+%     ATTENTION : le rapport de jury 2019 ne corrige PAS ces questions (sa numerotation
+%     Q15-Q17 porte sur une autre partie, supercondensateurs, Rapport_Jury_2019.md
+%     l.291-311). Les resultats ci-dessous sont donc MES calculs, valides par les
+%     trois exemples de l'annexe A5 qui se retrouvent exactement.
+%       -> noeud 182h - 180h = 2 ; T = 017Eh = 382 -> 38,2 degC ;
+%          I = FFF1h (C2 sur 16 bits) = -15 -> -15 A donc CHARGE ;
+%          U = C2BAh = 49 850 -> 498,50 V.
+%
+%   - Ex. 2 : 2023, "epreuve ecrite disciplinaire appliquee" (intitule lu l.13 du
+%     sujet ; code EDE STI 2), questions 22, 23, 24 et 25.
+%     Enonce (Modbus RTU sur RS 485, 102 ventilateurs / 51 par corridor, repeteurs) :
+%     E2_Appliquee_Commune_2023.md l.343-371. Annexe 5 Modbus (maitre/esclave,
+%     diffusion, codes fonction 03/06/10, CRC 16 bits calcule sur tous les octets
+%     sauf lui-meme) : l.855-879 et l.893-905.
+%     Corrige officiel Rapport_Jury_2023.md : Q22 l.740, Q23 l.744 (trame
+%     00 06 0F A0 01 A2 22 C0), Q24 l.748 (01A2 = 418 -> 41,8 Hz), Q25 l.754 (ete).
+%     Correspondance 41,8 Hz <-> 800 tr/min : Rapport_Jury_2023.md l.732 (Q20).
+%     Citation jury : verbatim exact de Rapport_Jury_2023.md l.1039.
+%     NB : la figure 11 (releve de la trame) est une image non extraite par Marker ;
+%     la trame reproduite ici est celle du CORRIGE officiel, pas une reconstitution.
+%
+%   - Ex. 3 : 2026, "ADMISSIBILITE : EPREUVE 1" (intitule lu l.21 du sujet ; code
+%     LDE ENE 1), partie D, questions D1, D2 et D5.
+%     Enonce (bus CAN entre pile a combustible Symbio et calculateur Hycity) :
+%     E1_Sujet_2026.md l.445-461. Couche physique differentielle CAN_H/CAN_L,
+%     UD = UCANH - UCANL, seuils recessif/dominant, codage NRZ : l.471-481.
+%     Exigence "message envoye en moins de 1 ms" et "trame constituee de 111 bits" :
+%     l.513-517 (question D5). Le sujet donne donc 111 bits, PAS 108 : l'ecart de
+%     3 bits est explicite dans le corrige (bits d'intermission ; voir remarque).
+%     Le chronogramme DRD1 est une image ; son axe des temps extrait par Marker
+%     porte la graduation 0-16-32-48-...-240 (E1_Sujet_2026.md l.752), soit un pas
+%     de 16 us. Le chronogramme redessine ici respecte ce pas et conduit a
+%     T_bit = 8 us / 125 kbit/s, seule valeur compatible a la fois avec ce pas et
+%     avec l'exigence des 1 ms (111 x 8 = 888 us). Ce point est SIGNALE comme une
+%     reconstruction dans le corrige, il n'est pas presente comme releve officiel.
+%     PAS de rapport de jury 2026 disponible dans le corpus (dossier 2026 = sujets
+%     E1 et E2 seulement) : aucune citation de jury n'est donnee sur cet exercice.
+%
+%   - Ex. 4 : 2024, "epreuve ecrite disciplinaire appliquee" (intitule lu l.13 du
+%     sujet ; code EDE STI 2), questions 27, 28, 30, 31 et 32.
+%     Enonce (Urbanloop, protocole UDP, codage hh:mm:ss, Tet = 20 us,
+%     df = 300 Mbit/s) : E2_Appliquee_Commune_2024.md l.415-443.
+%     Corrige officiel Rapport_Jury_2024.md l.771-792 : Q27 erreur 1 s -> 16,7 m ;
+%     Q28 erreur > 1 cm, coder les ms ; Q30 40 octets = 320 bits, Ttrans = 1,07 us ;
+%     Q31 Tret = 20 + 1,07 + 5 = 26,07 us ; Q32 erreur 0,435 mm, negligeable.
+%     Le temps de decodage Td = 5 us n'apparait que dans le corrige officiel (Q31) :
+%     il est donc donne explicitement dans l'enonce de l'exercice.
+%
+%   - Ex. 5 : 2023, "EPREUVE ECRITE DISCIPLINAIRE" (intitule lu l.5 du sujet, la
+%     coquille "DSICIPLINAIRE" du PDF est corrigee ici ; option Ingenierie
+%     electrique), questions E4, E7 et E8.
+%     Enonce (robot viticole Bakus, module GPS, liaison a 115 200 bauds, vitesse
+%     max 6 km/h, precision de position exigee 1 cm) : E2_Disciplinaire_IE_2023.md
+%     l.486-520. Les figures 18 et 20 sont des images non extraites ; le NOMBRE de
+%     caracteres (71) et le format (10 bits par caractere) proviennent du CORRIGE
+%     officiel, Rapport_Jury_2023.md l.409, et sont donc donnes dans l'enonce de
+%     l'exercice plutot que releves sur une figure reconstituee.
+%     >> DEUX ERREURS DU CORRIGE OFFICIEL sont relevees et corrigees ici (E7/E8) :
+%        (a) "710 bits soit 89 octets" : 710/8 = 88,75, et surtout les 710 bits
+%            transmis ne sont pas 89 octets utiles -- il n'y a que 71 octets utiles
+%            (568 bits), le reste etant de l'encapsulation ; c'est precisement
+%            l'amalgame bit/octet que le jury reproche par ailleurs ;
+%        (b) "la distance parcourue est 1,03 m" : la propre formule du rapport,
+%            (6/3,6) x 710/115 200, vaut 0,0103 m = 1,03 CENTIMETRE. La conclusion
+%            du rapport (cahier des charges non respecte) reste valide car
+%            1,03 cm > 1 cm, mais de justesse et non d'un facteur 100.
+%     Citation jury : verbatim exact de Rapport_Jury_2023.md l.463.
+%
+%   - Ex. 6 (docTech) : 2022, "EPREUVE ECRITE DISCIPLINAIRE" (intitule lu l.5 du
+%     sujet, meme coquille "DSICIPLINAIRE" ; option Ingenierie electrique),
+%     questions 16 et 17.
+%     Enonce (poste de purge SNCF, TRT 200, capteur DS1820 sur bus OneWire) :
+%     E1_Sujet_2022.md l.318-332 (= E2_Disciplinaire_IE_2022.md l.321-335, sujet
+%     identique sur cette partie). Identifiant releve
+%     (CC 3C 01 A8 16 48 C8 | 28) : figure 6, l.336. Sequence 0x44 / 750 ms / 0xBE :
+%     l.352. Scratchpad releve (Byte 8..0 = E0 10 0C FF 7F 46 4B 03 36) : figure 7,
+%     l.358. Extrait micropython "temp = Byte[1] << 8 | Byte[0] ; return temp / 16" :
+%     figure 8, l.364-368. Table des operateurs micropython : DT C5, l.752-762.
+%     Corrige officiel Rapport_Jury_2022.md l.246 (Q16 : 2^48 par famille, role du
+%     CRC, famille DS18B20 car code family 28) et l.250-258 (Q17 : temp = 0x0336 =
+%     822, concatenation, 12 bits car byte 4 = 7F, T = 51,375 degC, intervention
+%     possible car < 60 degC).
+%     >> Le contenu du docTech (DT C2 layout ROM 64 bits, DT C3 scratchpad 9 octets,
+%     DT C4 format temperature et registre de configuration) correspond a des
+%     figures du sujet NON extraites par Marker. Il est donc RECONSTITUE a partir
+%     de la datasheet constructeur officielle DS18B20 (Dallas/Maxim, rev 042208),
+%     verifiee page par page : ROM 64 bits = 8 bits CRC + 48 bits n de serie +
+%     8 bits family code (28h) [fig. 4, p.6] ; scratchpad 9 octets, byte 0/1 =
+%     temperature LSB/MSB, byte 4 = registre de configuration [p.8] ; registre de
+%     configuration = 0 R1 R0 1 1 1 1 1, R1R0 = 11 -> 12 bits -> 0x7F [fig. 7, p.8] ;
+%     temperature = mot signe de 16 bits en complement a 2, LSB = 2^-4 = 0,0625 degC
+%     [table 2, p.5] ; commandes Convert T = 44h et Read Scratchpad = BEh [p.5].
+%     Toutes ces valeurs coincident avec celles que le sujet et le corrige officiel
+%     citent (byte 4 = 7F, division par 16, code family 28) : la reconstitution est
+%     donc coherente avec le sujet, mais elle reste une reconstitution et est
+%     annoncee comme telle dans le titre du docTech.
+%     Source : https://cdn.sparkfun.com/datasheets/Sensors/Temp/DS18B20.pdf
+%
+% ===================================================================================
+% NOTE D'HONNETETE sur les intitules d'epreuve
+% ===================================================================================
+% Le sujet 2019 ne contient, dans sa conversion Marker, aucun intitule d'epreuve en
+% clair (les pages de garde sont des images) : seul le code administratif "EDE ENE 2"
+% est lisible (l.27 et l.656). C'est donc ce code, et lui seul, qui est cite dans la
+% reference de l'exercice 1 -- aucun intitule n'a ete suppose.
+%
+% ===================================================================================
+% FPGA / VHDL
+% ===================================================================================
+% Recherche exhaustive (grep -ril "FPGA|VHDL|logique programmable") sur l'INTEGRALITE
+% du corpus 2013-2026 : AUCUNE occurrence. Le constat du Bloc 4 de la fiche ("absent
+% des sujets reels 2013-2026 mais au programme") est confirme. Aucun exercice de cette
+% banque ne peut donc s'appuyer sur un sujet reel pour le VHDL : plutot que d'inventer
+% une fausse reference, la notion n'est pas traitee ici et reste a reviser sur la fiche.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+% Le baud (symbole/s) n'est pas fourni par siunitx ; garde \ifdefined comme pour \var.
+\ifdefined\baud\else\DeclareSIUnit{\baud}{Bd}\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T24}} - Exercices - Syst\`emes embarqu\'es}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T24 \quad Syst\`emes embarqu\'es -- r\'eseaux de terrain, trames et protocoles}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 1 -- 2019, EDE ENE 2, questions 15, 16 et 17
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2019, EDE ENE 2, questions 15, 16 et 17}
+]
+\CAPETSHOW{
+Les blocs batteries d'un v\'ehicule de maintenance ferroviaire communiquent avec l'unit\'e de contr\^ole sur un r\'eseau \textbf{CANopen}. Chaque bloc batterie est associ\'e \`a un n\oe ud num\'erot\'e et transmet cycliquement une trame de donn\'ees \textbf{TPDO} (\emph{transmit-process data object}) dont l'identificateur vaut $\mathrm{180_{16}} + n^\circ\text{du n\oe ud}$.
+
+Un traceur a captur\'e la trame suivante sur le r\'eseau (toutes les valeurs sont en hexad\'ecimal) :
+
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}lcccccccc@{}}
+\toprule
+& ID & DLC & Data1 & Data2 & Data3 & Data4 & Data5 & Data6 \\
+\midrule
+Valeur & $\mathrm{182_{16}}$ & $\mathrm{05_{16}}$ & $\mathrm{7E_{16}}$ & $\mathrm{01_{16}}$ & $\mathrm{F1_{16}}$ & $\mathrm{FF_{16}}$ & $\mathrm{BA_{16}}$ & $\mathrm{C2_{16}}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Le document annexe du sujet donne la structure du champ de donn\'ees d'une trame TPDO de bloc batterie :
+
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+Champ & Data1 & Data2 & Data3 & Data4 & Data5 & Data6 \\
+\midrule
+Contenu & Temp\_L & Temp\_H & Amp\_L & Amp\_H & Volt\_L & Volt\_H \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Les trois grandeurs sont transmises sur \textbf{deux octets en compl\'ement \`a 2}, l'octet \_L \'etant l'octet de poids \textbf{faible} et l'octet \_H l'octet de poids \textbf{fort} :
+
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item la \textbf{temp\'erature} est transmise en \textbf{dixi\`emes de degr\'e}. Exemple donn\'e par le constructeur : une temp\'erature de \SI{200,8}{\degreeCelsius} est transmise avec $\text{Temp\_L} = \mathrm{D8_{16}}$ et $\text{Temp\_H} = \mathrm{07_{16}}$ ;
+  \item le \textbf{courant} est compt\'e \textbf{positif lors de la d\'echarge}. Exemple : pour un courant de d\'echarge de \SI{100}{\ampere}, $\text{Amp\_L} = \mathrm{64_{16}}$ et $\text{Amp\_H} = \mathrm{00_{16}}$ ;
+  \item la \textbf{tension} est transmise en \textbf{dizaines de millivolts}. Exemple : une tension de \SI{515,34}{\volt} est transmise avec $\text{Volt\_L} = \mathrm{4E_{16}}$ et $\text{Volt\_H} = \mathrm{C9_{16}}$.
+\end{itemize}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item D\'eterminer le num\'ero de la batterie ayant transmis cette trame.
+  \item D\'eterminer la valeur de la temp\'erature mesur\'ee. V\'erifier au pr\'ealable la r\`egle de reconstitution sur l'exemple fourni par le constructeur.
+  \item D\'eterminer la valeur de la tension mesur\'ee.
+  \item D\'eterminer la valeur du courant mesur\'e, et pr\'eciser si le bloc batterie est en charge ou en d\'echarge \`a l'instant de la capture. Conclure sur la coh\'erence de l'ensemble des trois mesures.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item L'identificateur d'une trame TPDO vaut $\mathrm{180_{16}} + n$, donc :
+  \[ n = \mathrm{182_{16}} - \mathrm{180_{16}} = \mathrm{02_{16}} = 2 \]
+  La trame a \'et\'e \'emise par le \textbf{bloc batterie n\textsuperscript{o}~2}.
+
+  \emph{Remarque.} Le DLC vaut $\mathrm{05_{16}} = 5$, alors que six octets de donn\'ees sont list\'es : c'est une incoh\'erence de l'\'enonc\'e du sujet, qu'un candidat a tout int\'er\^et \`a signaler sur sa copie. Elle ne bloque pas le d\'ecodage, les six octets \'etant fournis.
+
+  \item \textbf{V\'erification de la r\`egle sur l'exemple constructeur.} Avec $\text{Temp\_L} = \mathrm{D8_{16}}$ (poids faible) et $\text{Temp\_H} = \mathrm{07_{16}}$ (poids fort), le mot de 16 bits reconstitu\'e est $\mathrm{07D8_{16}}$, soit $7\times 16^2 + 13\times 16 + 8 = 2\,008$, et $2\,008/10 = \SI{200,8}{\degreeCelsius}$ : la r\`egle est bien \guillemotleft\ octet de poids fort \`a gauche, r\'esultat en dixi\`emes de degr\'e \guillemotright.
+
+  \smallskip
+  \textbf{Application \`a la trame captur\'ee.} $\text{Temp\_L} = \mathrm{7E_{16}}$, $\text{Temp\_H} = \mathrm{01_{16}}$ :
+  \[ \mathrm{017E_{16}} = 1\times 16^2 + 7\times 16 + 14 = 382 \qquad\Longrightarrow\qquad T = \frac{382}{10} = \boldsymbol{\SI{38,2}{\degreeCelsius}} \]
+  Le bit de poids fort du mot vaut $0$ : la valeur est bien positive, aucune conversion de compl\'ement \`a 2 n'est \`a faire.
+
+  \item $\text{Volt\_L} = \mathrm{BA_{16}}$, $\text{Volt\_H} = \mathrm{C2_{16}}$, donc le mot vaut $\mathrm{C2BA_{16}}$ :
+  \[ \mathrm{C2BA_{16}} = 12\times 16^3 + 2\times 16^2 + 11\times 16 + 10 = 49\,152 + 512 + 176 + 10 = 49\,850 \]
+  La tension \'etant transmise en dizaines de millivolts, c'est-\`a-dire par pas de \SI{10}{\milli\volt} :
+  \[ U = 49\,850 \times \SI{10}{\milli\volt} = \boldsymbol{\SI{498,50}{\volt}} \]
+  \emph{V\'erification sur l'exemple constructeur} : $\mathrm{C94E_{16}} = 51\,534$, et $51\,534\times\SI{10}{\milli\volt} = \SI{515,34}{\volt}$ : conforme.
+
+  \item $\text{Amp\_L} = \mathrm{F1_{16}}$, $\text{Amp\_H} = \mathrm{FF_{16}}$, donc le mot vaut $\mathrm{FFF1_{16}}$. \textbf{Ici le bit de poids fort vaut 1} : le nombre est \textbf{n\'egatif} et doit \^etre interpr\'et\'e en compl\'ement \`a 2 sur 16 bits :
+  \[ \mathrm{FFF1_{16}} = 65\,521 \qquad\Longrightarrow\qquad I = 65\,521 - 2^{16} = 65\,521 - 65\,536 = \boldsymbol{\SI{-15}{\ampere}} \]
+  Le courant \'etant compt\'e \textbf{positif en d\'echarge}, un courant n\'egatif de \SI{-15}{\ampere} signifie que le bloc batterie n\textsuperscript{o}~2 est en \textbf{charge}, avec un courant de charge de \SI{15}{\ampere}.
+
+  \smallskip
+  \textbf{Conclusion.} Les trois mesures sont mutuellement coh\'erentes et d\'ecrivent un \textbf{bloc batterie en cours de recharge} : courant entrant de \SI{15}{\ampere}, tension de \SI{498,5}{\volt} (valeur \'elev\'ee, typique d'une fin de charge pour un pack de traction), temp\'erature de \SI{38,2}{\degreeCelsius} mod\'er\'ee mais sup\'erieure \`a l'ambiante, ce qui est l'\'echauffement attendu d'un pack en charge. C'est exactement l'information dont l'algorithme d'\'equilibrage a besoin : il peut poursuivre la charge de ce bloc, la temp\'erature restant loin des seuils d'alarme d'une chimie Li-ion. \textbf{Le point de m\'ethode d\'eterminant est le signe} : lire $\mathrm{FFF1_{16}}$ comme $65\,521$ au lieu de $-15$ aurait fait conclure \`a une d\'echarge de \SI{65}{\kilo\ampere}, valeur physiquement absurde qui doit alerter imm\'ediatement.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 2 -- 2023, epreuve ecrite disciplinaire appliquee, Q22-Q25
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{2} \hfill\normalfont\footnotesize 2023, \'epreuve \'ecrite disciplinaire appliqu\'ee, questions 22 \`a 25}
+]
+\CAPETSHOW{
+Une serre semi-ferm\'ee est ventil\'ee par \textbf{102 ventilateurs} (51 par corridor) entra\^in\'es par des machines asynchrones aliment\'ees par des modulateurs d'\'energie. Les consignes de fr\'equence sont transmises par l'ordinateur de supervision via un r\'eseau Ethernet, puis par une \textbf{liaison s\'erie multipoints RS 485} sur laquelle chaque passerelle joue le r\^ole de \textbf{ma\^itre} et les modulateurs celui d'\textbf{esclaves}, selon le protocole \textbf{Modbus RTU}.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.85, every node/.style={scale=0.85}]
+  \node[draw, minimum width=1.9cm, minimum height=0.8cm, align=center, font=\scriptsize] (sup) at (0,1.6) {Supervision\\(Ethernet)};
+  \node[draw, minimum width=1.7cm, minimum height=0.8cm, align=center, font=\scriptsize] (pas) at (3.0,1.6) {Passerelle\\\textbf{ma\^itre}};
+  \draw[->] (sup.east) -- (pas.west);
+  % bus RS485
+  \draw[very thick, colExo] (1.3,0.4) -- (10.4,0.4);
+  \node[font=\scriptsize, colExo, above left] at (10.4,0.4) {bus RS 485};
+  \draw (pas.south) -- (3.0,0.4); \fill (3.0,0.4) circle (1.6pt);
+  \foreach \x/\lab in {5.0/1, 6.6/2, 9.6/51} {
+    \node[draw, minimum width=1.25cm, minimum height=0.7cm, align=center, font=\scriptsize] (e\lab) at (\x,-0.7) {Modul.\\esclave \lab};
+    \draw (\x,0.4) -- (\x,-0.35); \fill (\x,0.4) circle (1.6pt);
+  }
+  \node[font=\small] at (8.1,-0.7) {$\cdots$};
+  \node[draw, dashed, fill=white, minimum width=1.3cm, minimum height=0.5cm, font=\scriptsize] (rep) at (8.1,1.15) {r\'ep\'eteur};
+  \draw[dashed] (8.1,0.9) -- (8.1,0.4); \fill (8.1,0.4) circle (1.6pt);
+\end{tikzpicture}
+\end{center}
+
+Le protocole Modbus peut \^etre impl\'ement\'e sur une liaison de type \textbf{RS 232}, \textbf{RS 422} ou \textbf{RS 485}. On retiendra de la documentation du sujet que la liaison RS 232 est une liaison \textbf{point \`a point} (un seul ma\^itre, un seul esclave) et de port\'ee limit\'ee, tandis que la RS 422 admet \textbf{10 r\'ecepteurs} et la RS 485 \textbf{32 r\'ecepteurs} sur un m\^eme bus.
+
+Le protocole Modbus propose notamment les fonctions suivantes, chacune cod\'ee sur un octet :
+
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}cl@{}}
+\toprule
+Code fonction (hexad\'ecimal) & Nom de la fonction \\
+\midrule
+$\mathrm{03}$ & Lecture de $N$ mots de sortie cons\'ecutifs \\
+$\mathrm{06}$ & \'Ecriture d'un mot de sortie \\
+$\mathrm{10}$ & \'Ecriture de $N$ mots de sortie \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Le ma\^itre peut s'adresser \`a un esclave donn\'e et attendre sa r\'eponse, ou \textbf{diffuser} une requ\^ete \`a tous les esclaves du bus (\emph{broadcast}), ceux-ci ex\'ecutant alors l'ordre \textbf{sans \'emettre de r\'eponse} ; l'adresse $\mathrm{00_{16}}$ est r\'eserv\'ee \`a la diffusion. Le CRC, calcul\'e sur 16 bits, porte sur tous les octets de la trame \`a l'exception de lui-m\^eme. Une trame Modbus RTU est constitu\'ee, dans l'ordre, de l'\textbf{adresse de l'esclave} (1 octet), du \textbf{code fonction} (1 octet), des \textbf{donn\'ees} et du \textbf{CRC} (2 octets).
+
+Le relev\'e effectu\'e sur la liaison RS 485 d'un corridor donne la trame \'emise par la passerelle :
+
+\begin{center}
+\large\ttfamily 00\quad 06\quad 0F\quad A0\quad 01\quad A2\quad 22\quad C0
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Justifier le choix d'une liaison RS 485 parmi les trois liaisons propos\'ees, ainsi que la n\'ecessit\'e des r\'ep\'eteurs.
+  \item Analyser la trame relev\'ee en indiquant l'adresse de l'esclave, la fonction, la donn\'ee et le CRC.
+  \item Le registre Modbus $4000$ ($\mathrm{0FA0_{16}}$) des modulateurs contient la consigne de fr\'equence $f$ en Hz, avec un \textbf{facteur d'\'echelle 10} (la valeur r\'eelle est la valeur du registre divis\'ee par 10). Interpr\'eter ce message.
+  \item L'\'etude m\'ecanique men\'ee en amont du sujet a \'etabli que les ventilateurs tournent \`a \SI{450}{\tr\per\minute} en hiver (soit $f = \SI{23,1}{\hertz}$) et \`a \SI{800}{\tr\per\minute} en \'et\'e (soit $f = \SI{41,8}{\hertz}$), un tiers seulement des ventilateurs fonctionnant en hiver contre la totalit\'e en \'et\'e. En d\'eduire le mode de fonctionnement de la serre \`a l'instant de l'\'emission de ce message. Justifier.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{\'Elimination de la RS 232.} Elle est \textbf{point \`a point} : elle n'autorise qu'un seul ma\^itre et un seul esclave, ce qui est incompatible avec une architecture ma\^itre/esclaves multipoints comportant 51 modulateurs par corridor ; sa port\'ee est en outre insuffisante \`a l'\'echelle d'un corridor de serre.
+
+  \textbf{Choix entre RS 422 et RS 485.} Les deux sont des liaisons diff\'erentielles multipoints, mais la RS 485 admet \textbf{32 r\'ecepteurs} contre \textbf{10} pour la RS 422 : elle est donc nettement plus proche du besoin. La RS 485 utilise de surcro\^it un nombre de fils r\'eduit (une seule paire en half-duplex), ce qui diminue le co\^ut et la complexit\'e du c\^ablage sur une installation de cette taille.
+
+  \textbf{N\'ecessit\'e des r\'ep\'eteurs.} M\^eme la RS 485 plafonne \`a 32 r\'ecepteurs, alors qu'il faut en adresser \textbf{51 par corridor} : $51 > 32$. Les r\'ep\'eteurs sont donc indispensables pour \textbf{\'etendre la limite en nombre d'\'equipements} (et accessoirement en distance) du segment, en r\'eg\'en\'erant le signal pour former plusieurs segments successifs.
+
+  \item D\'ecoupage de la trame selon la structure adresse / fonction / donn\'ees / CRC :
+  \begin{center}
+  \footnotesize
+  \begin{tabular}{@{}llll@{}}
+  \toprule
+  Octet(s) & Champ & Valeur & Signification \\
+  \midrule
+  1 & Adresse esclave & \texttt{00} & \textbf{diffusion} (\emph{broadcast}) : tous les esclaves \\
+  2 & Code fonction & \texttt{06} & \'ecriture d'\textbf{un} mot de sortie \\
+  3--4 & Donn\'ee & \texttt{0F A0} & adresse du registre vis\'e : $\mathrm{0FA0_{16}} = 4\,000$ \\
+  5--6 & Donn\'ee & \texttt{01 A2} & valeur \'ecrite dans ce registre \\
+  7--8 & CRC & \texttt{22 C0} & contr\^ole de redondance cyclique sur 16 bits \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  Deux points m\'eritent d'\^etre soulign\'es sur la copie. D'une part l'adresse \texttt{00} n'est pas \guillemotleft\ l'esclave num\'ero z\'ero \guillemotright\ mais l'adresse r\'eserv\'ee de \textbf{diffusion} : le message s'adresse simultan\'ement \`a \textbf{tous} les modulateurs, et \textbf{aucun ne r\'epondra}. D'autre part le CRC ne fait pas partie des donn\'ees : il est calcul\'e sur les six octets pr\'ec\'edents et sert uniquement au destinataire \`a v\'erifier l'int\'egrit\'e de ce qu'il a re\c{c}u.
+
+  \item La valeur \'ecrite dans le registre $4\,000$ est $\mathrm{01A2_{16}}$ :
+  \[ \mathrm{01A2_{16}} = 1\times 16^2 + 10\times 16 + 2 = 256 + 160 + 2 = 418 \]
+  Le facteur d'\'echelle \'etant de 10 :
+  \[ f = \frac{418}{10} = \boldsymbol{\SI{41,8}{\hertz}} \]
+  Le message est donc un ordre de \textbf{diffusion g\'en\'erale} imposant \`a \textbf{tous} les modulateurs d'\'energie de la ligne une consigne de fr\'equence statorique de \SI{41,8}{\hertz}.
+
+  \item Deux indices convergent :
+  \begin{itemize}
+    \item la consigne vaut pr\'ecis\'ement \SI{41,8}{\hertz}, valeur qui correspond \`a \SI{800}{\tr\per\minute}, c'est-\`a-dire la vitesse \textbf{maximale}, celle du r\'egime d'\textbf{\'et\'e} (l'hiver correspondrait \`a \SI{23,1}{\hertz}) ;
+    \item le message est \'emis en \textbf{diffusion} et impose la m\^eme consigne \`a tous les modulateurs, ce qui n'a de sens que si \textbf{tous} les ventilateurs fonctionnent -- or en hiver seul un tiers d'entre eux est en service.
+  \end{itemize}
+
+  \smallskip
+  \textbf{Conclusion.} La serre fonctionne en \textbf{mode \'et\'e}, au \textbf{taux maximal de renouvellement d'air} : les 102 ventilateurs tournent simultan\'ement \`a \SI{800}{\tr\per\minute}. L'analyse ne s'arr\^ete donc pas au d\'ecodage de la trame : c'est le \textbf{croisement} de la valeur d\'ecod\'ee avec les r\'esultats de l'\'etude a\'eraulique \emph{et} avec le mode d'adressage (diffusion plut\^ot qu'adressage individuel) qui permet de qualifier l'\'etat r\'eel de l'installation et de valider que l'architecture r\'eseau retenue remplit bien sa fonction de pilotage.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2023, commentaires de la partie 3) : \guillemotleft\ Le d\'ecodage d'une trame MODBUS n'a pas pos\'e de souci majeur. N\'eanmoins, l'interpr\'etation a \'et\'e plus d\'elicate. \guillemotright\ La question 2 ci-dessus est la partie facile ; ce sont les questions 3 et 4, qui demandent de \emph{donner un sens physique} aux octets, qui font la diff\'erence.}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 3 -- 2026, epreuve 1, questions D1, D2 et D5
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize 2026, \'epreuve 1 (mod\'elisation d'un produit), questions D1, D2 et D5}
+]
+\CAPETSHOW{
+La pile \`a combustible d'un bus \`a hydrog\`ene communique avec le calculateur du v\'ehicule sur une architecture de type \textbf{bus CAN}. Le bus CAN est un bus s\'erie de terrain \textbf{multiplex\'e}, con\c{c}u pour fonctionner en environnement s\'ev\`ere (v\'ehicule, atelier, milieu industriel), dont l'\'enonc\'e rappelle les particularit\'es : bus producteur/consommateur o\`u tous les participants ont les m\^emes droits ; les n\oe uds ne sont \textbf{pas adress\'es}, seuls les \textbf{messages} portent un identificateur, chaque n\oe ud scrutant en permanence le bus pour d\'ecider si le message le concerne.
+
+Dans sa version \emph{CAN High Speed}, la couche physique comporte deux signaux \textbf{CAN\_H} et \textbf{CAN\_L} construits de fa\c{c}on sym\'etrique (mode \textbf{diff\'erentiel}). C'est la diff\'erence de tension $U_D = U_{CAN\_H} - U_{CAN\_L}$ qui est prise en compte pour l'interpr\'etation des bits, avec un codage \textbf{NRZ} :
+
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item si $U_D \leq \SI{0,5}{\volt}$ : \'etat \textbf{r\'ecessif}, \'etat logique \guillemotleft\ 1 \guillemotright\ ;
+  \item si $U_D \geq \SI{0,9}{\volt}$ : \'etat \textbf{dominant}, \'etat logique \guillemotleft\ 0 \guillemotright.
+\end{itemize}
+
+Lors de la mise au point, un test de \textbf{proc\'edure d'urgence} est men\'e : la pile envoie aux autres \'equipements un message signalant un d\'efaut grave (surchauffe). Pour que la proc\'edure soit valid\'ee, le \textbf{message doit \^etre envoy\'e en moins de \SI{1}{\milli\second}}. Dans ce cas, \textbf{8 octets de donn\'ees} sont transmis, et l'\'enonc\'e pr\'ecise que la trame compl\`ete est alors constitu\'ee de \textbf{111 bits}.
+
+Le chronogramme ci-dessous reproduit le d\'ebut de la trame captur\'ee sur le bus lors du test (la graduation de l'axe des temps est celle du document r\'eponse du sujet, en microsecondes) :
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\footnotesize, xscale=0.345, yscale=0.85]
+  % axes
+  \draw[->] (0,0) -- (31.2,0) node[right] {$t$ (\si{\micro\second})};
+  \draw[->] (0,-0.3) -- (0,2.45) node[above right, inner sep=1pt] {$U_D$ (\si{\volt})};
+  % graduations toutes les 16 us
+  \foreach \t in {0,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240} {
+    \pgfmathsetmacro\xx{\t/8}
+    \draw (\xx,0) -- (\xx,-0.14) node[below, font=\scriptsize] {\t};
+  }
+  % seuils
+  \draw[dashed, colSlate] (0,0.45) -- (30,0.45) node[right, font=\scriptsize, colSlate] {\SI{0,5}{\volt}};
+  \draw[dashed, colSlate] (0,1.75) -- (30,1.75) node[right, font=\scriptsize, colSlate] {\SI{0,9}{\volt}};
+  % signal : 1 bit = 1 unite x (=8us). Sequence : 0 1 1 0 1 0 0 0 1 1 0 1 0 1 1 0 ...
+  % dominant (0 logique) -> UD haut (2.1) ; recessif (1 logique) -> UD bas (0.15)
+  \def\hi{2.1}\def\lo{0.15}
+  \draw[very thick, colExo]
+    (0,\hi) -- (1,\hi) -- (1,\lo) -- (3,\lo) -- (3,\hi) -- (4,\hi) -- (4,\lo) --
+    (5,\lo) -- (5,\hi) -- (8,\hi) -- (8,\lo) -- (10,\lo) -- (10,\hi) -- (11,\hi) --
+    (11,\lo) -- (12,\lo) -- (12,\hi) -- (13,\hi) -- (13,\lo) -- (15,\lo) --
+    (15,\hi) -- (16,\hi);
+  \draw[colExo, dotted, very thick] (16,\hi) -- (19,\hi);
+  \node[font=\scriptsize, colSlate, right] at (19.1,\hi) {suite de la trame};
+  % reperage d'un bit : place SOUS l'axe des temps, a l'ecart du label U_D
+  \draw[<->, colMeca, thick] (0,-0.62) -- (1,-0.62);
+  \node[colMeca, font=\scriptsize, below] at (0.5,-0.66) {$T_{bit}$};
+  \node[font=\scriptsize, left] at (-0.12,\hi) {dom.};
+  \node[font=\scriptsize, left] at (-0.12,\lo) {r\'ec.};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Pour le protocole de communication CAN, pr\'eciser en justifiant : le \textbf{type} de transmission (s\'erie ou parall\`ele) ; la \textbf{nature} de la transmission (synchrone ou asynchrone) ; le \textbf{mode} de transmission (simplex, half-duplex ou full-duplex).
+  \item Expliquer comment la couche physique diff\'erentielle permet l'\'elimination des perturbations \'electromagn\'etiques.
+  \item \`A partir du chronogramme, d\'eterminer la \textbf{dur\'ee d'un bit} $T_{bit}$ ainsi que le \textbf{d\'ebit binaire} $D$ de la liaison.
+  \item En d\'eduire la \textbf{dur\'ee de la trame} sachant qu'elle est constitu\'ee de 111 bits, puis conclure quant \`a l'exigence portant sur la dur\'ee de transmission.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Type : transmission s\'erie.} Les bits sont transmis \textbf{les uns apr\`es les autres} sur une paire unique de conducteurs (CAN\_H / CAN\_L), et non simultan\'ement sur $n$ fils. C'est d'ailleurs ce qui rend n\'ecessaire le m\'ecanisme d'arbitrage bit \`a bit : un seul support est partag\'e.
+
+  \textbf{Nature : transmission asynchrone.} Aucune horloge n'est transmise sur un conducteur d\'edi\'e. La resynchronisation des n\oe uds se fait \textbf{sur les transitions du signal lui-m\^eme}, notamment sur le front descendant du bit SOF en d\'ebut de trame. C'est pr\'ecis\'ement la raison d'\^etre du \emph{bit stuffing} du protocole CAN : l'insertion d'un bit de polarit\'e oppos\'ee apr\`es cinq bits identiques cons\'ecutifs garantit qu'il y aura toujours des transitions pour maintenir la synchronisation.
+
+  \textbf{Mode : half-duplex.} La transmission est bien bidirectionnelle -- tout n\oe ud peut \'emettre comme recevoir -- mais \textbf{pas simultan\'ement} : le support est unique et partag\'e, et l'arbitrage garantit qu'un seul n\oe ud \'emet \`a la fois.
+
+  \item Les deux conducteurs sont \textbf{physiquement torsad\'es et voisins} : une perturbation \'electromagn\'etique ext\'erieure induit sur chacun d'eux une tension parasite $u_p$ pratiquement \textbf{identique} (perturbation dite \emph{de mode commun}). Le r\'ecepteur n'exploitant que la \textbf{diff\'erence} :
+  \[ U_D = (U_{CAN\_H} + u_p) - (U_{CAN\_L} + u_p) = U_{CAN\_H} - U_{CAN\_L} \]
+  la perturbation \textbf{s'\'elimine par soustraction} et l'information binaire est restitu\'ee intacte. S'y ajoute la \textbf{marge de bruit} m\'enag\'ee par le constructeur : entre \SI{0,5}{\volt} et \SI{0,9}{\volt} s'\'etend une \textbf{zone morte} de \SI{0,4}{\volt} dans laquelle aucun \'etat n'est d\'eclar\'e, si bien qu'une perturbation r\'esiduelle de mode diff\'erentiel doit d\'epasser cette bande pour provoquer une erreur de lecture.
+
+  \item Le chronogramme est gradu\'e tous les \SI{16}{\micro\second}, et l'on y compte \textbf{deux bits par graduation} : le palier \'el\'ementaire le plus court observ\'e -- par exemple le premier \'etat dominant, ou le bit r\'ecessif isol\'e -- a une largeur de \textbf{une demi-graduation}. D'o\`u :
+  \[ T_{bit} = \frac{\SI{16}{\micro\second}}{2} = \boldsymbol{\SI{8}{\micro\second}} \]
+  Le d\'ebit binaire est l'inverse de la dur\'ee d'un bit :
+  \[ D = \frac{1}{T_{bit}} = \frac{1}{8\times 10^{-6}} = 125\,000\ \si{\bit\per\second} = \boldsymbol{\SI{125}{\kilo\bit\per\second}} \]
+  C'est bien l'un des d\'ebits normalis\'es du bus CAN, et non une valeur quelconque, ce qui constitue une premi\`ere v\'erification de coh\'erence.
+
+  \emph{M\'ethode.} Le pi\`ege classique consiste \`a relever la dur\'ee d'un \textbf{palier} au lieu de celle d'un \textbf{bit}. Ce sont deux choses diff\'erentes : le codage NRZ ne pr\'evoit \textbf{aucune transition entre deux bits identiques cons\'ecutifs}, si bien qu'un palier long correspond \`a plusieurs bits de m\^eme valeur. Il faut donc identifier le \textbf{plus petit} palier pr\'esent sur le relev\'e, qui seul vaut un bit unique.
+
+  \item La trame comportant 111 bits :
+  \[ T_{trame} = 111 \times T_{bit} = 111 \times 8 = \SI{888}{\micro\second} = \boldsymbol{\SI{0,888}{\milli\second}} \]
+
+  \smallskip
+  \textbf{Conclusion.} La dur\'ee de transmission du message d'urgence vaut \SI{0,888}{\milli\second}, \textbf{inf\'erieure aux \SI{1}{\milli\second}} impos\'ees par le cahier des charges : l'\textbf{exigence est satisfaite} et la proc\'edure d'urgence est valid\'ee sur ce crit\`ere. La marge est toutefois \textbf{faible -- \SI{11}{\percent} seulement}, et elle est de surcro\^it \textbf{optimiste} : le d\'ecompte de 111 bits ne tient pas compte des \textbf{bits de \emph{stuffing}} que le protocole ins\`ere apr\`es toute s\'equence de cinq bits identiques, ni d'une \'eventuelle attente d'arbitrage si un autre n\oe ud \'emet au m\^eme instant. Dans le pire cas, le \emph{stuffing} peut ajouter une vingtaine de bits, soit environ \SI{160}{\micro\second}, ce qui ferait franchir le seuil. La conclusion rigoureuse est donc : \textbf{exigence respect\'ee sur la trame nominale, mais sans marge suffisante pour absorber le \emph{stuffing}} -- il serait prudent de porter le d\'ebit \`a \SI{250}{\kilo\bit\per\second}, ce qui ram\`enerait la trame \`a \SI{444}{\micro\second} et offrirait un facteur 2 de s\'ecurit\'e.
+
+  \smallskip
+  \textbf{Remarque sur les 111 bits.} Le recomptage de la structure d'une trame CAN 2.0A standard \`a 8 octets de donn\'ees donne $1 + 11 + 1 + 2 + 4 + 64 + 15 + 1 + 2 + 7 = 108$ bits (SOF, identificateur, RTR, bits r\'eserv\'es, DLC, donn\'ees, CRC, d\'elimiteur, ACK, EOF). Les \textbf{3 bits} suppl\'ementaires annonc\'es par l'\'enonc\'e correspondent \`a l'\textbf{espace d'intertrame} (\emph{intermission}), qui s\'epare obligatoirement deux trames cons\'ecutives sur le bus. Les deux valeurs ne sont donc pas contradictoires : 108 bits pour la trame seule, 111 bits pour le temps d'occupation du bus -- c'est bien cette seconde valeur qu'il faut retenir pour comparer \`a un d\'elai impos\'e.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 4 -- 2024, epreuve ecrite disciplinaire appliquee, Q27-Q32
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize 2024, \'epreuve \'ecrite disciplinaire appliqu\'ee, questions 27, 28 et 30 \`a 32}
+]
+\CAPETSHOW{
+Les capsules autonomes d'un syst\`eme de transport urbain de type \emph{Urbanloop} circulent \`a une vitesse maximale $V_0 = \SI{60}{\kilo\meter\per\hour}$. Chaque capsule \'elabore une information de position toutes les millisecondes et la transmet \`a la centrale de gestion en utilisant le protocole \textbf{UDP}, sur une \textbf{fibre optique} de d\'ebit $d_f = \SI{300}{\mega\bit\per\second}$.
+
+Les premiers octets du champ \guillemotleft\ Data \guillemotright\ de la trame codent la \textbf{position} et l'\textbf{instant} associ\'e \`a cette position. Une premi\`ere proposition consiste \`a coder l'instant selon le syst\`eme horaire sur 24 heures \textbf{hh:mm:ss}, chacun des trois champs \'etant cod\'e sur un octet.
+
+Le budget temporel de la cha\^ine de transmission comporte trois contributions :
+
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item le temps d'\'elaboration de la trame, $T_{et} = \SI{20}{\micro\second}$ ;
+  \item le temps de transmission $T_{trans}$ sur la fibre, \`a d\'eterminer ;
+  \item le temps de d\'ecodage c\^ot\'e centrale, $T_d = \SI{5}{\micro\second}$.
+\end{itemize}
+
+La trame UDP compl\`ete envoy\'ee par une capsule comporte \textbf{40 octets}. Le cahier des charges impose une \textbf{pr\'ecision de position de \SI{1}{\centi\meter}}.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.9, every node/.style={scale=0.9}]
+  \node[draw, minimum width=1.7cm, minimum height=0.85cm, align=center, font=\scriptsize] (cap) at (0,0) {Capsule\\\SI{60}{\kilo\meter\per\hour}};
+  \node[draw, minimum width=1.8cm, minimum height=0.85cm, align=center, font=\scriptsize] (ela) at (2.9,0) {\'Elaboration\\$T_{et}{=}\SI{20}{\micro\second}$};
+  \node[draw, minimum width=2.2cm, minimum height=0.85cm, align=center, font=\scriptsize] (fib) at (6.3,0) {Fibre optique\\$d_f{=}\SI{300}{\mega\bit\per\second}$};
+  \node[draw, minimum width=1.8cm, minimum height=0.85cm, align=center, font=\scriptsize] (dec) at (9.6,0) {D\'ecodage\\$T_d{=}\SI{5}{\micro\second}$};
+  \node[align=center, font=\scriptsize] (cen) at (12.0,0) {Centrale\\de gestion};
+  \draw[->] (cap.east) -- (ela.west);
+  \draw[->] (ela.east) -- (fib.west) node[midway,above,font=\scriptsize]{40 o};
+  \draw[->] (fib.east) -- (dec.west);
+  \draw[->] (dec.east) -- (cen.west);
+  \draw[<->, colMeca, thick] (2.0,-0.75) -- (10.5,-0.75);
+  \node[colMeca, font=\scriptsize, below] at (6.3,-0.75) {$T_{ret}$ : retard total entre la position r\'eelle et la position connue de la centrale};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Donner l'\textbf{erreur maximale}, en secondes, commise sur l'instant avec le codage hh:mm:ss. V\'erifier que l'erreur maximale ainsi faite sur l'estimation de la position de la capsule vaut \SI{16,7}{\meter}.
+  \item Conclure sur le respect du cahier des charges avec ce codage. En cas de non-respect, proposer une solution de codage permettant d'obtenir une erreur de position conforme.
+  \item Donner le nombre $N_b$ de bits contenus dans la trame, puis en d\'eduire le temps de transmission $T_{trans}$ sur la fibre.
+  \item Calculer la dur\'ee $T_{ret}$ s\'eparant l'instant o\`u la capsule acquiert sa position de l'instant o\`u la centrale de gestion dispose de l'information.
+  \item Conclure sur l'erreur de position finalement obtenue.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le champ le plus fin du codage hh:mm:ss est la \textbf{seconde}. Deux instants s\'epar\'es de moins d'une seconde portent donc le \textbf{m\^eme} horodatage : l'erreur maximale sur l'instant vaut
+  \[ \Delta t_{max} = \SI{1}{\second} \]
+  Pendant cette seconde, la capsule, \`a sa vitesse maximale, parcourt :
+  \[ V_0 = \SI{60}{\kilo\meter\per\hour} = \frac{60}{3{,}6} = \SI{16,7}{\meter\per\second} \qquad\Longrightarrow\qquad \Delta x_{max} = V_0 \times \Delta t_{max} = 16{,}7\times 1 = \boldsymbol{\SI{16,7}{\meter}} \]
+  L'erreur de position annonc\'ee est bien retrouv\'ee.
+
+  \item Le cahier des charges exige \SI{1}{\centi\meter}, soit \SI{0,01}{\meter}. Or $\SI{16,7}{\meter} \ggg \SI{0,01}{\meter}$ : le codage hh:mm:ss est \textbf{tr\`es largement insuffisant}, d'un facteur $16{,}7/0{,}01 \approx 1\,700$.
+
+  Pour respecter l'exigence, il faut que la r\'esolution temporelle $\delta t$ v\'erifie $V_0\,\delta t \leq \SI{0,01}{\meter}$, soit :
+  \[ \delta t \leq \frac{0{,}01}{16{,}7} \approx \SI{6e-4}{\second} = \SI{0,6}{\milli\second} \]
+  Il faut donc \textbf{descendre au moins \`a la milliseconde}, et plus s\^urement aux \textbf{centaines de microsecondes}, en ajoutant au codage un champ de fraction de seconde. C'est coh\'erent avec le fonctionnement du syst\`eme, qui \'elabore de toute fa\c{c}on une position \emph{toutes les millisecondes} : horodater \`a la seconde revenait \`a jeter 999 informations sur 1000.
+
+  \item La trame comporte 40 octets, soit :
+  \[ N_b = 40\times 8 = \boldsymbol{320\ \text{bits}} \]
+  \[ T_{trans} = \frac{N_b}{d_f} = \frac{320}{300\times 10^6} \approx \SI{1,07e-6}{\second} = \boldsymbol{\SI{1,07}{\micro\second}} \]
+
+  \item Le retard total est la somme des trois contributions de la cha\^ine :
+  \[ T_{ret} = T_{et} + T_{trans} + T_d = 20 + 1{,}07 + 5 = \boldsymbol{\SI{26,07}{\micro\second}} \]
+  On notera que la transmission proprement dite ne repr\'esente que \SI{4}{\percent} du retard : ce sont l'\'elaboration de la trame et son d\'ecodage qui dominent largement le budget.
+
+  \item Pendant ce retard, la capsule a continu\'e d'avancer \`a \SI{16,7}{\meter\per\second} :
+  \[ \Delta x = V_0\,T_{ret} = \frac{60}{3{,}6}\times 26{,}07\times 10^{-6} \approx \SI{4,35e-4}{\meter} = \boldsymbol{\SI{0,435}{\milli\meter}} \]
+
+  \smallskip
+  \textbf{Conclusion.} L'erreur de position imputable \`a la cha\^ine de communication (\'elaboration, transmission, d\'ecodage) vaut \SI{0,435}{\milli\meter}, soit plus de \textbf{vingt fois moins} que le centim\`etre exig\'e par le cahier des charges : la solution de transmission est \textbf{tr\`es largement conforme} sur ce crit\`ere, et cette erreur est en pratique n\'egligeable devant les autres sources d'incertitude (glissement des roues, r\'esolution du codeur, positionnement absolu aux traverses). Le r\'esultat d\'eterminant de l'\'etude est donc ailleurs : c'est le \textbf{choix du codage de l'instant} (question 2) qui conditionnait le respect de l'exigence, pas la performance du support physique. Une fibre trente fois plus rapide n'aurait rien chang\'e \`a l'erreur de \SI{16,7}{\meter} du codage \`a la seconde -- illustration du fait qu'un budget d'erreur doit \^etre attaqu\'e par son terme dominant.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 5 -- 2023, epreuve ecrite disciplinaire (IE), Q E4, E7, E8
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize 2023, \'epreuve \'ecrite disciplinaire (option IE), questions E4, E7 et E8}
+]
+\CAPETSHOW{
+Le robot viticole autonome \emph{Bakus} acquiert sa position au moyen d'un \textbf{module GPS} reli\'e \`a sa carte de contr\^ole par une \textbf{liaison s\'erie asynchrone} cadenc\'ee \`a \textbf{115\,200 bauds}. Les donn\'ees \'echang\'ees sont des \textbf{caract\`eres cod\'es en ASCII sur un octet}.
+
+Le chronogramme ci-dessous reproduit la transmission d'\textbf{un} caract\`ere du module GPS vers la carte de contr\^ole. Le format de trame utilis\'e comporte, dans l'ordre : un \textbf{bit de start} \`a l'\'etat bas, les \textbf{8 bits de donn\'ees} transmis du poids faible au poids fort, et un \textbf{bit de stop} \`a l'\'etat haut.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\footnotesize, xscale=1.05, yscale=0.8]
+  \def\hi{1.55}\def\lo{0.1}
+  \draw[->] (-0.5,0) -- (11.4,0) node[right] {$t$};
+  \draw[->] (-0.5,-0.25) -- (-0.5,2.2) node[above] {$V$};
+  % repos haut, start bas, data 0 1 0 0 1 0 0 1 (LSB first) -> caractere 0b10010010 ? cf corrige
+  % Sequence tracee : repos(hi) start(lo) puis bits LSB->MSB : 1 0 0 1 0 0 1 0 puis stop(hi)
+  \draw[very thick, colExo]
+    (-0.5,\hi) -- (0,\hi) -- (0,\lo) -- (1,\lo)          % start
+    -- (1,\hi) -- (2,\hi)                                  % b0 = 1
+    -- (2,\lo) -- (4,\lo)                                  % b1 = 0, b2 = 0
+    -- (4,\hi) -- (5,\hi)                                  % b3 = 1
+    -- (5,\lo) -- (7,\lo)                                  % b4 = 0, b5 = 0
+    -- (7,\hi) -- (8,\hi)                                  % b6 = 1
+    -- (8,\lo) -- (9,\lo)                                  % b7 = 0
+    -- (9,\hi) -- (10.9,\hi);                              % stop + repos
+  % separations verticales
+  \foreach \x in {0,1,2,3,4,5,6,7,8,9,10} {
+    \draw[dotted, colRule] (\x,-0.1) -- (\x,1.95);
+  }
+  % etiquettes des intervalles
+  \node[font=\scriptsize, colMeca] at (0.5,2.0) {start};
+  \foreach \i/\x in {0/1.5, 1/2.5, 2/3.5, 3/4.5, 4/5.5, 5/6.5, 6/7.5, 7/8.5} {
+    \node[font=\scriptsize] at (\x,2.0) {$b_{\i}$};
+  }
+  \node[font=\scriptsize, colMeca] at (9.5,2.0) {stop};
+  % valeurs logiques lues
+  \foreach \v/\x in {1/1.5, 0/2.5, 0/3.5, 1/4.5, 0/5.5, 0/6.5, 1/7.5, 0/8.5} {
+    \node[font=\scriptsize, colSlate] at (\x,-0.42) {\v};
+  }
+  \node[font=\scriptsize, left, colSlate] at (-0.55,\hi) {1};
+  \node[font=\scriptsize, left, colSlate] at (-0.55,\lo) {0};
+\end{tikzpicture}
+\end{center}
+
+L'ensemble des caract\`eres ASCII transmis par le module GPS forme une \textbf{trame compl\`ete de 71 caract\`eres}. Le robot se d\'eplace \`a une vitesse maximale de \SI{6}{\kilo\meter\per\hour}, et l'exigence de pr\'ecision sur la mesure de position du robot est fix\'ee \`a \textbf{\SI{1}{\centi\meter}}.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \`A l'aide du chronogramme, d\'eterminer le \textbf{nombre de bits transmis} pour un caract\`ere ASCII. Identifier le caract\`ere transmis sur le chronogramme (on donne $\mathrm{49_{16}} = $ \guillemotleft\ I \guillemotright, $\mathrm{52_{16}} = $ \guillemotleft\ R \guillemotright, $\mathrm{92_{16}}$ hors table ASCII 7 bits).
+  \item D\'eterminer le nombre total de \textbf{bits transmis} pour la trame compl\`ete, et le distinguer soigneusement du nombre d'\textbf{octets utiles} qu'elle v\'ehicule. En d\'eduire l'\textbf{efficacit\'e} de la transmission.
+  \item En d\'eduire le \textbf{temps n\'ecessaire} pour transmettre cette trame compl\`ete.
+  \item D\'eterminer la \textbf{distance maximale} parcourue par le robot pendant cet intervalle de temps. Conclure vis-\`a-vis de l'exigence de pr\'ecision de la mesure de position.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le chronogramme montre, pour un seul caract\`ere : \textbf{1 bit de start} + \textbf{8 bits de donn\'ees} + \textbf{1 bit de stop}, soit
+  \[ n_{bits/car} = 1 + 8 + 1 = \boldsymbol{10\ \text{bits}} \]
+  pour \textbf{8 bits d'information utile} seulement.
+
+  \textbf{Lecture du caract\`ere.} Les bits de donn\'ees sont transmis \textbf{du poids faible vers le poids fort}, et le chronogramme se lit $b_0 b_1 \ldots b_7 = 1\,0\,0\,1\,0\,0\,1\,0$. Il faut donc \textbf{inverser l'ordre} pour \'ecrire l'octet du MSB au LSB :
+  \[ b_7 b_6 b_5 b_4 b_3 b_2 b_1 b_0 = 0100\;1001_2 = \mathrm{49_{16}} = 73_{10} \]
+  soit le caract\`ere ASCII \guillemotleft\ \textbf{I} \guillemotright. \emph{Lire le chronogramme de gauche \`a droite sans inverser} aurait donn\'e $1001\,0010_2 = \mathrm{92_{16}}$, qui n'appartient m\^eme pas \`a la table ASCII 7 bits : c'est l'erreur la plus fr\'equente, et elle est ici auto-d\'etectable.
+
+  \item \textbf{C'est la question o\`u se joue la distinction bit/octet.} La trame compl\`ete comporte 71 caract\`eres. Chaque caract\`ere occupant 10 bits \emph{sur la ligne} :
+  \[ N_{bits\ transmis} = 71 \times 10 = \boldsymbol{710\ \text{bits}} \]
+  En revanche, l'information \textbf{utile} v\'ehicul\'ee est de \textbf{71 octets}, soit :
+  \[ N_{bits\ utiles} = 71 \times 8 = 568\ \text{bits} \]
+  Les 710 bits transmis ne font donc \textbf{pas} 710/8 = 88,75 octets utiles : ils transportent \textbf{71 octets utiles} plus \textbf{142 bits d'encapsulation} (71 bits de start + 71 bits de stop). L'efficacit\'e de la transmission vaut :
+  \[ Ef = \frac{N_{bits\ utiles}}{N_{bits\ transmis}} = \frac{568}{710} = \frac{8}{10} = \boldsymbol{0{,}80} \quad\text{soit}\quad \SI{80}{\percent} \]
+  Autrement dit, \textbf{un bit sur cinq transmis sur la ligne ne porte aucune information} : c'est le prix de l'asynchronisme, qui oblige \`a resynchroniser le r\'ecepteur \`a chaque caract\`ere.
+
+  \item Le d\'ebit \'etant de 115\,200 bauds, soit ici 115\,200 bits par seconde (un symbole = un bit sur cette liaison), et le temps de transmission se calculant sur les bits \textbf{r\'eellement transmis} :
+  \[ T_{trame} = \frac{N_{bits\ transmis}}{D} = \frac{710}{115\,200} \approx \SI{6,16e-3}{\second} = \boldsymbol{\SI{6,16}{\milli\second}} \]
+  \emph{Pi\`ege \`a \'eviter} : utiliser les 568 bits utiles aurait donn\'e \SI{4,93}{\milli\second}, soit une sous-estimation de \SI{20}{\percent} du temps d'occupation de la ligne. Le d\'ebit s'applique \`a \textbf{tout} ce qui transite, encapsulation comprise.
+
+  \item La vitesse maximale du robot vaut :
+  \[ v = \SI{6}{\kilo\meter\per\hour} = \frac{6}{3{,}6} \approx \SI{1,67}{\meter\per\second} \]
+  Pendant la transmission de la trame, le robot parcourt donc :
+  \[ d = v\,T_{trame} = \frac{6}{3{,}6}\times \frac{710}{115\,200} \approx \SI{1,03e-2}{\meter} = \boldsymbol{\SI{1,03}{\centi\meter}} \]
+
+  \smallskip
+  \textbf{Conclusion.} La position transmise par le module GPS est d\'ej\`a p\'erim\'ee de \SI{1,03}{\centi\meter} au moment o\`u la carte de contr\^ole ach\`eve de la recevoir, alors que le cahier des charges exige une pr\'ecision de \SI{1}{\centi\meter} : l'exigence \textbf{n'est pas respect\'ee}, m\^eme si elle ne l'est que de tr\`es peu (\SI{3}{\percent} de d\'epassement). Ce d\'epassement est enti\`erement imputable \`a la \textbf{dur\'ee de transmission}, ind\'ependamment de toute erreur du capteur lui-m\^eme. Deux leviers sont disponibles : \textbf{augmenter le d\'ebit} de la liaison (passer \`a \SI{230400}{\baud} ram\`enerait $d$ \`a \SI{0,51}{\centi\meter}, avec une marge confortable), ou \textbf{r\'eduire la taille de la trame} en ne transmettant que les champs NMEA effectivement exploit\'es par le robot. La premi\`ere solution est la plus imm\'ediate ; c'est celle que retient le corrig\'e officiel, qui conclut qu'\guillemotleft\ il faudra choisir une liaison plus rapide \guillemotright.
+
+  \smallskip
+  \textit{Note de lecture critique du corrig\'e officiel.} Le rapport de jury 2023 \'ecrit pour cette question : \guillemotleft\ La trame comporte 71 caract\`eres soit 710 bits (10 bits par caract\`ere) soit 89 octets \guillemotright, puis conclut \`a une distance de \guillemotleft\ 1,03 m \guillemotright. Deux inexactitudes s'y sont gliss\'ees. D'abord les \guillemotleft\ 89 octets \guillemotright\ ($710/8 = 88{,}75$) m\'elangent pr\'ecis\'ement bits transmis et octets utiles : la trame v\'ehicule \textbf{71} octets utiles, pas 89. Ensuite, la formule donn\'ee par le rapport lui-m\^eme, $\frac{6}{3{,}6}\times\frac{710}{115\,200}$, vaut \num[group-minimum-digits=5]{0,0103}\,\si{\meter}, soit \textbf{\SI{1,03}{\centi\meter} et non \SI{1,03}{\meter}}. La conclusion du rapport (cahier des charges non respect\'e) reste juste, mais elle l'est de justesse et non d'un facteur 100. \textbf{Savoir contr\^oler l'ordre de grandeur d'un r\'esultat, y compris face \`a un corrig\'e, est exactement la comp\'etence attendue} : un robot viticole qui d\'eriverait d'un m\`etre entre deux mesures GPS ne pourrait tout simplement pas suivre un rang de vigne.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2023, commentaires de la cinqui\`eme partie) : \guillemotleft\ La cinqui\`eme partie permettait d'aborder l'\'electronique num\'erique et la communication par liaison s\'erie. Le jury constate beaucoup d'amalgames entre bit et octet et invite les candidats \`a revoir le principe d'une liaison s\'erie. \guillemotright}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 6 -- docTech -- 2022, epreuve ecrite disciplinaire (IE), Q16-Q17
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize 2022, \'epreuve \'ecrite disciplinaire (option IE), questions 16 et 17}
+]
+\CAPETSHOW{
+La temp\'erature r\'egnant dans la chambre d'un \textbf{poste de purge} du r\'eseau ferroviaire doit imp\'erativement \^etre connue du technicien de maintenance avant toute intervention : un tuyau ayant c\'ed\'e y ferait r\'egner une pression et une temp\'erature dangereuses. Le seuil de s\'ecurit\'e impos\'e pour une intervention humaine est de \textbf{\SI{60}{\degreeCelsius}}.
+
+Cette temp\'erature est mesur\'ee par un composant \textbf{DS1820} int\'egr\'e au module de t\'el\'etransmission TRT~200. Ce capteur dit \guillemotleft\ intelligent \guillemotright\ est reli\'e au microcontr\^oleur par un bus \textbf{OneWire} (bus Dallas, deux fils seulement : donn\'ees et masse). Le constructeur produit deux familles de ce composant :
+
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item le \textbf{DS18B20}, valeur de temp\'erature cod\'ee et configurable entre 9 et 12 bits ;
+  \item le \textbf{DS18S20}, valeur de temp\'erature cod\'ee sur 9 bits.
+\end{itemize}
+
+\begin{tcolorbox}[docTech, title={Document technique -- DS18B20 / DS18S20 sur bus OneWire (d'apr\`es la datasheet constructeur Dallas-Maxim, reconstitu\'ee)}]
+\footnotesize
+\textbf{1. Identifiant du composant -- ROM las\'eris\'ee de 64 bits.} Chaque composant porte un identifiant unique de 64 bits, organis\'e comme suit (poids forts \`a gauche) :
+
+\begin{center}
+\begin{tabular}{@{}ccc@{}}
+\toprule
+8 bits & 48 bits & 8 bits \\
+\textbf{CRC} & \textbf{Num\'ero de s\'erie} & \textbf{Code famille} \\
+\midrule
+\multicolumn{3}{@{}l}{Code famille : $\mathrm{28_{16}}$ pour le DS18B20 ; $\mathrm{10_{16}}$ pour le DS18S20.} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Le CRC est calcul\'e sur les 56 premiers bits et permet au ma\^itre de v\'erifier que l'identifiant a \'et\'e re\c{c}u sans erreur.
+
+\smallskip
+\textbf{2. M\'emoire \emph{Scratchpad} -- 9 octets.}
+
+\begin{center}
+\begin{tabular}{@{}cl@{}}
+\toprule
+Octet & Contenu \\
+\midrule
+Byte 0 & Temp\'erature, octet de poids \textbf{faible} (LSB) \\
+Byte 1 & Temp\'erature, octet de poids \textbf{fort} (MSB) \\
+Byte 2 & Seuil d'alarme haute $T_H$ \\
+Byte 3 & Seuil d'alarme basse $T_L$ \\
+\textbf{Byte 4} & \textbf{Registre de configuration} \\
+Byte 5--7 & R\'eserv\'es (usage interne) \\
+Byte 8 & CRC des huit octets pr\'ec\'edents \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\textbf{3. Registre de configuration (Byte 4).}
+
+\begin{center}
+\begin{tabular}{@{}cccccccc@{}}
+\toprule
+b7 & b6 & b5 & b4 & b3 & b2 & b1 & b0 \\
+\midrule
+0 & R1 & R0 & 1 & 1 & 1 & 1 & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{@{}cccc@{}}
+\toprule
+R1 & R0 & R\'esolution & Quantum \\
+\midrule
+0 & 0 & 9 bits & \SI{0,5}{\degreeCelsius} \\
+0 & 1 & 10 bits & \SI{0,25}{\degreeCelsius} \\
+1 & 0 & 11 bits & \SI{0,125}{\degreeCelsius} \\
+1 & 1 & \textbf{12 bits} & \textbf{\num[group-minimum-digits=5]{0,0625}\,\si{\degreeCelsius}} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\textbf{4. Format de la temp\'erature.} La temp\'erature est stock\'ee dans les Byte 1:Byte 0 sous la forme d'un mot sign\'e de 16 bits en \textbf{compl\'ement \`a 2}, le bit de poids le plus faible valant $2^{-4}$ :
+
+\begin{center}
+\begin{tabular}{@{}cccccccc@{}}
+\toprule
+\multicolumn{8}{@{}l}{Byte 0 (LSB) :} \\
+$2^{3}$ & $2^{2}$ & $2^{1}$ & $2^{0}$ & $2^{-1}$ & $2^{-2}$ & $2^{-3}$ & $2^{-4}$ \\
+\midrule
+\multicolumn{8}{@{}l}{Byte 1 (MSB) :} \\
+S & S & S & S & S & $2^{6}$ & $2^{5}$ & $2^{4}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+$S$ : bits de signe ($S = 0$ temp\'erature positive, $S = 1$ temp\'erature n\'egative).
+
+\smallskip
+\textbf{5. Commandes utilis\'ees.} $\mathrm{44_{16}}$ : lancement d'une conversion de temp\'erature (dur\'ee jusqu'\`a \SI{750}{\milli\second} en r\'esolution 12 bits). $\mathrm{BE_{16}}$ : lecture du \emph{Scratchpad} (les 9 octets sont renvoy\'es).
+
+\smallskip
+\textbf{6. Op\'erateurs MicroPython.} \texttt{\&} et bit \`a bit ; \texttt{|} ou bit \`a bit ; \texttt{\textasciicircum} ou exclusif ; \texttt{\textasciitilde} non bit \`a bit ; \texttt{<{}<} d\'ecalage \`a gauche ; \texttt{>{}>} d\'ecalage \`a droite.
+\end{tcolorbox}
+
+Une lecture de l'\textbf{identifiant} du capteur install\'e dans le poste de purge \guillemotleft\ PstPurge102 \guillemotright\ donne :
+
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}lcccccccc@{}}
+\toprule
+Octet & \multicolumn{7}{c}{$\longleftarrow$ poids forts \dots\ poids faibles $\longrightarrow$} & \\
+Valeur & $\mathrm{CC}$ & $\mathrm{3C}$ & $\mathrm{01}$ & $\mathrm{A8}$ & $\mathrm{16}$ & $\mathrm{48}$ & $\mathrm{C8}$ & $\mathrm{28}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Le microcontr\^oleur envoie ensuite $\mathrm{44_{16}}$ au capteur, attend \SI{750}{\milli\second}, puis envoie $\mathrm{BE_{16}}$. Le contenu du \emph{Scratchpad} ainsi r\'ecup\'er\'e est :
+
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}lccccccccc@{}}
+\toprule
+N\textsuperscript{o} octet & Byte 8 & Byte 7 & Byte 6 & Byte 5 & Byte 4 & Byte 3 & Byte 2 & Byte 1 & Byte 0 \\
+\midrule
+Valeur & $\mathrm{E0}$ & $\mathrm{10}$ & $\mathrm{0C}$ & $\mathrm{FF}$ & $\mathrm{7F}$ & $\mathrm{46}$ & $\mathrm{4B}$ & $\mathrm{03}$ & $\mathrm{36}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+La fonction de lecture du capteur, \'ecrite en MicroPython, comporte les deux lignes suivantes :
+
+\begin{center}
+\begin{tcolorbox}[colback=colGrayLight, colframe=colSeparator, boxrule=0.4pt, left=6pt, right=6pt, top=4pt, bottom=4pt, width=0.72\linewidth]
+\ttfamily\small
+1:\quad temp = Byte[1] <{}< 8 | Byte[0]\\
+2:\quad return temp / 16
+\end{tcolorbox}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever} dans le document technique l'organisation des 64 bits de l'identifiant, puis en d\'eduire le nombre total de capteurs par famille pouvant th\'eoriquement \^etre fabriqu\'es avec un identifiant unique. \textbf{Donner} le r\^ole du CRC. \textbf{Identifier}, \`a partir de l'identifiant relev\'e, la famille \`a laquelle appartient ce composant.
+  \item \textbf{Relever} dans le \emph{Scratchpad} l'octet qui fixe la r\'esolution de la conversion, et en d\'eduire sur combien de bits la temp\'erature est cod\'ee ici. Justifier la coh\'erence avec la temporisation de \SI{750}{\milli\second}.
+  \item Donner la valeur de la variable \texttt{temp} de la ligne 1 \textbf{en binaire}, et nommer l'op\'eration informatique r\'ealis\'ee par cette ligne.
+  \item D\'ecoder la temp\'erature r\'egnant dans le poste de purge, par \textbf{deux m\'ethodes} : en appliquant la ligne 2 du programme, puis en lisant directement les poids binaires du format de temp\'erature. Le technicien peut-il intervenir en toute s\'ecurit\'e ?
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\textbf{\'Etape 1 -- Extraction des donn\'ees du document technique.}
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item Identifiant 64 bits $=$ 8 bits de CRC $+$ \textbf{48 bits de num\'ero de s\'erie} $+$ 8 bits de code famille ($\mathrm{28_{16}}$ pour le DS18B20, $\mathrm{10_{16}}$ pour le DS18S20).
+  \item Le \emph{Scratchpad} comporte 9 octets, dont \textbf{Byte 0 et Byte 1} portent la temp\'erature (LSB puis MSB) et \textbf{Byte 4} est le \textbf{registre de configuration}.
+  \item Registre de configuration : $0\;R1\;R0\;1\;1\;1\;1\;1$, avec $R1R0 = 11$ pour la r\'esolution 12 bits.
+  \item Temp\'erature : mot sign\'e de 16 bits en compl\'ement \`a 2, LSB de poids $2^{-4}$.
+\end{itemize}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Nombre de capteurs par famille.} Le num\'ero de s\'erie occupe \textbf{48 bits}, ind\'ependamment du code famille et du CRC qui ne sont pas des degr\'es de libert\'e. Le nombre de combinaisons possibles vaut donc :
+  \[ N = 2^{48} = 281\,474\,976\,710\,656 \approx \boldsymbol{2{,}81\times 10^{14}} \text{ capteurs par famille} \]
+  \textbf{R\^ole du CRC.} Le CRC (\emph{Cyclical Redundancy Check}) est un code de contr\^ole d'int\'egrit\'e : recalcul\'e par le ma\^itre sur les 56 bits re\c{c}us et compar\'e aux 8 bits transmis, il permet de \textbf{d\'etecter une alt\'eration de l'identifiant} lors de son transport sur le bus OneWire. Il ne corrige pas l'erreur : il signale qu'il faut relire.
+
+  \textbf{Famille du composant.} Le code famille est l'octet de \textbf{poids faible}, c'est-\`a-dire le dernier de la lecture : $\mathrm{28_{16}}$. Le composant install\'e est donc un \textbf{DS18B20} (r\'esolution configurable de 9 \`a 12 bits), et non un DS18S20 (qui porterait $\mathrm{10_{16}}$).
+
+  \emph{Attention au sens de lecture} : l'octet de t\^ete de la lecture, $\mathrm{CC_{16}}$, est le \textbf{CRC} et non le code famille. Le confondre conduirait \`a chercher une famille $\mathrm{CC_{16}}$ inexistante.
+
+  \item L'octet qui fixe la r\'esolution est le \textbf{Byte 4}, registre de configuration, qui vaut ici $\mathrm{7F_{16}}$ :
+  \[ \mathrm{7F_{16}} = 0111\;1111_2 \quad\Longrightarrow\quad b_7 = 0,\ \underbrace{R1 = 1,\ R0 = 1}_{b_6,\ b_5},\ b_4\ldots b_0 = 11111 \]
+  $R1R0 = 11$ : la temp\'erature est donc cod\'ee sur \textbf{12 bits}, avec un quantum de $q = 2^{-4} = \num[group-minimum-digits=5]{0,0625}\,\si{\degreeCelsius}$.
+
+  \textbf{Coh\'erence avec la temporisation.} Les \SI{750}{\milli\second} d'attente impos\'ees entre l'envoi de $\mathrm{44_{16}}$ et celui de $\mathrm{BE_{16}}$ correspondent pr\'ecis\'ement au \textbf{temps de conversion maximal en r\'esolution 12 bits}, la plus lente des quatre. Les deux informations se confirment mutuellement : le microcontr\^oleur attend bien le temps requis par la configuration effectivement charg\'ee dans le capteur.
+
+  \item La ligne 1 reconstitue un mot de 16 bits \`a partir des deux octets du \emph{Scratchpad} :
+  \[ \texttt{Byte[1] <{}< 8} \;=\; \mathrm{03_{16}} \ll 8 \;=\; \mathrm{0300_{16}} \qquad\text{puis}\qquad \mathrm{0300_{16}}\ \texttt{|}\ \mathrm{36_{16}} \;=\; \mathrm{0336_{16}} \]
+  Soit, en binaire :
+  \[ \texttt{temp} = \boldsymbol{0000\;0011\;0011\;0110_2} \qquad (= \mathrm{0336_{16}} = 822_{10}) \]
+  L'op\'eration r\'ealis\'ee -- un d\'ecalage \`a gauche de l'octet de poids fort suivi d'un \guillemotleft\ ou \guillemotright\ bit \`a bit avec l'octet de poids faible -- est une \textbf{concat\'enation} des deux octets en un mot unique de 16 bits. Le \guillemotleft\ ou \guillemotright\ fonctionne ici comme une addition sans retenue, les 8 bits de poids faible de \texttt{Byte[1] <{}< 8} \'etant tous nuls.
+
+  \item \textbf{M\'ethode 1 -- par la ligne 2 du programme.} Le bit de poids fort du mot vaut $0$ : la temp\'erature est \textbf{positive}, aucune conversion de compl\'ement \`a 2 n'est requise.
+  \[ T = \frac{\texttt{temp}}{16} = \frac{822}{16} = \boldsymbol{\SI{51,375}{\degreeCelsius}} \]
+  La division par 16 n'est pas arbitraire : elle traduit exactement le fait que le bit de poids le plus faible vaut $2^{-4} = 1/16$ de degr\'e.
+
+  \textbf{M\'ethode 2 -- par lecture directe des poids.} En rempla\c{c}ant chaque bit \`a 1 par son poids dans le format du document technique, le mot $0000\;0011\;0011\;0110_2$ donne :
+  \[ T = 2^{5} + 2^{4} + 2^{1} + 2^{0} + 2^{-2} + 2^{-3} = 32 + 16 + 2 + 1 + 0{,}25 + 0{,}125 = \SI{51,375}{\degreeCelsius} \]
+  Les deux m\'ethodes concordent, ce qui valide \`a la fois la lecture du \emph{Scratchpad} et l'interpr\'etation du format.
+
+  \smallskip
+  \textbf{Conclusion.} La temp\'erature r\'egnant dans le poste de purge vaut \SI{51,375}{\degreeCelsius}, \textbf{inf\'erieure au seuil de \SI{60}{\degreeCelsius}} fix\'e pour une intervention humaine : le technicien \textbf{peut intervenir en s\'ecurit\'e}. La marge n'est toutefois que de \SI{8,6}{\degreeCelsius}, et rien n'indique dans cette mesure unique si la temp\'erature est stable ou en train de monter -- ce qui justifie pleinement l'architecture retenue par le constructeur : l'historique des mesures est enregistr\'e en base de donn\'ees et consult\'e par le technicien \textbf{avant} son d\'eplacement, de mani\`ere \`a juger d'une \textbf{tendance} et pas seulement d'un instantan\'e. On notera enfin que la r\'esolution de \num[group-minimum-digits=5]{0,0625}\,\si{\degreeCelsius} est ici tr\`es largement surdimensionn\'ee au regard d'une d\'ecision binaire prise sur un seuil de \SI{60}{\degreeCelsius} : une configuration 9 bits (\SI{0,5}{\degreeCelsius}) aurait suffi et aurait divis\'e par huit le temps de conversion, donc la consommation du module -- argument non n\'egligeable pour un \'equipement de t\'el\'etransmission aliment\'e de fa\c{c}on autonome.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

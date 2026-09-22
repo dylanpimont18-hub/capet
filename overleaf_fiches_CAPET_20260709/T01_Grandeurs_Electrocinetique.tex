@@ -1,0 +1,416 @@
+﻿\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colElec}{T01}} - Grandeurs electriques et electrocinetique}
+\fancyhead[R]{\small\textit{CAPET SII IE - Session 2026}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC 0 - EN-TeTE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colElec,
+  colframe=colElec,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T01 \quad Grandeurs electriques fondamentales et electrocinetique}\\[2pt]
+  {\color{colElecLight}\small
+    \textbf{Domaine :} electrotechnique \quad
+    \textbf{Presence :} \textbf{13/13} sujets (2013-2026) - theme \emph{systematiquement} present
+  }\\[1pt]
+  {\color{colElecLight!80!white}\footnotesize
+    Sous-themes : lois de Kirchhoff - diviseur de tension/courant - valeur efficace - regime continu vs alternatif
+  }
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  BLOC 1 - RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Lois fondamentales ------------------------------------------
+\textbf{1.1 Lois de Kirchhoff et loi d'Ohm}
+
+\smallskip
+Tout circuit peut etre resolu par application systematique de ces trois lois.
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{llll}
+\toprule
+\textbf{Loi} & \textbf{enonce} & \textbf{Expression} & \textbf{Remarque} \\
+\midrule
+Loi d'Ohm & Tension = resistance - courant & $u = R \cdot i$ & $R$ en $\Omega$ \\[3pt]
+Loi d'Ohm generalisee & Avec source de tension $e$ & $u = R \cdot i + e$ & Branche active \\[3pt]
+Loi des mailles (LMK) & Somme algebrique des tensions & $\sum e_k = \sum R_k i_k$ & Choisir un sens \\[3pt]
+Loi des neuds (LNK) & Conservation des courants & $\sum i_\text{entrants} = \sum i_\text{sortants}$ & En tout neud \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\textbf{Diviseurs :}
+\[
+  V_s = V_e \cdot \frac{R_B}{R_A + R_B} \quad \text{(tension)}
+  \qquad\qquad
+  I_1 = I \cdot \frac{R_2}{R_1 + R_2} \quad \text{(courant)}
+\]
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 Regime sinusoedal ------------------------------------------
+\textbf{1.2 Grandeurs sinusoedales - valeurs efficaces}
+
+\smallskip
+Pour $u(t) = U_\text{max}\cos(\omega t + \phi)$, la \textbf{valeur efficace} vaut :
+\[
+  U_\text{eff} = \frac{U_\text{max}}{\sqrt{2}} \quad \text{(sinusoede pure)}
+  \qquad
+  U_\text{eff} = \sqrt{\frac{1}{T}\int_0^T u^2(t)\,dt} \quad \text{(cas general)}
+\]
+
+Reseau franeais : $U_\text{eff} = \SI{230}{\volt}$ (phase-neutre), $U_\text{max} = 230\sqrt{2} \approx \SI{325}{\volt}$.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 ALI parfait ----------------------------------------------
+\textbf{1.3 Amplificateur Lineaire Integre (ALI) parfait - hypotheses}
+
+\smallskip
+En regime lineaire, un ALI parfait verifie deux hypotheses fondamentales :
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{lll}
+\toprule
+\textbf{Hypothese} & \textbf{Expression} & \textbf{Consequence} \\
+\midrule
+Entrees - meme potentiel & $v_+ = v_-$ & Calculer $v_-$ depuis $v_+$ \\[3pt]
+Courants d'entree nuls & $i_+ = i_- = 0$ & LNK simplifiee aux entrees \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+Application : dans un montage inverseur, la LNK au neud $v_-$ donne directement le gain $G = -R_2/R_1$.
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  BLOC 2 - FORMULAIRE SYNTHeTIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthetique},
+]
+
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.2cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Lois de base (DC et AC)}} \\
+$u = R \cdot i$ & Loi d'Ohm & V \\
+$u = R \cdot i + e$ & Branche active & V \\
+$V_s = V_e \cdot R_B/(R_A+R_B)$ & Div. tension & V \\
+$I_1 = I \cdot R_2/(R_1+R_2)$ & Div. courant & A \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Valeur efficace}} \\
+$U_\text{eff} = U_\text{max}/\sqrt{2}$ & Sinusoede & V \\
+$E_C = \tfrac{1}{2}C V^2$ & energie condo & J \\
+$E_L = \tfrac{1}{2}L I^2$ & energie bobine & J \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Constantes de temps}} \\
+$\tau = RC$ & Circuit RC & s \\
+$\tau = L/R$ & Circuit RL & s \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.2cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Puissances}} \\
+$P = U \cdot I$ & Continu & W \\
+$P = U I\cos\varphi$ & AC monophase & W \\
+$P = \sqrt{3}\,UI\cos\varphi$ & AC triphase & W \\
+$Q = UI\sin\varphi$ & Reactive & VAR \\
+$S = UI = \sqrt{P^2+Q^2}$ & Apparente & VA \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Moteur asynchrone (MAS)}} \\
+$N_s = 60f/p$ & Vitesse synchro & tr/min \\
+$g = (N_s - N)/N_s$ & Glissement & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Reseau FR}} \\
+$V = \SI{230}{\volt}$, $U = \SI{400}{\volt}$ & Phase / Ligne & V \\
+$\omega = 2\pi\times50 \approx 314$ & Pulsation & rad/s \\
+\bottomrule
+\end{tabular}
+
+\end{multicols}
+\normalsize
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  BLOC 3 - QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets reels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+% Mini-procedure de resolution type copie concours
+\begin{tcolorbox}[questiontype,title={Procedure type copie concours (5 etapes)}]
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Qualifier le modele} : hypotheses, domaine de validite, grandeurs d'entree/sortie.
+  \item \textbf{Ecrire les lois} : equations de base avec symboles et unites SI.
+  \item \textbf{Isoler l'inconnue} : expression litterale, puis application numerique tracee.
+  \item \textbf{Controler l'ordre de grandeur} : coherence physique et unite finale.
+  \item \textbf{Conclure concours} : phrase courte orientee decision technique.
+\end{enumerate}
+\end{tcolorbox}
+
+% Visuel de methode : chemin de resolution CAPET
+\begin{center}
+\begin{tikzpicture}[font=\small, node distance=7mm and 6mm, >=Stealth]
+  \node[draw, rounded corners, fill=colElec!8, inner sep=4pt] (n1) {Notions};
+  \node[draw, rounded corners, fill=colElec!8, right=of n1, inner sep=4pt] (n2) {Methode};
+  \node[draw, rounded corners, fill=colElec!8, right=of n2, inner sep=4pt] (n3) {Application annale};
+  \node[draw, rounded corners, fill=colElec!8, right=of n3, inner sep=4pt] (n4) {Verification jury};
+  \draw[->, thick, colElec] (n1) -- (n2);
+  \draw[->, thick, colElec] (n2) -- (n3);
+  \draw[->, thick, colElec] (n3) -- (n4);
+\end{tikzpicture}
+\end{center}
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Loi des mailles avec ALI parfait \hfill\normalfont\footnotesize E2 disciplinaire IE 2024}
+]
+
+\textbf{enonce.}
+Le montage comporte un ALI parfait en regime lineaire.
+La resistance $R_1$ est connectee entre l'entree $e_{AB}$ et l'entree inverseuse $v_-$.
+La resistance $R_2$ est en contre-reaction (de la sortie vers $v_-$).
+ecrire la relation liant $e_{AB}$ - la tension aux bornes de $R_2$.
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{etape 1 - Hypothese ALI.}
+En regime lineaire : $v_+ = v_- = 0$ (entree non-inverseuse - la masse) et $i_- = 0$.
+
+\textbf{etape 2 - LNK au neud $v_-$.}
+Le courant entrant par $R_1$ doit ressortir par $R_2$ (puisque $i_- = 0$) :
+\[
+  \frac{e_{AB} - 0}{R_1} = \frac{0 - V_s}{R_2}
+  \quad\Longrightarrow\quad
+  V_s = -\frac{R_2}{R_1}\,e_{AB}
+\]
+La tension $e_{AB}$ se retrouve integralement traduite en sortie avec le gain $-R_2/R_1$.
+
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Diviseur de tension - rapport d'attenuation \hfill\normalfont\footnotesize E2 disciplinaire IE 2023}
+]
+
+\textbf{enonce.}
+Le circuit F2 est un pont diviseur de tension alimente par $V_{e1}$.
+Il comporte deux resistances $R_A$ et $R_B$ ($R_A = 9\,R_B$) montees en serie.
+Exprimer $V_{s1}$ en fonction de $V_{e1}$, $R_A$, $R_B$ puis calculer le rapport $V_{s1}/V_{e1}$.
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{etape 1 - Formule du diviseur de tension.}
+\[
+  V_{s1} = V_{e1} \cdot \frac{R_B}{R_A + R_B}
+\]
+
+\textbf{etape 2 - Application numerique avec $R_A = 9\,R_B$.}
+\[
+  V_{s1} = V_{e1} \cdot \frac{R_B}{9R_B + R_B} = V_{e1} \cdot \frac{1}{10}
+  \quad\Longrightarrow\quad
+  \frac{V_{s1}}{V_{e1}} = \mathbf{\frac{1}{10}}
+\]
+Le circuit realise une attenuation d'un facteur 10 : il ramene une tension $V_{e1}$ - un dixieme de sa valeur.
+
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Constante de temps d'un circuit RL - modele Thevenin \hfill\normalfont\footnotesize E2 disciplinaire IE 2023}
+]
+
+\textbf{enonce.}
+Une batterie est modelisee par une force electromotrice $E_{Li}$ en serie avec une resistance interne $R_{Li}$ et une inductance $L$.
+Le circuit est ferme sur une charge resistive $R$.
+Calculer la constante de temps $\tau$ du circuit en regime transitoire.
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{etape 1 - equation differentielle par LMK.}
+
+La loi des mailles donne :
+\[
+  E_{Li} = R_{Li}\,i + L\,\frac{di}{dt} + R\,i = (R_{Li}+R)\,i + L\,\frac{di}{dt}
+\]
+
+\textbf{etape 2 - Identification de la constante de temps.}
+
+On identifie - la forme canonique du premier ordre :
+\[
+  \tau\,\frac{di}{dt} + i = \frac{E_{Li}}{R_{Li}+R}
+  \quad\Longrightarrow\quad
+  \boxed{\tau = \frac{L}{R_{Li}+R}}
+\]
+En negligeant la charge ($R \ll R_{Li}$), on retrouve $\tau \approx L/R_{Li}$.
+
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  BLOC 4 - ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs recurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Confondre puissance continue et alternative.}
+  En DC : $P = U \cdot I$. En AC : $P = U_\text{eff} I_\text{eff} \cos\varphi$.
+  Utiliser $P = UI$ en regime AC revient - supposer $\cos\varphi = 1$, ce qui est rarement vrai.
+
+  \item \textbf{Oublier de choisir un sens de parcours avant d'ecrire une LMK.}
+  Une tension est comptee positivement si le sens de parcours va du $-$ au $+$ de la source.
+  Ne jamais ecrire une LMK sans avoir trace le sens sur le schema.
+
+  \item \textbf{Confondre valeur de crete et valeur efficace.}
+  $U_\text{max} = U_\text{eff}\sqrt{2}$ uniquement pour un signal sinusoedal pur.
+  Pour un signal deforme : utiliser la definition integrale.
+
+  \item \textbf{Oublier les hypotheses de l'ALI parfait.}
+  $v_+ = v_-$ et $i_+ = i_- = 0$ en regime lineaire : ces deux hypotheses doivent etre
+  invoquees explicitement avant d'appliquer la LNK, sans quoi la demarche n'est pas valide.
+
+  \item \textbf{Confondre tension de phase et tension composee en triphase.}
+  Reseau 400\,V/230\,V : $V = \SI{230}{\volt}$ (phase-neutre), $U = \SI{400}{\volt}$ (entre phases).
+  $P = \sqrt{3}\,UI\cos\varphi$ utilise la tension \emph{composee} $U$ et le courant \emph{de ligne}.
+
+  \item \textbf{Ne pas justifier les etapes de calcul.}
+  Le jury attend la demarche, pas seulement le resultat numerique.
+  ecrire la formule litterale, substituer les valeurs, isoler l'inconnue, encadrer le resultat.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2024 : "Le jury a constate le manque de maetrise des formules de base sur les reseaux triphases, le regime sinusoedal et les relations d'electrocinetique telles que la loi des mailles, la loi des neuds ou encore la loi d'Ohm."
+Rapport jury 2025 : "De nombreux candidats ne maetrisent pas les lois basiques de l'electricite (la loi des neuds, la loi des mailles, les calculs de puissance ou encore la loi d'Ohm)."
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  BLOC 5 - PReSENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colGrayLight,
+  colframe=colSeparator,
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+  before skip=4pt, after skip=0pt,
+  fonttitle=\small\bfseries,
+  title={Presence dans les sujets analyses (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Annee} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)    & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+E2 discipl. IE  & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-themes frequents :}
+Loi des mailles / neuds (13/13) - loi d'Ohm (13/13) - diviseur de tension (10/13) - ALI parfait (8/13) - constante de temps RC/RL (7/13) - valeur efficace (6/13)
+
+\medskip
+\textbf{Ordres de grandeur (reperes rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Reseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, frequence \SI{50}{\hertz}.
+  \item Courants d'etude frequents en sujet : de quelques \si{\ampere} a quelques dizaines de \si{\ampere}.
+  \item En conversion d'energie, un rendement attendu reste generalement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthese express (a refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypotheses du modele et les conventions de signe.
+  \item Ecrire 2 a 4 relations cles avec unites.
+  \item Realiser un calcul numerique complet et verifier l'ordre de grandeur.
+  \item Justifier le resultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,388 @@
+﻿\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colElec}{T12}} - Machine synchrone et brushless (PMSM / BLDC)}
+\fancyhead[R]{\small\textit{CAPET SII IE - Session 2026}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TeTE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colElec,
+  colframe=colElec,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T12 \quad Machine synchrone et brushless (PMSM\,/\,BLDC)}\\[2pt]
+  {\color{colElec!30!white}\small
+    \textbf{Domaine :} electrotechnique - Machines electriques \quad
+    \textbf{Presence :} \textbf{6/13} sujets (2013-2026) - theme \emph{regulier}
+  }\\[1pt]
+  {\color{colElec!20!white}\footnotesize
+    Sous-themes : frequence d'alimentation et paires de peles - couplage etoile/triangle - diagramme de Kapp - servomoteur brushless (PMSM/BLDC) - autopilotage - rendement chaene de puissance
+  }
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Vitesse de synchronisme ---------------------------------------
+\textbf{1.1 Vitesse de synchronisme}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{lll}
+\toprule
+\textbf{Grandeur} & \textbf{Expression} & \textbf{Unite} \\
+\midrule
+Vitesse angulaire mecanique & $\omega_m = \dfrac{2\pi f}{p}$ & rades$^{-1}$ \\[6pt]
+Vitesse de synchronisme & $N_s = \dfrac{60\,f}{p}$ & tremin$^{-1}$ \\[6pt]
+Frequence imposee par la vitesse & $f = p \cdot \dfrac{N}{60}$ & Hz \\[4pt]
+\bottomrule
+\end{tabular}
+\end{center}
+$p$ = nombre de \textbf{paires} de peles ( nombre de peles).
+Une machine - 28 peles a $p = 14$.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 equation electrique et diagramme de Kapp ---------------------
+\textbf{1.2 equation electrique - circuit equivalent monophase}
+
+\smallskip
+\[
+  \vec{V}_s = \vec{E} + R_s \vec{I}_s + jX_s \vec{I}_s
+  \qquad;\qquad
+  X_s = L_s \omega
+\]
+En convention moteur avec $R_s \approx 0$ :
+\[
+  E = \sqrt{V_s^2 + (X_s I_s)^2} \quad \text{(si } \cos\varphi = 1 \text{)}
+  \qquad;\qquad
+  P_{max} = \frac{3\,V_s E}{X_s} \quad (\delta = 90^\circ)
+\]
+L'angle de charge $\delta$ : en moteur $\delta > 0$ (rotor en avance) ; en generateur $\delta < 0$.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 Servomoteur PMSM/BLDC ----------------------------------------
+\textbf{1.3 Servomoteur brushless (PMSM / BLDC) - comparaison MCC}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{llll}
+\toprule
+\textbf{Critere} & \textbf{MCC} & \textbf{PMSM / BLDC} & \textbf{MAS} \\
+\midrule
+Entretien & Balais - changer & Aucun (pas de balais) & Faible \\
+Commutation & Mecanique (collecteur) & electronique (onduleur) & - \\
+Densite de puissance & Moyenne & elevee & Moyenne \\
+Coet & Moyen & eleve & Faible \\
+Capteur position & Non requis & Resolveur / Encodeur / Hall & Non requis \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+
+\textbf{Servomoteur vs moteur :} un servomoteur est un moteur associe - un capteur de retour (resolveur, encodeur, capteurs Hall) et - une boucle fermee d'asservissement en position, vitesse ou couple.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 Couplage etoile/triangle -------------------------------------
+\textbf{1.4 Couplage etoile / triangle}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{lll}
+\toprule
+\textbf{Couplage} & \textbf{Tension par enroulement} & \textbf{Choisir si} \\
+\midrule
+etoile (Y) & $V_{enr} = V_{composee} / \sqrt{3}$ & $V_{nom\,enr} < V_{composee}$ \\[4pt]
+Triangle ($\Delta$) & $V_{enr} = V_{composee}$ & $V_{nom\,enr} = V_{composee}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHeTIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthetique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Synchronisme}} \\
+$N_s = 60f/p$ & Vitesse synchro & tr/min \\
+$\omega_m = 2\pi f/p$ & Vitesse angulaire & rad/s \\
+$f = p \cdot N/60$ & Frequence imposee & Hz \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Circuit equivalent}} \\
+$\vec{V}_s = \vec{E} + jX_s\vec{I}_s$ & equation ($R_s=0$) & V \\
+$X_s = L_s \omega$ & Reactance sync. & O \\
+$E = k\phi\Omega$ & FEM aimants & V \\
+$P_{em} = 3V_sE\sin\delta/X_s$ & Puissance em & W \\
+$P_{max} = 3V_sE/X_s$ & P max ($\delta=90^\circ$) & W \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Couple}} \\
+$C_{em} = P_{em}/\Omega$ & Couple em & Nem \\
+$C_{nom} = P_{nom}/\Omega_{nom}$ & Couple nominal & Nem \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Couplage}} \\
+$V_Y = V_{comp}/\sqrt{3}$ & etoile & V \\
+$V_\Delta = V_{comp}$ & Triangle & V \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Donnees Urbanloop 2024}} \\
+$p = 14$ (28 peles) & Urbanloop & - \\
+$V_{comp} = 72$ V & Onduleur & V \\
+$f_0 = 185{,}6$ Hz & - 60 kmeh$^{-1}$ & Hz \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets reels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+% Mini-procedure de resolution type copie concours
+\begin{tcolorbox}[questiontype,title={Procedure type copie concours (5 etapes)}]
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Qualifier le modele} : hypotheses, domaine de validite, grandeurs d'entree/sortie.
+  \item \textbf{Ecrire les lois} : equations de base avec symboles et unites SI.
+  \item \textbf{Isoler l'inconnue} : expression litterale, puis application numerique tracee.
+  \item \textbf{Controler l'ordre de grandeur} : coherence physique et unite finale.
+  \item \textbf{Conclure concours} : phrase courte orientee decision technique.
+\end{enumerate}
+\end{tcolorbox}
+
+% Visuel de methode : chemin de resolution CAPET
+\begin{center}
+\begin{tikzpicture}[font=\small, node distance=7mm and 6mm, >=Stealth]
+  \node[draw, rounded corners, fill=colElec!8, inner sep=4pt] (n1) {Notions};
+  \node[draw, rounded corners, fill=colElec!8, right=of n1, inner sep=4pt] (n2) {Methode};
+  \node[draw, rounded corners, fill=colElec!8, right=of n2, inner sep=4pt] (n3) {Application annale};
+  \node[draw, rounded corners, fill=colElec!8, right=of n3, inner sep=4pt] (n4) {Verification jury};
+  \draw[->, thick, colElec] (n1) -- (n2);
+  \draw[->, thick, colElec] (n2) -- (n3);
+  \draw[->, thick, colElec] (n3) -- (n4);
+\end{tikzpicture}
+\end{center}
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Frequence d'alimentation et couplage - capsule Urbanloop \hfill\normalfont\footnotesize E2 appl. 2024 (Q44-46)}
+]
+\textbf{enonce.}
+La capsule Urbanloop est motorisee par quatre PMSM - 28 peles. La vitesse maximale est $V_0 = 60\,\mathrm{km\!\cdot\!h^{-1}}$, le rayon de roue $R = 0{,}20\,\mathrm{m}$. L'onduleur delivre une tension composee de 72\,V efficace. La tension nominale des enroulements du stator est 72\,V. Calculer la frequence $f_0$ et indiquer le couplage.
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{etape 1 - vitesse de la roue :}
+\[
+  \omega_{roue} = \frac{V_0}{R} = \frac{60\,000/3600}{0{,}20} = \frac{16{,}67}{0{,}20} = 83{,}3\,\mathrm{rad\!\cdot\!s^{-1}}
+\]
+
+\textbf{etape 2 - frequence ($p = 28/2 = 14$) :}
+\[
+  f_0 = \frac{p\,\omega_{roue}}{2\pi} = \frac{14 \times 83{,}3}{2\pi} \approx \mathbf{185{,}6\,\mathrm{Hz}}
+\]
+
+\textbf{etape 3 - couplage :} tension nominale par enroulement = 72\,V = tension composee - \textbf{couplage triangle}. En etoile, chaque enroulement ne recevrait que $72/\sqrt{3} \approx 41{,}6\,\mathrm{V}$.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Servomoteur brushless - definition et difference \hfill\normalfont\footnotesize E2 appl. 2025 (Q18, robots KUKA KR QUANTEC)}
+]
+\textbf{enonce.}
+Les robots KUKA KR QUANTEC sont equipes de servomoteurs brushless. Rappeler la definition d'un servomoteur et preciser la difference avec un moteur classique.
+
+\tcbline
+
+\textbf{Corrige.}
+
+Un \textbf{moteur} convertit une energie electrique en energie mecanique en boucle ouverte : il n'y a pas de retour d'information sur la position ou la vitesse.
+
+Un \textbf{servomoteur} est un moteur associe - un \textbf{capteur de position} (encodeur incremental, resolveur ou capteurs Hall) et - une \textbf{boucle d'asservissement fermee}. Il est commande precisement en position, vitesse ou couple.
+
+Les servomoteurs brushless (PMSM) utilisent des \textbf{aimants permanents au rotor} - pas de collecteur ni de balais - entretien reduit, duree de vie allongee, densite de puissance elevee. La commutation est assuree electroniquement par l'onduleur pilote par les signaux du capteur.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Rendement de la chaene de puissance (robot Bakus) \hfill\normalfont\footnotesize E2 disc. 2023 (Figure 5)}
+]
+\textbf{enonce.}
+La chaene de puissance du robot Bakus comprend : convertisseur statique ($\eta_{CS} = 0{,}97$), machine synchrone ($\eta_{MS} = 0{,}90$) et reducteur ($\eta_{red} = 0{,}72$). La puissance mecanique necessaire est $P_{meca} = 500\,\mathrm{W}$. Exprimer et calculer la puissance electrique $P_{elec}$ fournie par les batteries.
+
+\tcbline
+
+\textbf{Corrige.}
+
+Le rendement global de la chaene est le produit des rendements en serie :
+\[
+  \eta_{global} = \eta_{CS} \times \eta_{MS} \times \eta_{red} = 0{,}97 \times 0{,}90 \times 0{,}72 = 0{,}630
+\]
+\[
+  P_{elec} = \frac{P_{meca}}{\eta_{global}} = \frac{500}{0{,}630} \approx \mathbf{794\,\mathrm{W}}
+\]
+Conclusion : les pertes dans la chaene representent $500 \times (1/0{,}63 - 1) \approx 294\,\mathrm{W}$ soit 37 \% de l'energie batt\-erie.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs recurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Paires de peles vs nombre de peles.}
+  $p$ designe les paires de peles. Une machine - 28 peles a $p = 14$. L'erreur $p = 28$ donne une frequence deux fois trop grande.
+
+  \item \textbf{Couplage etoile/triangle : comparer les tensions.}
+  Comparer systematiquement la tension nominale d'un enroulement (donnee constructeur) avec la tension composee disponible. En triangle : $V_{enr} = V_{comp}$. Justifier explicitement.
+
+  \item \textbf{Decrochage de la machine synchrone.}
+  - vitesse fixe (reseau), le couple max est atteint pour $\delta = 90^\circ$. Si le couple resistant depasse $C_{max}$, la machine decroche brutalement. En autopilotage (PMSM), ce risque est supprime.
+
+  \item \textbf{Angle de charge et signe.}
+  En moteur $\delta > 0$ (rotor en avance sur le champ tournant). En generateur $\delta < 0$. Oublier le signe conduit - une erreur dans le diagramme de Kapp.
+
+  \item \textbf{Servomoteur : mentionner le capteur ET la boucle fermee.}
+  Le jury 2025 deplore les reponses qui evoquent le servomoteur sans preciser le capteur de retour (type : resolveur, encodeur) ni le rele de la boucle d'asservissement dans la precision.
+
+  \item \textbf{Rendement de chaene = produit des rendements elementaires.}
+  Presenter les trois rendements avant de les multiplier. Ne pas les additionner.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2024 : "La partie portant sur l'etude de la machine synchrone (partie 3.3) a ete globalement bien traitee par les candidats qui ont su appliquer la relation entre frequence d'alimentation et vitesse de rotation."\\
+Rapport jury 2025 : "Le jury regrette que certains candidats confondent servomoteur et moteur classique, et ne precisent pas la nature de la boucle de retour ni son rele dans la precision du positionnement."
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PReSENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colGrayLight,
+  colframe=colSeparator,
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+  before skip=4pt, after skip=0pt,
+  fonttitle=\small\bfseries,
+  title={Presence dans les sujets analyses (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Annee} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & - & - & - & - & - & - & - & - & - & - & - & - \\
+E2 discipl. IE & - & - & $\checkmark$ & - & - & - & - & - & - & - & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-themes frequents :}
+frequence d'alimentation $f = pN/60$ (3/13) - couplage etoile/triangle (2/13) - servomoteur brushless (2/13) - diagramme de Kapp (2/13) - rendement chaene de puissance (2/13)
+
+\medskip
+\textbf{Ordres de grandeur (reperes rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Reseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, frequence \SI{50}{\hertz}.
+  \item Courants d'etude frequents en sujet : de quelques \si{\ampere} a quelques dizaines de \si{\ampere}.
+  \item En conversion d'energie, un rendement attendu reste generalement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthese express (a refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypotheses du modele et les conventions de signe.
+  \item Ecrire 2 a 4 relations cles avec unites.
+  \item Realiser un calcul numerique complet et verifier l'ordre de grandeur.
+  \item Justifier le resultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,366 @@
+% T16 -- \'Energies renouvelables : photovolta\"ique, hydraulique, \'eolien -- banque d'exercices
+% Sources (valeurs num\'eriques v\'erifi\'ees mot pour mot dans les sujets/rapports de jury r\'eels).
+% PASSE COMPL\'EMENTARIT\'E 2026-09-02 : la fiche T16 traite d\'ej\`a en Questions Types
+%   QT1 = 2021 Q11/Q12 (250000/320 = 782 panneaux, 1298 m^2, Voc_cell = 0,683 V),
+%   QT2 = 2021 Q13 (782/30 = 26 panneaux/entr\'ee, 892,32 V, 8320 W, v\'erif onduleur),
+%   QT3 = 2025 Q17/Q18 (signe de dP en P1/P2, m\'ethode P\&O).
+% Les exercices qui refaisaient ces trois calculs ont \'et\'e remplac\'es par d'autres
+% questions des M\^EMES sujets, non trait\'ees par la fiche.
+% Sources d\'etaill\'ees :
+%   - Exercice 1 : E2_Disciplinaire_IE_2022 (Q19) et Rapport_Jury_2022 l.270-273 :
+%     comparaison Peltier / micro-turbine+alternateur / panneaux PV (avantages-inconv\'enients)
+%   - Exercice 2 : E2_Disciplinaire_IE_2025, \guillemotleft\ \'Epreuve \'ecrite disciplinaire
+%     \guillemotright\ (Q6 et Q7). Donn\'ees toutes textuelles dans le sujet :
+%     ETOT = 1,3.10^9 Wh/an (l.107), eta_panneau = 18,9 % (l.117), Esan = 1447 kWh/m^2 (l.139),
+%     DT5 : eta_Mod = 90 % et perte de ligne 3 % (l.589 et bloc image-texte l.594-596).
+%     R\'esultats officiels Rapport_Jury_2025 : Ejour = 3561 kWh (Q13) et surface
+%     \guillemotleft\ 5445 m2 \guillemotright\ (Q7).
+%   - Exercice 3 (docTech) : E2_Disciplinaire_IE_2025 (Q16). L'encadr\'e docTech reproduit
+%     LITT\'ERALEMENT la ligne 599 du sujet (document technique DT5) :
+%     \guillemotleft\ Caract\'eristiques d'un panneau : monocristallin ; eta_panneau = 18,9 %
+%     Pnom = 375 W Unom = 39,6 V ; Inom = 9,47 A Uco = 48,2 V ; Icc = 9,92 A
+%     L x l x e = 1 980 mm x 1 002 mm x 40 mm Poids : 22 kg \guillemotright.
+%     Seules la mise en tableau et l'ordre des lignes sont reconstitu\'es (le DT5 original est
+%     une image omise par la conversion Markdown) ; AUCUNE valeur ajout\'ee. Unom champ = 317 V
+%     et Inom champ = 9,47 A viennent de la l.240 du sujet. R\'esultats officiels
+%     Rapport_Jury_2025 Q16 : 317/39,6 = 8 panneaux en s\'erie, 1,98x1,002x8 = 16 m^2,
+%     317x9,47 = 3 kW.
+%   - Exercice 4 (micro-centrale hydraulique au fil de l'eau) : exercice in\'edit, formule
+%     $P_{turb}=\rho g Q H_{net}\eta_{turb}$ reprise de fiches/T16_contenu.md (section 1.3),
+%     donn\'ees num\'eriques invent\'ees (annonc\'e comme in\'edit).
+%   - Exercice 5 : E2_Sujet_2021, \guillemotleft\ \'Etude d'un syst\`eme, d'un proc\'ed\'e ou
+%     d'une organisation \guillemotright\ (Q5, Q6, Q9, Q10) -- bilan \'energ\'etique de la
+%     micro-STEP. Donn\'ees textuelles du sujet : citerne 1 000 m^3 (l.90), volume utile 90 %
+%     (l.135), rho = 1000 kg/m^3 et g = 9,81 (l.135), rendement de turbinage 78 % et
+%     consommation du village 580 kWh/jour (l.137), HMT 135 m (l.143).
+%     R\'esultats officiels Rapport_Jury_2021 : h = 130 m et Ep = 318,825 kWh (l.559),
+%     Eelec = 248,68 kWh soit 43 % du besoin (l.563), Qpompe = 160 m^3/h et t = 5,625 h
+%     (l.577), Pabs = 76 kW, Eremplissage = 427,5 kWh, eta_st = 58,17 % (l.581-583),
+%     conclusion Q10 (l.585).
+%   - Exercice 6 (\'eolien, loi de Betz) : exercice in\'edit, rho_air = 1,225 kg/m^3
+%     (valeur atmosph\'erique standard ISA au niveau de la mer), limite de Betz
+%     Cp_max = 16/27 (constante physique classique).
+% Citations de jury : uniquement des verbatims exacts, r\'ef\'erenc\'es (Rapport_Jury_2021
+% l.759 et Rapport_Jury_2025 l.331). Aucune citation fabriqu\'ee.
+% Ordre des exercices : gradation croissante 1-2-2-2-3-3.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T16}} - Exercices - \'Energies renouvelables}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T16 \quad \'Energies renouvelables : photovolta\"ique, hydraulique, \'eolien}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2022, \'Epreuve \'ecrite disciplinaire, question 19}
+]
+\CAPETSHOW{
+Un site isol\'e peut \^etre \'equip\'e, seul ou en combinaison, de l'un des trois modes de production d'\'energie \'electrique autonome suivants : panneaux photovolta\"iques, micro-turbine hydraulique avec alternateur, ou module \`a effet Peltier (thermog\'en\'erateur).
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Pour chacune de ces trois solutions, citer un avantage et un inconv\'enient principal.
+  \item Indiquer, en le justifiant en une phrase, quelle solution est \`a privil\'egier dans le cas g\'en\'eral d'un site isol\'e disposant d'un fort ensoleillement mais d'aucune source d'eau courante ni de source de chaleur r\'esiduelle exploitable.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item
+  \begin{center}
+  \begin{tabular}{@{}p{2.6cm}p{5.6cm}p{5.6cm}@{}}
+  \toprule
+  \textbf{Fili\`ere} & \textbf{Avantage} & \textbf{Inconv\'enient} \\
+  \midrule
+  Panneaux PV & Silencieux, entretien faible, modulaire & Production intermittente (jour/nuit, m\'et\'eo), surface importante \\
+  Micro-turbine + alternateur & Disponible en continu (jour et nuit) si le d\'ebit est suffisant & N\'ecessite un site sp\'ecifique (cours d'eau), d\'ebit variable selon la saison \\
+  Module Peltier & Aucune pi\`ece mobile, tr\`es fiable, pas d'entretien & Rendement de conversion tr\`es faible (${<}5\,\%$) \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  \item Dans ce cas (fort ensoleillement, pas d'eau courante, pas de chaleur r\'esiduelle disponible pour le Peltier), la solution \`a privil\'egier est le \textbf{panneau photovolta\"ique} : c'est la seule des trois fili\`eres dont la ressource primaire (le rayonnement solaire) est effectivement disponible sur le site, la micro-turbine et le Peltier n'\'etant l\`a que des solutions de repli en pr\'esence d'une ressource sp\'ecifique (eau courante ou source chaude) absente ici.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{2} \hfill\normalfont\footnotesize 2025, \'Epreuve \'ecrite disciplinaire, questions 6 et 7}
+]
+\CAPETSHOW{
+Un hameau de montagne isol\'e (310 foyers et 13 g\^ites, non raccord\'e au r\'eseau) consomme une \'energie \'electrique annuelle totale $E_{TOT} = \SI{1,3e9}{\watt\hour}$. On envisage de l'alimenter \textbf{exclusivement} par des panneaux photovolta\"iques associ\'es \`a un stockage par batteries.
+
+Le d\'epouillement d'une ann\'ee compl\`ete de relev\'es d'irradiance sur le site donne une \'energie surfacique annuelle re\c{c}ue $E_{san} = \SI{1447}{\kilo\watt\hour\per\meter\squared}$. La cha\^ine de conversion comporte, de la lumi\`ere jusqu'\`a l'utilisation :
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.85, every node/.style={scale=0.85}]
+  \node[align=center,font=\footnotesize] (sol) at (-0.4,0) {Soleil\\$E_{san}$};
+  \node[draw,minimum width=1.9cm,minimum height=0.85cm,align=center,font=\footnotesize] (pv) at (2.4,0) {Panneaux\\$\eta_P = 18{,}9\,\%$};
+  \node[draw,minimum width=2.0cm,minimum height=0.85cm,align=center,font=\footnotesize] (mod) at (5.6,0) {Modulateur\\$\eta_{Mod} = 90\,\%$};
+  \node[draw,minimum width=2.0cm,minimum height=0.85cm,align=center,font=\footnotesize] (li) at (8.8,0) {Ligne\\perte $3\,\%$};
+  \node[align=center,font=\footnotesize] (use) at (11.3,0) {Utilisation};
+  \draw[->] (sol) -- (pv); \draw[->] (pv) -- (mod); \draw[->] (mod) -- (li); \draw[->] (li) -- (use);
+  \node[draw,dashed,minimum width=1.7cm,minimum height=0.7cm,align=center,font=\footnotesize] (bat) at (5.6,-1.8) {Batteries\\$\eta = 1$};
+  \draw[<->,dashed] (mod) -- (bat);
+\end{tikzpicture}
+\end{center}
+
+Le rendement de charge et de d\'echarge des batteries est pris \'egal \`a 1.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Calculer la consommation \'electrique moyenne journali\`ere $E_{jour}$ du hameau, en \si{\kilo\watt\hour}.
+  \item En d\'eduire l'\'energie \'electrique utile r\'ecup\'er\'ee par \si{\meter\squared} de panneau et par jour, en tenant compte des trois \'etapes de la cha\^ine ci-dessus.
+  \item Calculer la surface totale de panneaux photovolta\"iques $S_{T\,Panneau}$ n\'ecessaire pour subvenir seule aux besoins journaliers du hameau.
+  \item Le hameau est situ\'e dans un cirque au relief tr\`es escarp\'e, class\'e au patrimoine mondial, et dispose d'un foncier tr\`es restreint. Conclure sur la possibilit\'e d'alimenter tout le hameau uniquement par des cellules photovolta\"iques.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \[ E_{jour} = \frac{E_{TOT}}{365} = \frac{1{,}3\times 10^{9}}{365} \approx 3{,}561\times 10^{6}\,\si{\watt\hour} \approx \SI{3561}{\kilo\watt\hour}\ \text{par jour} \]
+  \item Chaque \si{\meter\squared} de panneau re\c{c}oit en moyenne par jour
+  \[ \frac{E_{san}}{365} = \frac{1\,447}{365} \approx \SI{3,964}{\kilo\watt\hour\per\meter\squared} \]
+  Les rendements se multiplient le long de la cha\^ine (le stockage \'etant de rendement unitaire, il n'intervient pas) :
+  \[ e_{utile} = 3{,}964\times \eta_P\times \eta_{Mod}\times (1-0{,}03) = 3{,}964\times 0{,}189\times 0{,}90\times 0{,}97 \approx \SI{0,654}{\kilo\watt\hour\per\meter\squared} \]
+  \item \[ S_{T\,Panneau} = \frac{E_{jour}}{e_{utile}} = \frac{3\,561}{0{,}654} \approx \SI{5445}{\meter\squared} \]
+  \item Une surface au sol d'environ $\SI{5445}{\meter\squared}$ (plus d'un demi-hectare de champ PV) est \`a comparer au foncier r\'eellement disponible : dans un cirque escarp\'e class\'e, o\`u le foncier est restreint et le relief interdit les grandes surfaces planes, cette exigence n'est pas satisfaite. La solution \guillemotleft\ tout photovolta\"ique \guillemotright\ n'est donc \textbf{pas envisageable seule} : c'est le crit\`ere \emph{surface disponible}, et non le crit\`ere \'energ\'etique, qui l'\'elimine -- d'o\`u le recours \`a une architecture hybride (PV + batteries lithium + hydrog\`ene) dans la suite du sujet.
+
+  \smallskip
+  \textit{Le corrig\'e officiel (rapport de jury CAPET 2025, \'el\'ements de correction de la question 7) retient la m\^eme surface, \guillemotleft\ 5445 m2 \guillemotright, et conclut que \guillemotleft\ Le foncier restreint dans le hameau, le relief et le stockage font que cette solution n'est pas envisageable \guillemotright.}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize 2025, \'Epreuve \'ecrite disciplinaire, question 16 (lecture de document technique)}
+]
+\CAPETSHOW{
+Le champ photovolta\"ique qui alimente un foyer du hameau est constitu\'e de panneaux \textbf{tous identiques}. Le sujet pr\'ecise que la tension nominale du champ est $U_{nom} = \SI{317}{\volt}$ et son courant nominal $I_{nom} = \SI{9,47}{\ampere}$ pour une irradiance de $\SI{1000}{\watt\per\meter\squared}$.
+
+\begin{tcolorbox}[docTech, title={Document technique DT5 -- caract\'eristiques d'un panneau du champ}]
+% Valeurs reproduites litt\'eralement du sujet E2_Disciplinaire_IE_2025 (l.599, DT5).
+% Seule la mise en tableau est reconstitu\'ee (le DT5 original est une image) : aucune valeur ajout\'ee.
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\multicolumn{2}{@{}l}{\textbf{Panneau photovolta\"ique -- technologie monocristalline}} \\
+\midrule
+Rendement du panneau $\eta_{panneau}$ & $18{,}9\,\%$ \\
+Puissance nominale $P_{nom}$ & \SI{375}{\watt} \\
+Tension nominale $U_{nom}$ & \SI{39,6}{\volt} \\
+Courant nominal $I_{nom}$ & \SI{9,47}{\ampere} \\
+Tension \`a circuit ouvert $U_{co}$ & \SI{48,2}{\volt} \\
+Courant de court-circuit $I_{cc}$ & \SI{9,92}{\ampere} \\
+Dimensions $L\times\ell\times e$ & $\SI{1980}{\milli\meter}\times\SI{1002}{\milli\meter}\times\SI{40}{\milli\meter}$ \\
+Masse & \SI{22}{\kilo\gram} \\
+\bottomrule
+\end{tabular}
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever dans le document technique DT5} les quatre grandeurs suivantes d'\emph{un seul} panneau : sa tension nominale, son courant nominal, sa puissance nominale et ses dimensions hors-tout dans le plan. V\'erifier la coh\'erence interne du document en recalculant $P_{nom}$ \`a partir de $U_{nom}$ et $I_{nom}$.
+  \item En comparant les grandeurs relev\'ees \`a celles du champ complet ($\SI{317}{\volt}$ ; $\SI{9,47}{\ampere}$), \textbf{pr\'eciser le mode de raccordement} des panneaux entre eux (s\'erie ou parall\`ele) et \textbf{justifier}.
+  \item En d\'eduire le nombre $N$ de panneaux qui composent le champ.
+  \item Calculer la puissance nominale $P_{nom,champ}$ et la surface au sol du champ photovolta\"ique. Conclure sur l'implantation de ce champ sur la toiture d'une habitation.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Relev\'e direct dans le DT5 : $U_{nom} = \SI{39,6}{\volt}$ ; $I_{nom} = \SI{9,47}{\ampere}$ ; $P_{nom} = \SI{375}{\watt}$ ; dimensions $\SI{1980}{\milli\meter}\times\SI{1002}{\milli\meter}$, soit $\SI{1,98}{\meter}\times\SI{1,002}{\meter}$.
+  V\'erification de coh\'erence : $39{,}6\times 9{,}47 \approx \SI{375}{\watt}$, ce qui confirme bien la puissance nominale annonc\'ee (le point nominal du DT5 est le point de puissance maximale).
+  \emph{Attention \`a ne pas relever par erreur $U_{co} = \SI{48,2}{\volt}$ ou $I_{cc} = \SI{9,92}{\ampere}$ : ce sont les valeurs \`a vide et en court-circuit, o\`u la puissance d\'ebit\'ee est nulle.}
+  \item Le courant nominal du champ ($\SI{9,47}{\ampere}$) est \textbf{identique} \`a celui d'un seul panneau, alors que la tension du champ ($\SI{317}{\volt}$) est un \textbf{multiple} de celle d'un panneau ($\SI{39,6}{\volt}$). Or dans une association s\'erie le courant est commun et les tensions s'ajoutent : les panneaux sont donc \textbf{connect\'es en s\'erie}.
+  \item \[ N = \frac{U_{nom,champ}}{U_{nom,panneau}} = \frac{317}{39{,}6} \approx 8{,}00 \Rightarrow N = 8\ \text{panneaux en s\'erie} \]
+  \item \[ P_{nom,champ} = U_{nom,champ}\times I_{nom,champ} = 317\times 9{,}47 \approx \SI{3002}{\watt} \approx \SI{3}{\kilo\watt} \]
+  \[ S_{champ} = N\times L\times \ell = 8\times 1{,}98\times 1{,}002 \approx \SI{15,9}{\meter\squared} \approx \SI{16}{\meter\squared} \]
+  (contr\^ole crois\'e : $8\times 375 = \SI{3000}{\watt}$, coh\'erent avec les $\SI{3002}{\watt}$ obtenus par $U\times I$.)
+
+  \smallskip
+  \textbf{Conclusion.} $\SI{16}{\meter\squared}$ pour $\SI{3}{\kilo\watt}$ cr\^ete par foyer est une surface compatible avec un pan de toiture d'habitation individuelle (une toiture courante offre \SIrange{30}{60}{\meter\squared}) : contrairement au champ centralis\'e de l'exercice pr\'ec\'edent, qui exigeait $\SI{5445}{\meter\squared}$ au sol sur un foncier indisponible, l'implantation \textbf{r\'epartie foyer par foyer} satisfait la contrainte d'emprise -- c'est ce crit\`ere de surface disponible qui valide l'architecture retenue.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Une micro-centrale hydro\'electrique « au fil de l'eau » (sans retenue, fonctionnement continu) exploite un d\'ebit d\'eriv\'e de rivi\`ere $Q = \SI{2,5}{\meter\cubed\per\second}$ sous une hauteur de chute nette $H_{net} = \SI{8}{\meter}$. Le rendement global turbine + alternateur est $\eta_{turb} = 0{,}85$.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.85, every node/.style={scale=0.85}]
+  \draw[fill=colExo!12] (0,2.4) rectangle (2.0,3.0);
+  \node[align=center,font=\footnotesize] at (1.0,2.7) {Prise d'eau\\(rivi\`ere)};
+  \draw[->,thick] (2.0,2.7) .. controls (3.2,2.5) and (3.4,1.2) .. (3.6,0.9)
+    node[midway,above,font=\scriptsize]{conduite forc\'ee, $H_{net}$};
+  \node[draw,minimum width=1.6cm,minimum height=0.7cm,align=center,font=\footnotesize] (turb) at (4.6,0.6) {Turbine};
+  \node[draw,minimum width=1.8cm,minimum height=0.7cm,align=center,font=\footnotesize] (alt) at (7.0,0.6) {Alternateur};
+  \draw[->] (turb) -- (alt);
+  \node[draw,minimum width=1.8cm,minimum height=0.7cm,align=center,font=\footnotesize] (res) at (9.4,0.6) {R\'eseau /\\hameau};
+  \draw[->] (alt) -- (res);
+  \draw[->,thick] (4.6,0.25) .. controls (4.0,-0.4) .. (2.0,-0.4) node[left,font=\scriptsize]{restitution};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Calculer la puissance hydraulique r\'ecup\'erable \`a la turbine $P_{turb} = \rho\,g\,Q\,H_{net}\,\eta_{turb}$ (avec $\rho_{eau} = \SI{1000}{\kilo\gram\per\meter\cubed}$, $g = \SI{9,81}{\meter\per\second\squared}$).
+  \item La centrale fonctionnant en continu 24 h/24 (contrairement \`a une STEP, il n'y a pas de cycle pompage/turbinage), calculer l'\'energie produite sur une journ\'ee.
+  \item Un hameau proche consomme en moyenne $E_{c} = \SI{3200}{\kilo\watt\hour\per\jour}$. Cette micro-centrale suffit-elle \`a couvrir seule ce besoin ? Conclure.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \[ P_{turb} = \rho\,g\,Q\,H_{net}\,\eta_{turb} = 1\,000\times 9{,}81\times 2{,}5\times 8\times 0{,}85 \approx \SI{166770}{\watt} \approx \SI{166,8}{\kilo\watt} \]
+  \item Fonctionnement continu sur 24 h :
+  \[ E_{jour} = P_{turb}\times 24 \approx 166{,}8\times 24 \approx \SI{4003}{\kilo\watt\hour} \approx \SI{4}{\mega\watt\hour} \]
+  \item \[ \frac{E_{jour}}{E_c} = \frac{4\,003}{3\,200} \approx 1{,}25 \]
+  L'\'energie produite (environ $\SI{4000}{\kilo\watt\hour\per\jour}$) d\'epasse de 25~\% le besoin du hameau ($\SI{3200}{\kilo\watt\hour\per\jour}$) : contrairement \`a une installation PV ou \`a une micro-STEP (dont la production est intermittente ou cyclique), le fonctionnement au fil de l'eau, continu par nature, permet ici de couvrir seul la totalit\'e du besoin, avec un exc\'edent valorisable (revente ou stockage compl\'ementaire).
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize 2021, \'Etude d'un syst\`eme, d'un proc\'ed\'e ou d'une organisation, questions 5, 6, 9 et 10}
+]
+\CAPETSHOW{
+Une micro-STEP solaire alimente un village de montagne d'une trentaine de foyers. Le point haut est une citerne souple de volume total $V = \SI{1000}{\meter\cubed}$ ; la partie basse comprend une seconde citerne de $\SI{1000}{\meter\cubed}$, la pompe et le groupe turbine-g\'en\'erateur. La hauteur de chute entre les deux citernes est $h = \SI{130}{\meter}$.
+
+Le jour, le surplus de production des panneaux alimente la pompe qui remonte l'eau ; la nuit, l'eau redescend dans la conduite forc\'ee et actionne le groupe turbine-g\'en\'erateur.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.85, every node/.style={scale=0.85}]
+  \draw[fill=colExo!12] (5.6,3.4) rectangle (8.2,4.1);
+  \node[align=center,font=\footnotesize] at (6.9,3.75) {Citerne haute\\$\SI{1000}{\meter\cubed}$};
+  \draw[fill=colExo!12] (0,0) rectangle (2.6,0.7);
+  \node[align=center,font=\footnotesize] at (1.3,0.35) {Citerne basse\\$\SI{1000}{\meter\cubed}$};
+  \draw[<->,dotted] (8.6,0.35) -- (8.6,3.75) node[midway,right,font=\footnotesize]{$h = \SI{130}{\meter}$};
+  \draw[dotted] (2.6,0.35) -- (8.6,0.35);
+  \draw[dotted] (8.2,3.75) -- (8.6,3.75);
+  \node[draw,minimum width=1.5cm,minimum height=0.7cm,align=center,font=\footnotesize] (pompe) at (3.3,2.4) {Pompe};
+  \node[draw,minimum width=2.1cm,minimum height=0.7cm,align=center,font=\footnotesize] (turb) at (3.3,1.2) {Turbine\\+ g\'en\'erateur};
+  \draw[->,thick] (2.0,0.7) -- (2.0,2.4) -- (pompe);
+  \draw[->,thick] (pompe) -- (5.6,2.4) -- (5.6,3.4) node[midway,above,font=\scriptsize]{pompage (jour)};
+  \draw[->,thick] (6.4,3.4) -- (6.4,1.2) -- (turb) node[midway,above,font=\scriptsize]{turbinage (nuit)};
+  \draw[->,thick] (turb) -- (1.7,1.2) -- (1.7,0.7);
+\end{tikzpicture}
+\end{center}
+
+\textbf{Donn\'ees.} Volume utile maximal du r\'eservoir haut : $90\,\%$ du volume total. Masse volumique de l'eau $\rho = \SI{1000}{\kilo\gram\per\meter\cubed}$, $g = \SI{9,81}{\meter\per\second\squared}$. Rendement global de la phase de turbinage (conduites + turbine + g\'en\'erateur) : $\eta_{turb} = 78\,\%$. Consommation journali\`ere moyenne du village : $\SI{580}{\kilo\watt\hour}$. En r\'egime nominal, la pompe d\'ebite $Q = \SI{160}{\meter\cubed\per\hour}$ et absorbe une puissance \'electrique $P_{abs} = \SI{76}{\kilo\watt}$.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item D\'eterminer, en \si{\kilo\watt\hour}, l'\'energie potentielle $E_p$ disponible lorsque le niveau d'eau dans le r\'eservoir sup\'erieur est maximal.
+  \item En d\'eduire la quantit\'e d'\'energie \'electrique disponible produite \`a partir de cette \'energie potentielle. Comparer cette valeur \`a la consommation journali\`ere du village et commenter l'\'ecart.
+  \item D\'eterminer la dur\'ee du remplissage complet du r\'eservoir sup\'erieur, puis l'\'energie \'electrique n\'ecessaire \`a ce remplissage si la pompe fonctionne \`a son r\'egime nominal.
+  \item En d\'eduire le rendement global du syst\`eme de stockage $\eta_{st}$, d\'efini comme le rapport de l'\'energie \'electrique restitu\'ee au turbinage sur l'\'energie \'electrique consomm\'ee au pompage. Conclure quant aux performances et \`a l'int\'er\^et de ce proc\'ed\'e de stockage.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Masse d'eau stock\'ee : $m = \rho\,V_{utile} = 1\,000\times (0{,}9\times 1\,000) = \SI{9e5}{\kilo\gram}$.
+  \[ E_p = m\,g\,h = 0{,}9\times 1\,000\times 1\,000\times 9{,}81\times 130 \approx \SI{1,1478e9}{\joule} \]
+  Conversion en \si{\kilo\watt\hour} ($\SI{1}{\kilo\watt\hour} = \SI{3,6e6}{\joule}$) :
+  \[ E_p = \frac{1{,}147\,8\times 10^{9}}{3{,}6\times 10^{6}} \approx \SI{318,8}{\kilo\watt\hour} \]
+  \item \[ E_{\acute{e}lec,dispo} = E_p\times \eta_{turb} = 318{,}8\times 0{,}78 \approx \SI{248,7}{\kilo\watt\hour} \]
+  \[ \frac{E_{\acute{e}lec,dispo}}{E_{village}} = \frac{248{,}7}{580} \approx 0{,}43 \]
+  Le stockage compl\`etement plein ne couvre donc que $43\,\%$ du besoin journalier du village : le turbinage ne peut assurer qu'un appoint nocturne, pas l'autonomie compl\`ete -- la production photovolta\"ique directe (et le r\'eseau) restent indispensables le reste du temps.
+  \item Dur\'ee de remplissage \`a d\'ebit nominal (r\'eservoir complet, $\SI{1000}{\meter\cubed}$) :
+  \[ t = \frac{V}{Q} = \frac{1\,000}{160} = \SI{5,625}{\hour} \quad \text{soit } 5\,\text{h}\,37\,\text{min} \]
+  \[ E_{remplissage} = P_{abs}\times t = 76\times 5{,}625 \approx \SI{427,5}{\kilo\watt\hour} \]
+  \item \[ \eta_{st} = \frac{E_{\acute{e}lec,dispo}}{E_{remplissage}} = \frac{248{,}7}{427{,}5} \approx 0{,}582 \quad \text{soit } 58{,}2\,\% \]
+
+  \smallskip
+  \textbf{Conclusion.} Avec $\eta_{st} \approx 58\,\%$, le proc\'ed\'e n'est pas tr\`es performant : pr\`es de $42\,\%$ de l'\'energie \'electrique investie au pompage est perdue (pertes de charge dans les conduites, pompe, turbine, g\'en\'erateur). De plus, la pompe n'\'etant aliment\'ee que par le surplus des panneaux, la dur\'ee de remplissage de $5\,\text{h}\,37$ ne permet pas un remplissage complet les journ\'ees peu ensoleill\'ees : le stockage ne sera pleinement efficace que durant les journ\'ees ensoleill\'ees d'\'et\'e. Le crit\`ere qui justifie n\'eanmoins ce choix n'est pas le rendement mais l'\textbf{impact environnemental} -- ce proc\'ed\'e est plus respectueux de l'environnement qu'un stockage par batteries.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2021, bilan de la partie A) : \guillemotleft\ La plupart d'entre eux ont bien r\'epondu aux premi\`eres questions mais certains ont rencontr\'e des difficult\'es \`a calculer l'\'energie potentielle. Par contre, la conclusion finale a \'et\'e souvent insuffisante. \guillemotright\ La conversion joules $\rightarrow$ \si{\kilo\watt\hour} et la conclusion argument\'ee sur les performances sont donc deux points de notation \`a ne pas n\'egliger.}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize 2025, \'Epreuve \'ecrite disciplinaire, questions 14, 15 et 19}
+]
+\CAPETSHOW{
+Le micro-r\'eseau d'un foyer isol\'e associe un champ photovolta\"ique, un stockage par batterie lithium de tension nominale $E_b = \SI{48}{\volt}$, un \'electrolyseur, un stockage d'hydrog\`ene et une pile \`a combustible (PAC). Trois convertisseurs assurent les transferts de puissance :
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.85, every node/.style={scale=0.85}]
+  \node[align=center,font=\footnotesize] (pv) at (-0.6,1.6) {Champ PV\\$U_{PV}$};
+  \node[draw,minimum width=1.3cm,minimum height=0.8cm,align=center,font=\footnotesize] (cv1) at (2.0,1.6) {CV1};
+  \node[draw,minimum width=2.3cm,minimum height=0.8cm,align=center,font=\footnotesize] (bus) at (5.2,1.6) {Bus continu\\batterie $E_b$};
+  \node[draw,minimum width=1.3cm,minimum height=0.8cm,align=center,font=\footnotesize] (cv3) at (8.3,1.6) {CV3};
+  \node[align=center,font=\footnotesize] (dis) at (10.6,1.6) {R\'eseau AC\\du foyer};
+  \draw[->] (pv) -- (cv1); \draw[->] (cv1) -- (bus); \draw[->] (bus) -- (cv3); \draw[->] (cv3) -- (dis);
+  \node[align=center,font=\footnotesize] (pac) at (2.0,-0.5) {PAC\\(sortie $\sim$)};
+  \node[draw,minimum width=1.3cm,minimum height=0.8cm,align=center,font=\footnotesize] (cv2) at (5.2,-0.5) {CV2};
+  \draw[->] (pac) -- (cv2); \draw[->] (cv2) -- (bus);
+  \node[font=\scriptsize,align=left] at (0.9,0.55) {$U_{PV} = f_m\,E_b$};
+\end{tikzpicture}
+\end{center}
+
+CV1 relie le champ photovolta\"ique au bus continu, CV2 relie la sortie \textbf{alternative} de la pile \`a combustible au bus continu, CV3 relie le bus continu au r\'eseau alternatif du foyer.
+
+La caract\'eristique $P = f(U)$ du champ pr\'esente son maximum au point nominal $U_{MPP} = \SI{317}{\volt}$. Deux autres points de fonctionnement sont relev\'es sur cette caract\'eristique : $P_1$ ($U_1 = \SI{195}{\volt}$) et $P_2$ ($U_2 = \SI{340}{\volt}$).
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Donner, pour chacun des trois convertisseurs CV1, CV2 et CV3, son \textbf{nom} (hacheur, redresseur, onduleur) et sa \textbf{fonction} en une phrase.
+  \item Pr\'eciser la signification du sigle MPPT et donner l'avantage apport\'e par cette commande sur une installation photovolta\"ique.
+  \item La tension $U_{PV}$ du champ et la tension $E_b$ du bus sont li\'ees par une \textbf{fonction de modulation} $f_m$ telle que $U_{PV} = f_m\,E_b$ (notation du sujet). Calculer $f_m$ aux points $P_1$, $P_{max}$ et $P_2$.
+  \item En d\'eduire la fonction de CV1 et justifier sa pr\'esence au sein de l'installation. Commenter la valeur num\'erique obtenue pour $f_m$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item
+  \begin{center}
+  \begin{tabular}{@{}p{1.2cm}p{2.4cm}p{9.0cm}@{}}
+  \toprule
+  & \textbf{Nom} & \textbf{Fonction} \\
+  \midrule
+  CV1 & Hacheur & Convertir une tension continue en une autre tension continue. \\
+  CV2 & Redresseur & Convertir une tension alternative en une tension continue. \\
+  CV3 & Onduleur & Convertir une tension continue en une tension alternative. \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  \item MPPT : \emph{Maximum Power Point Tracking}, recherche du point de puissance maximale. Cette commande permet d'extraire en permanence le maximum de puissance disponible sur l'installation photovolta\"ique, quelles que soient l'irradiance et la temp\'erature, en d\'epla\c{c}ant le point de fonctionnement du champ le long de sa caract\'eristique $P = f(U)$ jusqu'au sommet.
+  \item \[ f_{m,1} = \frac{U_1}{E_b} = \frac{195}{48} \approx 4{,}06 \qquad f_{m,max} = \frac{U_{MPP}}{E_b} = \frac{317}{48} \approx 6{,}60 \qquad f_{m,2} = \frac{U_2}{E_b} = \frac{340}{48} \approx 7{,}08 \]
+  \item CV1 est le convertisseur continu-continu qui \textbf{adapte} la tension du champ \`a celle du bus batterie : c'est lui qui, pilot\'e par la commande MPPT, impose au champ sa tension de fonctionnement. Sans lui, le champ serait directement impos\'e \`a $\SI{48}{\volt}$, tr\`es loin du MPP situ\'e \`a $\SI{317}{\volt}$, et l'installation perdrait l'essentiel de la puissance disponible : sa pr\'esence est donc indispensable au fonctionnement en MPPT.
+
+  \smallskip
+  \textit{Commentaire sur $f_m$.} Les trois valeurs obtenues sont \textbf{sup\'erieures \`a 1}, ce qui est parfaitement normal : $f_m$ n'est \textbf{pas} un rapport cyclique (celui-ci serait born\'e, $0\leq\alpha\leq 1$) mais la \textbf{fonction de modulation} d\'efinie par le sujet, c'est-\`a-dire le rapport des deux tensions continues $U_{PV}/E_b$. Elle cro\^it avec $U_{PV}$ : c'est sur elle qu'agit la commande MPPT, via le rapport cyclique r\'eel des interrupteurs de CV1. La lecture de la relation $U_{PV} = f_m E_b$ avec $f_m > 1$ est celle du corrig\'e officiel, qui conclut : \guillemotleft\ De ce point de vue, le convertisseur CV1 est un hacheur \'el\'evateur \guillemotright\ (rapport de jury CAPET 2025, \'el\'ements de correction de la question 19).
+
+  \smallskip
+  \textbf{Conclusion.} La tension du champ (\SIrange{195}{340}{\volt}) reste en permanence tr\`es sup\'erieure \`a celle du bus batterie (\SI{48}{\volt}) : dans le sens du transfert de puissance (champ PV $\rightarrow$ bus \SI{48}{\volt}), CV1 \textbf{abaisse} donc effectivement la tension. Le crit\`ere de validation de CV1 n'est pas son sens de conversion mais sa \textbf{plage d'entr\'ee} : il doit accepter toute l'\'etendue $\SIrange{195}{340}{\volt}$ balay\'ee par la recherche du MPP, faute de quoi le r\'egulateur ne pourrait pas atteindre le sommet \`a $\SI{317}{\volt}$.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

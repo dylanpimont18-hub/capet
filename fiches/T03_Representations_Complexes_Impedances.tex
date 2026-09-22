@@ -1,0 +1,373 @@
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ficheHeaders{T03}{Complexes et impédances}{colElec}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TETE
+% -----------------------------------------------------------------------
+
+\ficheEntete{T03}{Représentation complexe et impédances}{colElec}%
+  {électrotechnique / électronique}%
+  {\textbf{Présence :} \textbf{12/13} sujets (2013-2026) - thème \emph{très fréquent}}%
+  {impédances R, L, C - loi d'Ohm complexe - déphasage - résonance - modèle MAS - fonctions de transfert}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Impedances elementaires --------------------------------------
+\textbf{1.1 Impédances des composants élémentaires}
+
+\smallskip
+En régime sinusoïdal permanent, on note $\underline{U} = \underline{Z} \cdot \underline{I}$ (loi d'Ohm complexe).
+La pulsation est $\omega = 2\pi f$.
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{llll}
+\toprule
+\textbf{Composant} & \textbf{Impédance $\underline{Z}$} & \textbf{Module $|\underline{Z}|$} & \textbf{Argument} \\
+\midrule
+Résistance $R$ & $R$ & $R$ & $0^\circ$ (pas de déphasage) \\[4pt]
+Inductance $L$ & $jL\omega$ & $L\omega$ & $+90^\circ$ ($u$ en avance sur $i$) \\[4pt]
+Condensateur $C$ & $\dfrac{1}{jC\omega} = \dfrac{-j}{C\omega}$ & $\dfrac{1}{C\omega}$ & $-90^\circ$ ($u$ en retard sur $i$) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.2 Associations ------------------------------------------------
+\textbf{1.2 Associations RL et RC série - module et déphasage}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{lll}
+\toprule
+\textbf{Circuit} & \textbf{Module} & \textbf{Déphasage $\varphi = \arg(\underline{Z})$} \\
+\midrule
+RL série & $|\underline{Z}| = \sqrt{R^2 + (L\omega)^2}$ & $\varphi = \arctan\!\left(\dfrac{L\omega}{R}\right) > 0$ (inductif) \\[8pt]
+RC série & $|\underline{Z}| = \sqrt{R^2 + (1/C\omega)^2}$ & $\varphi = -\arctan\!\left(\dfrac{1}{RC\omega}\right) < 0$ (capacitif) \\[6pt]
+RLC série & $|\underline{Z}| = \sqrt{R^2 + (L\omega - 1/C\omega)^2}$ & $\varphi = \arctan\!\left(\dfrac{L\omega - 1/C\omega}{R}\right)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\textbf{Diagramme de Fresnel (circuit RL série) :}
+\begin{center}
+\begin{tikzpicture}[scale=1, font=\small, >=Stealth]
+  \draw[->, thin, gray] (-0.3,0) -- (4.4,0);
+  \draw[->, thick, colElec] (0,0) -- (3,0) node[below right] {$\underline{I}$};
+  \draw[->, thick, colElec!55] (0,0) -- (2.1,0) node[below] {$\underline{U}_R = R\underline{I}$};
+  \draw[->, thick, colElec!55] (2.1,0) -- (2.1,1.8) node[midway, right] {$\underline{U}_L = jL\omega\underline{I}$};
+  \draw[->, thick, colElec] (0,0) -- (2.1,1.8) node[above right, xshift=2pt] {$\underline{U} = \underline{U}_R+\underline{U}_L$};
+  \draw (0.7,0) arc[start angle=0, end angle=40.6, radius=0.7];
+  \node at (1.05,0.28) {\footnotesize $\varphi$};
+\end{tikzpicture}
+\end{center}
+$\underline{I}$ est pris comme origine des phases (axe de référence) ; $\underline{U}_R$ est en phase avec $\underline{I}$, $\underline{U}_L$ est en quadrature avance ($+90^\circ$). Pour un circuit RC, $\underline{U}_C$ serait en quadrature retard, plaçant $\underline{U}$ sous l'axe de référence ($\varphi<0$).
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.3 Resonance serie ----------------------------------------------
+\textbf{1.3 Résonance en série RLC}
+
+À la résonance, $X_L = X_C$ : l'impédance est purement résistive ($\varphi = 0$, courant maximal).
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{lll}
+\toprule
+\textbf{Grandeur} & \textbf{Expression} & \textbf{Unité} \\
+\midrule
+Pulsation propre & $\omega_0 = \dfrac{1}{\sqrt{LC}}$ & rad/s \\[6pt]
+Fréquence de résonance & $f_0 = \dfrac{1}{2\pi\sqrt{LC}}$ & Hz \\[6pt]
+Facteur de qualité & $Q = \dfrac{L\omega_0}{R} = \dfrac{1}{RC\omega_0}$ & - \\[6pt]
+Surtension à résonance & $U_L = U_C = Q \cdot U_{alim}$ & V \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.4 Fonctions de transfert ---------------------------------------
+\textbf{1.4 Formes canoniques des fonctions de transfert}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{lll}
+\toprule
+\textbf{Ordre} & \textbf{Forme canonique} & \textbf{Paramètres} \\
+\midrule
+1\textsuperscript{er} ordre & $H(j\omega) = \dfrac{H_0}{1 + j\omega/\omega_c}$ & $\omega_c = 1/\tau$ : pulsation de coupure \\[8pt]
+2\textsuperscript{e} ordre  & $H(j\omega) = \dfrac{H_0}{1 + 2m\,\dfrac{j\omega}{\omega_0} - \left(\dfrac{\omega}{\omega_0}\right)^2}$ & $\omega_0$ : puls. propre, $m$ : amortissement \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+{\footnotesize $m < 1$ : régime pseudo-périodique. $m \geq 1$ : apériodique. $m \approx 0{,}7$ : optimum ($M_\varphi \approx 65^\circ$).}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHETIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthétique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{3.8cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Impédances élémentaires}} \\
+$\underline{Z}_R = R$ & Résistance & $\Omega$ \\
+$\underline{Z}_L = jL\omega$ & Inductance & $\Omega$ \\
+$\underline{Z}_C = 1/(jC\omega)$ & Condensateur & $\Omega$ \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Circuits RL / RC}} \\
+$|\underline{Z}_{RL}| = \sqrt{R^2+(L\omega)^2}$ & Module & $\Omega$ \\
+$|\underline{Z}_{RC}| = \sqrt{R^2+(1/C\omega)^2}$ & Module & $\Omega$ \\
+$\varphi_{RL} = \arctan(L\omega/R)$ & Déphasage & - \\
+$\varphi_{RC} = -\arctan(1/RC\omega)$ & Déphasage & - \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{3.8cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Résonance série RLC}} \\
+$\omega_0 = 1/\sqrt{LC}$ & Puls. propre & rad/s \\
+$f_0 = 1/(2\pi\sqrt{LC})$ & Fréq. résonance & Hz \\
+$Q = L\omega_0/R$ & Facteur qualité & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Diagramme de Bode}} \\
+$G_{dB} = 20\log|H(j\omega)|$ & Gain & dB \\
+$\varphi = \arg H(j\omega)$ & Phase & - \\
+$M_\varphi = 180^\circ + \varphi(\omega_{c0})$ & Marge phase & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Modèle MAS (monophasé équiv.)}} \\
+$\underline{I}_r' = \underline{V}_s/(jL_f\omega_s + R_r'/g)$ & Courant rotor & A \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets réels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Modèle monophasé équivalent MAS - courant rotorique \hfill\normalfont\footnotesize E2 disciplinaire 2024}
+]
+\textbf{Énoncé.}
+La machine asynchrone est modélisée par son schéma monophasé équivalent.
+Exprimer le courant rotorique ramené au stator $\underline{I}_r'$ en fonction de $\underline{V}_s$, $L_f$, $\omega_s$, $R_r'$ et du glissement $g$.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Impédance du circuit rotorique.}
+\[
+  \underline{Z}_{rot} = j L_f \omega_s + \frac{R_r'}{g}
+\]
+(La partie résistive $R_r'/g$ varie avec le glissement : à l'arrêt $g=1$, $\underline{Z}_{rot}=R_r'+jL_f\omega_s$ ; en régime $g\approx0{,}03$, $R_r'/g \approx 33R_r'$.)
+
+\textbf{Étape 2 — Application de la loi d'Ohm complexe.}
+\[
+  \underline{I}_r' = \frac{\underline{V}_s}{\underline{Z}_{rot}} = \frac{\underline{V}_s}{j L_f \omega_s + R_r'/g}
+\]
+
+\textbf{Conclusion.} En régime établi ($g\approx0{,}03$), le terme résistif $R_r'/g$ domine largement le terme inductif : le courant rotorique est quasiment en phase avec $\underline{V}_s$, cohérent avec un fonctionnement proche du synchronisme.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Déphasage d'un filtre - expression analytique \hfill\normalfont\footnotesize Rapport jury 2018 (partie C)}
+]
+\textbf{Énoncé.}
+Un filtre de premier ordre est caractérisé par $H(j\omega)$. Donner l'expression analytique complète de la tension de sortie $v_s(t)$ lorsque l'entrée est $v_e(t) = V_m\cos(\omega t)$.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Module et argument de la fonction de transfert.}
+\[
+  |H(j\omega)| = \frac{H_0}{\sqrt{1+(\omega/\omega_c)^2}}
+  \qquad
+  \varphi(\omega) = \arg H(j\omega) = -\arctan\!\left(\frac{\omega}{\omega_c}\right)
+\]
+
+\textbf{Étape 2 — Expression temporelle de sortie.}
+\[
+  v_s(t) = |H(j\omega)| \cdot V_m \cos\!\bigl(\omega t + \varphi(\omega)\bigr)
+\]
+
+\textbf{Conclusion.} Le jury 2018 signale que beaucoup de candidats donnent la valeur numérique de $\varphi$ mais omettent d'écrire l'expression temporelle complète $v_s(t)$ : c'est cette expression complète, pas la seule valeur de $\varphi$, qui est notée.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Marge de phase et stabilité \hfill\normalfont\footnotesize E2 disciplinaire 2024 (partie C)}
+]
+\textbf{Énoncé.}
+La fonction de transfert en boucle ouverte $H_{BO}(j\omega)$ est donnée.
+Calculer la marge de phase $M_\varphi$ et conclure sur la stabilité du système.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Pulsation de coupure à $0\,\text{dB}$.}
+Résoudre $|H_{BO}(j\omega_{c0})| = 1$ (ou $G_{dB} = 0$\,dB).
+
+\textbf{Étape 2 — Calcul de la marge de phase.}
+\[
+  M_\varphi = 180^\circ + \arg\!\bigl(H_{BO}(j\omega_{c0})\bigr)
+\]
+
+\textbf{Conclusion.} $M_\varphi > 45^\circ$ : système stable avec dépassement acceptable. $M_\varphi < 0^\circ$ : système instable. \textit{Jury 2024 : seulement 31\,\% des candidats ont traité correctement la marge de phase.}
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs récurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Oublier $j$ dans l'impédance.}
+  Écrire $Z_L = L\omega$ au lieu de $\underline{Z}_L = jL\omega$ supprime toute information de déphasage et fausse les calculs de puissance.
+
+  \item \textbf{Déphasage = argument de $\underline{Z}$, pas de $1/\underline{Z}$.}
+  $\varphi = \arg(\underline{Z})$ donne le retard de $i$ sur $u$. Confondre avec l'argument de l'admittance inverse le signe.
+
+  \item \textbf{Marge de phase $\neq$ phase à $0\,\text{dB}$.}
+  $M_\varphi = 180^\circ + \arg(H_{BO})$ : ne pas oublier d'ajouter $180^\circ$.
+  Le résultat doit être positif pour un système stable.
+
+  \item \textbf{Forme canonique 2\textsuperscript{e} ordre : facteur 2.}
+  Le dénominateur est $1 + 2m(j\omega/\omega_0) + (j\omega/\omega_0)^2$.
+  Beaucoup de candidats oublient le facteur $2$ devant $m$.
+
+  \item \textbf{Modèle MAS : ne pas confondre $g=1$ (démarrage) et $g\approx0{,}03$ (régime).}
+  En régime établi, $R_r'/g \gg jL_f\omega_s$ : le terme inductif est négligeable.
+  Au démarrage c'est l'inverse.
+
+  \item \textbf{Expression analytique complète.}
+  Une valeur numérique de déphasage n'est pas suffisante : écrire $v_s(t) = \cdots\cos(\omega t + \varphi)$ avec toutes les grandeurs exprimées.
+
+  \item \textbf{Condensateur de démarrage moteur monophasé.}
+  Le condensateur $C_p$ crée un déphasage $-90^\circ$ dans l'enroulement auxiliaire, générant un champ tournant elliptique. Ce n'est pas une compensation d'énergie réactive.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2024 : «~La partie C (asservissement) a été abordée par seulement 31\,\% des candidats avec correction ; le jury note que la représentation complexe et les diagrammes de Bode font partie des bases attendues à ce niveau.~»\\
+Rapport jury 2025 : «~La partie 3 (asservissement) n'a été abordée que par 74\,\% des candidats, et seulement 7\,\% ont obtenu la moyenne sur cette partie.~»
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PRESENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colPresence,
+  title={Présence dans les sujets analysés (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Année} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & $\checkmark$ & $\checkmark$ & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+E2 discipl. IE & - & - & - & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-thèmes fréquents :}
+impédances R/L/C (11/13) - modèle MAS monophasé (7/13) - fonctions de transfert / Bode (9/13) - résonance LC (5/13) - déphasage analytique (10/13)
+
+\medskip
+\textbf{Ordres de grandeur (repères rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Réseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, fréquence \SI{50}{\hertz}.
+  \item Courants d'étude fréquents en sujet : de quelques \si{\ampere} à quelques dizaines de \si{\ampere}.
+  \item En conversion d'énergie, un rendement attendu reste généralement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthèse express (à refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypothèses du modèle et les conventions de signe.
+  \item Écrire 2 à 4 relations clés avec unités.
+  \item Réaliser un calcul numérique complet et vérifier l'ordre de grandeur.
+  \item Justifier le résultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE

@@ -1,0 +1,374 @@
+%% Correction audit de veracite - 2026-09-20 : citations de rapport de jury sans
+%% support textuel dans le corpus (rapports 2018-2025) remplacees par des verbatims
+%% verifies ou supprimees. Detail ci-dessous.
+%% l.319 (ex) : citation "jury 2025" reformulee (lois basiques / fonctions de transfert /
+%%   redaction des demonstrations) INTROUVABLE telle quelle -> remplacee par le verbatim
+%%   exact de RJ2025 l.484. l.308 et l.320 sont conformes : non touchees.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ficheHeaders{T21}{Fonctions de transfert}{colElec}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TETE
+% -----------------------------------------------------------------------
+
+\ficheEntete{T21}{Fonctions de transfert - Diagramme de Bode}{colElec}%
+  {électronique / Automatique - Analyse fréquentielle}%
+  {\textbf{Présence :} \textbf{8/13} sujets (2013-2026) - thème \emph{fondamental}}%
+  {transformée de Laplace - FdT 1\textsuperscript{er}/2\textsuperscript{e} ordre - identification graphique Bode - marges de phase et de gain - correcteur proportionnel - erreur statique}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Transformee de Laplace ----------------------------------------
+\textbf{1.1 Transformée de Laplace - rappels essentiels}
+
+\smallskip
+Conditions de Heaviside (conditions initiales nulles) :
+\[
+  \mathcal{L}\!\left\{\frac{dx}{dt}\right\} = p\,X(p)
+  \qquad
+  \mathcal{L}\!\left\{\int x\,dt\right\} = \frac{X(p)}{p}
+  \qquad
+  H(p) = \frac{S(p)}{E(p)}
+\]
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 FdT 1er ordre ------------------------------------------------
+\textbf{1.2 Système du 1\textsuperscript{er} ordre - forme canonique}
+
+\[
+  H(p) = \frac{K}{1 + \tau\,p}
+  \qquad K : \text{gain statique} \qquad \tau : \text{constante de temps}
+\]
+
+Réponse indicielle à l'échelon $E_0$ : $s(t) = K\,E_0\,(1 - e^{-t/\tau})$ \quad;\quad $t_{r5\%} \approx 3\tau$
+
+\textbf{Identification sur le Bode :}
+\begin{itemize}
+  \item Plateau basse fréquence $= 20\log K$ dB
+  \item Pulsation de coupure = intersection des asymptotes 0\,dB/dec et $-20$\,dB/dec
+\end{itemize}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 FdT 2e ordre -------------------------------------------------
+\textbf{1.3 Système du 2\textsuperscript{e} ordre - forme canonique}
+
+\[
+  H(p) = \frac{K}{1 + \dfrac{2m}{\omega_0}\,p + \dfrac{p^2}{\omega_0^2}}
+\]
+\[
+  D\% = 100\,e^{-m\pi/\sqrt{1-m^2}} \quad (m<1) \qquad;\qquad t_{r5\%}\cdot\omega_0 = f(m) \text{ (abaque)}
+\]
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 Diagramme de Bode asymptotique --------------------------------
+\textbf{1.4 Bode asymptotique - règles de tracé}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{llll}
+\toprule
+\textbf{Facteur} & \textbf{Gain asymptotique} & \textbf{Phase} & \textbf{Pente} \\
+\midrule
+Gain pur $K$ & $20\log K$ (constant) & $0^\circ$ & 0 \\
+Intégrateur $1/p$ & $0\,\mathrm{dB}$ à $\omega=1$ & $-90^\circ$ & $-20\,\mathrm{dB/dec}$ \\
+1\textsuperscript{er} ordre $(1+\tau p)^{-1}$ & $0$ puis $-20\,\mathrm{dB/dec}$ à $1/\tau$ & $0^\circ$ puis $-90^\circ$ & \\
+2\textsuperscript{e} ordre & $0$ puis $-40\,\mathrm{dB/dec}$ à $\omega_0$ & $0^\circ$ puis $-180^\circ$ & \\
+\bottomrule
+\end{tabular}
+\end{center}
+Pour $m < 1/\sqrt{2} \approx 0{,}707$ : pic de résonance $G_{pic} = 20\log\dfrac{1}{2m\sqrt{1-m^2}}$.
+
+\smallskip
+\begin{center}
+\begin{tikzpicture}[scale=1, font=\footnotesize]
+  % --- Diagramme de gain (1er ordre) ---
+  \node[below] at (2.6,-2.15) {\bfseries Gain};
+  \draw[->] (0,0) -- (5.4,0) node[right] {$\log\omega$};
+  \draw[->] (0,-1.8) -- (0,1.3) node[above] {$G_{dB}$};
+  \draw[thick, colElec] (0,0.85) -- (2,0.85);
+  \draw[thick, colElec] (2,0.85) -- (5,-1.4);
+  \draw[dashed] (2,0.85) -- (2,-1.8);
+  \node[below] at (2,-1.8) {$\omega_c$};
+  \node[above] at (0.9,0.85) {$20\log K$};
+  \node[colElec] at (4.1,-0.55) {\rotatebox{-27}{$-20\,\mathrm{dB/dec}$}};
+
+  % --- Diagramme de phase (1er ordre) ---
+  \begin{scope}[xshift=7.4cm]
+    \node[below] at (2.5,-2.15) {\bfseries Phase};
+    \draw[->] (0,0.3) -- (5.4,0.3) node[right] {$\log\omega$};
+    \draw[->] (0,-1.8) -- (0,0.6) node[above] {$\varphi$};
+    \draw[thick, colElec] (0,0.3) .. controls (1.6,0.3) and (2.4,-1.35) .. (4,-1.35);
+    \draw[thick, colElec] (4,-1.35) -- (5,-1.35);
+    \draw[dashed] (2,0.3) -- (2,-1.8);
+    \node[below] at (2,-1.8) {$\omega_c$};
+    \node[left] at (-0.1,-0.68) {$-45^\circ$};
+    \node[left] at (-0.1,-1.35) {$-90^\circ$};
+  \end{scope}
+\end{tikzpicture}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.5 Marges de stabilite -------------------------------------------
+\textbf{1.5 Marges de phase et de gain (FTBO)}
+
+\[
+  M_\varphi = 180^\circ + \arg\!\bigl(FTBO(j\omega_u)\bigr) \quad \text{avec } |FTBO(j\omega_u)| = 1 \quad (0\,\mathrm{dB})
+\]
+\[
+  M_G = -20\log|FTBO(j\omega_\pi)| \quad \text{avec } \arg(FTBO(j\omega_\pi)) = -180^\circ
+\]
+
+Critères habituels : $M_\varphi \geq 45^\circ$ (2023, 2026) ; $M_\varphi \geq 90^\circ$ (2024, 2025) ; $M_G \geq 10\,\mathrm{dB}$ (2026).
+
+\textbf{Procédure graphique :}
+\begin{enumerate}[leftmargin=1.5em]
+  \item Lire $\omega_u$ sur la courbe de gain (croisement 0\,dB).
+  \item Lire la phase à $\omega_u$ : $M_\varphi = 180^\circ + \varphi(\omega_u)$.
+  \item Lire $\omega_\pi$ sur la courbe de phase (croisement $-180^\circ$).
+  \item Lire le gain à $\omega_\pi$ : $M_G = -G_{dB}(\omega_\pi)$.
+\end{enumerate}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.6 Correcteur proportionnel --------------------------------------
+\textbf{1.6 Correcteur proportionnel $C(p) = K_C$}
+
+Ajouter $K_C$ décale le gain de $+20\log K_C$ dB \textbf{sans modifier la phase}.\\
+Détermination de $K_C$ pour $M_\varphi$ imposée : lire $G_0$ dB à $\omega_u$ souhaité, puis $K_C = 10^{-G_0/20}$.
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHETIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthétique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.8cm}l@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} \\
+\midrule
+\multicolumn{2}{@{}l}{\footnotesize\textit{1\textsuperscript{er} ordre}} \\
+$H(p) = K/(1+\tau p)$ & Forme canonique \\
+$t_{r5\%} \approx 3\tau$ & Rapidité \\
+$K = s(\infty)/E_0$ & Identification \\
+$\tau$ : lu à $63{,}2\,\%$ de $K\,E_0$ & Identification \\
+\midrule
+\multicolumn{2}{@{}l}{\footnotesize\textit{2\textsuperscript{e} ordre}} \\
+$H(p) = K/(1+2m\,p/\omega_0 + p^2/\omega_0^2)$ & Forme canonique \\
+$D\% = 100\,e^{-m\pi/\sqrt{1-m^2}}$ & Dépassement \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.8cm}l@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} \\
+\midrule
+\multicolumn{2}{@{}l}{\footnotesize\textit{Marges de stabilité (FTBO)}} \\
+$M_\varphi = 180^\circ + \varphi(\omega_u)$ & Marge de phase \\
+$M_G = -G_{dB}(\omega_\pi)$ & Marge de gain \\
+$M_\varphi \geq 45^\circ$ ; $M_G \geq 10\,\mathrm{dB}$ & CdC typique \\
+\midrule
+\multicolumn{2}{@{}l}{\footnotesize\textit{Correcteur et erreur}} \\
+$K_C = 10^{-G_0/20}$ & Réglage $K_C$ \\
+$\varepsilon_s = E/(1+K_{BO})$ & Erreur statique \\
+$\varepsilon_s = 0$ si intégrateur BO & Classe 1 \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets réels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Identification graphique de $H_M(p)$ sur le Bode \hfill\normalfont\footnotesize E2 disc. 2023 (D4)}
+]
+\textbf{Énoncé.}
+Le diagramme de Bode de $H_M(p)$ montre un plateau BF à $+26{,}4\,\mathrm{dB}$ et deux pulsations de coupure $\omega_a$ et $\omega_b$. Déterminer $K_M$, $\omega_a$, $\omega_b$ par lecture graphique. Proposer une expression approchée si $\tau_a \gg \tau_b$.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Gain plateau BF.} $20\log K_M = 26{,}4\,\mathrm{dB} \Rightarrow K_M = 10^{26{,}4/20} \approx \mathbf{20{,}9}$.
+
+\textbf{Étape 2 — Pulsations de coupure.} $\omega_a$ et $\omega_b$ se lisent aux intersections des asymptotes (0 dB/dec avec $-20$ dB/dec, puis $-20$ avec $-40$ dB/dec).
+
+\textbf{Étape 3 — Modèle réduit.} Si $\tau_a \gg \tau_b$, le pôle en $\omega_a$ est dominant : $H_M(p) \approx K_M / (1 + \tau_a p)$.
+
+\textbf{Conclusion.} Le modèle réduit du premier ordre reproduit fidèlement la réponse temporelle tant que la question ne porte pas sur le comportement haute fréquence : il satisfait l'exigence de simplification demandée par l'énoncé.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Marge de phase et réglage $K_C$ \hfill\normalfont\footnotesize E2 disc. 2023 (D7-D8)}
+]
+\textbf{Énoncé.}
+FTBO tracée pour $K_C = 1$. La phase vaut $-135^\circ$ à $\omega_u$ (croisement 0\,dB). Calculer la marge de phase. Déterminer $K_C$ pour obtenir $M_\varphi = 45^\circ$.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Marge de phase courante.} $M_\varphi = 180^\circ + (-135^\circ) = \mathbf{45^\circ}$ : la condition est déjà satisfaite pour $K_C = 1$.
+
+\textbf{Étape 2 — Réglage si le gabarit change} \emph{[corrigé reconstitué : valeur $G_0$ illustrative, non issue du sujet]}\textbf{.} Si le gain lu à la pulsation souhaitée $\omega_u^*$ vaut $G_0 = +12\,\si{\decibel}$ :
+\[
+  K_C = 10^{-12/20} = 10^{-0{,}6} \approx \mathbf{0{,}25}
+\]
+Le décalage du gain de $20\log K_C = -12\,\si{\decibel}$ ramène le croisement $0\,\si{\decibel}$ à $\omega_u^*$ avec $M_\varphi = 45^\circ$.
+
+\textbf{Conclusion.} Avec $K_C \approx 0{,}25$, la marge de phase obtenue respecte le critère de stabilité imposé ($M_\varphi \geq 45^\circ$) : le réglage est validé.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - FTBF du 2\textsuperscript{e} ordre - dépassement nul \hfill\normalfont\footnotesize E1 2026 (C7-C8)}
+]
+\textbf{Énoncé.}
+Montrer que la FTBF d'une boucle d'asservissement se met sous la forme du 2\textsuperscript{e} ordre. Exprimer $\omega_0$ et $m$ en fonction du gain $K_C$. Déduire la valeur de $K_C$ assurant $D\% = 0$.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Identification canonique.} On identifie la FTBF sous forme canonique du second ordre : $\omega_0$ et $m$ s'expriment en fonction de $K_C$ selon le système étudié ($m$ croissant ou décroissant avec $K_C$ suivant les cas).
+
+\textbf{Étape 2 — Condition de dépassement nul.} $D\% = 0 \Leftrightarrow m \geq 1$ (régime apériodique ou critique).
+
+\textbf{Étape 3 — Application numérique.} Pour $m = 1$, on obtient $K_C = K_{C,lim}$, lu graphiquement sur l'abaque ou calculé analytiquement.
+
+\textbf{Conclusion.} Pour $K_C = K_{C,lim}$, le système fonctionne à la limite de l'amortissement critique : le dépassement est annulé sans dégrader excessivement la rapidité, ce qui satisfait le cahier des charges — à condition de vérifier aussi que $M_G$ reste correct.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs récurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Mettre la FdT sous forme canonique.} Le jury sanctionne l'absence de mise sous forme avec $K$, $\tau$ (ou $m$, $\omega_0$) explicitement identifiés.
+
+  \item \textbf{Lire les marges graphiquement.} Ne pas chercher à les calculer analytiquement ; le document réponse fournit le diagramme de Bode : s'en servir.
+
+  \item \textbf{Distinguer FTBO et FTBF.} Les marges se calculent sur la \textbf{boucle ouverte} ; la stabilité s'apprécie sur la \textbf{boucle fermée}.
+
+  \item \textbf{Signe de la marge de phase.} $M_\varphi = 180^\circ + \varphi(\omega_u)$. Si $\varphi = -150^\circ$ alors $M_\varphi = 30^\circ$ (positif : stable).
+
+  \item \textbf{Identification depuis l'essai indiciel.} Lire $\tau$ à $63{,}2\,\%$ (1\textsuperscript{er} ordre). Pour le 2\textsuperscript{e} ordre : lire le dépassement et la pseudo-période pour obtenir $m$ et $\omega_0$.
+
+  \item \textbf{Thème le plus discriminant.} Jury 2024 : traité par 79\,\% des candidats, correctement par seulement 31\,\% — prévoir un entraînement intensif sur la lecture de Bode.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2025 : «~De nombreux candidats ne maitrisent pas les lois basiques de l'électricité (la loi des nœuds, la loi des mailles, les calculs de puissance ou encore la loi d'Ohm).~»\\
+Rapport jury 2023 : «~L'automatique est un champ disciplinaire important des SII auquel les candidats ne peuvent se soustraire. Le jury invite à revoir les concepts de base.~»
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PRESENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colPresence,
+  title={Présence dans les sujets analysés (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Année} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & - & - & $\checkmark$ & - & - & $\checkmark$ & - & $\checkmark$ & - & $\checkmark$ & - & $\checkmark$ \\
+E2 discipl. IE & - & $\checkmark$ & - & - & - & - & - & $\checkmark$ & - & - & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+E2 appl. comm. & - & - & - & - & - & - & - & - & - & - & - & $\checkmark$ & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-thèmes fréquents :}
+identification graphique FdT (Bode + essai indiciel) - mise sous forme canonique 1\textsuperscript{er}/2\textsuperscript{e} ordre - marges de phase et de gain - correcteur proportionnel $K_C$ - erreur statique (classe 0 vs 1)
+
+\medskip
+\textbf{Ordres de grandeur (repères rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Réseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, fréquence \SI{50}{\hertz}.
+  \item Courants d'étude fréquents en sujet : de quelques \si{\ampere} à quelques dizaines de \si{\ampere}.
+  \item En conversion d'énergie, un rendement attendu reste généralement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthèse express (à refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypothèses du modèle et les conventions de signe.
+  \item Écrire 2 à 4 relations clés avec unités.
+  \item Réaliser un calcul numérique complet et vérifier l'ordre de grandeur.
+  \item Justifier le résultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE

@@ -1,0 +1,785 @@
+% T27 -- Syst\`emes boucl\'es, correcteurs, stabilit\'e -- banque d'exercices
+% (domaine Automatique ; la fiche de cours T27 utilise colAuto, la banque d'exercices
+%  conserve colExo comme toutes les autres notions.)
+%
+% COMPL\'EMENTARIT\'E AVEC LA FICHE fiches/T27_Systemes_Boucles_Correcteurs.tex
+% Les trois Questions Types de la fiche sont :
+%   QT1 = lecture graphique des marges Mphi et MG sur un Bode de FTBO fourni (E1 2026, C5) ;
+%   QT2 = d\'etermination graphique de K_Clim pour Mphi = 45 deg (E1 2026, C6) -- l'exemple
+%         num\'erique du Bloc 1.5 de la fiche est celui du sujet 2023 : omega_B = 7 000 rad/s,
+%         gain = -59,4 dB, K_PV = 933 (question D8 du sujet 2023) ;
+%   QT3 = relation de r\'ecurrence du correcteur PI num\'erique u_k = u_{k-1} + a0 eps_k + a1 eps_{k-1}
+%         (E2 2026, B18-B19) -- QT SIGNAL\'EE COMME CORRIG\'EE LORS DE L'AUDIT 2026-08-24,
+%         volontairement NON reprise ici (ni la discr\'etisation d'Euler, ni le signe de a1).
+% Aucun des six exercices ci-dessous ne refait ces trois travaux :
+%   - le r\'eglage graphique de K_C sur un Bode fourni (QT2 / sujet 2023 D8) n'est PAS repris ;
+%   - la lecture pure de Mphi/MG sur un Bode (QT1) n'est reprise qu'\`a l'exercice 5, et sur une
+%     source DIFF\'ERENTE (2024) o\`u elle est coupl\'ee \`a la lecture d'un d\'epassement et \`a la
+%     conclusion sur trois crit\`eres de cahier des charges simultan\'es ;
+%   - le correcteur num\'erique (QT3) est totalement absent de cette banque.
+% Le Bloc 4 de la fiche traite en outre : la lecture des marges au bon endroit (point 1), la
+% conclusion vis-\`a-vis du CdC (point 2), l'effet de K_C sur le gain sans effet sur la phase
+% (point 3), le -90 deg du PI (point 4). Les exercices 4 et 6 les MOBILISENT sur des calculs
+% neufs plut\^ot que de les r\'e\'enoncer.
+% Ne pas emp\'ieter sur T26 (mod\'elisation pure) : l'exercice 1 s'arr\^ete \`a l'identification
+% d'un mod\`ele de comportement, qui est ici le PR\'EALABLE explicite au r\'eglage du correcteur
+% des exercices 2 et 3 (m\^eme sujet, questions cons\'ecutives) -- pas une \'etude de mod\'elisation.
+%
+% SOURCES (toutes relues ligne \`a ligne dans les .md de conversion Marker, chemin racine
+%   docs/CAPET_Markdown-20260629T134311Z-3-001/CAPET_Markdown/docs/CAPET_SII_IE/06_PDFs_Originaux/) :
+%
+%   - Ex. 1 : 2021, "Analyse et exploitation p\'edagogique d'un syst\`eme pluritechnique"
+%     (\'epreuve EDE STI 1, nom lu l.1 et l.11 de E1_Sujet_2021.md), questions 31 et 32.
+%     \'Enonc\'e : E1_Sujet_2021.md l.520-568 (boucle d'asservissement du couple sur le bras
+%     rotatif d'une cuve de d\'ecantation, \'echelon de Ucom de 10 V \`a t = 100 min, Ccons =
+%     2 800 kN.m, notations Ccons/Icons/Cbras/Imes/eps/Ucom/rho_pulpe l.540-556).
+%     Corrig\'e officiel Rapport_Jury_2021.md l.319 (justification ordre 1) et l.321
+%     ("K = dCbras/dU0 = 600/10 = 60 kN.m.V^-1"). Constante de temps : le trac\'e du corrig\'e
+%     porte "tau = 70 min" (Rapport_Jury_2021.md l.326-340, texte de l'image de la figure 18
+%     annot\'ee). t5% = 3.tau = 210 min recalcul\'e ici.
+%     Exigences de l'asservissement (erreur statique nulle, t5% < 500 min, d\'epassement < 15 %
+%     de Ccons) : E1_Sujet_2021.md l.572-578.
+%
+%   - Ex. 2 : 2022, "\'Etude et exploitation p\'edagogique d'un banc d'essais automobile"
+%     (\'epreuve EDE STI 2, nom lu l.1 et l.73 de E2_Appliquee_Commune_2022.md), questions 27 \`a 29.
+%     \'Enonc\'e : E2_Appliquee_Commune_2022.md l.475-501 (frein \`a courant de Foucault
+%     F16-250 EL, consigne de couple en \'echelon 700 -> 750 N.m, vitesse du disque constante
+%     \`a 1 000 tr/min, essais \`a gain 1 et gain 10 puis correcteur PI).
+%     Exigence 1.2.1 du SysML figure 2 (l.164, texte d'image) : "Un couple variable doit \^etre
+%     appliqu\'e sur les roues avec une erreur statique nulle et un temps de r\'eponse \`a 5 %
+%     inf\'erieur \`a 1 s."  Rappel du cadrage de la partie : l.469.
+%     Corrig\'e officiel Rapport_Jury_2022.md l.603 (Q27 : "la valeur finale passe de 742 N.m \`a
+%     749 N.m en augmentant le gain du correcteur"), l.605 (Q28 : "On attend une erreur statique
+%     nulle, ce correcteur avec ces r\'eglages ne convient pas"), l.607 (Q29 : "La pr\'ecision et
+%     la rapidit\'e ont \'et\'e am\'elior\'ees. Les crit\`eres du cahier des charges sont respect\'es.").
+%     Les erreurs statiques relatives 1,07 % et 0,13 % sont recalcul\'ees ici \`a partir de ces
+%     valeurs officielles (8/750 et 1/750).
+%
+%   - Ex. 3 (docTech) : 2021, m\^eme \'epreuve, question 33 (document annexe A7).
+%     \'Enonc\'e et description de l'annexe A7 : E1_Sujet_2021.md l.580-582 et l.764-766
+%     (Ccons = 2 800 kN.m constant, perturbations de rho_pulpe \`a t = 400, 640, 1 480, 1 960 et
+%     2 310 min ; trois r\'eglages trac\'es). Corrig\'e officiel Rapport_Jury_2021.md l.333-339
+%     (r\'eglage 1 : faibles d\'epassements mais erreur statique non nulle ; r\'eglage 2 : pr\'ecis
+%     mais d\'epassements tr\`es importants ; r\'eglage 3 : pr\'ecis, < 500 min, d\'epassements bien
+%     inf\'erieurs \`a 15 % -> meilleur r\'eglage).
+%     ATTENTION : le trac\'e de l'annexe A7 est une image omise par Marker. Le docTech ci-dessous
+%     ne reproduit donc PAS de valeurs relev\'ees sur la courbe : il reproduit le TEXTE de
+%     l'annexe (conditions de simulation, dates des perturbations) et redonne les trois allures
+%     sous forme de relev\'es qualitatifs strictement conformes \`a la description du corrig\'e
+%     officiel, plus le rappel litt\'eral des trois exigences (l.572-578 du sujet). Les chiffres
+%     du tableau de relev\'es sont donc reconstitu\'es \`a partir du corrig\'e, ce qui est dit dans
+%     l'\'enonc\'e ("relev\'es synth\'etis\'es") -- aucune valeur n'est attribu\'ee \`a une courbe du sujet.
+%     Citation jury : verbatim exact de Rapport_Jury_2021.md l.455.
+%
+%   - Ex. 4 : 2024, "\'Epreuve \'ecrite disciplinaire" option Ing\'enierie \'electrique
+%     (\'epreuve EDE ENE 1, nom lu l.1 et l.8 de E2_Disciplinaire_IE_2024.md), questions C5 \`a C8.
+%     \'Enonc\'e : E2_Disciplinaire_IE_2024.md l.343-373 (boucle de vitesse d'un moto-ventilateur
+%     d'extraction, Hm(p) = Kmeca/(1+tau_meca p), correcteur Kp puis int\'egrateur Ki/p,
+%     forme canonique impos\'ee, m = 1, Tr = 1 s, omega0 = 5/Tr, Kmeca = 250, tau_meca = 8,5 s).
+%     D\'emonstration de C5 (mise en \'equation de la FTBF) : Rapport_Jury_2024.md l.266
+%     (texte de l'image du corrig\'e, qui donne Hbf = KiKpKmeca / (tau p^2 + p + KpKmeca p + KiKpKmeca)).
+%     Valeurs officielles de C8 : Rapport_Jury_2024.md l.277 -- "Kp = (2.m.tau_meca.omega0 - 1)/Kmeca
+%     = 0.35" et "Ki = tau_meca.omega0^2/(Kp.Kmeca) = 2.5".
+%     \'ECART ASSUM\'E ET SIGNAL\'E DANS LE CORRIG\'E : la formule du rapport appliqu\'ee \`a ses propres
+%     donn\'ees donne Kp = (2x1x8,5x5 - 1)/250 = 84/250 = 0,336 (et non 0,35), puis
+%     Ki = 8,5x25/(0,336x250) = 2,53 (et non 2,5). Les formules litt\'erales du rapport sont
+%     confirm\'ees par v\'erification ind\'ependante de la forme canonique (voir corrig\'e) ; seules
+%     les arrondis imprim\'es diff\`erent. On retient ici le r\'esultat des formules.
+%
+%   - Ex. 5 : 2024, m\^eme \'epreuve, questions C9 \`a C13 (documents techniques DT4 et DT5).
+%     \'Enonc\'e : E2_Disciplinaire_IE_2024.md l.375-405. D\'efinition de la marge de phase
+%     donn\'ee PAR LE SUJET l.383 : "Mphi = Arg(Hbf(0dB)) + 180 deg".
+%     Cahier des charges l.389-393 : D% <= 5 % ; erreur statique nulle ; Mphi >= 90 deg.
+%     Corrig\'e officiel Rapport_Jury_2024.md : C9 l.279-283 (D1 = 0 et eps_s1 = 0 par lecture
+%     graphique du DT4) ; C10/C11 l.285-291 (texte de l'image : "Mphi1 = 180 deg" ;
+%     "Les exigences du cahier des charges sont respect\'ees") ; C12 l.293-299 ("eps_s2 = 0 ;
+%     D2 = (180-150)/150 x 100 = 20 % ; une marge de phase de 180 deg") ; C13 l.303
+%     ("La valeur du d\'epassement ne respecte pas le cahier des charges. En effet D2 > 5 %").
+%     Les valeurs 180 et 150 (unit\'es non pr\'ecis\'ees dans le rapport, ce sont les ordonn\'ees du
+%     DT5 en rad/s) sont reprises telles quelles et D2 = 20 % est recalcul\'e ici.
+%     Taux de r\'eussite de la partie C : Rapport_Jury_2024.md l.505, verbatim exact.
+%     Seconde citation de l'ex. 5 : Rapport_Jury_2023.md l.459, verbatim exact (la phrase
+%     d'ouverture "La quatri\`eme partie portait sur l'asservissement..." n'est pas reprise,
+%     la citation d\'ebute \`a "C'est un champ disciplinaire important...").
+%     Citation jury de l'ex. 3 : Rapport_Jury_2021.md l.455, verbatim exact et int\'egral.
+%
+%   - Ex. 6 : EXERCICE IN\'EDIT (aucune r\'ef\'erence de sujet). Syst\`eme de classe 0 invent\'e
+%     (HBO = K0/((1+T1 p)(1+T2 p)), K0 = 4, T1 = 0,5 s, T2 = 0,05 s) choisi pour faire
+%     appara\^itre proprement le conflit pr\'ecision / marge de phase et le fait qu'un PI
+%     D\'EGRADE la marge. Toutes les valeurs num\'eriques ont \'et\'e calcul\'ees ind\'ependamment
+%     (deux fois) : Kc = 5 -> eps_s = 1/21 = 4,76 % et omega_c = 24,94 rad/s, Mphi = 43,3 deg ;
+%     PI avec Ti = T1 = 0,5 s et Kp = 5 -> Mphi = 38,7 deg ; Kp = 2,5 -> omega_c = 15,72 rad/s
+%     et Mphi = 51,8 deg. Aucun chiffre n'est attribu\'e \`a un sujet r\'eel.
+%
+% AUCUNE citation de rapport de jury de ce fichier n'est paraphras\'ee : les trois citations
+% (ex. 3, ex. 5 et ex. 5 bis) sont des copies litt\'erales des lignes indiqu\'ees ci-dessus.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ifdefined\tr\else\DeclareSIUnit{\tr}{tr}\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T27}} - Exercices - Systemes boucles}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T27 \quad Syst\`emes boucl\'es, correcteurs, stabilit\'e}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 1 -- 2021, questions 31 et 32
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2021, Analyse et exploitation p\'edagogique d'un syst\`eme pluritechnique, questions 31 et 32}
+]
+\CAPETSHOW{
+Dans une usine de traitement de minerai, la pulpe est clarifi\'ee dans une \textbf{cuve de d\'ecantation} dont un bras rotatif racle la boue de fond. Pour acc\'el\'erer la s\'edimentation, des pompes injectent un \textbf{floculant} dans la cuve : plus le d\'ebit de floculant augmente, plus le pourcentage de solides dans la boue augmente, et plus le \textbf{couple $C_{bras}$} exerc\'e sur le bras rotatif est \'elev\'e.
+
+On souhaite \textbf{asservir} ce couple \`a une valeur de consigne $C_{cons}$ (le couple nominal), en agissant sur la tension de commande $U_{com}$ des pompes de dosage. La structure retenue est la suivante :
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\scriptsize, scale=0.95, every node/.style={scale=0.95}]
+  % chaine directe
+  \node (Cc) at (-0.4,0) {$C_{cons}$};
+  \node[draw, minimum width=15mm, minimum height=7mm] (ad) at (1.5,0) {Adaptateur};
+  \node[draw, circle, minimum size=6mm, inner sep=0pt] (sum) at (4.0,0) {};
+  \draw (sum.north) -- (sum.south);
+  \draw (sum.east) -- (sum.west);
+  \node[font=\scriptsize] at ($(sum.center)+(-0.10,0.42)$) {$+$};
+  \node[font=\scriptsize] at ($(sum.center)+(-0.42,-0.36)$) {$-$};
+  \node[draw, minimum width=15mm, minimum height=7mm] (cor) at (6.0,0) {Correcteur};
+  \node[draw, minimum width=24mm, minimum height=7mm] (sys) at (9.1,0) {Syst\`eme \`a identifier};
+  \node (Cb) at (11.6,0) {$C_{bras}$};
+  % perturbation
+  \node (rho) at (9.1,1.3) {$\rho_{pulpe}$};
+  \draw[->] (rho) -- (sys.north);
+  % fleches
+  \draw[->] (Cc) -- (ad);
+  \draw[->] (ad) -- node[above, pos=0.42]{$I_{cons}$} (sum);
+  \draw[->] (sum) -- node[above]{$\varepsilon$} (cor);
+  \draw[->] (cor) -- node[above, pos=0.42]{$U_{com}$} (sys);
+  \draw[->] (sys) -- (Cb);
+  % retour
+  \node[draw, minimum width=26mm, minimum height=7mm] (cap) at (6.9,-1.6) {Capteur + amplificateur};
+  \fill (10.8,0) circle (1.1pt);
+  \draw[->] (10.8,0) |- (cap.east);
+  \draw[->] (cap.west) -| node[pos=0.72,left]{$I_{mes}$} (sum.south);
+\end{tikzpicture}
+\end{center}
+
+Le mod\`ele de connaissance reliant le d\'ebit de floculant au pourcentage de solides \'etant trop complexe, on cherche un \textbf{mod\`ele de comportement} du bloc « syst\`eme \`a identifier », de la tension $U_{com}$ vers le couple $C_{bras}$. Un essai indiciel est r\'ealis\'e : \`a $t = \SI{100}{\minute}$, $U_{com}$ passe brusquement de \SI{30}{\volt} \`a \SI{40}{\volt} (\'echelon de \SI{10}{\volt}), les variations de $\rho_{pulpe}$ \'etant n\'egligeables pendant l'essai. Le relev\'e de $C_{bras}$ est donn\'e ci-dessous.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\scriptsize, x=0.0145cm, y=0.0034cm]
+  % axes
+  \draw[->] (0,0) -- (640,0) node[right]{$t$ [min]};
+  \draw[->] (0,0) -- (0,1400) node[above]{$C_{bras}$ [kN$\cdot$m]};
+  \foreach \x in {0,100,200,300,400,500,600} \draw (\x,0) -- (\x,-30) node[below]{\x};
+  \foreach \y in {200,400,600,800,1000,1200} \draw (0,\y) -- (-9,\y) node[left]{\y};
+  % palier initial 600
+  \draw[thick, colExo] (0,600) -- (100,600);
+  % exponentielle 600 -> 1200, tau = 70 min
+  \draw[thick, colExo, domain=100:600, samples=90, smooth, variable=\t]
+    plot ({\t},{600 + 600*(1 - exp(-(\t-100)/70))});
+  % asymptote
+  \draw[dashed] (0,1200) -- (620,1200);
+  \draw[dashed] (100,0) -- (100,1250);
+  % tangente a l'origine : pente 600/70 ; atteint 1200 a t=170
+  \draw[dotted, thick] (100,600) -- (170,1200);
+  \draw[dashed] (170,0) -- (170,1200);
+  \node[font=\tiny] at (330,1290) {asymptote};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Justifier}, au vu de l'allure de $C_{bras}$, que l'on peut mod\'eliser le bloc « syst\`eme \`a identifier » en boucle ouverte non corrig\'ee par un syst\`eme du \textbf{premier ordre} $H(p) = \dfrac{K}{1 + \tau p}$.
+  \item \textbf{D\'eterminer} pour ce mod\`ele des valeurs approch\'ees du gain $K$ (en \si{\kilo\newton\meter\per\volt}) et de la constante de temps $\tau$ (en minutes). Indiquer les trac\'es utilis\'es.
+  \item Le cahier des charges de l'asservissement impose une \textbf{rapidit\'e} telle que le temps de r\'eponse \`a \SI{5}{\percent} soit inf\'erieur \`a \SI{500}{\minute}. \textbf{\'Evaluer} le temps de r\'eponse \`a \SI{5}{\percent} du syst\`eme \textbf{non corrig\'e} et conclure.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Trois observations sur le relev\'e caract\'erisent un premier ordre :
+  \begin{itemize}[itemsep=1pt]
+    \item la r\'eponse \`a l'\'echelon est une \textbf{exponentielle amortie} croissante, qui tend asymptotiquement vers une valeur finale sans oscillation ;
+    \item la \textbf{tangente \`a l'origine est non nulle} (d\'epart franc d\`es $t = \SI{100}{\minute}$) : ce n'est donc pas un second ordre \`a d\'epart \`a tangente horizontale, ni un syst\`eme \`a retard pur ;
+    \item il n'y a \textbf{aucun d\'epassement} de la valeur finale.
+  \end{itemize}
+  Un mod\`ele du premier ordre $H(p) = K/(1+\tau p)$ est donc l\'egitime.
+  \item \textbf{Gain statique $K$.} Il se lit en \textbf{r\'egime permanent} comme le rapport de la variation de sortie sur la variation d'entr\'ee :
+  \[ \Delta C_{bras} = K\,\Delta U_{com} \quad\Longrightarrow\quad K = \frac{\Delta C_{bras}}{\Delta U_{com}} = \frac{1\,200 - 600}{40 - 30} = \frac{600}{10} = \boldsymbol{\SI{60}{\kilo\newton\meter\per\volt}} \]
+  Trac\'e n\'ecessaire : l'\textbf{asymptote horizontale} \`a \SI{1200}{\kilo\newton\meter} donnant la valeur finale.
+
+  \smallskip
+  \textbf{Constante de temps $\tau$.} Deux lectures \'equivalentes :
+  \begin{itemize}[itemsep=1pt]
+    \item la \textbf{tangente \`a l'origine} (en $t = \SI{100}{\minute}$) coupe l'asymptote \`a $t = 100 + \tau$ ; on lit l'intersection vers \SI{170}{\minute}, d'o\`u $\tau \approx \SI{70}{\minute}$ ;
+    \item ou bien l'instant o\`u la sortie atteint \SI{63}{\percent} de la variation totale, soit $600 + 0{,}63\times 600 = \SI{978}{\kilo\newton\meter}$, atteint lui aussi vers \SI{170}{\minute}.
+  \end{itemize}
+  \[ \boxed{\;K \approx \SI{60}{\kilo\newton\meter\per\volt} \qquad \tau \approx \SI{70}{\minute}\;} \]
+  \item Pour un premier ordre, $t_{R5\%} \approx 3\,\tau$ :
+  \[ t_{R5\%} \approx 3 \times 70 = \SI{210}{\minute} \]
+
+  \smallskip
+  \textbf{Conclusion.} Le syst\`eme \textbf{non corrig\'e} r\'epond d\'ej\`a en \SI{210}{\minute} $< \SI{500}{\minute}$ : l'exigence de rapidit\'e est satisfaite \emph{avant m\^eme} toute correction. Le r\^ole du correcteur ne sera donc \textbf{pas} d'acc\'el\'erer le syst\`eme, mais de r\'epondre aux deux autres exigences, \`a savoir une \textbf{erreur statique nulle} en r\'egime permanent et un \textbf{d\'epassement inf\'erieur \`a \SI{15}{\percent}} de $C_{cons}$, en pr\'esence des perturbations de $\rho_{pulpe}$. C'est ce que d\'eterminera le choix du r\'eglage (exercice 3).
+
+  \smallskip
+  \emph{Attention \`a l'\'echelle de temps} : $\tau$ vaut ici \SI{70}{\minute}, pas \SI{70}{\second}. Un asservissement de proc\'ed\'e chimique est un syst\`eme \textbf{tr\`es lent} devant un asservissement \'electrom\'ecanique ; la p\'eriode d'\'echantillonnage du r\'egulateur num\'erique s'en d\'eduit directement.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 2 -- 2022, questions 27 a 29
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{1} \hfill\normalfont\footnotesize 2022, \'Etude et exploitation p\'edagogique d'un banc d'essais automobile, questions 27 \`a 29}
+]
+\CAPETSHOW{
+Le banc \`a rouleaux \textsc{Autoscan Fi} simule la r\'esistance de la route sur un v\'ehicule immobilis\'e, gr\^ace \`a un \textbf{frein \`a courant de Foucault} dont le couple de freinage d\'epend \`a la fois du courant d'excitation \emph{et} de la vitesse de rotation du disque. Cette d\'ependance \`a la vitesse constitue une \textbf{perturbation} : le couple doit donc \^etre asservi.
+
+Le diagramme des exigences du banc comporte l'exigence \textbf{1.2.1 « Appliquer un couple r\'esistant variable »} dont le texte est :
+
+\begin{quote}\itshape
+« Un couple variable doit \^etre appliqu\'e sur les roues avec une erreur statique nulle et un temps de r\'eponse \`a \SI{5}{\percent} inf\'erieur \`a \SI{1}{\second}. »
+\end{quote}
+
+Le r\'eglage du correcteur se fait par essais successifs en simulation. La vitesse de rotation du disque de frein, qui varie tr\`es lentement devant la consigne de couple, est consid\'er\'ee constante et \'egale \`a \SI[group-minimum-digits=4]{1000}{\tr\per\minute}. La \textbf{consigne de couple est un \'echelon qui passe de \SI{700}{\newton\meter} \`a \SI{750}{\newton\meter}}.
+
+Trois essais sont r\'ealis\'es. Les valeurs finales relev\'ees en r\'egime permanent sont :
+
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Essai & Correcteur & Valeur finale du couple de freinage \\
+\midrule
+1 & proportionnel, gain $K_C = 1$ & \SI{742}{\newton\meter} \\
+2 & proportionnel, gain $K_C = 10$ & \SI{749}{\newton\meter} \\
+3 & proportionnel int\'egral (PI) & \SI{750}{\newton\meter}, atteinte plus rapidement qu'\`a l'essai 2 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\scriptsize, x=1.55cm, y=0.052cm]
+  \draw[->] (0,690) -- (4.3,690) node[right]{$t$};
+  \draw[->] (0,690) -- (0,765) node[above]{$C_f$ [N$\cdot$m]};
+  \foreach \y/\l in {700/700,720/720,740/740,750/750}
+    \draw (0,\y) -- (-0.07,\y) node[left]{\l};
+  % consigne
+  \draw[dashed, thick] (0.5,750) -- (4.2,750);
+  \draw[thick, gray] (0,700) -- (0.5,700) -- (0.5,750);
+  \node[gray, font=\tiny, above right] at (2.9,750) {consigne};
+  % essai 1 : Kc=1, tau grand, vers 742
+  \draw[thick, colExo!55!black, domain=0.5:4.2, samples=70, smooth, variable=\t]
+    plot ({\t},{700 + 42*(1 - exp(-(\t-0.5)/0.85))});
+  \node[colExo!55!black, font=\tiny, right] at (4.2,742) {essai 1};
+  % essai 2 : Kc=10, plus rapide, vers 749
+  \draw[thick, colExo, domain=0.5:4.2, samples=70, smooth, variable=\t]
+    plot ({\t},{700 + 49*(1 - exp(-(\t-0.5)/0.38))});
+  \node[colExo, font=\tiny, right] at (4.2,749) {essai 2};
+  % essai 3 : PI, vers 750 tres vite
+  \draw[thick, colMeca, domain=0.5:4.2, samples=70, smooth, variable=\t]
+    plot ({\t},{700 + 50*(1 - exp(-(\t-0.5)/0.17))});
+  \node[colMeca, font=\tiny, right] at (4.2,754) {essai 3};
+  \draw[dashed] (0.5,690) -- (0.5,752);
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Indiquer} le crit\`ere de performance de l'asservissement qui a \'et\'e am\'elior\'e en passant de l'essai 1 \`a l'essai 2, et \textbf{chiffrer} cette am\'elioration en calculant l'erreur statique relative dans chaque cas.
+  \item \textbf{D\'eterminer} si l'un de ces deux r\'eglages proportionnels r\'epond \`a l'exigence 1.2.1.
+  \item \textbf{Donner} les deux crit\`eres de performance qui ont \'et\'e am\'elior\'es entre l'essai 2 et l'essai 3, et \textbf{pr\'eciser} si ce correcteur r\'epond \`a l'exigence 1.2.1.
+  \item \textbf{Expliquer} quelle propri\'et\'e structurelle du correcteur PI garantit \textbf{par construction} le r\'esultat obtenu \`a l'essai 3, alors qu'aucune valeur finie de $K_C$ ne pouvait l'obtenir \`a l'essai 2.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le crit\`ere am\'elior\'e est la \textbf{pr\'ecision} (erreur statique). Pour une consigne de \SI{750}{\newton\meter} :
+  \[ \varepsilon_{s1} = 750 - 742 = \SI{8}{\newton\meter} \quad\text{soit}\quad \frac{8}{750} = \SI{1,07}{\percent} \]
+  \[ \varepsilon_{s2} = 750 - 749 = \SI{1}{\newton\meter} \quad\text{soit}\quad \frac{1}{750} = \SI{0,13}{\percent} \]
+  Multiplier le gain par 10 a divis\'e l'erreur statique par environ 8. Ce n'est pas un hasard : pour un syst\`eme de \textbf{classe 0} (sans int\'egrateur dans la FTBO), $\varepsilon_s = \dfrac{E_0}{1 + H_{BO}(0)}$, et $H_{BO}(0)$ est proportionnel \`a $K_C$. Augmenter $K_C$ \textbf{r\'eduit} l'erreur sans jamais l'annuler.
+  \item L'exigence 1.2.1 impose une erreur statique \textbf{nulle}, pas « petite ». Or :
+  \[ \varepsilon_{s2} = \SI{1}{\newton\meter} \neq 0 \]
+  \textbf{Aucun} des deux r\'eglages proportionnels ne convient. Il serait vain de continuer \`a augmenter $K_C$ : $\varepsilon_s$ tendrait vers z\'ero sans jamais l'atteindre, tandis que la \textbf{marge de phase se d\'egraderait} \`a chaque augmentation (la pulsation de coupure \`a \SI{0}{\deci\bel} se d\'eplace vers les hautes fr\'equences, o\`u la phase de la FTBO est plus n\'egative), jusqu'\`a rendre le syst\`eme instable.
+  \item Entre l'essai 2 et l'essai 3, deux crit\`eres sont am\'elior\'es : la \textbf{pr\'ecision} (la valeur finale atteint exactement la consigne de \SI{750}{\newton\meter}, soit $\varepsilon_s = 0$) et la \textbf{rapidit\'e} (la consigne est atteinte plus t\^ot). Les deux termes de l'exigence 1.2.1 sont donc satisfaits : erreur statique nulle, et temps de r\'eponse \`a \SI{5}{\percent} inf\'erieur \`a \SI{1}{\second}. \textbf{Le correcteur PI r\'epond \`a l'exigence.}
+  \item Le PI s'\'ecrit $C(p) = K_P\left(1 + \dfrac{1}{T_i\,p}\right) = K_P\,\dfrac{1 + T_i\,p}{T_i\,p}$ : il contient un \textbf{int\'egrateur pur} $1/p$. La FTBO passe donc de la classe 0 \`a la \textbf{classe 1}, ce qui donne $H_{BO}(p) \to \infty$ quand $p \to 0$, et par cons\'equent
+  \[ \varepsilon_s = \lim_{p\to 0} \frac{E_0}{1 + H_{BO}(p)} = 0 \]
+  \textbf{quelle que soit} la valeur de $K_P$. C'est une propri\'et\'e \textbf{structurelle} (li\'ee \`a la classe du syst\`eme), pas un r\'eglage \`a affiner : l'annulation de l'erreur statique en \'echelon est acquise par la seule pr\'esence de l'int\'egrateur.
+
+  \smallskip
+  \textbf{Conclusion.} Le correcteur retenu pour le frein \`a courant de Foucault est donc un \textbf{PI}, seule structure capable de satisfaire simultan\'ement les deux termes de l'exigence 1.2.1 : l'int\'egrateur garantit $\varepsilon_s = 0$ par construction, et le gain proportionnel $K_P$ reste disponible pour r\'egler la rapidit\'e sous \SI{1}{\second}. Le prix \`a payer est un \textbf{apport de $-90^{\circ}$ de phase en basse fr\'equence} : la marge de phase doit imp\'erativement \^etre v\'erifi\'ee \emph{apr\`es} introduction du PI (voir exercice 6).
+
+  \smallskip
+  \emph{Remarque sur la classe} : ce raisonnement ne vaut que pour une entr\'ee en \textbf{\'echelon}. Face \`a une entr\'ee en \textbf{rampe}, un syst\`eme de classe 1 conserve une erreur de tra\^inage finie et non nulle ; il faudrait alors deux int\'egrateurs. La question « l'erreur est-elle nulle ? » n'a pas de r\'eponse sans pr\'eciser \emph{la classe du syst\`eme} \textbf{et} \emph{le type d'entr\'ee}.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 3 -- docTech -- 2021, question 33
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize 2021, Analyse et exploitation p\'edagogique d'un syst\`eme pluritechnique, question 33 (document annexe A7)}
+]
+\CAPETSHOW{
+On reprend l'asservissement du couple du bras rotatif de l'exercice 1, dont le mod\`ele de comportement a \'et\'e identifi\'e \`a $K \approx \SI{60}{\kilo\newton\meter\per\volt}$ et $\tau \approx \SI{70}{\minute}$. Trois r\'eglages de correcteur sont maintenant compar\'es en simulation. \`A vous de choisir celui qui convient.
+
+\begin{tcolorbox}[docTech, title={Document annexe A7 -- r\'esultats de simulation de l'asservissement du couple sur le bras rotatif}]
+\footnotesize
+\textbf{Conditions de simulation.} La simulation est r\'ealis\'ee avec un couple consigne \textbf{constant} $C_{cons} = \SI{2800}{\kilo\newton\meter}$ et des variations de $\rho_{pulpe}$ d'amplitudes diff\'erentes \`a $t = 400$, $640$, $1\,480$, $1\,960$ et \SI{2310}{\minute}. Ces variations traduisent des discontinuit\'es dans le pourcentage de solides contenus dans la pulpe et constituent une \textbf{perturbation} pour l'asservissement. Trois r\'eglages de correcteur sont trac\'es sur l'intervalle $0$--\SI{3000}{\minute}.
+
+\smallskip
+\textbf{Relev\'es synth\'etis\'es sur les trois trac\'es} (comportement apr\`es chaque perturbation) :
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+ & \textbf{R\'eglage 1} & \textbf{R\'eglage 2} & \textbf{R\'eglage 3} \\
+\midrule
+Valeur stabilis\'ee de $C_{bras}$ & $\approx \SI{2400}{\kilo\newton\meter}$ & \SI{2800}{\kilo\newton\meter} & \SI{2800}{\kilo\newton\meter} \\
+\'Ecart \`a la consigne en r\'egime permanent & non nul & nul & nul \\
+Amplitude des d\'epassements & faible & \textbf{tr\`es importante} & faible \\
+Temps de stabilisation apr\`es perturbation & --- & long & un peu moins de \SI{500}{\minute} \\
+\'Echelle verticale du trac\'e & $0$--$4\,000$ & $0$--$\mathbf{5\,000}$ & $0$--$4\,000$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\emph{Le r\'eglage 2 a d\^u \^etre trac\'e sur une \'echelle verticale \'elargie ($0$ \`a \SI{5000}{\kilo\newton\meter}) pour que ses pics restent dans le cadre, alors que les r\'eglages 1 et 3 tiennent sur $0$ \`a \SI{4000}{\kilo\newton\meter}.}
+\end{tcolorbox}
+
+\smallskip
+On rappelle les \textbf{trois exigences} de l'asservissement, telles qu'\'enonc\'ees dans le sujet :
+
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item \textbf{pr\'ecision} : erreur statique nulle en r\'egime permanent ;
+  \item \textbf{rapidit\'e} : temps de r\'eponse $t_{5\%} < \SI{500}{\minute}$ ;
+  \item \textbf{d\'epassement} : inf\'erieur \`a \SI{15}{\percent} du couple consigne $C_{cons}$.
+\end{itemize}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever} dans le document annexe A7, pour chacun des trois r\'eglages, la valeur stabilis\'ee de $C_{bras}$ et l'amplitude qualitative des d\'epassements. \textbf{Calculer} la valeur de couple \`a ne pas d\'epasser pour respecter la troisi\`eme exigence.
+  \item \textbf{\'Eliminer}, en justifiant par l'exigence viol\'ee, les r\'eglages qui ne conviennent pas.
+  \item \textbf{Choisir} le r\'eglage qui r\'epond au mieux aux exigences de l'asservissement, en justifiant la r\'eponse sur les \textbf{trois} crit\`eres.
+  \item \textbf{Pr\'eciser} quelle est vraisemblablement la structure (P, PI ou PID) des r\'eglages 1 et 3, en vous appuyant sur leur seul comportement en r\'egime permanent.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\textbf{\'Etape 1 --- Extraction des donn\'ees.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Lecture directe du tableau de relev\'es de l'annexe A7 :
+  \begin{center}
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabular}{@{}lcc@{}}
+  \toprule
+  R\'eglage & Valeur stabilis\'ee & D\'epassements \\
+  \midrule
+  1 & $\approx \SI{2400}{\kilo\newton\meter}$ ($\neq C_{cons}$) & faibles \\
+  2 & \SI{2800}{\kilo\newton\meter} ($= C_{cons}$) & tr\`es importants \\
+  3 & \SI{2800}{\kilo\newton\meter} ($= C_{cons}$) & faibles \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  Le seuil de d\'epassement admissible se calcule sur la \textbf{consigne} :
+  \[ C_{max} = C_{cons}\,(1 + 0{,}15) = 2\,800 \times 1{,}15 = \SI[group-minimum-digits=4]{3220}{\kilo\newton\meter} \]
+  Autrement dit, aucun pic de $C_{bras}$ ne doit d\'epasser \SI{3220}{\kilo\newton\meter} apr\`es une perturbation.
+  \item \textbf{\'Elimination.}
+  \begin{itemize}[itemsep=2pt]
+    \item \textbf{R\'eglage 1} : il pr\'esente de faibles d\'epassements, donc respecte le crit\`ere de d\'epassement, \textbf{mais il n'est pas pr\'ecis} : la valeur stabilis\'ee ($\approx \SI{2400}{\kilo\newton\meter}$) n'atteint pas la consigne, l'\textbf{erreur statique est non nulle} en r\'egime permanent. La premi\`ere exigence est viol\'ee : \textbf{\'elimin\'e}.
+    \item \textbf{R\'eglage 2} : il est bien pr\'ecis (valeur stabilis\'ee \'egale \`a la consigne), \textbf{mais ses d\'epassements sont tr\`es importants} : l'\'echelle du trac\'e a d\^u \^etre port\'ee \`a \SI{5000}{\kilo\newton\meter}, ce qui situe les pics tr\`es au-del\`a du seuil admissible de \SI{3220}{\kilo\newton\meter}. La troisi\`eme exigence est viol\'ee : \textbf{\'elimin\'e}.
+  \end{itemize}
+  \item \textbf{Choix : le r\'eglage 3}, qui est le seul \`a satisfaire les trois crit\`eres \textbf{simultan\'ement} :
+  \begin{itemize}[itemsep=1pt]
+    \item \textbf{pr\'ecision} : la valeur stabilis\'ee est \'egale \`a la consigne de \SI{2800}{\kilo\newton\meter} ; l'erreur statique est nulle en r\'egime permanent ;
+    \item \textbf{rapidit\'e} : \`a chaque \'echelon de variation de $\rho_{pulpe}$, la r\'eponse met \textbf{un peu moins de \SI{500}{\minute}} \`a se stabiliser, ce qui satisfait $t_{5\%} < \SI{500}{\minute}$ ;
+    \item \textbf{d\'epassement} : les d\'epassements sont faibles, et restent \textbf{bien inf\'erieurs \`a \SI{15}{\percent}} de $C_{cons}$, donc sous les \SI{3220}{\kilo\newton\meter} calcul\'es.
+  \end{itemize}
+  \item Le \textbf{r\'eglage 1} laisse subsister une erreur statique : sa FTBO est de \textbf{classe 0}, il s'agit donc vraisemblablement d'un \textbf{correcteur proportionnel} seul. Le \textbf{r\'eglage 3} annule l'erreur statique tout en ma\^itrisant les d\'epassements : il comporte n\'ecessairement un \textbf{int\'egrateur}, c'est donc un \textbf{PI} (ou un PID, l'action d\'eriv\'ee pouvant expliquer la ma\^itrise des d\'epassements face \`a des perturbations en \'echelon). Le \textbf{r\'eglage 2}, pr\'ecis mais tr\`es oscillant, ressemble \`a un PI dont le gain proportionnel a \'et\'e pouss\'e trop haut : la marge de phase s'est effondr\'ee.
+
+  \smallskip
+  \textbf{Conclusion.} On retient le \textbf{r\'eglage 3}. Ce choix illustre la r\`egle de lecture d'un cahier des charges d'asservissement : les trois crit\`eres (pr\'ecision, rapidit\'e, d\'epassement) doivent \^etre v\'erifi\'es \textbf{simultan\'ement}, et un r\'eglage excellent sur un seul crit\`ere (le r\'eglage 2 sur la pr\'ecision) est \`a \'ecarter d\`es qu'il en viole un autre. Sur ce proc\'ed\'e, un d\'epassement sup\'erieur \`a \SI{15}{\percent} de \SI{2800}{\kilo\newton\meter} ferait travailler le bras racleur au-del\`a de son couple nominal \`a chaque changement de densit\'e de pulpe : le crit\`ere de d\'epassement n'est pas un confort, c'est une \textbf{contrainte m\'ecanique} sur l'actionneur.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2021, commentaire de la partie 5) : \guillemotleft\ Cette partie a \'et\'e moins trait\'ee que les autres. Le jury constate, comme pour les mod\`eles multiphysiques, que la maitrise du langage Python est tr\`es d\'ependante des sp\'ecialit\'es pr\'esent\'ees et reste globalement tr\`es insuffisante. Les calculs cin\'ematiques manquent de rigueur. La sous-partie correspondant \`a l'\'etude d'un asservissement est tr\`es peu trait\'ee, et la qualit\'e des r\'eponses est faible. La lecture graphique d'une courbe est la question la moins bien trait\'ee du sujet. \guillemotright}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 4 -- 2024, questions C5 a C8
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize 2024, \'epreuve \'ecrite disciplinaire (option IE), questions C5 \`a C8}
+]
+\CAPETSHOW{
+Le moto-ventilateur d'extraction d'air d'un atelier est entra\^in\'e par une machine asynchrone pilot\'ee en \textbf{commande scalaire}. Un capteur mesure la vitesse instantan\'ee $\Omega$ et la compare \`a la consigne $\Omega_{r\acute{e}f}$ ; l'\'ecart attaque un correcteur qui \'elabore la commande de pulsation statorique.
+
+La boucle de vitesse est mod\'elis\'ee par le sch\'ema-bloc ci-dessous. La partie m\'ecanique est du premier ordre :
+\[ H_m(p) = \frac{K_{m\acute{e}ca}}{1 + \tau_{m\acute{e}ca}\,p} \]
+et le correcteur est constitu\'e d'un gain proportionnel $K_p$ pr\'ec\'ed\'e d'une boucle interne portant un int\'egrateur $K_i/p$.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\scriptsize, scale=0.95, every node/.style={scale=0.95}]
+  \node (E) at (-0.2,0) {$\Omega_{r\acute{e}f}(p)$};
+  % premier sommateur
+  \node[draw, circle, minimum size=6mm, inner sep=0pt] (s1) at (1.9,0) {};
+  \draw (s1.north) -- (s1.south); \draw (s1.east) -- (s1.west);
+  \node[font=\scriptsize] at ($(s1.center)+(-0.46,0.30)$) {$+$};
+  \node[font=\scriptsize] at ($(s1.center)+(-0.46,-0.32)$) {$-$};
+  % deuxieme sommateur
+  \node[draw, circle, minimum size=6mm, inner sep=0pt] (s2) at (4.5,0) {};
+  \draw (s2.north) -- (s2.south); \draw (s2.east) -- (s2.west);
+  \node[font=\scriptsize] at ($(s2.center)+(-0.46,0.30)$) {$+$};
+  \node[font=\scriptsize] at ($(s2.center)+(-0.46,-0.32)$) {$-$};
+  \node[draw, minimum width=10mm, minimum height=7mm] (Ki) at (3.2,0) {$\dfrac{K_i}{p}$};
+  \node[draw, minimum width=10mm, minimum height=7mm] (Kp) at (6.0,0) {$K_p$};
+  \node[draw, minimum width=20mm, minimum height=8mm] (Hm) at (8.4,0) {$\dfrac{K_{m\acute{e}ca}}{1+\tau_{m\acute{e}ca}\,p}$};
+  \node (S) at (10.7,0) {$\Omega(p)$};
+
+  \draw[->] (E) -- (s1);
+  \draw[->] (s1) -- (Ki);
+  \draw[->] (Ki) -- (s2);
+  \draw[->] (s2) -- (Kp);
+  \draw[->] (Kp) -- (Hm);
+  \draw[->] (Hm) -- (S);
+  % retour interne (sur s2) : prise apres Hm
+  \fill (9.9,0) circle (1.1pt);
+  \draw[->] (9.9,0) |- (4.5,-0.95) -- (s2.south);
+  % retour externe (sur s1) : meme prise, plus bas
+  \draw[->] (9.9,-0.95) -- (9.9,-1.75) -| (1.9,-1.75) -- (s1.south);
+  \node[font=\tiny, below] at (5.6,-1.78) {retour unitaire de vitesse};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{D\'eterminer} la fonction de transfert en boucle ferm\'ee $H_{bf}(p) = \dfrac{\Omega(p)}{\Omega_{r\acute{e}f}(p)}$ en fonction de $K_p$, $K_i$, $K_{m\acute{e}ca}$ et $\tau_{m\acute{e}ca}$.
+  \item \textbf{Mettre} l'expression obtenue sous la forme canonique
+  \[ H_{bf}(p) = \frac{1}{1 + \dfrac{2m}{\omega_0}\,p + \dfrac{1}{\omega_0^{\,2}}\,p^2} \]
+  et \textbf{en d\'eduire} les expressions de $m$ et de $\omega_0$.
+  \item \`A l'aide du th\'eor\`eme de la valeur finale, \textbf{montrer} que l'erreur statique de la boucle de vitesse est \textbf{nulle} lorsque l'entr\'ee est un \'echelon de vitesse d'amplitude $\Omega_0$.
+  \item On impose d\'esormais : amortissement $m = 1$ ; temps de r\'eponse $T_r = \SI{1}{\second}$ ; pulsation propre $\omega_0 = 5/T_r$. On donne $K_{m\acute{e}ca} = 250$ et $\tau_{m\acute{e}ca} = \SI{8,5}{\second}$.\\
+  \textbf{Exprimer} $K_p$ et $K_i$ en fonction de $m$, $K_{m\acute{e}ca}$, $\tau_{m\acute{e}ca}$ et $\omega_0$, puis \textbf{d\'eterminer} leurs valeurs num\'eriques. \textbf{Conclure} sur la coh\'erence du r\'eglage obtenu.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item On \'ecrit la cha\^ine directe en partant de la sortie. La boucle interne donne l'entr\'ee de $K_p$ :
+  \[ \left[\left(\Omega_{r\acute{e}f}(p) - \Omega(p)\right)\frac{K_i}{p} - \Omega(p)\right]K_p\,H_m(p) = \Omega(p) \]
+  En reportant $H_m(p) = K_{m\acute{e}ca}/(1+\tau_{m\acute{e}ca}p)$ et en regroupant :
+  \[ \Omega_{r\acute{e}f}(p)\,\frac{K_p K_i K_{m\acute{e}ca}}{p\,(1+\tau_{m\acute{e}ca}p)} = \Omega(p)\left[1 + \frac{(p + K_i)\,K_p K_{m\acute{e}ca}}{p\,(1+\tau_{m\acute{e}ca}p)}\right] \]
+  d'o\`u, en multipliant les deux membres par $p\,(1+\tau_{m\acute{e}ca}p)$ :
+  \[ \boxed{\;H_{bf}(p) = \frac{\Omega(p)}{\Omega_{r\acute{e}f}(p)} = \frac{K_i K_p K_{m\acute{e}ca}}{\tau_{m\acute{e}ca}\,p^2 + \left(1 + K_p K_{m\acute{e}ca}\right)p + K_i K_p K_{m\acute{e}ca}}\;} \]
+  \item On divise num\'erateur et d\'enominateur par $K_i K_p K_{m\acute{e}ca}$ pour faire appara\^itre un gain statique unitaire :
+  \[ H_{bf}(p) = \frac{1}{1 + \dfrac{1 + K_p K_{m\acute{e}ca}}{K_i K_p K_{m\acute{e}ca}}\,p + \dfrac{\tau_{m\acute{e}ca}}{K_i K_p K_{m\acute{e}ca}}\,p^2} \]
+  Par identification terme \`a terme avec la forme canonique :
+  \[ \frac{1}{\omega_0^{\,2}} = \frac{\tau_{m\acute{e}ca}}{K_i K_p K_{m\acute{e}ca}} \quad\Longrightarrow\quad \boldsymbol{\omega_0 = \sqrt{\dfrac{K_i K_p K_{m\acute{e}ca}}{\tau_{m\acute{e}ca}}}} \]
+  \[ \frac{2m}{\omega_0} = \frac{1 + K_p K_{m\acute{e}ca}}{K_i K_p K_{m\acute{e}ca}} \quad\Longrightarrow\quad \boldsymbol{m = \dfrac{\omega_0\,(1 + K_p K_{m\acute{e}ca})}{2\,K_i K_p K_{m\acute{e}ca}} = \dfrac{1 + K_p K_{m\acute{e}ca}}{2\,\tau_{m\acute{e}ca}\,\omega_0}} \]
+  \item L'entr\'ee est un \'echelon d'amplitude $\Omega_0$, donc $\Omega_{r\acute{e}f}(p) = \Omega_0/p$. L'\'ecart vaut $\mathcal{E}(p) = \Omega_{r\acute{e}f}(p) - \Omega(p) = \Omega_{r\acute{e}f}(p)\left[1 - H_{bf}(p)\right]$. Le th\'eor\`eme de la valeur finale donne :
+  \[ \varepsilon_s = \lim_{p\to 0} p\,\mathcal{E}(p) = \lim_{p\to 0} p\,\frac{\Omega_0}{p}\left[1 - H_{bf}(p)\right] = \Omega_0\left[1 - H_{bf}(0)\right] \]
+  Or la forme canonique obtenue \`a la question 2 a un \textbf{gain statique unitaire} : $H_{bf}(0) = 1$. Donc :
+  \[ \varepsilon_s = \Omega_0\,(1 - 1) = \boldsymbol{0} \]
+  Ce r\'esultat est la cons\'equence directe de l'\textbf{int\'egrateur} $K_i/p$ plac\'e dans la cha\^ine directe : la FTBO est de classe 1, son gain diverge en $p \to 0$, et l'erreur statique en \'echelon s'annule quelles que soient les valeurs de $K_p$ et $K_i$.
+  \item On inverse les deux relations de la question 2. De l'expression de $m$ :
+  \[ 2\,m\,\tau_{m\acute{e}ca}\,\omega_0 = 1 + K_p K_{m\acute{e}ca} \quad\Longrightarrow\quad \boxed{\;K_p = \frac{2\,m\,\tau_{m\acute{e}ca}\,\omega_0 - 1}{K_{m\acute{e}ca}}\;} \]
+  De l'expression de $\omega_0$ :
+  \[ \omega_0^{\,2} = \frac{K_i K_p K_{m\acute{e}ca}}{\tau_{m\acute{e}ca}} \quad\Longrightarrow\quad \boxed{\;K_i = \frac{\tau_{m\acute{e}ca}\,\omega_0^{\,2}}{K_p\,K_{m\acute{e}ca}}\;} \]
+  \textbf{Application num\'erique} avec $m = 1$, $\omega_0 = 5/T_r = 5/1 = \SI{5}{\radian\per\second}$, $K_{m\acute{e}ca} = 250$ et $\tau_{m\acute{e}ca} = \SI{8,5}{\second}$ :
+  \[ K_p = \frac{2 \times 1 \times 8{,}5 \times 5 - 1}{250} = \frac{85 - 1}{250} = \frac{84}{250} = \boldsymbol{0{,}336} \]
+  \[ K_i = \frac{8{,}5 \times 5^2}{0{,}336 \times 250} = \frac{212{,}5}{84} = \boldsymbol{2{,}53} \]
+
+  \smallskip
+  \textbf{V\'erification} (indispensable apr\`es une identification) : avec ces valeurs, $K_p K_{m\acute{e}ca} = 0{,}336 \times 250 = 84$, donc
+  \[ \omega_0 = \sqrt{\frac{2{,}53 \times 84}{8{,}5}} = \sqrt{25{,}0} = \SI{5,0}{\radian\per\second} \quad\text{et}\quad m = \frac{1 + 84}{2 \times 8{,}5 \times 5} = \frac{85}{85} = 1 \]
+  Les deux cibles sont retrouv\'ees exactement : le r\'eglage est coh\'erent.
+
+  \smallskip
+  \textbf{Conclusion.} Le r\'eglage $K_p = 0{,}336$ et $K_i = 2{,}53$ place la boucle de vitesse \`a l'\textbf{amortissement critique} $m = 1$, c'est-\`a-dire \`a la fronti\`ere exacte entre r\'eponse ap\'eriodique et r\'eponse oscillante : c'est le r\'eglage le plus rapide qui garantisse un \textbf{d\'epassement strictement nul}, exigence du cahier des charges de ce moto-ventilateur ($D\% \leq \SI{5}{\percent}$). Toute augmentation de $K_p$ au-del\`a ferait chuter $m$ sous 1 et ferait appara\^itre un d\'epassement. L'\'evaluation effective des performances sur les relev\'es de simulation fait l'objet de l'exercice 5.
+
+  \smallskip
+  \emph{Note sur les arrondis} : le corrig\'e officiel de ce sujet imprime $K_p = 0{,}35$ et $K_i = 2{,}5$. Appliqu\'ees aux donn\'ees de l'\'enonc\'e, \emph{ses propres formules} donnent $84/250 = 0{,}336$ et $212{,}5/84 = 2{,}53$ ; les formules litt\'erales sont confirm\'ees par la v\'erification ci-dessus, seuls les arrondis imprim\'es diff\`erent. On retient ici le r\'esultat des formules.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 5 -- 2024, questions C9 a C13
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize 2024, \'epreuve \'ecrite disciplinaire (option IE), questions C9 \`a C13}
+]
+\CAPETSHOW{
+On reprend la boucle de vitesse du moto-ventilateur de l'exercice 4, r\'egl\'ee \`a $m = 1$ et $\omega_0 = \SI{5}{\radian\per\second}$. La consigne de vitesse est un \'echelon d'amplitude $\Omega_0$.
+
+Le \textbf{cahier des charges} de l'autopilotage impose :
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+D\'epassement relatif & $D\% \leq \SI{5}{\percent}$ \\
+Erreur statique sur la boucle de vitesse & $\varepsilon_v$ nulle \\
+Marge de phase & $M_\varphi \geq 90^{\circ}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Le sujet d\'efinit la marge de phase comme \textbf{la diff\'erence entre la phase pour un gain de \SI{0}{\deci\bel} et $180^{\circ}$}, soit $M_\varphi = \operatorname{Arg}\!\left(H(\SI{0}{\deci\bel})\right) + 180^{\circ}$.
+
+\medskip
+\textbf{Cas 1 --- situation parfaite.} La g\'en\'eration de $\omega_s$ \`a partir de $\omega_{sr\acute{e}f}$ se fait \textbf{instantan\'ement et sans erreur statique} ($\omega_s = \omega_{sr\acute{e}f}$). Les simulations donnent :
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\scriptsize, scale=0.95, every node/.style={scale=0.95}]
+  % -- reponse indicielle
+  \begin{scope}
+    \draw[->] (0,0) -- (4.0,0) node[right]{$t$};
+    \draw[->] (0,0) -- (0,2.3) node[above]{$\Omega/\Omega_0$};
+    \draw[dashed] (0,1.8) -- (3.8,1.8) node[right, font=\tiny]{$\Omega_0$};
+    \draw[thick, colExo, domain=0:3.8, samples=90, smooth, variable=\t]
+      plot ({\t},{1.8*(1 - (1+5*\t)*exp(-5*\t))});
+    \node[font=\tiny] at (2.0,-0.42) {Cas 1 : r\'eponse indicielle (DT4)};
+    \node[font=\tiny, colExo] at (2.7,1.52) {pas de d\'epassement};
+  \end{scope}
+  % -- bode phase
+  \begin{scope}[xshift=5.4cm]
+    \draw[->] (0,0) -- (4.2,0) node[right, font=\tiny]{$\omega$ (log)};
+    \draw[->] (0,0) -- (0,2.3) node[above]{$\varphi$ ($^{\circ}$)};
+    \foreach \y/\l in {2.0/0,1.1/-90,0.2/-180} {
+      \draw (0,\y) -- (-0.09,\y) node[left, font=\tiny]{\l};
+      \draw[dotted] (0,\y) -- (4.0,\y);
+    }
+    % phase : 0 -> -180 sur deux decades, passant par -90 a w0
+    \draw[thick, colExo, domain=0.15:4.0, samples=80, smooth, variable=\x]
+      plot ({\x},{2.0 - 1.8/(1 + exp(-(\x-2.0)*1.7))});
+    % pulsation de gain 0 dB : tres basse
+    \draw[dashed, colMeca] (0.30,0) -- (0.30,2.05);
+    \node[colMeca, font=\tiny, above right] at (0.20,2.05) {$\omega$ \`a \SI{0}{\deci\bel}};
+    \fill[colMeca] (0.30,1.985) circle (1.3pt);
+    \node[font=\tiny] at (2.1,-0.42) {Cas 1 : phase de la boucle (DT4)};
+  \end{scope}
+\end{tikzpicture}
+\end{center}
+
+\medskip
+\textbf{Cas 2 --- prise en compte du variateur.} Le r\'egime transitoire du variateur n'est plus n\'eglig\'e : $\omega_s = \dfrac{1}{1 + \tau_{vv}\,p}\,\omega_{sr\acute{e}f}$. Le relev\'e de la r\'eponse indicielle (DT5) donne un \textbf{premier pic \`a 180} pour une \textbf{valeur finale de 150} (m\^emes unit\'es, \si{\radian\per\second}) ; l'erreur statique reste nulle et la marge de phase relev\'ee reste de $180^{\circ}$.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Cas 1.} \`A l'aide du relev\'e de r\'eponse indicielle, \textbf{d\'eterminer} l'erreur statique $\varepsilon_{s1}$ et le d\'epassement relatif $D_1$ de la boucle de vitesse.
+  \item \textbf{Cas 1.} \`A l'aide du relev\'e de phase, \textbf{d\'eterminer} la marge de phase $M_{\varphi 1}$. \textbf{Pr\'eciser} soigneusement o\`u se lit cette marge sur le diagramme.
+  \item \textbf{Cas 1.} \textbf{Conclure} sur les performances de la motorisation au regard des trois exigences du cahier des charges.
+  \item \textbf{Cas 2.} \textbf{\'Evaluer} l'erreur statique $\varepsilon_{s2}$, le d\'epassement relatif $D_2$ et la marge de phase $M_{\varphi 2}$, puis \textbf{conclure} sur le respect du cahier des charges.
+  \item \textbf{Expliquer} physiquement pourquoi l'ajout du retard du variateur d\'egrade le d\'epassement, alors m\^eme que le r\'eglage $K_p$, $K_i$ n'a pas \'et\'e modifi\'e.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Par lecture graphique de la r\'eponse indicielle du cas 1 :
+  \begin{itemize}[itemsep=1pt]
+    \item la sortie rejoint exactement la valeur de consigne $\Omega_0$ en r\'egime permanent : \textbf{pas d'erreur statique}, $\boldsymbol{\varepsilon_{s1} = 0}$ ;
+    \item la courbe cro\^it de fa\c{c}on monotone et n'exc\`ede jamais la valeur finale : \textbf{pas de d\'epassement}, $\boldsymbol{D_1 = 0}$.
+  \end{itemize}
+  Ces deux relev\'es sont coh\'erents avec le r\'eglage de l'exercice 4 : l'int\'egrateur $K_i/p$ impose $\varepsilon_s = 0$, et l'amortissement critique $m = 1$ impose $D\% = 0$.
+  \item \textbf{O\`u se lit la marge de phase.} La marge de phase se lit \textbf{\`a la pulsation de coupure \`a \SI{0}{\deci\bel}}, c'est-\`a-dire la pulsation $\omega_c$ pour laquelle la \emph{courbe de gain} traverse \SI{0}{\deci\bel} --- et \textbf{non} \`a la pulsation o\`u la phase vaut $-180^{\circ}$ (qui sert, elle, \`a la marge de \emph{gain}). La proc\'edure est :
+  \begin{enumerate}[label=(\alph*), itemsep=1pt]
+    \item rep\'erer $\omega_c$ sur la courbe de \textbf{gain} ;
+    \item reporter cette abscisse sur la courbe de \textbf{phase} et y lire $\varphi(\omega_c)$ ;
+    \item appliquer $M_\varphi = 180^{\circ} + \varphi(\omega_c)$.
+  \end{enumerate}
+  Ici, $\omega_c$ tombe dans le domaine des basses pulsations, o\`u la phase de la boucle vaut encore $\varphi(\omega_c) \approx 0^{\circ}$ (la chute de phase vers $-180^{\circ}$ n'intervient qu'au-del\`a). D'o\`u :
+  \[ M_{\varphi 1} = 180^{\circ} + 0^{\circ} = \boldsymbol{180^{\circ}} \]
+  \item \textbf{Confrontation aux trois exigences} (cas 1) :
+  \begin{center}
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabular}{@{}lccc@{}}
+  \toprule
+  Crit\`ere & Exigence & Relev\'e & Verdict \\
+  \midrule
+  D\'epassement & $D\% \leq \SI{5}{\percent}$ & $D_1 = 0$ & respect\'e \\
+  Erreur statique & nulle & $\varepsilon_{s1} = 0$ & respect\'e \\
+  Marge de phase & $M_\varphi \geq 90^{\circ}$ & $M_{\varphi 1} = 180^{\circ}$ & respect\'e \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  \textbf{Les trois exigences du cahier des charges sont respect\'ees} dans la situation id\'ealis\'ee $\omega_s = \omega_{sr\acute{e}f}$.
+  \item \textbf{Cas 2.} Par lecture des relev\'es :
+  \begin{itemize}[itemsep=1pt]
+    \item \textbf{erreur statique} : la sortie rejoint toujours la consigne, $\boldsymbol{\varepsilon_{s2} = 0}$ --- l'int\'egrateur est toujours l\`a, l'ajout d'un p\^ole suppl\'ementaire ne change pas la \emph{classe} du syst\`eme ;
+    \item \textbf{d\'epassement relatif} : il se calcule sur la \emph{valeur finale}, pas sur l'amplitude absolue du pic :
+    \[ D_2 = \frac{\text{pic} - \text{valeur finale}}{\text{valeur finale}}\times 100 = \frac{180 - 150}{150}\times 100 = \boldsymbol{\SI{20}{\percent}} \]
+    \item \textbf{marge de phase} : le relev\'e donne toujours $\boldsymbol{M_{\varphi 2} = 180^{\circ}}$.
+  \end{itemize}
+
+  \smallskip
+  \textbf{Conclusion.} Deux crit\`eres sur trois restent satisfaits ($\varepsilon_{s2} = 0$ et $M_{\varphi 2} = 180^{\circ} \geq 90^{\circ}$), \textbf{mais le d\'epassement de \SI{20}{\percent} viole l'exigence $D\% \leq \SI{5}{\percent}$} : il est quatre fois trop grand. \textbf{Le cahier des charges n'est donc pas respect\'e} lorsqu'on prend en compte le r\'egime transitoire du variateur. Le r\'eglage $K_p = 0{,}336$, $K_i = 2{,}53$ \'etabli \`a l'exercice 4 doit \^etre repris en int\'egrant $\tau_{vv}$ au mod\`ele --- typiquement en \textbf{r\'eduisant $K_p$} pour restaurer un amortissement effectif proche de 1 au prix d'un temps de r\'eponse plus long.
+
+  \smallskip
+  \emph{Le\c{c}on de m\'ethode} : le r\'eglage de l'exercice 4 a \'et\'e calcul\'e sur un mod\`ele o\`u le variateur \'etait suppos\'e parfait. La conclusion de l'exercice 4 (« d\'epassement strictement nul ») n'\'etait donc valable que \emph{sous cette hypoth\`ese}. C'est pr\'ecis\'ement le r\^ole de cette derni\`ere question du sujet : v\'erifier que le candidat \textbf{ne conclut pas d\'efinitivement sur un mod\`ele simplifi\'e}.
+  \item Le variateur ajoute un \textbf{p\^ole suppl\'ementaire} $1/(1+\tau_{vv}p)$ dans la cha\^ine directe. Ce p\^ole apporte un \textbf{retard de phase suppl\'ementaire} (jusqu'\`a $-90^{\circ}$ en haute fr\'equence) sans que le gain basse fr\'equence change : la commande calcul\'ee par le correcteur arrive \textbf{en retard} sur le proc\'ed\'e. Le correcteur continue donc de « pousser » alors que la vitesse est d\'ej\`a en train d'atteindre la consigne, et la sortie \textbf{d\'epasse}. Le syst\`eme, du second ordre en cas 1, devient du \textbf{troisi\`eme ordre} en cas 2 : l'amortissement effectif de la paire de p\^oles dominants chute sous 1, ce qui fait appara\^itre les \SI{20}{\percent} de d\'epassement. Ce m\'ecanisme --- un retard suppl\'ementaire d\'egrade la stabilit\'e relative \`a r\'eglage constant --- est le m\^eme que celui qui explique qu'un correcteur PI, en apportant $-90^{\circ}$, d\'egrade la marge de phase (exercice 6).
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2024, analyse globale des r\'esultats) : \guillemotleft\ la partie C a \'et\'e abord\'ee par 79 \% des candidats. Elle a \'et\'e trait\'ee correctement par seulement 31 \% des candidats \guillemotright. Le rapport 2023 ajoute, sur une partie d'asservissement comparable : \guillemotleft\ C'est un champ disciplinaire important des sciences industrielles auquel les candidats au CAPET de SII ne peuvent se soustraire. Le jury invite les candidats \`a revoir les concepts de base de ce domaine comme les notions de boucle ouverte, de correcteur ou encore de marge de phase. \guillemotright}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 6 -- inedit
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Un axe de positionnement de pupitre motoris\'e est command\'e en \textbf{boucle ferm\'ee \`a retour unitaire}. Le proc\'ed\'e non corrig\'e, identifi\'e exp\'erimentalement, est du second ordre \`a deux constantes de temps r\'eelles :
+\[ G(p) = \frac{K_0}{(1 + T_1\,p)(1 + T_2\,p)} \qquad\text{avec}\qquad K_0 = 4 \;;\quad T_1 = \SI{0,5}{\second} \;;\quad T_2 = \SI{0,05}{\second} \]
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\scriptsize, scale=0.95, every node/.style={scale=0.95}]
+  \node (E) at (0,0) {$E(p)$};
+  \node[draw, circle, minimum size=6mm, inner sep=0pt] (sum) at (1.8,0) {};
+  \draw (sum.north) -- (sum.south); \draw (sum.east) -- (sum.west);
+  \node[font=\scriptsize] at ($(sum.center)+(-0.46,0.30)$) {$+$};
+  \node[font=\scriptsize] at ($(sum.center)+(-0.46,-0.32)$) {$-$};
+  \node[draw, minimum width=13mm, minimum height=8mm] (C) at (3.8,0) {$C(p)$};
+  \node[draw, minimum width=30mm, minimum height=9mm] (G) at (7.2,0) {$\dfrac{K_0}{(1+T_1 p)(1+T_2 p)}$};
+  \node (S) at (10.2,0) {$S(p)$};
+  \draw[->] (E) -- (sum);
+  \draw[->] (sum) -- node[above]{$\varepsilon(p)$} (C);
+  \draw[->] (C) -- (G);
+  \draw[->] (G) -- (S);
+  \fill (9.4,0) circle (1.1pt);
+  \draw[->] (9.4,0) -- (9.4,-1.25) -| (1.8,-1.25) -- (sum.south);
+  \node[font=\tiny, below] at (5.6,-1.28) {retour unitaire (capteur suppos\'e parfait)};
+\end{tikzpicture}
+\end{center}
+
+Le cahier des charges impose, pour une consigne en \textbf{\'echelon} :
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item \textbf{pr\'ecision} : erreur statique relative $\varepsilon_s \leq \SI{5}{\percent}$ ;
+  \item \textbf{stabilit\'e} : marge de phase $M_\varphi \geq 45^{\circ}$.
+\end{itemize}
+
+\medskip
+\textbf{Partie A --- correcteur proportionnel} $C(p) = K_C$.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{D\'eterminer} la \textbf{classe} de la FTBO, puis \textbf{\'etablir} l'expression litt\'erale de l'erreur statique relative $\varepsilon_s$ en fonction de $K_C$ et $K_0$. \textbf{En d\'eduire} la valeur minimale de $K_C$ satisfaisant le crit\`ere de pr\'ecision.
+  \item On retient $K_C = 5$. \textbf{Calculer} la pulsation de coupure \`a \SI{0}{\deci\bel} $\omega_c$, puis la marge de phase $M_\varphi$. \textbf{Conclure} sur le respect du cahier des charges.
+\end{enumerate}
+
+\medskip
+\textbf{Partie B --- correcteur proportionnel int\'egral} $C(p) = K_P\left(1 + \dfrac{1}{T_i\,p}\right)$, r\'egl\'e par \textbf{compensation du p\^ole dominant} : $T_i = T_1 = \SI{0,5}{\second}$.
+
+\begin{enumerate}[leftmargin=1.5em, start=3]
+  \item \textbf{Montrer} que la FTBO se simplifie alors, et \textbf{donner} sa nouvelle expression. \textbf{Justifier} que l'erreur statique est d\'esormais nulle quelle que soit la valeur de $K_P$.
+  \item On conserve dans un premier temps $K_P = 5$ (m\^eme gain proportionnel qu'en partie A). \textbf{Calculer} la nouvelle marge de phase et \textbf{comparer} \`a celle de la question 2. \textbf{Commenter}.
+  \item \textbf{D\'eterminer} la valeur de $K_P$ qui restaure une marge de phase d'au moins $45^{\circ}$, et \textbf{conclure} sur le compromis obtenu.
+\end{enumerate}
+
+\smallskip
+\emph{On rappelle} : $\arctan(1{,}247) = 51{,}27^{\circ}$ ; $\arctan(1{,}250) = 51{,}34^{\circ}$ ; $\arctan(12{,}47) = 85{,}42^{\circ}$ ; $\arctan(0{,}786) = 38{,}17^{\circ}$.
+
+}{
+\textbf{Corrig\'e.}
+
+\textbf{Partie A --- correcteur proportionnel.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item La FTBO vaut $H_{BO}(p) = K_C\,G(p) = \dfrac{K_C K_0}{(1+T_1 p)(1+T_2 p)}$. Elle ne comporte \textbf{aucun int\'egrateur} : le syst\`eme est de \textbf{classe 0}. Pour une entr\'ee en \'echelon d'amplitude $E_0$ et un retour unitaire :
+  \[ \varepsilon_s = \frac{E_0}{1 + H_{BO}(0)} = \frac{E_0}{1 + K_C K_0} \quad\Longrightarrow\quad \boxed{\;\frac{\varepsilon_s}{E_0} = \frac{1}{1 + K_C K_0}\;} \]
+  Le crit\`ere $\varepsilon_s/E_0 \leq 0{,}05$ impose :
+  \[ \frac{1}{1 + 4\,K_C} \leq 0{,}05 \quad\Longleftrightarrow\quad 1 + 4\,K_C \geq 20 \quad\Longleftrightarrow\quad K_C \geq \frac{19}{4} = 4{,}75 \]
+  \[ \boldsymbol{K_{C\,min} = 4{,}75} \]
+  \item Avec $K_C = 5$, on a $K_C K_0 = 20$. La pulsation de coupure v\'erifie $|H_{BO}(j\omega_c)| = 1$ :
+  \[ \frac{20}{\sqrt{1 + (0{,}5\,\omega_c)^2}\,\sqrt{1 + (0{,}05\,\omega_c)^2}} = 1 \]
+  En posant $x = \omega_c^{\,2}$, on obtient l'\'equation bicarr\'ee $T_1^2 T_2^2\,x^2 + (T_1^2 + T_2^2)\,x + 1 - 400 = 0$, soit $6{,}25\cdot 10^{-4}\,x^2 + 0{,}2525\,x - 399 = 0$, dont la racine positive donne :
+  \[ \boldsymbol{\omega_c \approx \SI{24,94}{\radian\per\second}} \]
+  La phase de la FTBO est $\varphi(\omega) = -\arctan(T_1\omega) - \arctan(T_2\omega)$ (le gain $K_C$ n'intervient pas dans la phase) :
+  \[ \varphi(\omega_c) = -\arctan(0{,}5\times 24{,}94) - \arctan(0{,}05\times 24{,}94) = -\arctan(12{,}47) - \arctan(1{,}247) \]
+  \[ \varphi(\omega_c) \approx -85{,}42^{\circ} - 51{,}27^{\circ} = -136{,}69^{\circ} \]
+  \[ M_\varphi = 180^{\circ} + \varphi(\omega_c) = 180^{\circ} - 136{,}69^{\circ} = \boldsymbol{43{,}3^{\circ}} \]
+
+  \smallskip
+  \textbf{Conclusion partielle.} Avec $K_C = 5$, la pr\'ecision est satisfaite ($\varepsilon_s/E_0 = 1/21 = \SI{4,76}{\percent} \leq \SI{5}{\percent}$) mais la \textbf{marge de phase $43{,}3^{\circ}$ est inf\'erieure aux $45^{\circ}$ requis} : le cahier des charges \textbf{n'est pas respect\'e}. Le correcteur proportionnel est pris en \textbf{\'etau} : le seul param\`etre disponible, $K_C$, agit dans des sens oppos\'es sur les deux crit\`eres. Le baisser am\'eliore la marge mais d\'egrade la pr\'ecision, et r\'eciproquement. Aucune valeur de $K_C$ ne peut satisfaire les deux simultan\'ement ici --- il faut \textbf{changer de structure de correcteur}.
+\end{enumerate}
+
+\medskip
+\textbf{Partie B --- correcteur proportionnel int\'egral.}
+
+\begin{enumerate}[leftmargin=1.5em, start=3]
+  \item Le PI s'\'ecrit sous forme factoris\'ee :
+  \[ C(p) = K_P\,\frac{1 + T_i\,p}{T_i\,p} \]
+  Avec le r\'eglage par compensation $T_i = T_1 = \SI{0,5}{\second}$, le z\'ero du correcteur annule le p\^ole dominant du proc\'ed\'e :
+  \[ H_{BO}(p) = K_P\,\frac{1 + T_i\,p}{T_i\,p}\cdot\frac{K_0}{(1+T_1 p)(1+T_2 p)}
+     \;\overset{T_i = T_1}{=}\; K_P\,\frac{1 + T_1\,p}{T_1\,p}\cdot\frac{K_0}{(1+T_1 p)(1+T_2 p)} \]
+  Le facteur $(1+T_1 p)$ se simplifie entre num\'erateur et d\'enominateur :
+  \[ \boxed{\;H_{BO}(p) = \frac{K_P\,K_0}{T_1\,p\,(1 + T_2\,p)}\;} \]
+  La FTBO est maintenant de \textbf{classe 1} : elle comporte un int\'egrateur pur. Donc $H_{BO}(p) \to \infty$ quand $p \to 0$, et pour une entr\'ee en \'echelon
+  \[ \varepsilon_s = \lim_{p\to 0}\frac{E_0}{1 + H_{BO}(p)} = 0 \]
+  \textbf{quelle que soit} la valeur de $K_P$ : l'annulation de l'erreur statique en \'echelon est \textbf{structurelle}, elle n'est plus un compromis de r\'eglage. Le crit\`ere de pr\'ecision est d\'esormais satisfait « gratuitement ».
+  \item Avec $K_P = 5$, posons $A = \dfrac{K_P K_0}{T_1} = \dfrac{5\times 4}{0{,}5} = 40$, de sorte que $H_{BO}(p) = \dfrac{A}{p\,(1+T_2 p)}$. La condition $|H_{BO}(j\omega_c)| = 1$ donne $\omega_c\sqrt{1 + (T_2\omega_c)^2} = 40$, soit $\omega_c \approx \SI{24,99}{\radian\per\second}$ (pratiquement inchang\'ee : la compensation a supprim\'e un p\^ole mais l'int\'egrateur a remplac\'e son effet sur le gain). La phase vaut maintenant :
+  \[ \varphi(\omega_c) = \underbrace{-90^{\circ}}_{\text{int\'egrateur}} - \arctan(T_2\,\omega_c) = -90^{\circ} - \arctan(1{,}250) \approx -90^{\circ} - 51{,}34^{\circ} = -141{,}34^{\circ} \]
+  \[ M_\varphi = 180^{\circ} - 141{,}34^{\circ} \approx \boldsymbol{38{,}7^{\circ}} \]
+
+  \smallskip
+  \textbf{Commentaire --- le point cl\'e de l'exercice.} \`A gain proportionnel \textbf{identique} ($K_P = K_C = 5$), la marge de phase est pass\'ee de $43{,}3^{\circ}$ \`a $38{,}7^{\circ}$ : le correcteur PI a \textbf{d\'egrad\'e} la marge d'environ $4{,}6^{\circ}$. La cause est purement structurelle : l'int\'egrateur apporte un \textbf{retard de phase constant de $-90^{\circ}$} sur toute la bande, alors que le p\^ole compens\'e $1/(1+T_1p)$ qu'il remplace n'apportait, \`a $\omega_c$, que $-85{,}4^{\circ}$. Il est donc \textbf{faux} de croire qu'un PI « am\'eliore le syst\`eme » : il \'echange de la \emph{stabilit\'e} contre de la \emph{pr\'ecision}. La stabilit\'e doit imp\'erativement \^etre \textbf{rev\'erifi\'ee apr\`es} toute introduction d'une action int\'egrale.
+  \item Avec le PI compens\'e, la marge de phase ne d\'epend plus que de $\omega_c$ :
+  \[ M_\varphi = 180^{\circ} - 90^{\circ} - \arctan(T_2\,\omega_c) = 90^{\circ} - \arctan(0{,}05\,\omega_c) \]
+  La contrainte $M_\varphi \geq 45^{\circ}$ s'\'ecrit $\arctan(0{,}05\,\omega_c) \leq 45^{\circ}$, soit $0{,}05\,\omega_c \leq 1$ :
+  \[ \omega_c \leq \frac{1}{T_2} = \SI{20}{\radian\per\second} \]
+  Or $\omega_c$ est fix\'ee par $A = K_P K_0/T_1$ via $\omega_c\sqrt{1+(T_2\omega_c)^2} = A$. En $\omega_c = \SI{20}{\radian\per\second}$ : $A = 20\sqrt{2} \approx 28{,}3$, d'o\`u
+  \[ K_P = \frac{A\,T_1}{K_0} = \frac{28{,}3\times 0{,}5}{4} \approx 3{,}54 \]
+  On retient une valeur normalis\'ee l\'eg\`erement en retrait pour garder une marge de s\'ecurit\'e, par exemple $\boldsymbol{K_P = 2{,}5}$. V\'erification : $A = 2{,}5\times 4/0{,}5 = 20$, la condition $\omega_c\sqrt{1+(0{,}05\,\omega_c)^2} = 20$ donne $\omega_c \approx \SI{15,72}{\radian\per\second}$, puis
+  \[ M_\varphi = 90^{\circ} - \arctan(0{,}05\times 15{,}72) = 90^{\circ} - \arctan(0{,}786) \approx 90^{\circ} - 38{,}17^{\circ} = \boldsymbol{51{,}8^{\circ}} \]
+
+  \smallskip
+  \textbf{Conclusion.} Le correcteur retenu est un \textbf{PI de gain $K_P = 2{,}5$ et de constante d'int\'egration $T_i = \SI{0,5}{\second}$}. Il satisfait les \textbf{deux} exigences du cahier des charges, ce qu'aucun correcteur proportionnel ne pouvait faire :
+  \begin{center}
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabular}{@{}lccc@{}}
+  \toprule
+  Correcteur & $\varepsilon_s$ (\'echelon) & $M_\varphi$ & Cahier des charges \\
+  \midrule
+  P, $K_C = 5$ & \SI{4,76}{\percent} \quad(OK) & $43{,}3^{\circ}$ \quad(KO) & non respect\'e \\
+  PI, $K_P = 5$, $T_i = 0{,}5$ & $0$ \quad(OK) & $38{,}7^{\circ}$ \quad(KO) & non respect\'e \\
+  \textbf{PI, $K_P = 2{,}5$, $T_i = 0{,}5$} & $\boldsymbol{0}$ \quad(OK) & $\boldsymbol{51{,}8^{\circ}}$ \quad(OK) & \textbf{respect\'e} \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  Le prix pay\'e est un \textbf{ralentissement} : la pulsation de coupure passe de $\SI{24,9}{\radian\per\second}$ \`a $\SI{15,7}{\radian\per\second}$, soit une bande passante r\'eduite d'environ \SI{37}{\percent} et donc un temps de r\'eponse allong\'e dans la m\^eme proportion. C'est le \textbf{compromis fondamental} de l'asservissement : pr\'ecision, rapidit\'e et stabilit\'e ne peuvent pas \^etre optimis\'ees ind\'ependamment. Si l'application exigeait \emph{aussi} la rapidit\'e de $\omega_c = \SI{25}{\radian\per\second}$, il faudrait passer \`a un \textbf{PID} et utiliser l'action d\'eriv\'ee pour \textbf{remonter} la phase au voisinage de $\omega_c$.
+
+  \smallskip
+  \emph{Pi\`ege \`a \'eviter} : ne jamais \'ecrire « $M_\varphi = 180^{\circ} - \varphi(\omega_c)$ ». La phase $\varphi(\omega_c)$ \'etant \textbf{n\'egative}, la formule correcte $M_\varphi = 180^{\circ} + \varphi(\omega_c)$ donne bien une marge \emph{inf\'erieure} \`a $180^{\circ}$ ; la formule avec un signe moins donnerait ici $316{,}7^{\circ}$, r\'esultat absurde. De m\^eme, la marge de phase se lit \`a $\omega_c$ (gain $= \SI{0}{\deci\bel}$), pas \`a la pulsation o\`u la phase vaut $-180^{\circ}$.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

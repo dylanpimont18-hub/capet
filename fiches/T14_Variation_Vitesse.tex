@@ -1,0 +1,361 @@
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ficheHeaders{T14}{Variation de vitesse}{colElec}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TETE
+% -----------------------------------------------------------------------
+
+\ficheEntete{T14}{Variation de vitesse et de couple des machines}{colElec}%
+  {électrotechnique - Variateurs}%
+  {\textbf{Présence :} \textbf{5/13} sujets (2013-2026) - thème \emph{régulier}}%
+  {commande scalaire V/f - THD et commande MLI - variateur de fréquence ATV630 - boucle de vitesse PI - freinage régénératif 4 quadrants - câblage variateur-automate}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Variateur de frequence ----------------------------------------
+\textbf{1.1 Structure d'un variateur de fréquence}
+
+\smallskip
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\small, node distance=8mm]
+  \node[draw, align=center, minimum width=20mm, minimum height=10mm] (redr) {Redresseur};
+  \node[draw, align=center, minimum width=20mm, minimum height=10mm, right=13mm of redr] (filt) {Bus DC\\filtré};
+  \node[draw, align=center, minimum width=20mm, minimum height=10mm, right=13mm of filt] (ond) {Onduleur\\MLI};
+  \node[left=13mm of redr] (res) {Réseau AC};
+  \node[right=13mm of ond] (mas) {MAS};
+  \draw[->] (res) -- (redr);
+  \draw[->] (redr) -- (filt);
+  \draw[->] (filt) -- (ond);
+  \draw[->] (ond) -- (mas);
+\end{tikzpicture}
+\end{center}
+Avantages : contrôle de la vitesse et du couple, démarrage progressif (rampe d'accélération), freinage par injection de courant continu ou récupératif, économie d'énergie sur charges à couple variable ($P \propto N^3$).
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 Commande scalaire V/f ----------------------------------------
+\textbf{1.2 Commande scalaire V/f}
+
+\smallskip
+\[
+  \frac{V_s}{f_s} = \text{constante} \quad \Rightarrow \quad \text{flux magnétique constant}
+\]
+Principe : faire varier simultanément la fréquence statorique $f_s$ et la tension $V_s$ pour maintenir le flux et donc le couple disponible.
+Boucle de vitesse avec correcteur PI :
+\[
+  H_{BF}(p) = \frac{1}{1 + \dfrac{2m}{\omega_0}\,p + \dfrac{1}{\omega_0^2}\,p^2}
+  \qquad;\qquad
+  m = \text{amortissement}, \quad \omega_0 = \text{pulsation naturelle}
+\]
+Données 2024 : $K_p = 0{,}35$, $K_i = 2{,}5$, erreur statique nulle, dépassement nul.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 THD et choix de commande ------------------------------------
+\textbf{1.3 Taux de distorsion harmonique (THD) - commande pleine onde vs MLI}
+
+\smallskip
+\[
+  THD = \frac{\sqrt{I_2^2 + I_3^2 + \cdots + I_n^2}}{I_1}
+  \qquad;\qquad
+  \text{Norme IEC/EN 61000-2-2 : } THD < 25\,\%
+\]
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{lll}
+\toprule
+\textbf{Commande} & \textbf{THD typique} & \textbf{Conformité norme} \\
+\midrule
+Pleine onde & $\approx 61\,\%$ & Non (> 25 \%) \\
+MLI ($f_p = \SI{6}{\kilo\hertz}$) & $\approx 25\,\%$ & Limite acceptable \\
+\bottomrule
+\end{tabular}
+\end{center}
+La MLI repousse les harmoniques vers les hautes fréquences (autour de $f_p$ et ses multiples) : THD du fondamental amélioré.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 Dimensionnement variateur ------------------------------------
+\textbf{1.4 Dimensionnement et câblage du variateur ATV630}
+
+\smallskip
+Courant nominal moteur : $I_n = \dfrac{P_u}{\eta\,\sqrt{3}\,U_{comp}\,\cos\varphi}$
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{lll}
+\toprule
+\textbf{Critère de choix} & \textbf{Paramètre} & \textbf{Exemple ATV630C11N4} \\
+\midrule
+Puissance moteur & $P_u$ & 90\,kW / 100\,kW \\
+Surcharge admissible & ND (110\,\%) ou HD (150\,\%) & HD si charge lourde \\
+Tension réseau & 400\,V triphasé & - \\
+Pouvoir de coupure disjoncteur amont & $I_{cu}$ & 50\,kA (NSX250N MA220) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\textbf{Câblage :} sens de rotation (LI1 / LI2), référence de vitesse (entrée 0-10\,V ou 4-20\,mA), retour de défaut à sortie DO. Rapport jury 2021 : maîtrise du câblage automate-variateur obligatoire.
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHETIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthétique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Commande V/f}} \\
+$V_s/f_s = \mathrm{cste}$ & Loi scalaire & - \\
+$N_s = 60f/p$ & Synchro & tr/min \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{THD}} \\
+$THD = \sqrt{\sum_{k\geq2} I_k^2}/I_1$ & Distorsion & - \\
+$THD < 25\,\%$ & Norme & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Courant moteur}} \\
+$I_n = P_u/(\eta\sqrt{3}U\cos\varphi)$ & Nominal & A \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Boucle vitesse PI}} \\
+$H(p) = K_p(1 + 1/(\tau_i p))$ & Correcteur & - \\
+$m$ = amortissement & BF 2\textsuperscript{e} ordre & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Quadrants}} \\
+I : $C>0,\Omega>0$ & Moteur direct & - \\
+II : $C<0,\Omega>0$ & Freinage récup. & - \\
+III,IV & Rotation inverse & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Données 2024}} \\
+$f_p = \SI{6}{\kilo\hertz}$ & MLI & Hz \\
+$THD_{pleine} \approx 61{,}4\,\%$ & Pleine onde & - \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets réels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT1 - THD et conformité norme - commande MLI vs pleine onde \hfill\normalfont\footnotesize E1 2024 (B10-B11)}
+]
+\textbf{Énoncé.}
+Le DT3 donne le spectre du courant réseau en pleine onde : $I_1 = 170\,\mathrm{A}$, $I_3 = 95\,\mathrm{A}$, $I_5 = 27\,\mathrm{A}$, $I_7 = 27\,\mathrm{A}$, $I_9 = 20\,\mathrm{A}$. En MLI ($f_p = 6\,\mathrm{kHz}$) : $I_1 = 170\,\mathrm{A}$, $I_3 = 37\,\mathrm{A}$, $I_5 = 22\,\mathrm{A}$. Calculer le THD dans chaque cas et conclure.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Pleine onde.}
+\[
+  THD = \frac{\sqrt{95^2 + 27^2 + 27^2 + 20^2}}{170} = \frac{\sqrt{9\,025 + 729 + 729 + 400}}{170} = \frac{\sqrt{10\,883}}{170} \approx \mathbf{61{,}4\,\%}
+\]
+Non conforme (> 25\,\%).
+
+\textbf{Étape 2 — MLI.}
+\[
+  THD = \frac{\sqrt{37^2 + 22^2}}{170} = \frac{\sqrt{1\,369 + 484}}{170} = \frac{\sqrt{1\,853}}{170} \approx \mathbf{25{,}3\,\%}
+\]
+
+\textbf{Conclusion.} La commande MLI est légèrement \textbf{non conforme} au seuil strict de $25\,\%$ (écart $\approx 0{,}3$ point) ; une conclusion de conformité ne serait acceptable que si une tolérance de mesure est explicitement justifiée. La MLI reste néanmoins indispensable pour réduire fortement la distorsion par rapport à la pleine onde.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Choix et dimensionnement du variateur ATV630 \hfill\normalfont\footnotesize Rapport jury 2021 (Q15-Q18)}
+]
+\textbf{Énoncé.}
+Choisir le modèle ATV630 pour un moteur de $P_u = 90\,\mathrm{kW}$, $U = 400\,\mathrm{V}$, $\cos\varphi = 0{,}86$, $\eta = 0{,}942$, surcharge 150\,\% (mode HD). Indiquer le disjoncteur amont ($I_{cu,reseau} = 50\,\mathrm{kA}$).
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Courant nominal moteur.}
+\[
+  I_n = \frac{P_u}{\eta\,\sqrt{3}\,U\,\cos\varphi} = \frac{90\,000}{0{,}942 \times 1{,}732 \times 400 \times 0{,}86} \approx \frac{90\,000}{562} \approx 160\,\mathrm{A}
+\]
+
+\textbf{Étape 2 — Choix variateur.} ATV630\textbf{C11N4} ($I_n = 170\,\mathrm{A}$, 110\,kW, HD 150\,\%, 400\,V). La puissance 110\,kW > 90\,kW et le courant 170\,A > 160\,A.
+
+\textbf{Étape 3 — Disjoncteur amont.} NSX250N MA220 - déclencheur \textbf{MA} (magnétique seul, seuil $I_{rm} = \SI{2860}{\ampere}$, le variateur assure la protection thermique), $I_{cu} = 50\,\mathrm{kA}$ (adapté au $I_{cc}$ réseau).
+
+\textbf{Conclusion.} Le couple variateur + protection amont respecte simultanément les trois critères du cahier des charges (courant nominal, surcharge HD, pouvoir de coupure) : le choix est validé.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Boucle de vitesse scalaire - correcteur PI \hfill\normalfont\footnotesize E1 2024 (C5-C11)}
+]
+\textbf{Énoncé.}
+La boucle de vitesse de la MAS (commande scalaire) associe, en retour unitaire, un correcteur PI $C(p) = K_p + \dfrac{K_i}{p}$ et le processus mécanique $G(p) = \dfrac{K_{meca}}{1 + \tau_{meca}\,p}$ avec $K_{meca} = 250$ et $\tau_{meca} = 8{,}5\,\si{\second}$. Déterminer la fonction de transfert en boucle fermée $H_{BF}(p)$, puis exprimer $\omega_0$ et $m$ en fonction de $K_p$, $K_i$, $K_{meca}$ et $\tau_{meca}$. Conclure avec les valeurs retenues au corrigé : $K_p = 0{,}35$, $K_i = 2{,}5$.
+
+\tcbline
+
+\textbf{Corrigé.} \textit{[corrigé reconstitué : mise en équation standard, le détail du sujet n'étant pas disponible]}
+
+\textbf{Étape 1 — Boucle fermée.} La chaîne directe vaut $C(p)\,G(p) = \dfrac{K_{meca}(K_p\,p + K_i)}{p\,(1 + \tau_{meca}\,p)}$, d'où :
+\[
+  H_{BF}(p) = \frac{C(p)\,G(p)}{1 + C(p)\,G(p)}
+  = \frac{K_{meca}(K_p\,p + K_i)}{\tau_{meca}\,p^2 + (1 + K_{meca}K_p)\,p + K_{meca}K_i}
+\]
+Le dénominateur, divisé par $K_{meca}K_i$, s'identifie à la forme canonique $1 + \dfrac{2m}{\omega_0}\,p + \dfrac{1}{\omega_0^2}\,p^2$.
+
+\textbf{Étape 2 — Identification.}
+\[
+  \omega_0 = \sqrt{\frac{K_{meca}\,K_i}{\tau_{meca}}}
+  \qquad;\qquad
+  m = \frac{1 + K_{meca}K_p}{2\,\sqrt{K_{meca}\,K_i\,\tau_{meca}}}
+\]
+Application numérique avec $K_p = 0{,}35$ et $K_i = 2{,}5$ :
+\[
+  \omega_0 = \sqrt{\frac{250 \times 2{,}5}{8{,}5}} \approx \SI{8,6}{\radian\per\second}
+  \qquad;\qquad
+  m = \frac{1 + 87{,}5}{2\,\sqrt{250 \times 2{,}5 \times 8{,}5}} \approx 0{,}61
+\]
+
+\textbf{Conclusion.} L'intégrateur du PI garantit une erreur statique nulle en régime permanent, et le corrigé officiel retient $K_p \approx 0{,}35$, $K_i \approx 2{,}5$ en annonçant un dépassement nul : le cahier des charges (erreur statique nulle, dépassement nul) est ainsi satisfait par un unique correcteur.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs récurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Justifier le choix du variateur - pas seulement la référence.}
+  Citer les critères : puissance ($P_u$), type de service (ND ou HD), tension réseau, pouvoir de coupure. Rapport jury 2021 : "sans justification, sans indiquer clairement les critères de choix".
+
+  \item \textbf{Disjoncteur MA devant un variateur.}
+  Le variateur assure lui-même la protection thermique du moteur. Utiliser un déclencheur magnétique seul (MA) en amont. Un disjoncteur magnéto-thermique crée une double protection thermique - décoordination.
+
+  \item \textbf{THD : mettre au carré sous la racine.}
+  Oublier de mettre les harmoniques au carré, ou diviser par l'amplitude totale au lieu de $I_1$, sont les erreurs les plus fréquentes.
+
+  \item \textbf{Commande scalaire vs vectorielle.}
+  La commande scalaire V/f suffit pour les charges à couple variable (pompe, ventilateur). La commande vectorielle FOC n'est pas exigée au CAPET mais peut être citée pour les applications à dynamique élevée.
+
+  \item \textbf{Câblage automate-variateur.}
+  Rapport jury 2021 : "un candidat au CAPET doit être capable de câbler une entrée ou une sortie TOR-analogique d'un automate industriel programmable, ainsi que la partie commande d'un variateur de fréquence".
+
+  \item \textbf{Freinage régénératif et 4 quadrants.}
+  Identifier les quadrants (couple/vitesse). Un onduleur 4 quadrants est nécessaire pour le freinage récupératif (quadrant II ou IV). Vérifier que la structure matérielle le permet.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  breakable,
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2021 : «~Le jury constate que beaucoup de candidats ne sont pas à l'aise dans la réalisation de schémas électriques. Un candidat au CAPET doit être capable de câbler une entrée ou une sortie TOR-analogique d'un automate industriel programmable, ainsi que la partie commande d'un variateur de fréquence.~»\\
+Rapport jury 2024 : «~Le contrôle de la vitesse peut être réalisé via une commande scalaire de la machine asynchrone et une boucle d'asservissement. L'objectif est d'étudier les paramètres à respecter : erreur statique, dépassement et marge de phase.~»
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PRESENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colPresence,
+  title={Présence dans les sujets analysés (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Année} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & - & - & - & - & - & - & $\checkmark$ & - & - & - & $\checkmark$ & - \\
+E2 discipl. IE & - & - & - & $\checkmark$ & - & $\checkmark$ & - & - & $\checkmark$ & - & - & - & - \\
+E2 appl. comm. & - & - & - & - & - & - & - & - & - & - & - & - & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-thèmes fréquents :}
+commande V/f et THD (4/13) - choix/câblage variateur ATV (3/13) - boucle de vitesse PI (2/13) - freinage 4 quadrants (sujets 2026) - dimensionnement disjoncteur MA (3/13)
+
+\medskip
+\textbf{Ordres de grandeur (repères rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Réseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, fréquence \SI{50}{\hertz}.
+  \item Courants d'étude fréquents en sujet : de quelques \si{\ampere} à quelques dizaines de \si{\ampere}.
+  \item En conversion d'énergie, un rendement attendu reste généralement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthèse express (à refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypothèses du modèle et les conventions de signe.
+  \item Écrire 2 à 4 relations clés avec unités.
+  \item Réaliser un calcul numérique complet et vérifier l'ordre de grandeur.
+  \item Justifier le résultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE

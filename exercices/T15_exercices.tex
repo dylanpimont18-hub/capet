@@ -1,0 +1,448 @@
+% T15 -- Stockage d'\'energie \'electrique -- banque d'exercices
+%
+% PASSE COMPL\'EMENTARIT\'E (2026-09-02) : 4 des 6 exercices dupliquaient les Questions Types
+% de fiches/T15_Stockage_Energie.tex (QT1 = Hycity 2026 A3-A5, QT2 = robot 2020 Q20-Q22,
+% QT3 = micro-STEP 2021 Q5-Q10). Ils ont \'et\'e remplac\'es par d'autres questions des
+% M\^EMES sujets r\'eels, non trait\'ees par la fiche :
+%   - ancien ex.1 (robot 2020 Q21-Q22 = QT2)   -> voilier 2020 Q9/Q12/Q13 (docTech DT6)
+%   - ancien ex.2 (Hycity 2026 A5 = QT1 et.3)  -> Hycity 2026 A1/A2 (stockage hydrog\`ene)
+%   - ancien ex.4 (Hycity 2026 A3-A4 = QT1)    -> micro-STEP 2021 Q21-Q23 (mesure du stock)
+%   - ancien ex.6 (STEP 2021 Q5-Q10 = QT3)     -> micro-STEP 2021 Q26-Q29 (bilan financier)
+% Exercices conserv\'es car disjoints de la fiche : SOC/BMS (in\'edit) et voilier 2020 Q14-Q15.
+%
+% Sources (toutes les valeurs num\'eriques sont v\'erifi\'ees dans les .md des sujets/rapports) :
+%   - E2_Sujet_2020 (\'epreuve "\'Etude d'un syst\`eme, d'un proc\'ed\'e ou d'une organisation",
+%     option ing\'enierie \'electrique -- voilier/dessalinisateur) : Q9 (tableau des postes
+%     40 W/24 h, 30 W/1 h, 70 W/10 h, l.223-231), Q12 (batterie GEL12-130, l.295), Q13
+%     (pertes 8 %, 70 % de d\'echarge, l.297-299), Q14/Q15 (l.320-332).
+%     Rapport_Jury_2020, \'el\'ements de correction option IE : Q9 total 1 690 W.h/j (l.1400-1410),
+%     Q12 E = 12 x 130 = 1 560 W.h (l.1439), Q13 : 1 690/0,92 = 1 837 W.h.j-1 ; 2 x 1 560 x 30 %
+%     = 936 W.h ; 1 837/936 = 1,96 ; "1 800 cycles" (l.1443-1453) ; Q14 total 4 282 W.h.j-1,
+%     Ec = 4 282/0,92 = 4 654 W.h.j-1, C = 969,6 A.h, 8 batteries, 8 x 38 kg = 304 kg,
+%     alternative 220 A.h (l.1467-1502). Verbatims jury : l.1451-1453 et l.1819-1823.
+%   - E2_Sujet_2026_BAC3 (\'epreuve 2 d'admissibilit\'e, BAC+3, bus Hycity) : trajet type 200 km
+%     et 852 MJ \`a fournir par la PAC (l.125), Q A1 (rendement PAC 50 %, PCI H2 141 MJ/kg,
+%     l.127), Q A2 (masse volumique 25 kg/m3, l.129), six r\'eservoirs de 232 L / autonomie
+%     minimale annonc\'ee de 2 trajets types en cycle urbain (l.107).
+%   - E2_Sujet_2021 (\'epreuve "\'Etude d'un syst\`eme, d'un proc\'ed\'e ou d'une organisation",
+%     micro-STEP) : partie D questions 21-23 (l.243-283), partie E figures 13 et 14 et
+%     questions 26 \`a 29 (l.287-331).
+%     Rapport_Jury_2021, \'el\'ements de correction : Q21 "non-lin\'earit\'e due \`a la forme de la
+%     cuve (bords arrondis)", \'ecart 40/600 = 6,67 % pour H = 90 cm ; Q22 V = (100/16) H ;
+%     Q23 V_citerne = 0,125 x N (l.669-682) ; Q26 54 400 EUR ; Q27 EStock = 390 x 0,25 x 0,5
+%     = 48,75 MW.h ; Q28 ESTEPCharge = 204,75 MW.h, Ereseau = 115,25 MW.h, 19 592,20 EUR ;
+%     Q29 revente 136,5 MW.h = 13 650 EUR, 5 942,20 EUR/an, 1 100 000 + 148 555 = 1 248 555 EUR,
+%     0,16 EUR/kW.h (l.683-720).
+%   - Exercice 3 (SOC/BMS) : exercice in\'edit, comptage coulom\'etrique, donn\'ees choisies.
+%
+% RECONSTITUTIONS D\'ECLAR\'EES :
+%   - DT6 2020 (extrait de catalogue batterie) est une image omise par la conversion Markdown.
+%     L'encadr\'e docTech de l'exercice 1 est RECONSTITU\'E \`a partir des seules valeurs
+%     textuellement pr\'esentes dans les sources : r\'ef\'erence GEL12-130 (sujet l.295),
+%     12 V et 130 A.h (jury Q12 l.1439), 38 kg (jury Q15 l.1492), 1 800 cycles associ\'es
+%     \`a la limite de 30 % de d\'echarge (jury Q13 l.1449), gamme 220 A.h (jury l.1455).
+%     La technologie "plomb-gel" et le r\'egime 20 h sont des mentions de catalogue usuelles
+%     pour une r\'ef\'erence "GEL", non lisibles dans le .md : elles ne servent \`a aucun calcul.
+%   - Figure V = f(H) de l'exercice 6 : la figure 10 du sujet 2021 est une image omise.
+%     Le trac\'e TikZ est reconstitu\'e \`a partir des seuls points chiffr\'es du corrig\'e jury
+%     (mod\`ele V = 6,25 H, \'ecart de 40 m3 sur 600 m3 \`a H = 90 cm, H_max = 1,6 m pour 1000 m3).
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T15}} - Exercices - Stockage d'\'energie \'electrique}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T15 \quad Stockage d'\'energie \'electrique}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+% =====================================================================
+%  EXERCICE 1 -- docTech (remplace l'ancien ex. 1, doublon de la QT2 de la fiche)
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2020, \'Etude d'un syst\`eme, d'un proc\'ed\'e ou d'une organisation (option IE), questions 9, 12 et 13}
+]
+\CAPETSHOW{
+Un voilier de plaisance est aliment\'e en \SI{12}{\volt} continu par un parc de \textbf{deux} batteries de servitude identiques, recharg\'ees par un panneau photovolta\"ique. On souhaite v\'erifier que l'installation existante permet de ne pas exc\'eder \textbf{70~\% de d\'echarge} des batteries, c'est-\`a-dire de conserver au moins 30~\% de leur charge.
+
+\begin{tcolorbox}[docTech, title={Document technique DT6 -- batterie de servitude, extrait de catalogue}]
+\footnotesize
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{R\'ef\'erence} & GEL12-130 \\
+Technologie & plomb-gel \'etanche, sans entretien \\
+Tension nominale $U_{bat}$ & \SI{12}{\volt} \\
+Capacit\'e nominale $C_{bat}$ (r\'egime \SI{20}{\hour}) & \SI{130}{\ampere\hour} \\
+Masse & \SI{38}{\kilo\gram} \\
+Dur\'ee de vie en cyclage & \textbf{\num{1800} cycles} pour une profondeur \\
+ & de d\'echarge limit\'ee \`a 30~\% \\
+Autres capacit\'es de la gamme & \SI{100}{\ampere\hour}, \SI{160}{\ampere\hour}, \SI{220}{\ampere\hour} \\
+\bottomrule
+\end{tabular}
+\end{tcolorbox}
+
+Les instruments de bord d\'ej\`a install\'es sont les suivants :
+
+\begin{center}\footnotesize
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Poste} & \textbf{Puissance (\si{\watt})} & \textbf{Dur\'ee de fonctionnement (\si{\hour} par jour)} \\
+\midrule
+Speedom\`etre & 40 & 24 \\
+Radio VHF & 30 & 1 \\
+Feux de signalisation & 70 & 10 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Sur cette petite installation, l'ensemble des pertes par effet Joule dans les fils, dans le r\'egulateur de charge et dans les batteries repr\'esente environ 8~\% de l'\'energie consomm\'ee.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever dans le document technique DT6} la tension nominale, la capacit\'e nominale et la profondeur de d\'echarge \`a laquelle le constructeur associe sa dur\'ee de vie en cyclage.
+  \item Calculer la consommation journali\`ere totale $E_{jour}$ des instruments de bord d\'ej\`a install\'es.
+  \item D\'eterminer l'\'energie th\'eorique stock\'ee dans une batterie GEL12-130, puis l'\'energie r\'eellement \textbf{exploitable} par le parc complet si l'on respecte la limite de d\'echarge du DT6.
+  \item En tenant compte des 8~\% de pertes, comparer le besoin journalier \`a l'\'energie exploitable. Conclure quantitativement sur la conformit\'e de l'installation existante \`a l'exigence \guillemotleft\ ne pas exc\'eder 70~\% de d\'echarge \guillemotright.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Lecture directe du DT6 : $U_{bat} = \SI{12}{\volt}$ ; $C_{bat} = \SI{130}{\ampere\hour}$ ; la dur\'ee de vie annonc\'ee (\num{1800} cycles) est donn\'ee \textbf{pour une profondeur de d\'echarge limit\'ee \`a 30~\%}. C'est cette derni\`ere donn\'ee qui fixe le crit\`ere de dimensionnement, et non la seule capacit\'e nominale.
+  \item Consommation journali\`ere :
+  \[ E_{jour} = 40\times 24 + 30\times 1 + 70\times 10 = 960 + 30 + 700 = \SI[group-minimum-digits=4]{1690}{\watt\hour} \ \text{par jour} \]
+  \item \'Energie th\'eorique stock\'ee dans une batterie :
+  \[ E_{bat} = U_{bat}\times C_{bat} = 12\times 130 = \SI[group-minimum-digits=4]{1560}{\watt\hour} \]
+  Avec deux batteries et une profondeur de d\'echarge limit\'ee \`a 30~\% :
+  \[ E_{exploitable} = 2\times 1\,560\times 0{,}30 = \SI{936}{\watt\hour} \]
+  \item Besoin journalier r\'eel, pertes incluses :
+  \[ E_{besoin} = \frac{E_{jour}}{1-0{,}08} = \frac{1\,690}{0{,}92} \approx \SI[group-minimum-digits=4]{1837}{\watt\hour} \ \text{par jour} \]
+  \[ \frac{E_{besoin}}{E_{exploitable}} = \frac{1\,837}{936} \approx 1{,}96 \]
+
+  \textbf{Conclusion.} Le besoin journalier vaut pr\`es de \textbf{deux fois} l'\'energie exploitable du parc : en une seule journ\'ee sans apport solaire, les batteries descendraient tr\`es en dessous du seuil des 30~\% de charge restante. L'exigence \guillemotleft\ ne pas exc\'eder 70~\% de d\'echarge \guillemotright\ n'est donc \textbf{pas} respect\'ee ; il faudrait doubler le nombre de batteries (4 au lieu de 2) pour rester dans la zone de cyclage \`a \num{1800} cycles garantie par le DT6, ou retenir un mod\`ele de capacit\'e sup\'erieure (\SI{220}{\ampere\hour}) de la m\^eme gamme.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2020, \'epreuve \guillemotleft\ \'Etude d'un syst\`eme, d'un proc\'ed\'e ou d'une organisation \guillemotright\ -- option ing\'enierie \'electrique, deuxi\`eme partie) : \guillemotleft\ Une critique \`a la fois qualitative et quantitative \'etait attendue afin de v\'erifier que l'installation permette de ne pas exc\'eder 70~\% de d\'echarge de la batterie. Le jury d\'eplore des r\'eponses trop \'evasives sans aucun lien avec les documents techniques et/ou un manque de valeurs num\'eriques pour assoir les justifications. \guillemotright}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+%  EXERCICE 2 -- Hycity A1/A2 (remplace l'ancien ex. 2, doublon de la QT1 etape 3)
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{1} \hfill\normalfont\footnotesize 2026, \'epreuve 2 d'admissibilit\'e (BAC+3), questions A1 et A2}
+]
+\CAPETSHOW{
+Le bus urbain \`a hydrog\`ene Hycity est propuls\'e par une cha\^ine \'electrique aliment\'ee principalement par une pile \`a combustible (PAC). L'hydrog\`ene y joue le r\^ole de \textbf{vecteur de stockage chimique} de l'\'energie : c'est une alternative au stockage \'electrochimique par batterie, que l'on cherche ici \`a dimensionner.
+
+Pour un trajet type de \SI{200}{\kilo\meter} en cycle urbain, des simulations du constructeur \'evaluent \`a $E_{PAC} = \SI{852}{\mega\joule}$ l'\'energie que doit fournir la pile \`a combustible.
+
+Donn\'ees : rendement de la PAC $\eta_{PAC} = 50\,\%$ ; pouvoir calorifique de l'hydrog\`ene $PC_{H_2} = \SI{141}{\mega\joule\per\kilo\gram}$ ; dans les conditions de stockage embarqu\'e, la masse volumique de l'hydrog\`ene est estim\'ee \`a $\rho_{H_2} = \SI{25}{\kilo\gram\per\meter\cubed}$. Le bus embarque \textbf{six r\'eservoirs de \SI{232}{\liter}} chacun ; le cahier des charges annonce une autonomie minimale de \textbf{2 trajets types} en cycle urbain avant recharge.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.9, every node/.style={scale=0.9}]
+  \node[draw,rounded corners,minimum width=2.4cm,minimum height=1.0cm,align=center,font=\footnotesize] (res) at (0,0) {R\'eservoirs $H_2$\\$6\times\SI{232}{\liter}$};
+  \node[draw,rounded corners,minimum width=2.0cm,minimum height=1.0cm,align=center,font=\footnotesize] (pac) at (4.2,0) {PAC\\$\eta_{PAC}=50\,\%$};
+  \node[draw,rounded corners,minimum width=2.2cm,minimum height=1.0cm,align=center,font=\footnotesize] (mot) at (8.4,0) {Motorisation\\+ transmission};
+  \draw[->,thick] (res) -- (pac) node[midway,above,font=\scriptsize]{$m_{H_2}\cdot PC_{H_2}$};
+  \draw[->,thick] (pac) -- (mot) node[midway,above,font=\scriptsize]{$E_{PAC} = \SI{852}{\mega\joule}$};
+  \node[below,font=\scriptsize,align=center] at (8.4,-0.85) {trajet type\\\SI{200}{\kilo\meter}};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item D\'eterminer l'\'energie chimique $E_{chim}$ que doit contenir l'hydrog\`ene consomm\'e pour un trajet type, puis la masse d'hydrog\`ene $m_{H_2}$ correspondante \`a embarquer.
+  \item En d\'eduire le volume d'hydrog\`ene $V_{H_2}$ n\'ecessaire pour effectuer un trajet type, dans les conditions de stockage embarqu\'e.
+  \item Calculer le volume total offert par les six r\'eservoirs, puis le nombre de trajets types r\'ealisables avec un remplissage complet. Conclure sur le respect du cahier des charges.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item La PAC ne restitue que la moiti\'e de l'\'energie chimique qu'elle consomme :
+  \[ E_{chim} = \frac{E_{PAC}}{\eta_{PAC}} = \frac{852}{0{,}5} = \SI[group-minimum-digits=4]{1704}{\mega\joule} \]
+  \[ m_{H_2} = \frac{E_{chim}}{PC_{H_2}} = \frac{1\,704}{141} \approx \SI{12,1}{\kilo\gram} \]
+  \item \[ V_{H_2} = \frac{m_{H_2}}{\rho_{H_2}} = \frac{12{,}1}{25} \approx \SI{0,483}{\meter\cubed} = \SI{483}{\liter} \]
+  \item Volume total embarqu\'e :
+  \[ V_{total} = 6\times 232 = \SI[group-minimum-digits=4]{1392}{\liter} \]
+  \[ n_{trajets} = \frac{V_{total}}{V_{H_2}} = \frac{1\,392}{483} \approx 2{,}88 \]
+
+  \textbf{Conclusion.} Un remplissage complet des r\'eservoirs autorise environ 2,88 trajets types, soit \textbf{2 trajets types complets} (on n'engage pas un trajet que l'on ne pourra pas terminer). L'exigence d'\guillemotleft\ autonomie minimale de 2 trajets types en cycle urbain \guillemotright\ est donc respect\'ee, la fraction r\'esiduelle de 0,88 trajet ($\approx \SI{175}{\kilo\meter}$) constituant la marge de s\'ecurit\'e du dimensionnement. \`A titre de comparaison, les \SI{12,1}{\kilo\gram} d'hydrog\`ene par trajet type repr\'esentent une \'energie chimique de \SI[group-minimum-digits=4]{1704}{\mega\joule}, soit \SI{473}{\kilo\watt\hour} : c'est pr\`es de quatre fois l'\'energie de la batterie de secours du m\^eme bus (\SI{128,4}{\kilo\watt\hour}), ce qui justifie le choix de l'hydrog\`ene comme vecteur de stockage principal.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+%  EXERCICE 3 -- SOC/BMS (inedit) : CONSERV\'E (disjoint de la fiche)
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{1} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Une batterie Lithium-ion de capacit\'e nominale $C_b = \SI{10}{\ampere\hour}$ est initialement charg\'ee \`a $SOC_0 = 100\,\%$. Elle alimente une charge qui pr\'el\`eve un courant constant $I = \SI{2}{\ampere}$ pendant une dur\'ee $\Delta t = \SI{3}{\hour}$.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.95, every node/.style={scale=0.95}]
+  % chronogramme du courant d\'ebit\'e par la batterie
+  \draw[-latex] (-0.2,0) -- (6.2,0) node[below,font=\footnotesize]{$t$};
+  \draw[-latex] (0,-0.15) -- (0,1.7) node[left,font=\footnotesize]{$i$};
+  \draw[thick,colExo] (0,1.1) -- (4.8,1.1) -- (4.8,0) -- (6.0,0);
+  \draw (0.08,1.1) -- (-0.08,1.1) node[left,font=\scriptsize]{$I$};
+  \draw[dotted] (4.8,0) -- (4.8,1.1);
+  \node[below,font=\scriptsize] at (4.8,-0.05) {$\Delta t$};
+  % chronogramme de l'\'etat de charge
+  \begin{scope}[yshift=-3.2cm]
+    \draw[-latex] (-0.2,0) -- (6.2,0) node[below,font=\footnotesize]{$t$};
+    \draw[-latex] (0,-0.15) -- (0,2.6) node[left,font=\footnotesize]{$SOC$};
+    \draw (0.08,2.2) -- (-0.08,2.2) node[left,font=\scriptsize]{$SOC_0$};
+    \draw[thick,colExo] (0,2.2) -- (4.8,0.9) -- (6.0,0.9);
+    \draw[dotted] (4.8,0) -- (4.8,0.9) -- (0,0.9);
+    \node[left,font=\scriptsize] at (-0.05,0.9) {$?$};
+    \node[below,font=\scriptsize] at (4.8,-0.05) {$\Delta t$};
+  \end{scope}
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Rappeler le principe du comptage coulom\'etrique (int\'egration du courant) utilis\'e par le BMS pour estimer le SOC (\'etat de charge), et donner sa formule.
+  \item Calculer la charge \'electrique pr\'elev\'ee (en A$\cdot$h) pendant $\Delta t$, puis en d\'eduire le SOC final de la batterie.
+  \item Citer deux autres grandeurs, en plus du courant, que surveille le BMS, et indiquer pour chacune un risque associ\'e \`a son absence de surveillance.
+  \item Le SOC (en \%) et la capacit\'e r\'esiduelle (en A$\cdot$h) sont parfois confondus par erreur. Expliquer la diff\'erence entre ces deux grandeurs sur un exemple num\'erique tir\'e de cet exercice.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le BMS estime le SOC en int\'egrant en continu le courant d\'ebit\'e (ou re\c{c}u lors d'une charge) par la batterie, rapport\'e \`a sa capacit\'e nominale :
+  \[ SOC(t) = SOC_0 - \frac{1}{C_b}\int_0^t i(\tau)\,\mathrm{d}\tau \]
+  \item Le courant \'etant constant, la charge pr\'elev\'ee vaut :
+  \[ \Delta Q = I\times\Delta t = 2\times 3 = \SI{6}{\ampere\hour} \]
+  \[ SOC_{final} = SOC_0 - \frac{\Delta Q}{C_b} = 100\,\% - \frac{6}{10} = 100\,\% - 60\,\% = 40\,\% \]
+  \item Le BMS surveille \'egalement : la \textbf{tension} de chaque cellule (une surtension en charge risque un emballement thermique, une sous-tension en d\'echarge d\'egrade irr\'eversiblement la cellule) et la \textbf{temp\'erature} (une temp\'erature excessive acc\'el\`ere le vieillissement et peut d\'eclencher un emballement thermique en cas de d\'efaut).
+  \item Ici, le SOC final est de 40~\%, ce qui correspond \`a une capacit\'e r\'esiduelle de $0{,}40\times 10 = \SI{4}{\ampere\hour}$. Le SOC est une grandeur relative (sans unit\'e, exprim\'ee en \%) qui ne d\'epend que du rapport charge restante/capacit\'e nominale, alors que la capacit\'e r\'esiduelle est une grandeur absolue en A$\cdot$h : pour deux batteries de capacit\'es nominales diff\'erentes affichant le m\^eme SOC de 40~\%, la capacit\'e r\'esiduelle en A$\cdot$h serait diff\'erente.
+
+  \textbf{Conclusion.} Avec $SOC_{final} = 40\,\%$, la batterie reste au-dessus du seuil bas de 20~\% de charge restante habituellement impos\'e par les constructeurs pour pr\'eserver le nombre de cycles : le cycle de d\'echarge \'etudi\'e est donc admissible. Le comptage coulom\'etrique cumulant toutefois l'erreur d'int\'egration du capteur de courant, le BMS doit \^etre recalibr\'e p\'eriodiquement (typiquement sur la tension \`a vide en fin de charge) pour que l'estimation du SOC reste conforme \`a la pr\'ecision annonc\'ee.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+%  EXERCICE 4 -- voilier 2020 Q14/Q15 : CONSERV\'E (disjoint de la fiche)
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize 2020, \'Etude d'un syst\`eme, d'un proc\'ed\'e ou d'une organisation (option IE), questions 14 et 15}
+]
+\CAPETSHOW{
+On reprend le voilier de l'exercice 1, sur lequel on installe d\'esormais un dessalinisateur d'eau de mer ainsi que les \'equipements n\'ecessaires \`a une navigation en autonomie compl\`ete (GPS, pilote automatique). La consommation journali\`ere moyenne du bord, ramen\'ee \`a l'entr\'ee des batteries (rendement de charge de 92~\% d\'ej\`a pris en compte), est alors estim\'ee \`a $E_c = \SI[group-minimum-digits=4]{4654}{\watt\hour}$ par jour.
+
+Pour s\'ecuriser l'installation, on souhaite dimensionner le parc de batteries pour une \textbf{autonomie de 2 jours sans recharge solaire}, tout en respectant un taux de d\'echarge maximal $DoD_{max} = 80\,\%$ (soit une charge restante minimale de 20~\%).
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85, every node/.style={scale=0.85}]
+  % batteries identiques, chacune ouverte, raccord\'ees entre deux rails communs
+  \foreach \y in {0,1.4,3.4} {
+    \draw (1.0,\y) to[battery1] (3.6,\y);
+    \node[circ] at (1.0,\y) {};
+    \node[circ] at (3.6,\y) {};
+  }
+  \node[font=\footnotesize] at (2.3,2.4) {$\vdots$};
+  % rails communs : bus 12 V du bord
+  \draw (1.0,3.4) -- (1.0,-1.0);
+  \draw (3.6,3.4) -- (3.6,-1.0);
+  \draw (1.0,-1.0) node[ocirc]{} node[left,font=\footnotesize]{$-$};
+  \draw (3.6,-1.0) node[ocirc]{} node[right,font=\footnotesize]{$+$};
+  \draw[latex-latex] (1.15,-1.55) -- (3.45,-1.55);
+  \node[below,font=\footnotesize] at (2.3,-1.6) {\SI{12}{\volt}};
+  \node[left,font=\footnotesize] at (0.8,0) {batterie 1};
+  \node[left,font=\footnotesize] at (0.8,1.4) {batterie 2};
+  \node[left,font=\footnotesize] at (0.8,3.4) {batterie $N$};
+  \node[right,font=\footnotesize,align=left] at (3.9,1.7) {$N$ batteries identiques\\\SI{12}{\volt} / \SI{130}{\ampere\hour}\\mont\'ees en parall\`ele};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Calculer l'\'energie totale n\'ecessaire pour couvrir 2 jours d'autonomie sans recharge.
+  \item En d\'eduire la capacit\'e n\'ecessaire du parc de batteries $C_b$ (en A$\cdot$h), en tenant compte du taux de d\'echarge maximal admissible.
+  \item Le mod\`ele de batterie retenu (GEL12-130, DT6 de l'exercice 1) a une capacit\'e unitaire de \SI{130}{\ampere\hour} sous \SI{12}{\volt}, pour une masse de \SI{38}{\kilo\gram}. Toutes les batteries \'etant \`a la m\^eme tension nominale que le parc, elles sont mont\'ees en parall\`ele. D\'eterminer le nombre de batteries n\'ecessaires et la masse totale du parc.
+  \item Proposer, sans refaire le calcul complet, une alternative utilisant des batteries de capacit\'e unitaire plus \'elev\'ee (\SI{220}{\ampere\hour}) et indiquer, en une phrase, son int\'er\^et principal pour l'installation.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \[ E_{2\,jours} = 2\times E_c = 2\times 4\,654 = \SI[group-minimum-digits=4]{9308}{\watt\hour} \]
+  \item Pour ne pas descendre sous 20~\% de charge restante (soit exploiter au maximum 80~\% de la capacit\'e), il faut :
+  \[ C_b = \frac{E_{2\,jours}}{U_{parc}\times DoD_{max}} = \frac{9\,308}{12\times 0{,}8} = \frac{9\,308}{9{,}6} \approx \SI{969,6}{\ampere\hour} \]
+  \item Toutes les batteries \'etant \`a \SI{12}{\volt} comme le parc, elles se montent uniquement en parall\`ele (association parall\`ele = addition des capacit\'es \`a tension \'egale) :
+  \[ N = \frac{C_b}{C_{unitaire}} = \frac{969{,}6}{130} \approx 7{,}46 \Rightarrow N = 8\ \text{batteries} \]
+  \[ m_{parc} = 8\times 38 = \SI{304}{\kilo\gram} \]
+  \item Avec des batteries de \SI{220}{\ampere\hour} : $N' = 969{,}6/220 \approx 4{,}4 \Rightarrow N' = 5$ batteries. L'int\'er\^et principal est de r\'eduire le nombre d'unit\'es (et donc l'encombrement et la complexit\'e du c\^ablage parall\`ele) pour une capacit\'e totale \'equivalente, m\^eme si le gain en masse reste limit\'e.
+
+  \textbf{Conclusion.} Une masse de \SI{304}{\kilo\gram} de batteries embarqu\'ees sur un voilier de plaisance est r\'edhibitoire au regard des performances \`a la voile et de la charge admissible : l'exigence d'autonomie de 2 jours \`a $DoD_{max} = 80\,\%$ n'est pas tenable en l'\'etat. Il faut soit revoir \`a la baisse le profil de consommation (dessalinisateur utilis\'e ponctuellement), soit accepter des d\'echarges plus profondes assorties de recharges rapides \`a quai.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2020, \'el\'ements de correction de la question 13) : \guillemotleft\ Attention \`a ne pas confondre \% de d\'echarge et profondeur de d\'echarge... \guillemotright\ Bien identifier si la donn\'ee du constructeur porte sur la charge restante minimale ou sur la profondeur de d\'echarge maximale avant d'\'ecrire la formule, les deux \'etant compl\'ementaires \`a 100~\%.}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+%  EXERCICE 5 -- STEP 2021 Q21-Q23 (remplace l'ancien ex. 4, doublon de la QT1)
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize 2021, \'Etude d'un syst\`eme, d'un proc\'ed\'e ou d'une organisation, questions 21 \`a 23}
+]
+\CAPETSHOW{
+Pour conna\^itre \`a tout instant la \textbf{quantit\'e d'\'energie stock\'ee} par une micro-STEP (station de transfert d'\'energie par pompage) alimentant un village de montagne, on mesure la hauteur d'eau $H$ dans la citerne sup\'erieure puis on la convertit en volume $V$. Le capteur retenu est un transmetteur de niveau \`a mesure diff\'erentielle de pression.
+
+Des relev\'es exp\'erimentaux donnent la caract\'eristique r\'eelle $V = f(H)$ ci-dessous, que l'on souhaite mod\'eliser par une droite passant par l'origine.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=1.0, every node/.style={scale=1.0}]
+  \draw[-latex] (0,0) -- (7.0,0) node[below right,font=\footnotesize]{$H$ (cm)};
+  \draw[-latex] (0,0) -- (0,4.7) node[left,font=\footnotesize]{$V$ (m$^3$)};
+  \foreach \x/\l in {1.5/40,3.0/80,4.5/120,6.0/160} {
+    \draw (\x,0.08) -- (\x,-0.08) node[below,font=\scriptsize]{\l};
+  }
+  \foreach \y/\l in {1.0/250,2.0/500,3.0/750,4.0/1000} {
+    \draw (0.08,\y) -- (-0.08,\y) node[left,font=\scriptsize]{\l};
+  }
+  % mod\`ele lin\'eaire : V = (100/16) H  ->  H = 160 cm donne V = 1000 m3
+  \draw[thick,colExo] (0,0) -- (6.0,4.0);
+  \node[right,font=\scriptsize,colExo] at (5.0,3.6) {mod\`ele};
+  % courbe r\'eelle (cuve \`a bords arrondis)
+  \draw[thick,dashed] (0,0) .. controls (2.4,0.85) and (3.8,2.15) .. (6.0,4.0);
+  \node[right,font=\scriptsize] at (2.5,1.05) {r\'eel};
+  \draw[latex-latex] (3.375,2.25) -- (3.375,1.65);
+  \node[right,font=\scriptsize] at (3.45,1.98) {$\Delta V$};
+  \draw[dotted] (3.375,0) -- (3.375,1.65);
+  \node[below,font=\scriptsize] at (3.375,-0.32) {90};
+\end{tikzpicture}
+\end{center}
+
+La cuve n'est pas un cylindre parfait. Pour $H = \SI{90}{\centi\meter}$, le mod\`ele lin\'eaire annonce \SI{600}{\meter\cubed} alors que le volume r\'eel n'est que de \SI{560}{\meter\cubed}. La hauteur maximale d'eau est de \SI{1,6}{\meter} et correspond au volume total de \SI[group-minimum-digits=4]{1000}{\meter\cubed}.
+
+La cha\^ine de mesure d\'elivre ensuite un mot num\'erique $N$ tel que $V_{citerne} = 0{,}125\times N$ (en \si{\meter\cubed}), $N$ \'etant l'image num\'erique de la hauteur mesur\'ee.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Indiquer la raison physique de la non-lin\'earit\'e de la courbe r\'eelle $V = f(H)$.
+  \item D\'eterminer, en valeur relative, le plus grand \'ecart entre le volume r\'eel et le volume donn\'e par le mod\`ele lin\'eaire.
+  \item \`A partir de la caract\'eristique mod\'elis\'ee, d\'eterminer la relation liant le volume $V$ (en \si{\meter\cubed}) \`a la hauteur $H$ (en \si{\centi\meter}).
+  \item L'automate doit lever un bit \texttt{Res\_plein} lorsque le volume atteint 95~\% du volume maximal, et un bit \texttt{Res\_vide} lorsqu'il descend sous 5~\%. D\'eterminer les deux seuils, en \si{\meter\cubed} puis en valeur du mot num\'erique $N$. Conclure sur la pertinence de la mod\'elisation lin\'eaire pour piloter ces deux seuils.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item La non-lin\'earit\'e provient de la \textbf{forme de la cuve} : ses bords arrondis font que la section horizontale n'est pas constante avec la hauteur. Le volume n'est donc pas proportionnel \`a $H$, alors qu'il le serait pour un r\'eservoir strictement cylindrique ou parall\'el\'epip\'edique \`a section constante.
+  \item Pour $H = \SI{90}{\centi\meter}$, l'\'ecart absolu vaut $\Delta V = 600 - 560 = \SI{40}{\meter\cubed}$, soit en valeur relative :
+  \[ \frac{\Delta V}{V_{mod\grave{e}le}} = \frac{40}{600} \approx 6{,}67\,\% \]
+  \item La droite mod\`ele passe par l'origine et par le point $(H = \SI{160}{\centi\meter}\,;\ V = \SI[group-minimum-digits=4]{1000}{\meter\cubed})$ :
+  \[ V = \frac{1\,000}{160}\,H = \frac{100}{16}\,H = 6{,}25\,H \qquad (V \text{ en } \si{\meter\cubed},\ H \text{ en } \si{\centi\meter}) \]
+  \item Seuils en volume :
+  \[ V_{plein} = 0{,}95\times 1\,000 = \SI{950}{\meter\cubed} \qquad ; \qquad V_{vide} = 0{,}05\times 1\,000 = \SI{50}{\meter\cubed} \]
+  Mots num\'eriques correspondants, avec $V_{citerne} = 0{,}125\,N$, soit $N = V_{citerne}/0{,}125 = 8\,V_{citerne}$ :
+  \[ N_{plein} = 8\times 950 = \num{7600} \qquad ; \qquad N_{vide} = 8\times 50 = \num{400} \]
+
+  \textbf{Conclusion.} L'erreur de mod\'elisation, maximale \`a mi-hauteur (6,67~\% vers $H = \SI{90}{\centi\meter}$), s'annule aux deux extr\'emit\'es de la caract\'eristique puisque la droite passe par l'origine et par le point de remplissage maximal : elle affecte donc peu les seuils \`a 5~\% et 95~\%, o\`u la d\'etection de r\'eservoir plein/vide reste fiable. En revanche, elle interdit d'utiliser cette m\^eme cha\^ine pour estimer finement l'\'energie \textbf{stock\'ee} \`a mi-remplissage : une surestimation de pr\`es de 7~\% du volume se r\'epercuterait \`a l'identique sur l'\'energie potentielle $E_p = \rho\,V\,g\,h$ annonc\'ee \`a l'exploitant. Une mod\'elisation par segments, ou une table de correspondance $V(H)$ tabul\'ee dans l'automate, r\'eduirait cette erreur.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+%  EXERCICE 6 -- STEP 2021 Q26-Q29 (remplace l'ancien ex. 6, doublon de la QT3)
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize 2021, \'Etude d'un syst\`eme, d'un proc\'ed\'e ou d'une organisation, questions 26 \`a 29}
+]
+\CAPETSHOW{
+On \'evalue ici l'int\'er\^et \'economique du \textbf{stockage} dans la micro-STEP de l'exercice 5, coupl\'ee \`a une centrale photovolta\"ique : sans stockage, tout le surplus photovolta\"ique serait revendu \`a bas prix et le village rach\`eterait son \'energie plus cher.
+
+Une simulation sur un an donne les consommations et productions annuelles suivantes :
+
+\begin{center}\footnotesize
+\begin{tabular}{@{}lc@{}}
+\toprule
+Consommation du village (charge) & \SI{320}{\mega\watt\hour} / an \\
+Production des panneaux photovolta\"iques (PV) & \SI{390}{\mega\watt\hour} / an \\
+\'Energie PV utilis\'ee pour le pompage ($E_{PV\,Pomp}$) & 25~\% de la production PV \\
+Rendement global du syst\`eme de stockage $\eta_p$ & 50~\% \\
+\'Energie PV alimentant directement le village ($E_{PV\,Charge}$) & 40~\% de la production PV \\
+\'Energie PV r\'einject\'ee dans le r\'eseau ($E_{PV\,R\acute{e}seau}$) & 35~\% de la production PV \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Les co\^uts de l'installation et les prix de l'\'energie sont les suivants :
+
+\begin{center}\footnotesize
+\begin{tabular}{@{}lc@{}}
+\toprule
+Investissement total & \num{850000}~\texteuro{} \\
+Maintenance de l'installation & \num{10000}~\texteuro{} / an \\
+Prix d'achat moyen de l'\'electricit\'e sur une ann\'ee & 170~\texteuro{} / \si{\mega\watt\hour} \\
+Prix de vente de l'\'electricit\'e (r\'einjection r\'eseau) & 100~\texteuro{} / \si{\mega\watt\hour} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item D\'eterminer le co\^ut \'energ\'etique annuel du village \textbf{avant} l'installation de la micro-STEP solaire.
+  \item D\'eterminer, en \si{\mega\watt\hour}, la quantit\'e d'\'energie \'electrique annuelle $E_{Stock}$ restitu\'ee par le stockage de l'eau.
+  \item Apr\`es mise en service, d\'eterminer l'\'energie $E_{STEP\,Charge}$ provenant de la micro-STEP solaire et utilis\'ee pour alimenter le village. En d\'eduire l'\'energie $E_{r\acute{e}seau}$ achet\'ee au fournisseur, puis le co\^ut \'energ\'etique annuel du village.
+  \item En tenant compte de la revente de l'exc\'edent, de l'investissement et de la maintenance, faire un bilan financier sur 25 ans et estimer le co\^ut de revient du \si{\kilo\watt\hour} consomm\'e par le village. Conclure quant \`a l'int\'er\^et d'une micro-STEP solaire.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Avant installation, la totalit\'e de la consommation est achet\'ee au fournisseur :
+  \[ C_{avant} = 320\times 170 = \num{54400}~\text{\texteuro{} / an} \]
+  \item L'\'energie PV envoy\'ee au pompage n'est restitu\'ee qu'au rendement $\eta_p$ du cycle de stockage :
+  \[ E_{Stock} = 390\times 0{,}25\times 0{,}50 = \SI{48,75}{\mega\watt\hour} \]
+  \item \[ E_{STEP\,Charge} = \underbrace{390\times 0{,}40}_{\text{PV direct}} + \underbrace{48{,}75}_{\text{stockage}} = 156 + 48{,}75 = \SI{204,75}{\mega\watt\hour} \]
+  \[ E_{r\acute{e}seau} = 320 - 204{,}75 = \SI{115,25}{\mega\watt\hour} \]
+  \[ C_{\acute{e}nerg} = 115{,}25\times 170 \approx \num{19592,20}~\text{\texteuro{} / an} \]
+  \item \'Energie revendue au r\'eseau et gain associ\'e :
+  \[ E_{PV\,R\acute{e}seau} = 0{,}35\times 390 = \SI{136,5}{\mega\watt\hour} \Rightarrow G = 136{,}5\times 100 = \num{13650}~\text{\texteuro{} / an} \]
+  Co\^ut \'energ\'etique net annuel :
+  \[ C_{net} = 19\,592{,}20 - 13\,650 = \num{5942,20}~\text{\texteuro{} / an} \]
+  Bilan sur 25 ans :
+  \[ D_{invest+maint} = 850\,000 + 10\,000\times 25 = \num{1100000}~\text{\texteuro{}} \]
+  \[ D_{\acute{e}nergie} = 5\,942{,}20\times 25 \approx \num{148555}~\text{\texteuro{}} \]
+  \[ D_{total} = 1\,100\,000 + 148\,555 = \num{1248555}~\text{\texteuro{}} \]
+  \'Energie consomm\'ee par le village sur 25 ans : $320\,000\times 25 = 8\times 10^6\ \si{\kilo\watt\hour}$, d'o\`u :
+  \[ c = \frac{1\,248\,555}{8\times 10^{6}} \approx 0{,}16~\text{\texteuro{} / \si{\kilo\watt\hour}} \]
+
+  \textbf{Conclusion.} Le co\^ut de revient ramen\'e au \si{\kilo\watt\hour} (0,16~\texteuro{}) est pratiquement \'egal au prix d'achat du march\'e (170~\texteuro{}/\si{\mega\watt\hour}, soit 0,17~\texteuro{}/\si{\kilo\watt\hour}) : sur le seul crit\`ere \'economique, l'installation est tout juste \`a l'\'equilibre sur 25 ans et ne constitue pas un investissement rentable \`a court terme. Son int\'er\^et est ailleurs, et doit \^etre argument\'e comme tel : d\'eveloppement durable et \textbf{r\'egulation de l'\'energie}, le stockage palliant l'intermittence de la production photovolta\"ique -- crit\`ere d\'ecisif pour un village de montagne.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2021, \'el\'ements de correction de la question 29) : \guillemotleft\ Le co\^ut ramen\'e au kW.h est pratiquement \'egal au prix du march\'e. \guillemotright\ ; les deux int\'er\^ets retenus sont \guillemotleft\ d\'eveloppement durable \guillemotright\ et \guillemotleft\ r\'egulation de l'\'energie (palier le probl\`eme de l'intermittence des \'energies renouvelables) \guillemotright. Une conclusion purement \'economique, sans ces deux arguments, est incompl\`ete.}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

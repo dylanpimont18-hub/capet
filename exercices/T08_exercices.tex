@@ -1,0 +1,556 @@
+% Sources verifiees (2026-07-15), RE-VERIFIEES le 2026-08-25 sur les PDF originaux
+% (texte extrait par pdftotext -layout, corpus de reference) :
+% - Ex. 1 : citation jury verifiee VERBATIM dans Rapport_Jury_2025.pdf, section
+%   "D. Commentaires du jury" / "Analyse globale des resultats et constats".
+% - Ex. 2 (Urbanloop) : E2_Appliquee_Commune_2024.pdf, questions 37, 48 et 49
+%   (Pmoy = 7,2 kW ; U0 = 72 V entre rails) -- conformes au sujet.
+% - Ex. 3 : la norme IEC/EN 61000-2-2 "fixe un THD de courant inferieur a 25 %" :
+%   verbatim du sujet CAPET SII 2024, partie B (juste avant la question B11).
+%   ATTENTION : le PDF "E1_Sujet_2024" est un DOUBLON exact (meme md5) de
+%   "E2_Disciplinaire_IE_2024" ; la reference correcte est donc l'epreuve ecrite
+%   disciplinaire (option ingenierie electrique), et non l'epreuve 1.
+% - Ex. 3, taux d'ondulation : DEFINITION RETENUE = valeur efficace de l'ondulation
+%   residuelle rapportee a la valeur moyenne, tau = Uond_eff/<uS> = racine(F^2 - 1)
+%   avec F le facteur de forme. PD2 : racine(pi^2/8 - 1) = 48,3 % ; P3 : 18,3 % ;
+%   PD6 : 4,2 %. Cette definition (et elle seule) est utilisee dans tout l'exercice ;
+%   l'ondulation CRETE-A-CRETE, distincte, est calculee et comparee en question 2.
+% ----------------------------------------------------------------------------
+% PASSE COMPLEMENTARITE FICHE/EXERCICES du 2026-09-02 (protocole partage) :
+%  - L'ancien Ex. 4 (HYCITY, questions E8/E9/E10) etait un DOUBLON de la fiche
+%    T08 : sa q.2 reproduisait QT1 etape 2 (fP du PD3 = 0,955) et sa q.3
+%    reproduisait QT2 a l'identique (UM = 631 V, U2comp = 446 V, m = 1,12).
+%    Il est REMPLACE par le nouvel Ex. 5, tire du MEME sujet mais des questions
+%    E2, E4, E6 et E8, non traitees par la fiche : relation v1/vD1/uS du
+%    commutateur "plus positif", periode TS = T1/3, ETABLISSEMENT de <uS> par
+%    calcul integral, allure et valeur efficace de iD1, puis fP du P3 etabli
+%    (et non applique). Le travail intellectuel demande est donc different :
+%    construction des formes d'onde + integration, la ou la fiche appliquait
+%    une formule donnee et calculait un rapport de transformation.
+%  - AJOUT d'un exercice docTech (nouvel Ex. 4, Urbanloop 2024 Q38 a Q43) :
+%    voir le bloc de sources detaille place juste avant cet exercice.
+%  - Ordre revu pour une gradation monotone : 1-2-2-2-3-3.
+% ----------------------------------------------------------------------------
+% - Ex. 5 (HYCITY) : E1_Sujet_2026.pdf, partie E (choix 2), questions E2/E4/E6/E8
+%   (E1_Sujet_2026.md l.593-666). Cahier des charges (230/400 V - 50 Hz ; sortie
+%   continue 600 V ; fP > 0,9) et enonce du commutateur "plus positif" (diodes a
+%   cathodes communes, charge fortement inductive modelisee par une source de
+%   courant) : conformes au sujet. v1(t) = racine(2).Veff.cos(w1.t) avec
+%   w1 = 100.pi rad/s : verbatim du sujet (l.640).
+%   POINT OUVERT TRANCHE le 2026-09-02 (etait : 0,827 vs 0,675 pour le P3).
+%   Verification a la source (E1_Sujet_2026.md l.654-664) : la formule
+%   fP = (2/pi) x racine(q) x sin(pi/q), avec "q le nombre de PHASES", n'est donnee
+%   par le sujet que pour le PD3 (question E9, q = 3 -> 0,955). La question E8, qui
+%   porte sur le P3, ne fournit aucune formule : le candidat doit l'etablir lui-meme
+%   a partir de P_A = <u_S>.I_S et de I_Deff (question E6).
+%   La formule fP = (q/pi) sin(pi/q) avec q = nombre de PULSATIONS, employee ici
+%   auparavant, est APOCRYPHE : elle redonne 0,955 pour q = 6 (ce qui la faisait
+%   paraitre valide) mais donne 0,827 pour le P3, valeur FAUSSE.
+%   Calcul exact du P3 (charge a courant constant, diodes non commandees donc
+%   cos phi1 = 1) : I_Deff = I_S/racine(3) ; P_A = (3.racine(6)/2pi).V.I_S = 1,17 V.I_S ;
+%   S = 3.V.I_Deff = racine(3).V.I_S ; fP = 3.racine(2)/(2.pi) = 0,675.
+%   Verification independante par le facteur de distorsion (creneau 120 deg) :
+%   I_1eff/I_eff = 0,3899/0,5774 = 0,675. Les deux voies concordent.
+%   L'exercice fait desormais ETABLIR fP pour le P3 (0,675). La formule du sujet
+%   (valable pour le PD3) n'est plus employee ici du tout, l'etude du PD3 ayant
+%   ete retiree avec le doublon.
+%   NB (hors perimetre de cette passe) : la fiche fiches/T08_Redresseurs.tex porte
+%   encore, en QT1, l'ancienne valeur FAUSSE fP(P3) = 0,827 obtenue par la formule
+%   apocryphe (q/pi).sin(pi/q). Incoherence fiche/exercices a traiter separement.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T08}} - Exercices - Redresseurs (monophas\'e et triphas\'e)}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T08 \quad Redresseurs (monophas\'e et triphas\'e)}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+% ============================================================
+% EXERCICE 1 (niveau 1) -- PD2 a diodes, grandeurs moyennes et efficaces
+% ============================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Un pont de Gra\"etz monophas\'e (PD2, 4 diodes suppos\'ees parfaites) redresse une tension alternative sinuso\"idale $v(t)$ de valeur efficace $V_{eff} = \SI{230}{\volt}$ et de fr\'equence $f = \SI{50}{\hertz}$. Il alimente directement (sans filtrage) une r\'esistance de charge $R = \SI{100}{\ohm}$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.9]
+\draw (2,2) node[circ]{} to[sV, l=$v(t)$] (5,2) node[circ]{};
+\draw (2,2) to[D, l=$D_1$] (2,4.2);
+\draw (5,2) to[D, l_=$D_3$] (5,4.2);
+\draw (2,-0.2) to[D, l=$D_4$] (2,2);
+\draw (5,-0.2) to[D, l_=$D_2$] (5,2);
+\draw (2,4.2) -- (7.2,4.2);
+\draw (2,-0.2) -- (7.2,-0.2);
+\node[circ] at (5,4.2) {};
+\node[circ] at (5,-0.2) {};
+\draw (7.2,4.2) to[R, l=$R$] (7.2,-0.2);
+\draw[-latex] (8.5,4.2) -- (8.5,-0.2) node[midway,right]{$u_S(t)$};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Rappeler la relation liant la valeur moyenne $\langle u_S \rangle$ de la tension redress\'ee et $V_{eff}$ pour un pont PD2, puis calculer num\'eriquement $\langle u_S \rangle$.
+  \item En d\'eduire le courant moyen $\langle i_S \rangle$ dans la r\'esistance de charge.
+  \item Justifier que la valeur efficace $U_{S,eff}$ de la tension redress\'ee est \'egale \`a $V_{eff}$, puis calculer la valeur efficace $I_{S,eff}$ du courant dans $R$.
+  \item Chaque diode ne conduit que pendant une moiti\'e de la p\'eriode de $v(t)$ (les diodes $D_1$-$D_2$ conduisent ensemble sur une alternance, $D_3$-$D_4$ sur l'autre). En d\'eduire la valeur efficace $I_{D,eff}$ du courant dans une diode, en fonction de $I_{S,eff}$, puis num\'eriquement.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Pour un pont PD2 :
+  \[ \langle u_S \rangle = \frac{2\sqrt{2}}{\pi}\,V_{eff} \approx 0{,}9\,V_{eff} = 0{,}9 \times 230 \approx \SI{207}{\volt} \]
+  \item Charge purement r\'esistive : $\langle i_S \rangle = \dfrac{\langle u_S \rangle}{R} = \dfrac{207}{100} \approx \SI{2,07}{\ampere}$.
+  \item $u_S(t) = \sqrt{2}\,V_{eff}\,|\sin(\omega t)|$. Or $\sin^2$ et $|\sin|^2$ co\"incident : la valeur efficace du redressement double alternance est identique \`a celle du signal non redress\'e, soit $U_{S,eff} = V_{eff} = \SI{230}{\volt}$. Comme $R$ est lin\'eaire, $I_{S,eff} = U_{S,eff}/R = 230/100 = \SI{2,3}{\ampere}$.
+  \item Sur une p\'eriode de $v(t)$, une diode (par exemple $D_1$-$D_2$) conduit le courant $i_S(t)$ pendant une demi-p\'eriode et est bloqu\'ee sur l'autre demi-p\'eriode :
+  \[
+  I_{D,eff} = \sqrt{\frac{1}{T}\int_0^{T/2} i_S^2(t)\,\mathrm dt} = \sqrt{\frac12}\cdot I_{S,eff} = \frac{I_{S,eff}}{\sqrt2}
+  \]
+  car la moyenne de $i_S^2(t)$ sur la demi-p\'eriode conductrice est \'egale \`a la moyenne de $i_S^2(t)$ sur la p\'eriode compl\`ete (m\^eme forme p\'eriodique). Num\'eriquement : $I_{D,eff} = 2{,}3/\sqrt{2} \approx \SI{1,63}{\ampere}$.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Le calibre en courant des diodes se choisit sur $I_{D,eff} \approx \SI{1,63}{\ampere}$ (et non sur $I_{S,eff} = \SI{2,3}{\ampere}$) : un pont dont les diodes sont donn\'ees pour \SI{2}{\ampere} efficaces convient donc \`a cette charge, alors qu'un dimensionnement fait \`a tort sur le courant de charge conduirait \`a sur-dimensionner le composant d'un facteur $\sqrt2$.
+
+\smallskip
+\textit{Point de vigilance jury (rapport de jury CAPET 2025, \guillemotleft\ Commentaires du jury \guillemotright) : \guillemotleft\ De nombreux candidats ne maitrisent pas les lois basiques de l'\'electricit\'e (la loi des n\oe uds, la loi des mailles, les calculs de puissance ou encore la loi d'Ohm) \guillemotright\ -- une ma\^itrise s\^ure des relations valeur moyenne / valeur efficace est indispensable avant d'aborder les montages redresseurs plus complexes.}
+}
+\end{tcolorbox}
+
+
+% ============================================================
+% EXERCICE 2 (niveau 2) -- Urbanloop, reversibilite du pont a diodes
+% ============================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{2} \hfill\normalfont\footnotesize 2024, \'Epreuve \'ecrite disciplinaire appliqu\'ee, questions 37, 48 et 49}
+]
+\CAPETSHOW{
+Le syst\`eme de transport Urbanloop alimente ses capsules \`a travers des rails aliment\'es par des bo\^itiers d'alimentation r\'epartis le long de la voie. Chaque bo\^itier est raccord\'e au r\'eseau EDF monophas\'e et impose en sortie une tension continue $U_0 = \SI{72}{\volt}$ (TBTS) entre les deux rails. La structure interne d'un bo\^itier est : pont redresseur PD2, filtre, hacheur s\'erie.
+
+\begin{center}
+\begin{tikzpicture}[scale=1, every node/.style={font=\small}]
+\draw (0,0) rectangle (2.3,1) node[pos=.5] {R\'eseau EDF};
+\node at (1.15,-0.35) {$\SI{230}{\volt}\sim$};
+\draw[-latex] (2.3,0.5) -- (3.1,0.5);
+\draw (3.1,0) rectangle (5.2,1) node[pos=.5] {Pont PD2};
+\draw[-latex] (5.2,0.5) -- (6,0.5);
+\draw (6,0) rectangle (7.9,1) node[pos=.5] {Filtre};
+\draw[-latex] (7.9,0.5) -- (8.7,0.5);
+\draw (8.7,0) rectangle (11.2,1) node[pos=.5] {Hacheur s\'erie};
+\draw[-latex] (11.2,0.5) -- (12,0.5);
+\draw (12,0) rectangle (13.8,1) node[pos=.5] {Rails};
+\node at (12.9,-0.35) {$U_0=\SI{72}{\volt}=$};
+\end{tikzpicture}
+\end{center}
+
+La puissance moyenne consomm\'ee par l'ensemble des capsules en mouvement sur le trajet est $P_{moy} = \SI{7,2}{\kilo\watt}$ (toutes les capsules n'acc\'el\`erent pas simultan\'ement), sous la tension $U_0 = \SI{72}{\volt}$ entre rails.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item En d\'eduire le courant moyen $I_{moy}$ circulant dans les rails.
+  \item Le pont redresseur PD2 est constitu\'e de 4 diodes. Indiquer, en justifiant \`a partir du sens de conduction impos\'e par les diodes, si le bo\^itier d'alimentation est r\'eversible en courant du c\^ot\'e du r\'eseau alternatif.
+  \item Lors du freinage d'une capsule, la machine synchrone qui l'entra\^ine fonctionne en g\'en\'eratrice et tend \`a renvoyer de l'\'energie \'electrique vers le bus continu des rails \`a $\SI{72}{\volt}$. Conclure sur le risque encouru si cette \'energie n'est pas g\'er\'ee autrement, compte tenu de la r\'eponse \`a la question pr\'ec\'edente, et indiquer bri\`evement une solution technique envisageable pour l'absorber.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item $\langle i \rangle = I_{moy} = \dfrac{P_{moy}}{U_0} = \dfrac{7\,200}{72} = \SI{100}{\ampere}$.
+  \item Dans un pont de diodes, chaque diode ne conduit que dans un seul sens (de l'anode vers la cathode) : le courant redress\'e $i_S(t)$ c\^ot\'e continu ne peut \^etre que positif ou nul, quel que soit le signe de la tension alternative d'entr\'ee. Le pont PD2 \`a diodes est donc \textbf{non r\'eversible en courant} : il ne peut transf\'erer de la puissance que du r\'eseau alternatif vers la charge continue, jamais dans l'autre sens.
+  \item Puisque le pont PD2 ne peut pas laisser transiter un courant renvoy\'e vers le r\'eseau, l'\'energie de freinage r\'ecup\'er\'ee par la machine synchrone \textbf{ne peut pas \^etre \'evacu\'ee vers le r\'eseau EDF} \`a travers le bo\^itier d'alimentation : elle resterait pi\'eg\'ee sur le bus continu des rails, provoquant une surtension dangereuse pour les composants (filtre, hacheur, isolation TBTS) si rien ne l'absorbe. Une solution consiste \`a embarquer un dispositif de stockage local (par exemple des supercondensateurs dans la capsule) qui absorbe l'\'energie cin\'etique r\'ecup\'er\'ee lors du freinage, sans avoir besoin de la renvoyer \`a travers le bo\^itier d'alimentation non r\'eversible.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Le courant de \SI{100}{\ampere} dans les rails et la non-r\'eversibilit\'e du pont \`a diodes fixent ensemble deux exigences de conception : un calibre de rail et de bo\^itier tenant \SI{100}{\ampere} en permanence, et un \'etage de dissipation ou de stockage embarqu\'e obligatoire, faute de quoi la tension du bus continu sortirait du domaine TBTS ($\leq \SI{120}{\volt}$ en continu) que le cahier des charges impose de respecter.
+}
+\end{tcolorbox}
+
+
+% ============================================================
+% EXERCICE 3 (niveau 2) -- Ondulation residuelle et nombre de pulsations
+% ============================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+On compare la qualit\'e de la tension continue obtenue en sortie de trois montages redresseurs \`a diodes aliment\'es par le m\^eme r\'eseau, en l'absence de tout filtrage : PD2 (monophas\'e, 2 pulsations), P3 (triphas\'e simple alternance, 3 pulsations) et PD6 (triphas\'e double alternance, 6 pulsations).
+
+\medskip
+\textbf{D\'efinition utilis\'ee dans tout l'exercice.} Le \emph{taux d'ondulation} $\tau$ est le rapport de la valeur \emph{efficace} $U_{ond,eff}$ de la composante alternative r\'esiduelle (l'ondulation) \`a la valeur moyenne de la tension redress\'ee :
+\[
+\tau = \frac{U_{ond,eff}}{\langle u_S \rangle}
+\qquad\text{avec}\qquad
+U_{ond,eff} = \sqrt{U_{S,eff}^{\,2} - \langle u_S \rangle^{2}}
+\]
+Les valeurs usuelles sont $\tau_{PD2} \approx 48{,}3\ \%$, $\tau_{P3} \approx 18{,}3\ \%$, $\tau_{PD6} \approx 4{,}2\ \%$. Cette d\'efinition ne doit pas \^etre confondue avec l'ondulation \emph{cr\^ete-\`a-cr\^ete} $\Delta U = U_{S,max} - U_{S,min}$, dont il sera question \`a la question 2.
+
+\begin{center}
+\begin{tikzpicture}[scale=0.85, >=Stealth]
+\draw[-latex] (0,0) -- (9.3,0) node[right]{$\theta$};
+\draw[-latex] (0,-0.4) -- (0,2.7) node[above]{$u_S(\theta)$};
+\draw[dashed,colSlate] (0,2) -- (7.1,2) node[right,black,font=\small]{$U_{S,max}$};
+\draw[dotted,colSlate] (0,1.27) -- (7.1,1.27) node[right,black,font=\small]{$\langle u_S\rangle$};
+\foreach \k in {0,1,2}{%
+  \draw[thick,colExo,domain=0:180,samples=60,smooth,variable=\x]
+    plot ({\k*2.1+\x/180*2.1},{2*sin(\x)});}
+\draw[latex-] (2.1,-0.06) -- (2.8,-0.85) node[right,font=\small]{$U_{S,min}$};
+\node[font=\small] at (3.6,-1.45) {allure de $u_S(\theta)$ pour le montage PD2 non filtr\'e};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Justifier, sans calcul, pourquoi le taux d'ondulation diminue fortement lorsque le nombre de pulsations par p\'eriode augmente (PD2 $\to$ P3 $\to$ PD6).
+  \item Un montage PD2 non filtr\'e alimente une charge r\'esistive dans les m\^emes conditions qu'\`a l'exercice 1 ($V_{eff} = \SI{230}{\volt}$, $f = \SI{50}{\hertz}$, sans filtrage).
+  \begin{enumerate}[label=\alph*)]
+    \item En reprenant les valeurs de $\langle u_S \rangle$ et de $U_{S,eff}$ \'etablies \`a l'exercice 1, calculer la valeur efficace $U_{ond,eff}$ de l'ondulation r\'esiduelle de deux mani\`eres : \`a partir de $\tau_{PD2}$, puis directement par la d\'efinition ci-dessus.
+    \item Relever sur l'allure ci-dessus les valeurs extr\^emes $U_{S,max}$ et $U_{S,min}$, les calculer, et en d\'eduire l'ondulation cr\^ete-\`a-cr\^ete $\Delta U$.
+    \item Comparer le rapport $\Delta U / \langle u_S \rangle$ au taux $\tau_{PD2}$ et commenter.
+  \end{enumerate}
+  \item Un cahier des charges impose un taux d'ondulation r\'esiduel $\tau$ inf\'erieur \`a $10\ \%$ sans filtrage suppl\'ementaire. Indiquer, parmi les trois montages, lequel (ou lesquels) satisfait ce crit\`ere.
+  \item Le contenu harmonique du courant absorb\'e c\^ot\'e r\'eseau par un pont redresseur \`a diodes est constitu\'e des rangs $2k\pm1$ pour un PD2 et $6k\pm1$ pour un PD6 ($k$ entier). Expliquer en une phrase pourquoi un passage de PD2 \`a PD6 est favorable du point de vue de la compatibilit\'e \'electromagn\'etique c\^ot\'e r\'eseau.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Plus le nombre de pulsations par p\'eriode augmente, plus la tension redress\'ee est reconstitu\'ee \`a partir de portions de sinuso\"ide courtes et proches de son maximum (chaque portion couvre un angle $2\pi/q$ de plus en plus petit) : l'\'ecart entre la valeur instantan\'ee et la valeur moyenne se r\'eduit d'autant, donc l'ondulation r\'esiduelle diminue quand $q$ augmente.
+  \item \begin{enumerate}[label=\alph*)]
+    \item D'apr\`es l'exercice 1 : $\langle u_S \rangle = \dfrac{2\sqrt2}{\pi}V_{eff} \approx \SI{207}{\volt}$ et $U_{S,eff} = V_{eff} = \SI{230}{\volt}$.
+
+    Par le taux d'ondulation : $U_{ond,eff} = \tau_{PD2}\times\langle u_S \rangle = 0{,}483\times 207 \approx \SI{100}{\volt}$.
+
+    Directement par la d\'efinition :
+    \[
+    U_{ond,eff} = \sqrt{U_{S,eff}^{\,2} - \langle u_S \rangle^{2}} = \sqrt{230^2 - 207^2} = \sqrt{52\,900 - 42\,849} = \sqrt{10\,051} \approx \SI{100}{\volt}
+    \]
+    Les deux voies concordent, ce qui confirme bien $\tau_{PD2} = 100/207 \approx 0{,}483$.
+    \item La tension redress\'ee est $u_S(\theta) = \sqrt2\,V_{eff}|\sin\theta|$ : son maximum est le sommet des arches et son minimum est atteint \`a chaque passage par z\'ero du r\'eseau, o\`u la tension redress\'ee \emph{s'annule} (aucun \'el\'ement de stockage ne maintient la tension en l'absence de filtrage) :
+    \[
+    U_{S,max} = \sqrt2\times 230 \approx \SI{325}{\volt}, \qquad U_{S,min} = \SI{0}{\volt}
+    \]
+    \[
+    \Delta U = U_{S,max} - U_{S,min} \approx \SI{325}{\volt}
+    \]
+    \item $\dfrac{\Delta U}{\langle u_S \rangle} = \dfrac{325}{207} \approx 1{,}57$, soit $157\ \%$ : plus de trois fois la valeur de $\tau_{PD2} = 48{,}3\ \%$. Les deux grandeurs ne mesurent pas la m\^eme chose : $\tau$ rapporte la valeur \emph{efficace} de l'ondulation \`a la moyenne, alors que $\Delta U/\langle u_S \rangle$ en rapporte l'amplitude \emph{cr\^ete-\`a-cr\^ete}. M\'elanger les deux d\'efinitions (par exemple \'ecrire $\Delta U = \tau_{PD2}\times\langle u_S \rangle$) conduirait \`a une tension minimale de \SI{157}{\volt}, en contradiction directe avec l'allure trac\'ee, qui touche z\'ero deux fois par p\'eriode.
+  \end{enumerate}
+  \item Seul le montage PD6 ($\tau \approx 4{,}2\ \% < 10\ \%$) satisfait le crit\`ere sans filtrage suppl\'ementaire ; P3 ($18{,}3\ \%$) et PD2 ($48{,}3\ \%$) n\'ecessitent un filtre (LC par exemple) pour atteindre cette exigence.
+  \item Le rang minimal des harmoniques inject\'es c\^ot\'e r\'eseau passe de $2k\pm1$ (soit le rang 1 -- fondamental -- puis 3, 5, \dots) \`a $6k\pm1$ (soit 5, 7, 11, 13, \dots pour un PD6) : les harmoniques de rang bas (le rang 3 notamment) disparaissent, ce qui r\'eduit le taux de distorsion harmonique global du courant r\'eseau et facilite le respect des normes de compatibilit\'e \'electromagn\'etique (par exemple la norme IEC/EN 61000-2-2, qui \guillemotleft\ fixe un THD de courant inf\'erieur \`a 25 \% pour assurer une compatibilit\'e \'electromagn\'etique conforme \guillemotright\ -- sujet CAPET SII 2024, \'epreuve \'ecrite disciplinaire, partie B).
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Avec une ondulation cr\^ete-\`a-cr\^ete \'egale \`a $157\ \%$ de sa valeur moyenne et une tension qui retombe \`a z\'ero deux fois par p\'eriode, un PD2 non filtr\'e ne peut pas alimenter directement une charge exigeant une tension quasi continue : le respect du crit\`ere $\tau < 10\ \%$ passe obligatoirement par un filtrage (cellule LC, condensateur de t\^ete) ou par le choix d'un montage \`a 6 pulsations.
+}
+\end{tcolorbox}
+
+
+% ============================================================
+% EXERCICE docTech (niveau 2) -- Urbanloop : lecture du DT1 (choix de section de
+% rail) et chute de tension sur le bus continu 72 V issu du pont PD2
+% ------------------------------------------------------------
+% SOURCES (verifiees le 2026-09-02 dans E2_Appliquee_Commune_2024.md) :
+%  - l.830  (DT1) : "Deformation de 0,13 mm pour un rail de dimensions 120x80x8 mm
+%    et un espacement de 0,66 m" / "1,4 mm ... 120x80x8 mm ... 2 m" /
+%    "0,08 mm ... 150x90x11 mm ... 0,66 m"  -> les 3 lignes du tableau docTech
+%    sont le VERBATIM du DT1 (seule la mise en tableau est reconstituee, le DT1
+%    d'origine etant une figure de courbes de simulation omise par la conversion).
+%  - l.290  : "le cahier des charges impose une fleche maximale du rail inferieure
+%    a 0,1 mm" (critere de la question 1)
+%  - l.518  : "La resistivite de l'acier est rho = 0,13 Ohm.mm2.m-1"
+%  - l.510  : "imposent en sortie une tension U0 de 72 V continue (TBTS)"
+%  - l.498  : "Pmoy = 7,2 kW ... sous une tension U0 de 72 V"
+%  - l.554  : "le cahier des charges impose une chute de tension maximale de 5% de
+%    U0. Le courant moyen est pris egal a 100 A."
+%  - l.217  : "la longueur par le rail est de 1,1 km entre la station 1 et la station 2"
+%  - Q40 (l.540) : expression Req = 2.Rl.L.(x/L).(1-x/L) FOURNIE PAR LE SUJET
+%  - RECONSTITUE : l'aire de la section (2519 mm2) n'est pas donnee numeriquement
+%    par le sujet (figure 11 omise). Elle est ici RECALCULEE explicitement dans
+%    l'enonce a partir des cotes 150x90x11 du DT1 en profil corniere en L, et la
+%    demarche est demandee au candidat. Verification de coherence : cette section
+%    conduit a Lmax = 1395 m > 1100 m, donc "deux boitiers suffisent", ce qui est
+%    exactement la conclusion attendue par la question 43 du sujet.
+% ============================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize 2024, \'Epreuve \'ecrite disciplinaire appliqu\'ee, questions 38 \`a 43 (DT1)}
+]
+\CAPETSHOW{
+Les capsules du syst\`eme de transport Urbanloop sont aliment\'ees par des bo\^itiers r\'epartis le long de la voie. Chaque bo\^itier (pont PD2 + filtre + hacheur s\'erie) \guillemotleft\ impose en sortie une tension $U_0$ de \SI{72}{\volt} continue (TBTS : tr\`es basse tension de s\'ecurit\'e) entre les deux rails \guillemotright. Ce sont les \emph{rails eux-m\^emes} qui transportent ensuite la puissance jusqu'\`a la capsule : leur r\'esistance vient donc en s\'erie avec la sortie du redresseur et d\'egrade la tension effectivement vue par la capsule.
+
+Le rail est un profil\'e en corni\`ere (section en L) en acier, de r\'esistivit\'e $\rho = \SI{0,13}{\ohm\milli\metre\squared\per\metre}$. Les r\'esultats de simulation m\'ecanique ayant servi \`a choisir ce profil\'e sont donn\'es ci-dessous.
+
+\begin{tcolorbox}[docTech, title={Document technique DT1 -- r\'esultats de simulation (fl\`eche du rail)}]
+\small
+L'espacement indiqu\'e correspond \`a la distance entre deux traverses.
+
+\smallskip
+\begin{center}
+\begin{tabular}{ccc}
+\toprule
+\textbf{Dimensions du rail} & \textbf{Espacement} & \textbf{D\'eformation (fl\`eche)} \\
+\midrule
+$120\times80\times8$\ \si{\milli\metre}  & \SI{0,66}{\metre} & \SI{0,13}{\milli\metre} \\
+$120\times80\times8$\ \si{\milli\metre}  & \SI{2}{\metre}    & \SI{1,4}{\milli\metre}  \\
+$150\times90\times11$\ \si{\milli\metre} & \SI{0,66}{\metre} & \SI{0,08}{\milli\metre} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\emph{Exigence du cahier des charges m\'ecanique :} la fl\`eche maximale du rail doit rester inf\'erieure \`a \SI{0,1}{\milli\metre}.
+\end{tcolorbox}
+
+\smallskip
+Un rail de corni\`ere de cotes $a \times b \times e$ (deux ailes de largeurs $a$ et $b$, d'\'epaisseur commune $e$) a pour aire de section $S = (a + b - e)\,e$.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever sur le document technique DT1} la seule configuration (dimensions de rail et espacement entre traverses) qui respecte l'exigence de fl\`eche du cahier des charges. Justifier en une phrase le rejet de chacune des deux autres.
+  \item \`A partir des dimensions ainsi retenues, calculer l'aire $S$ de la section du rail, puis la r\'esistance \'electrique lin\'eique $R_\ell$ du rail, en \si{\ohm\per\metre}.
+  \item La capsule se trouve \`a la distance $x$ du bo\^itier 1 et \`a la distance $L - x$ du bo\^itier 2, $L$ \'etant l'espacement entre deux bo\^itiers cons\'ecutifs. Les deux bo\^itiers alimentent la capsule en parall\`ele par l'interm\'ediaire des rails. Le sujet \'etablit que la r\'esistance \'equivalente vue par la capsule vaut
+  \[ R_{eq} = 2\,R_\ell\,L\cdot\frac{x}{L}\left(1 - \frac{x}{L}\right) \]
+  D\'eterminer la position $x$ la plus d\'efavorable au regard de la chute de tension, et en d\'eduire l'expression de la chute de tension maximale $\Delta u_{Rmax}$ en fonction de $R_\ell$, $L$ et du courant moyen $I_{moy}$.
+  \item Le cahier des charges impose une chute de tension maximale de $5\ \%$ de $U_0$, le courant moyen \'etant pris \'egal \`a \SI{100}{\ampere}. D\'eterminer la distance maximale $L_{max}$ entre deux bo\^itiers d'alimentation. La longueur de voie \`a \'equiper entre les deux stations \'etant de \SI{1,1}{\kilo\metre}, v\'erifier que deux bo\^itiers d'alimentation suffisent pour ce parcours.
+  \item Le pont PD2 du bo\^itier d\'elivre, avant filtrage et hachage, une tension moyenne $\langle u \rangle = \frac{2\sqrt2}{\pi}V_{eff}$ \`a partir du r\'eseau EDF monophas\'e $V_{eff} = \SI{230}{\volt}$. Calculer cette tension, puis le rapport cyclique du hacheur s\'erie qui en d\'eduit les \SI{72}{\volt} du bus. Indiquer si la chute de tension calcul\'ee \`a la question 4 remet en cause ce r\'eglage, et sous quelle condition.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Lecture du DT1.} Seule la configuration \textbf{rail $150\times90\times11$\ \si{\milli\metre} avec un espacement de \SI{0,66}{\metre}} respecte l'exigence : sa fl\`eche vaut \SI{0,08}{\milli\metre} $<$ \SI{0,1}{\milli\metre}. Les deux autres sont rejet\'ees : le rail $120\times80\times8$ \`a \SI{0,66}{\metre} donne \SI{0,13}{\milli\metre} $>$ \SI{0,1}{\milli\metre}, et le m\^eme rail \`a \SI{2}{\metre} d'espacement donne \SI{1,4}{\milli\metre}, tr\`es largement hors crit\`ere (l'\'ecartement des traverses augmente fortement la fl\`eche).
+  \item Aire de la section de la corni\`ere $150\times90\times11$ :
+  \[ S = (a + b - e)\,e = (150 + 90 - 11)\times 11 = 229 \times 11 = \SI{2519}{\milli\metre\squared} \]
+  R\'esistance lin\'eique (la r\'esistivit\'e \'etant donn\'ee en \si{\ohm\milli\metre\squared\per\metre}, elle se combine directement \`a une section en \si{\milli\metre\squared}) :
+  \[ R_\ell = \frac{\rho}{S} = \frac{0{,}13}{2\,519} \approx \SI{5,16e-5}{\ohm\per\metre} = \SI{51,6}{\micro\ohm\per\metre} \]
+  \item Posons $u = x/L \in [0\,;1]$. Alors $R_{eq} = 2R_\ell L \cdot u(1-u)$. La fonction $u \mapsto u(1-u)$ est maximale en $u = 1/2$, o\`u elle vaut $1/4$ : la position la plus d\'efavorable est donc la capsule \textbf{\`a mi-distance entre les deux bo\^itiers} ($x = L/2$), ce qui est physiquement attendu puisque c'est l\`a que les deux chemins de courant sont simultan\'ement les plus longs.
+  \[ R_{eq,max} = 2R_\ell L \times \frac14 = \frac{R_\ell L}{2}
+  \qquad\Longrightarrow\qquad
+  \Delta u_{Rmax} = R_{eq,max}\,I_{moy} = \frac{R_\ell\,L\,I_{moy}}{2} \]
+  \item Chute de tension admissible : $\Delta u_{adm} = 0{,}05 \times U_0 = 0{,}05 \times 72 = \SI{3,6}{\volt}$.
+  \[ \frac{R_\ell\,L_{max}\,I_{moy}}{2} = \Delta u_{adm}
+  \qquad\Longrightarrow\qquad
+  L_{max} = \frac{2\,\Delta u_{adm}}{R_\ell\,I_{moy}} = \frac{2 \times 3{,}6}{5{,}16\times10^{-5} \times 100} \approx \SI{1395}{\metre} \]
+  Deux bo\^itiers plac\'es aux deux extr\'emit\'es couvrent un espacement $L = \SI{1100}{\metre}$. Comme $1\,100 < L_{max} = 1\,395$, le crit\`ere est respect\'e : \textbf{deux bo\^itiers d'alimentation suffisent} pour les \SI{1,1}{\kilo\metre} de voie. La chute r\'eelle au point le plus d\'efavorable vaut alors
+  \[ \Delta u_R = \frac{5{,}16\times10^{-5} \times 1\,100 \times 100}{2} \approx \SI{2,84}{\volt} \quad (3{,}9\ \% \text{ de } U_0) \]
+  \item Tension moyenne en sortie du pont PD2 :
+  \[ \langle u \rangle = \frac{2\sqrt2}{\pi}\times 230 \approx 0{,}9 \times 230 \approx \SI{207}{\volt} \]
+  Le hacheur s\'erie (abaisseur) impose $\langle u_{sortie}\rangle = \alpha\,\langle u \rangle$, d'o\`u
+  \[ \alpha = \frac{72}{207} \approx 0{,}35 \]
+  Ce r\'eglage n'est pas remis en cause \`a condition que le hacheur soit \textbf{asservi} en tension : la chute de \SI{2,84}{\volt} appara\^it \emph{en aval} du bo\^itier, dans les rails, et non \`a ses bornes de sortie. Le bo\^itier maintient bien \SI{72}{\volt} \`a sa sortie ; c'est la capsule qui ne voit que \SI{69,2}{\volt} au point le plus d\'efavorable. Compenser cette chute en augmentant $\alpha$ (soit $\alpha \approx 0{,}36$ pour viser \SI{74,8}{\volt} en sortie de bo\^itier) rel\`everait la tension vue par une capsule proche d'un bo\^itier au-del\`a de \SI{74}{\volt} : la marge vis-\`a-vis de la limite TBTS (\SI{120}{\volt} en continu) reste confortable, mais le r\'eglage doit alors \^etre v\'erifi\'e \`a vide comme en charge.
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Le choix du profil\'e est ici doublement contraint : la section $150\times90\times11$\ \si{\milli\metre} est impos\'ee par la fl\`eche m\'ecanique (\SI{0,08}{\milli\metre} $<$ \SI{0,1}{\milli\metre}), et c'est cette m\^eme section qui, par sa faible r\'esistance lin\'eique (\SI{51,6}{\micro\ohm\per\metre}), autorise un espacement de \SI{1395}{\metre} entre bo\^itiers et rend donc suffisants les deux seuls bo\^itiers pr\'evus sur les \SI{1,1}{\kilo\metre} de voie. Un rail plus l\'eger aurait exig\'e un troisi\`eme bo\^itier d'alimentation : le dimensionnement m\'ecanique et le dimensionnement \'electrique de la distribution continue ne peuvent pas \^etre men\'es s\'epar\'ement.
+}
+\end{tcolorbox}
+
+% ============================================================
+% EXERCICE 5 (niveau 3) -- HYCITY, etude du P3 : commutateur plus positif,
+% valeur moyenne par integration, courant efficace de diode, facteur de puissance
+% ============================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize 2026, \'Epreuve 1 (admissibilit\'e), partie E, questions E2, E4, E6 et E8}
+]
+\CAPETSHOW{
+Le bus \`a hydrog\`ene HYCITY\textregistered\ est \'equip\'e d'une batterie de secours recharg\'ee \`a partir du r\'eseau triphas\'e d'alimentation. La solution \'etudi\'ee ici associe le secondaire d'un transformateur triphas\'e et un pont redresseur \`a diodes de type P3. La charge, fortement inductive, est mod\'elis\'ee par une source de courant $I_S$ suppos\'e constant.
+
+Les diodes sont \`a \textbf{cathodes communes} et suppos\'ees parfaites : le fonctionnement est celui d'un \emph{commutateur \guillemotleft\ plus positif \guillemotright}, c'est-\`a-dire que la diode voyant le plus haut potentiel \`a son anode est \`a l'\'etat passant, les autres \'etant bloqu\'ees.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.95]
+% ---- point neutre (couplage etoile du secondaire) ----
+\draw (-1.8,1.0) -- (-1.8,4.4);
+\node[left] at (-1.9,2.7) {$N$};
+% ---- trois sources (secondaire du transformateur) ----
+\draw (-1.8,4.4) node[circ]{} to[sV, l=$v_1$] (0.9,4.4);
+\draw (-1.8,2.7) node[circ]{} to[sV, l=$v_2$] (0.9,2.7);
+\draw (-1.8,1.0) node[circ]{} to[sV, l=$v_3$] (0.9,1.0);
+% ---- diodes : anode cote source, cathode en haut (cathodes communes) ----
+\draw (0.9,4.4) to[D, l=$D_1$] (3.6,4.4);
+\draw (0.9,2.7) to[D, l=$D_2$] (3.6,2.7);
+\draw (0.9,1.0) to[D, l=$D_3$] (3.6,1.0);
+% ---- barre des cathodes communes ----
+\draw (3.6,1.0) -- (3.6,4.4);
+\node[circ] at (3.6,2.7) {};
+\draw (3.6,4.4) -- (5.6,4.4);
+% ---- retour par le neutre ----
+\draw (-1.8,1.0) -- (-1.8,-0.6) -- (5.6,-0.6);
+% ---- charge : source de courant ----
+\draw (5.6,4.4) to[I, l=$I_S$] (5.6,-0.6);
+\draw[-latex] (7.1,4.4) -- (7.1,-0.6) node[midway,right]{$u_S$};
+% ---- reperage de vD1 ----
+\draw[-latex] (0.9,5.3) -- (3.6,5.3) node[midway,above,font=\small]{$v_{D1}$};
+\draw[dotted] (0.9,4.5) -- (0.9,5.3);
+\draw[dotted] (3.6,4.5) -- (3.6,5.3);
+\end{circuitikz}
+\end{center}
+
+L'expression temporelle de la tension $v_1$ est $v_1(t) = \sqrt2\,V_{eff}\cos(\omega_1 t)$, avec $\omega_1 = 100\pi\ \si{\radian\per\second}$ la pulsation, $T_1$ la p\'eriode et $V_{eff}$ la valeur efficace des tensions simples au secondaire. Les tensions $v_2$ et $v_3$ sont d\'ephas\'ees respectivement de $-2\pi/3$ et $-4\pi/3$ par rapport \`a $v_1$.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Dans le cas g\'en\'eral, \'etablir la relation liant $v_1$, $v_{D1}$ et $u_S$ (les tensions sont rep\'er\'ees sur le sch\'ema, le neutre $N$ servant de r\'ef\'erence). Simplifier cette relation lorsque la diode $D_1$ est \`a l'\'etat passant.
+  \item Sur quel intervalle angulaire, en fonction de $\omega_1 t$, la diode $D_1$ est-elle passante ? En d\'eduire la p\'eriode $T_S$ de la tension $u_S$ en fonction de $T_1$.
+  \item En utilisant la d\'efinition de la valeur moyenne d'une grandeur p\'eriodique
+  \[ \langle x \rangle = \frac{1}{T}\int_{0}^{T} x(t)\,\mathrm dt \]
+  montrer par le calcul int\'egral que la valeur moyenne de la tension redress\'ee s'exprime
+  \[ \langle u_S \rangle = \frac{3\sqrt6}{2\pi}\,V_{eff} \]
+  \item Repr\'esenter l'allure du courant $i_{D1}$ traversant la diode $D_1$ et le premier enroulement du secondaire, puis d\'eterminer, en fonction de $I_S$, la valeur efficace $I_{D1,eff}$ de ce courant.
+  \item Le transformateur et les diodes \'etant parfaits, la puissance active est uniquement consomm\'ee par la charge et s'exprime $P_A = \langle u_S \rangle \cdot I_S$. Rappeler la d\'efinition du facteur de puissance $f_P$ au secondaire du transformateur, puis \'etablir sa valeur \`a partir des r\'esultats pr\'ec\'edents. Le cahier des charges impose $f_P > 0{,}9$ : conclure.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item En parcourant la maille form\'ee par la source $v_1$, la diode $D_1$ et la charge (retour par le neutre $N$) :
+  \[ v_1 = v_{D1} + u_S \qquad\text{soit}\qquad v_{D1} = v_1 - u_S \]
+  Lorsque $D_1$ est passante, la diode est suppos\'ee parfaite donc $v_{D1} = 0$, d'o\`u
+  \[ \boxed{u_S = v_1} \]
+  Ce r\'esultat se g\'en\'eralise : \`a chaque instant, $u_S$ est \'egale \`a la plus grande des trois tensions simples, ce qui traduit exactement le fonctionnement en commutateur \guillemotleft\ plus positif \guillemotright.
+  \item $D_1$ conduit tant que $v_1$ est sup\'erieure \`a $v_2$ et \`a $v_3$. Par sym\'etrie du syst\`eme triphas\'e \'equilibr\'e, les intersections de $v_1$ avec $v_2$ et $v_3$ encadrent le maximum de $v_1$ (atteint en $\omega_1 t = 0$ avec la convention en cosinus) \`a $\pm\pi/3$ :
+  \[ D_1 \text{ passante pour } \omega_1 t \in \left[-\frac{\pi}{3},\ +\frac{\pi}{3}\right] \]
+  soit un tiers de p\'eriode ($2\pi/3$ sur $2\pi$). Les trois diodes se relaient de fa\c{c}on identique et d\'ecal\'ee de $2\pi/3$ : le motif de $u_S$ se r\'ep\`ete donc trois fois par p\'eriode du r\'eseau,
+  \[ \boxed{T_S = \frac{T_1}{3}} \]
+  (montage \`a 3 pulsations par p\'eriode).
+  \item Sur l'intervalle de conduction de $D_1$, $u_S(t) = v_1(t) = \sqrt2\,V_{eff}\cos(\omega_1 t)$. En int\'egrant sur une p\'eriode $T_S$ de $u_S$, c'est-\`a-dire sur $\omega_1 t \in [-\pi/3,\ +\pi/3]$ :
+  \[
+  \langle u_S \rangle = \frac{1}{2\pi/3}\int_{-\pi/3}^{+\pi/3} \sqrt2\,V_{eff}\cos\theta\;\mathrm d\theta
+  = \frac{3\sqrt2\,V_{eff}}{2\pi}\Big[\sin\theta\Big]_{-\pi/3}^{+\pi/3}
+  \]
+  \[
+  = \frac{3\sqrt2\,V_{eff}}{2\pi}\left(\frac{\sqrt3}{2} + \frac{\sqrt3}{2}\right)
+  = \frac{3\sqrt2\,V_{eff}}{2\pi}\times\sqrt3
+  = \frac{3\sqrt6}{2\pi}\,V_{eff}
+  \]
+  Num\'eriquement $\langle u_S \rangle \approx 1{,}17\,V_{eff}$ : la valeur moyenne redress\'ee est sup\'erieure \`a la valeur efficace d'une tension simple, car le montage ne pr\'el\`eve que le sommet des alternances.
+  \item Le courant $I_S$ impos\'e par la charge inductive traverse int\'egralement l'enroulement dont la diode conduit. Le courant $i_{D1}$ est donc un cr\'eneau d'amplitude $I_S$ et de largeur $2\pi/3$ (soit un tiers de p\'eriode), nul le reste du temps :
+  \begin{center}
+  \begin{tikzpicture}[scale=0.85, >=Stealth]
+  \draw[-latex] (-0.4,0) -- (8.6,0) node[right]{$\omega_1 t$};
+  \draw[-latex] (0,-0.3) -- (0,2.2) node[above]{$i_{D1}$};
+  % creneau 1 : de -pi/3 a pi/3 -> ici on centre sur 0 : trace partiel puis motif suivant
+  \draw[thick,colExo] (0,1.6) -- (0.9,1.6) -- (0.9,0) -- (5.3,0) -- (5.3,1.6) -- (7.1,1.6) -- (7.1,0) -- (8.3,0);
+  \draw[dashed,colSlate] (0,1.6) -- (5.3,1.6);
+  \node[left,font=\small] at (0,1.6) {$I_S$};
+  \draw[dotted] (0.9,0) -- (0.9,-0.55) node[below,font=\small]{$\pi/3$};
+  \draw[dotted] (5.3,0) -- (5.3,-0.55) node[below,font=\small]{$5\pi/3$};
+  \draw[dotted] (7.1,0) -- (7.1,-0.55) node[below,font=\small]{$7\pi/3$};
+  \draw[latex-latex] (0.95,0.35) -- (5.25,0.35);
+  \node[font=\footnotesize,fill=white,inner sep=1pt] at (3.1,0.35) {conduction de $D_2$ puis $D_3$};
+  \end{tikzpicture}
+  \end{center}
+  Valeur efficace d'un cr\'eneau de rapport cyclique $1/3$ :
+  \[
+  I_{D1,eff} = \sqrt{\frac{1}{T_1}\int_{\text{conduction}} I_S^2\,\mathrm dt} = \sqrt{\frac{1}{3}\,I_S^2} = \frac{I_S}{\sqrt3} \approx 0{,}577\,I_S
+  \]
+  \item Le facteur de puissance au secondaire est le rapport de la puissance active \`a la puissance apparente :
+  \[ f_P = \frac{P_A}{S} \qquad\text{avec}\qquad S = 3\,V_{eff}\,I_{D1,eff} \]
+  (la puissance apparente d'un syst\`eme triphas\'e se calcule sur les valeurs \emph{efficaces} des tensions simples et des courants de ligne, ici les courants dans les enroulements secondaires).
+  \[
+  P_A = \langle u_S \rangle\,I_S = \frac{3\sqrt6}{2\pi}\,V_{eff} I_S \approx 1{,}17\,V_{eff} I_S
+  \qquad
+  S = 3\,V_{eff}\,\frac{I_S}{\sqrt3} = \sqrt3\,V_{eff} I_S \approx 1{,}73\,V_{eff} I_S
+  \]
+  \[
+  f_P = \frac{3\sqrt6/(2\pi)}{\sqrt3} = \frac{3\sqrt2}{2\pi} \approx \mathbf{0{,}675}
+  \]
+  \textbf{Conclusion sur le cahier des charges.} $f_P = 0{,}675 < 0{,}9$ : le crit\`ere de facteur de puissance \textbf{n'est pas respect\'e} par le montage P3, et l'\'ecart au seuil est important (25\,\% en de\c{c}\`a). L'origine du d\'efaut est enti\`erement contenue dans les questions pr\'ec\'edentes : chaque enroulement ne conduit qu'un tiers de p\'eriode, si bien que la valeur efficace du courant qu'il supporte ($0{,}577\,I_S$) est disproportionn\'ee devant la puissance active effectivement transmise. La solution P3 doit donc \^etre \'ecart\'ee au profit d'une structure faisant conduire chaque enroulement plus longtemps (pont PD3).
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Le transformateur devrait \^etre dimensionn\'e pour une puissance apparente $S = 1{,}73\,V_{eff}I_S$ alors que la charge n'en consomme que $1{,}17\,V_{eff}I_S$ : pr\`es de 48\,\% de puissance apparente install\'ee en exc\`es, factur\'ee au constructeur en cuivre et en fer sans contrepartie utile. C'est bien un crit\`ere de dimensionnement, et non un simple indicateur de qualit\'e r\'eseau, qui condamne ici le P3 face \`a l'exigence $f_P > 0{,}9$ du cahier des charges.
+}
+\end{tcolorbox}
+
+% ============================================================
+% EXERCICE 6 (niveau 3) -- PD2 tout thyristor, commande de l'angle d'amorcage
+% ============================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Un pont de Gra\"etz command\'e (PD2 tout thyristor) alimente une charge fortement inductive, mod\'elis\'ee par une source de courant constant $I_S$. La tension d'entr\'ee est $v(t) = \sqrt2\,V_{eff}\sin(\omega t)$. Les quatre thyristors sont amorc\'es avec un retard angulaire $\alpha$ (angle d'amor\c cage) par rapport au passage par z\'ero de $v(t)$ : la paire $T_1$-$T_2$ est amorc\'ee \`a $\theta = \alpha$ et conduit jusqu'\`a $\theta = \pi + \alpha$, o\`u la paire $T_3$-$T_4$ prend le relais.
+
+\begin{center}
+\begin{tikzpicture}[scale=0.85, >=Stealth]
+\draw[-latex] (0,0) -- (7.9,0) node[right]{$\theta$};
+\draw[-latex] (0,-1.95) -- (0,2.4) node[above]{$u_S(\theta)$};
+\draw[dashed,colSlate] (0,1.8) -- (7.4,1.8);
+\node[left,font=\small] at (0,1.8) {$\sqrt2 V_{eff}$};
+% arc 1 : theta de alpha a pi+alpha (alpha = 30 deg)
+\draw[thick,colExo,domain=30:210,samples=90,smooth,variable=\x]
+  plot ({\x*0.01778},{1.8*sin(\x)});
+% arc 2 : motif identique decale de pi (periode de repetition = pi)
+\draw[thick,colExo,domain=30:210,samples=90,smooth,variable=\x]
+  plot ({(\x+180)*0.01778},{1.8*sin(\x)});
+% saut de commutation en pi+alpha
+\draw[thick,colExo] (3.734,-0.9) -- (3.734,0.9);
+\draw[latex-] (3.79,0) -- (4.55,-1.05) node[right,font=\footnotesize]{saut de commutation};
+\draw[dotted] (0.533,0) -- (0.533,-1.55) node[below,font=\small]{$\alpha$};
+\draw[dotted] (3.734,-0.9) -- (3.734,-1.55) node[below,font=\small]{$\pi+\alpha$};
+\draw[dotted] (6.934,-0.9) -- (6.934,-1.55) node[below,font=\small]{$2\pi+\alpha$};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Justifier pourquoi, la charge \'etant fortement inductive (courant $I_S$ suppos\'e constant, jamais nul), une seule paire de thyristors conduit \`a la fois et pourquoi $u_S(\theta) = \sqrt2\,V_{eff}\sin\theta$ sur l'intervalle de conduction $[\alpha,\ \pi+\alpha]$.
+  \item Expliquer l'origine du saut de tension observ\'e sur le chronogramme en $\theta = \pi+\alpha$ et donner son amplitude en fonction de $V_{eff}$ et $\alpha$.
+  \item Montrer, par le calcul de la valeur moyenne de $u_S(\theta)$ sur une p\'eriode de conduction, que
+  \[ \langle u_S \rangle = \underbrace{\frac{2\sqrt2}{\pi}V_{eff}}_{\langle u_S \rangle_0}\cos\alpha \]
+  \item Application num\'erique : pour $V_{eff} = \SI{230}{\volt}$, calculer $\langle u_S \rangle_0$ (angle d'amor\c cage nul). Calculer $\langle u_S \rangle$ pour $\alpha = \ang{30}$. Pour quel angle $\alpha$ a-t-on $\langle u_S \rangle = 0$ ? Que peut-on dire du sens de transfert de la puissance pour $\alpha > \ang{90}$ ?
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le courant $I_S$ ne peut jamais s'annuler brutalement dans une charge fortement inductive : \`a tout instant, un et un seul couple de thyristors doit \^etre passant pour assurer la continuit\'e de $I_S$. Tant que $T_1$-$T_2$ sont amorc\'es et passants (de $\alpha$ \`a $\pi+\alpha$), la tension aux bornes de la charge est directement impos\'ee par la source : $u_S(\theta) = v(\theta) = \sqrt2\,V_{eff}\sin\theta$ (thyristors suppos\'es parfaits, chute de tension nulle \`a l'\'etat passant).
+  \item En $\theta = (\pi+\alpha)^-$, $T_1$-$T_2$ conduisent encore et $u_S = \sqrt2\,V_{eff}\sin(\pi+\alpha) = -\sqrt2\,V_{eff}\sin\alpha$ (valeur \textbf{n\'egative}). \`A $\theta = \pi+\alpha$, l'amor\c cage de $T_3$-$T_4$ commute la charge sur l'autre diagonale du pont : la source est alors vue \`a l'envers, donc $u_S = -v(\theta) = -\sqrt2\,V_{eff}\sin(\pi+\alpha) = +\sqrt2\,V_{eff}\sin\alpha$. La tension saute donc instantan\'ement de $-\sqrt2\,V_{eff}\sin\alpha$ \`a $+\sqrt2\,V_{eff}\sin\alpha$, soit une amplitude de saut
+  \[ \Delta u_S = 2\sqrt2\,V_{eff}\sin\alpha \]
+  Le motif se r\'ep\`ete ensuite \`a l'identique : la p\'eriode de $u_S$ vaut $\pi$ (2 pulsations par p\'eriode du r\'eseau), et non $2\pi$.
+  \item Valeur moyenne sur la p\'eriode de conduction $[\alpha,\ \pi+\alpha]$ (de largeur $\pi$, qui constitue la p\'eriode de r\'ep\'etition du motif $u_S$) :
+  \[
+  \langle u_S \rangle = \frac1\pi\int_\alpha^{\pi+\alpha} \sqrt2\,V_{eff}\sin\theta\,\mathrm d\theta
+  = \frac{\sqrt2\,V_{eff}}{\pi}\Big[-\cos\theta\Big]_\alpha^{\pi+\alpha}
+  = \frac{\sqrt2\,V_{eff}}{\pi}\big(\cos\alpha - \cos(\pi+\alpha)\big)
+  \]
+  Or $\cos(\pi+\alpha) = -\cos\alpha$, donc :
+  \[
+  \langle u_S \rangle = \frac{\sqrt2\,V_{eff}}{\pi}\times 2\cos\alpha = \frac{2\sqrt2}{\pi}V_{eff}\cos\alpha
+  \]
+  On retrouve bien $\langle u_S \rangle = \langle u_S \rangle_0 \cos\alpha$ avec $\langle u_S \rangle_0 = \dfrac{2\sqrt2}{\pi}V_{eff}$, la valeur moyenne du pont PD2 \`a diodes (montage non command\'e, $\alpha = 0$).
+  \item $\langle u_S \rangle_0 = \dfrac{2\sqrt2}{\pi}\times 230 \approx 0{,}9\times 230 \approx \SI{207}{\volt}$.
+
+  Pour $\alpha = \ang{30}$ : $\langle u_S \rangle = 207\times\cos(\ang{30}) = 207\times 0{,}866 \approx \SI{179}{\volt}$.
+
+  $\langle u_S \rangle = 0$ pour $\cos\alpha = 0$, soit $\alpha = \ang{90}$.
+
+  Pour $\alpha > \ang{90}$, $\cos\alpha < 0$ donc $\langle u_S \rangle < 0$ : la tension moyenne aux bornes de la charge s'inverse alors que le courant $I_S$ garde le m\^eme sens (impos\'e par la charge inductive). La puissance moyenne $\langle u_S \rangle \times I_S$ devient n\'egative : le montage transf\`ere alors de la puissance de la charge continue vers le r\'eseau alternatif -- on parle de fonctionnement en \textbf{onduleur assist\'e} (ou onduleur non autonome), possible uniquement gr\^ace \`a la commandabilit\'e des thyristors (impossible avec un pont \`a diodes, non commandable).
+\end{enumerate}
+
+\smallskip
+\textbf{Conclusion.} Le r\'eglage de $\alpha$ entre \ang{0} et \ang{180} donne acc\`es \`a une tension moyenne continu\^ument variable de $+\SI{207}{\volt}$ \`a $-\SI{207}{\volt}$ avec un courant de charge de signe constant : le pont tout thyristor couvre donc les quadrants 1 et 4 du plan $(\langle u_S \rangle,\ I_S)$, ce qui permet le freinage par r\'ecup\'eration -- exigence qu'un pont \`a diodes, limit\'e au seul quadrant 1, ne peut pas satisfaire (cf. exercice 2).
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

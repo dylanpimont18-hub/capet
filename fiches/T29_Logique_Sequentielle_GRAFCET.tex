@@ -1,0 +1,377 @@
+% Audit de veracite des citations de rapport de jury - 2026-09-20
+% Bloc 4 : citation attribuee au jury 2022 introuvable dans le corpus ; le theme
+% (cablage API / variateur) figure en 2021. Remplacee par le verbatim du
+% Rapport_Jury_2021 (l.819), annee corrigee en 2021.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ficheHeaders{T29}{Logique séquentielle, API}{colAuto}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TETE
+% -----------------------------------------------------------------------
+
+\ficheEntete{T29}{Logique séquentielle, GRAFCET, automates programmables}{colAuto}%
+  {Automatique / électronique numérique - Séquentiel}%
+  {\textbf{Présence :} \textbf{5/13} sujets (2013-2026) - thème \emph{occasionnel}}%
+  {bascules RS/D/JK - GRAFCET (au programme, jamais interrogé 2013-2026) - langages IEC 61131-3 - câblage API + variateur - algorigramme - protocoles série (UART, liaison GPS)}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colAuto,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Bascules -----------------------------------------------------
+\textbf{1.1 Bascules (éléments mémorisants)}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lccl}
+\toprule
+\textbf{Bascule} & \textbf{Entrée(s)} & \textbf{$Q_{n+1}$} & \textbf{Remarque} \\
+\midrule
+RS & $S=0,R=0$ & $Q_n$ & Mémorisation \\
+   & $S=1,R=0$ & 1 & Set \\
+   & $S=0,R=1$ & 0 & Reset \\
+   & $S=1,R=1$ & Interdit & - \\
+\midrule
+D  & $D$ & $D$ & Sur front d'horloge \\
+JK & $J=0,K=0$ & $Q_n$ & Mémorisation \\
+   & $J=1,K=1$ & $\overline{Q_n}$ & Toggle \\
+T  & $T$ & $Q_n \oplus T$ & Toggle si $T=1$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 GRAFCET ------------------------------------------------------
+\textbf{1.2 GRAFCET (IEC 60848)}
+
+\emph{N.B. — Dans les 41 sujets et rapports analysés (2013-2026), le mot « GRAFCET » n'apparaît que deux fois (référence au programme dans le sujet commun 2017), jamais comme question d'examen : les questions d'automatisme portent sur l'algorigramme, le Texte Structuré et le câblage API/variateur. Le GRAFCET reste néanmoins au programme comme langage de description (graphe d'états, logigramme, algorigramme).}
+
+\smallskip
+\textbf{Éléments constitutifs :}
+\begin{itemize}
+  \item \textbf{Étape} : rectangle numéroté (double contour = étape initiale) ; actions associées
+  \item \textbf{Transition} : trait horizontal avec réceptivité (condition booléenne)
+  \item \textbf{Liaison orientée} : flèche (sens de haut en bas par convention)
+\end{itemize}
+
+\smallskip
+\textbf{Extrait de GRAFCET (séquence linéaire) :}
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\small]
+  \node[draw, double, minimum width=8mm, minimum height=8mm] (e0) at (0,4) {0};
+  \draw (0,3.6) -- (0,3.2);
+  \draw[thick] (-0.3,3.2) -- (0.3,3.2);
+  \node[right] at (0.4,3.2) {$dcy$};
+  \draw[->] (0,3.2) -- (0,2.6);
+  \node[draw, minimum width=8mm, minimum height=8mm] (e1) at (0,2.2) {1};
+  \draw (0,1.8) -- (0,1.4);
+  \draw[thick] (-0.3,1.4) -- (0.3,1.4);
+  \node[right] at (0.4,1.4) {$t_1$};
+  \draw[->] (0,1.4) -- (0,0.8);
+  \node[draw, minimum width=8mm, minimum height=8mm] (e2) at (0,0.4) {2};
+\end{tikzpicture}
+\end{center}
+L'étape 0 (double contour) est active au repos. La transition franchie dès que $dcy$ (dcy = mise en marche) est vraie active l'étape 1 ; puis $t_1$ franchie active l'étape 2.
+
+\textbf{Règles d'évolution :}
+\begin{enumerate}
+  \item L'étape initiale est active au démarrage
+  \item Une transition est franchissable si \textbf{toutes} les étapes amont sont actives ET sa réceptivité est vraie
+  \item Le franchissement désactive les étapes amont et active les étapes aval
+  \item Plusieurs transitions franchissables le même cycle le sont toutes simultanément
+\end{enumerate}
+
+\textbf{Structures courantes :}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{ll}
+\toprule
+\textbf{Structure} & \textbf{Représentation} \\
+\midrule
+Séquence simple & Étapes en série \\
+Divergence OU & Plusieurs branches alternatives (aiguillage) \\
+Convergence OU & Réunion de branches alternatives \\
+Divergence ET & Double barre - branches simultanées \\
+Convergence ET & Double barre de synchronisation \\
+Saut / reprise & Liaison directe entre étapes non consécutives \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 Langages IEC 61131-3 -----------------------------------------
+\textbf{1.3 Langages de programmation automate (IEC 61131-3)}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lll}
+\toprule
+\textbf{Langage} & \textbf{Type} & \textbf{Usage typique} \\
+\midrule
+Ladder (LD) & Graphique & Logique contacts/bobines \\
+FBD & Graphique & Blocs PID, temporisateurs \\
+Texte Structuré (ST) & Textuel & Algorithmie, calculs \\
+SFC (GRAFCET) & Graphique & Séquencement \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Temporisateurs :} TON (ON-delay), TOF (OFF-delay), TP (impulsion). TON : sortie $Q$ active uniquement si l'entrée reste vraie pendant toute la durée $PT$.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 Ceblage API --------------------------------------------------
+\textbf{1.4 Câblage automate + variateur de vitesse}
+
+\begin{itemize}
+  \item \textbf{Sortie analogique API} (0-10 V ou 4-20 mA) - borne de consigne variateur (AI1)
+  \item \textbf{Sorties TOR API} - LI1 (sens avant), LI2 (sens arrière), LI3 (2\textsuperscript{e} vitesse)
+  \item \textbf{Entrées TOR API} - SD (signal défaut), RUN, disponible
+  \item \textbf{Entrée analogique API} - retour tachymétrique ou sortie AO variateur
+  \item \textbf{Commun 24 V DC} : toujours câbler le 0 V de référence des entrées logiques
+\end{itemize}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.5 Protocoles serie ----------------------------------------------
+\textbf{1.5 Liaison série UART}
+
+Format typique : 1 bit start + 8 bits data + 1 bit stop = \textbf{10 bits par caractère}.
+
+\[
+  T_{trame} = \frac{N_{car} \times 10}{f_{bauds}}
+  \qquad
+  \textit{Ex. (2023) : } \frac{71 \times 10}{115\,200} \approx \SI{6{,}16}{\milli\second}
+\]
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHETIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colAuto,
+  title={2. Formulaire synthétique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{5.2cm}l@{}}
+\toprule
+\textbf{Formule / Règle} & \textbf{Usage} \\
+\midrule
+$Q_{n+1}^D = D$ & Bascule D \\
+$Q_{n+1}^T = Q_n \oplus T$ & Bascule T (toggle) \\
+Transition franchissable & Étapes amont actives ET réceptivité vraie \\
+TON : $Q$ actif si IN vrai pendant $PT$ & Temporisateur \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{5.2cm}l@{}}
+\toprule
+\textbf{Formule / Règle} & \textbf{Usage} \\
+\midrule
+$I_{th} \approx 0{,}94 \times I_n$ (moteur) & Choix variateur \\
+Plage 4-20 mA : 0 mA = défaut câblé & Sécurité \\
+$T_{trame} = N_{car} \times 10 / f_{bauds}$ & UART \\
+Affectation ST : $:=$, comparaison $=$ & Syntaxe \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colAuto,
+  title={3. Questions types - extraites des sujets réels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Câblage API + variateur ATV630 \hfill\normalfont\footnotesize E2 appl. commune 2021 (Q.19-20)}
+]
+\textbf{Énoncé.}
+Compléter les schémas de puissance et de commande du variateur Schneider ATV630 (\SI{90}{kW}). Câbler le débitmètre, le capteur de pression, l'électrovanne et le pressostat aux modules d'E/S du Schneider M340.
+
+\tcbline
+
+\textbf{Corrigé — éléments clés attendus.}
+\begin{itemize}
+  \item Schéma puissance : alimentation triphasée - disjoncteur-moteur - bornes L1/L2/L3 du variateur ; bornes U/V/W - moteur. Courant variateur : $I_{th} \geq 0{,}94 \times I_{nom} \approx \SI{170}{\ampere}$.
+  \item Schéma commande : sortie AO du M340 (0-10 V ou 4-20 mA) - AI1 du variateur (consigne vitesse).
+  \item Sortie TOR M340 - LI1 (marche/arrêt) ; LI2 si inversion de sens.
+  \item Entrée TOR M340 - SD (défaut variateur) pour signalisation.
+  \item \textbf{Ne pas oublier :} commun 0 V entre l'API et le variateur (borne COM).
+\end{itemize}
+
+\textbf{Conclusion.} L'architecture de puissance et de commande, ainsi que les points de câblage identifiés (consigne, retour défaut, commun 0 V), sont conformes au cahier des charges fonctionnel de la liaison API-variateur.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Algorigramme de gestion de volume \hfill\normalfont\footnotesize E2 appl. commune 2021 (Q.24)}
+]
+\textbf{Énoncé.}
+Proposer un algorigramme du bloc fonction « Contrôler le volume ». Définir les sorties \textit{Res\_plein} et \textit{Res\_vide} en fonction de la mesure de volume.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Entrée.} $V_{mes}$ [m$^3$] (mesure de volume issue de la chaîne capteur + CAN).
+
+\textbf{Étape 2 — Tests de seuil.}
+\begin{enumerate}
+  \item SI $V_{mes} \geq 0{,}95 \times V_{max}$ - \textit{Res\_plein} $:= 1$
+  \item SI $V_{mes} \leq 0{,}05 \times V_{max}$ - \textit{Res\_vide} $:= 1$
+  \item Sinon : \textit{Res\_plein} $:= 0$ ; \textit{Res\_vide} $:= 0$
+\end{enumerate}
+
+Structure de contrôle : deux SI-ALORS-SINON imbriqués (ou juxtaposés). En Texte Structuré :
+\begin{center}
+\small\ttfamily
+IF Vmes >= 0.95*Vmax THEN Res\_plein := TRUE; ELSE Res\_plein := FALSE; END\_IF;
+\end{center}
+
+\textbf{Conclusion.} Cette logique de seuils à 5\,\% de marge de part et d'autre évite les basculements intempestifs autour des bornes exactes : elle est directement exploitable en API et conforme au cahier des charges de surveillance du volume.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Durée de transmission UART \hfill\normalfont\footnotesize E2 disciplinaire 2023}
+]
+\textbf{Énoncé.}
+Une trame GPS (protocole NMEA) comporte 71 caractères. La liaison est configurée à 115 200 bauds, format 8N1. Calculer la durée de transmission de la trame.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Bits par caractère.} Format 8N1 : 1 bit start + 8 bits data + 1 bit stop = 10 bits/caractère.
+
+\textbf{Étape 2 — Durée de trame.}
+\[
+  T_{trame} = \frac{71 \times 10}{115\,200} \approx \SI{6{,}16}{\milli\second}
+\]
+
+\textbf{Conclusion.} La tâche automate qui lit la liaison série doit avoir une période de scrutation strictement inférieure à $T_{trame} \approx 6{,}16\,\mathrm{ms}$ pour éviter la perte de trame : c'est cette contrainte de scrutation, et non le seul calcul de durée, qui conditionne la conformité de l'architecture de communication.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs récurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Câblage variateur - le commun 24 V.} Oublier le câblage du commun 0 V entre l'API et le variateur est la première cause d'erreur. Les entrées logiques LI du variateur sont référencées à ce commun.
+
+  \item \textbf{4-20 mA : 0 mA signifie une rupture de câble.} C'est l'avantage de la boucle de courant sur le 0-10 V : 0 mA est détectable comme un défaut.
+
+  \item \textbf{Algorigramme : structures de contrôle.} Le jury déplore que les "notions de base d'algorithmie ne soient pas maîtrisées" (2021). Distinguer SI (test unique), TANT QUE (boucle conditionnelle), POUR (boucle à compteur).
+
+  \item \textbf{Langage Texte Structuré.} L'affectation est $:=$ (pas $=$) ; la comparaison est $=$. Terminer chaque instruction par un point-virgule.
+
+  \item \textbf{GRAFCET - action vs réceptivité.} L'action est associée à l'étape (ce qui se fait pendant que l'étape est active) ; la réceptivité est associée à la transition (condition pour quitter l'étape).
+
+  \item \textbf{Schéma électrique : point noir récurrent.} Moyenne de 4,8/20 en 2021 sur la partie câblage. Le jury attend la maîtrise complète du schéma variateur (puissance + commande).
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2021 : «~Les candidats doivent acquérir des connaissances dans l'algorithmie et dans la réalisation de schémas électriques prenant appui sur de la documentation constructeur. Ces notions sont largement accessibles à un étudiant de BTS.~»\\
+Rapport jury 2021 : «~Le jury constate que beaucoup de candidats ne sont pas à l'aise dans la réalisation de schémas électriques. Un candidat au CAPET doit être capable de câbler une entrée ou une sortie TOR analogique d'un automate industriel programmable, ainsi que la partie commande d'un variateur de fréquence.~»
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PRESENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colPresence,
+  title={Présence dans les sujets analysés (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Année} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+Câblage API/variateur & - & - & - & - & - & $\checkmark$ & - & - & $\checkmark$ & $\checkmark$ & - & - & - \\
+Algorigramme / ST   & - & - & - & - & - & - & - & - & $\checkmark$ & - & - & $\checkmark$ & - \\
+Protocoles série    & - & - & - & - & - & - & - & - & - & - & $\checkmark$ & $\checkmark$ & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-thèmes fréquents :}
+câblage API + variateur (puissance + commande) - algorigramme bloc fonction - choix du variateur ($I_{th}$) - protocole UART (durée trame, chronogramme) - algorithmie en Texte Structuré
+
+\medskip
+\textbf{Ordres de grandeur (repères rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Réseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, fréquence \SI{50}{\hertz}.
+  \item Courants d'étude fréquents en sujet : de quelques \si{\ampere} à quelques dizaines de \si{\ampere}.
+  \item En conversion d'énergie, un rendement attendu reste généralement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthèse express (à refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypothèses du modèle et les conventions de signe.
+  \item Écrire 2 à 4 relations clés avec unités.
+  \item Réaliser un calcul numérique complet et vérifier l'ordre de grandeur.
+  \item Justifier le résultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE

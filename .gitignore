@@ -1,1 +1,31 @@
 .superpowers/
+
+# Archives sources (volumineuses, non modifiées — conservées hors git)
+*.zip
+
+# Fichiers auxiliaires LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+texput.log
+
+# PDF compilés : régénérables depuis les .tex
+fiches/*.pdf
+exercices/*.pdf
+manuel/*.pdf
+manuel/pdf/
+
+# App de révision — artefacts régénérables (cf. scripts/build_cards.py)
+app/svg/
+app/cards.json
+app/sw-assets.js
+
+# Rendus PNG d inspection visuelle (regenerables)
+exercices/_png/
+fiches/_png/

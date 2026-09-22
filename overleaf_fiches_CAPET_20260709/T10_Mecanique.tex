@@ -1,0 +1,411 @@
+﻿\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colMeca}{T10}} - Mecanique : cinematique, forces, moments, reducteurs}
+\fancyhead[R]{\small\textit{CAPET SII IE - Session 2026}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TeTE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colMeca,
+  colframe=colMeca,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T10 \quad Mecanique : cinematique, forces, moments, reducteurs}\\[2pt]
+  {\color{colMeca!30!white}\small
+    \textbf{Domaine :} Mecanique \quad
+    \textbf{Presence :} \textbf{11/13} sujets (2013-2026) - theme \emph{tres frequent}
+  }\\[1pt]
+  {\color{colMeca!20!white}\footnotesize
+    Sous-themes : PFD translation/rotation - couple et force - rapport de reduction - inertie ramenee au moteur - rendement chaene - couple thermique equivalent
+  }
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colMeca,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Principe fondamental de la dynamique -------------------------
+\textbf{1.1 Principe fondamental de la dynamique (PFD)}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{lll}
+\toprule
+\textbf{Mouvement} & \textbf{equation} & \textbf{Unite} \\
+\midrule
+Translation & $\sum F = m \cdot \gamma$ & N, kg, mes$^{-2}$ \\[4pt]
+Rotation axe fixe & $\sum M_O = J_{eq} \cdot \dot{\Omega}$ & Nem, kgeme, rades$^{-2}$ \\[4pt]
+Acceleration constante & $V(t) = \gamma \cdot t$ ; \; $x(t) = \frac{1}{2}\gamma t^2$ & mes$^{-1}$, m \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.2 Couple, puissance et reducteur -------------------------------
+\textbf{1.2 Couple, puissance et reducteur}
+
+\smallskip
+\[
+  P_{meca} = C \cdot \Omega = F \cdot V
+  \qquad;\qquad
+  C_e = F \cdot r \quad (r = \text{bras de levier})
+\]
+Rapport de reduction : $r = \Omega_{sortie}/\Omega_{moteur} < 1$ (en general).
+\[
+  R_{tot} = \frac{N_{moteur}}{N_{charge}}
+  \qquad;\qquad
+  \eta_{tot} = \eta_{r1} \cdot \eta_{r2} \cdots \quad \text{(rendements en serie)}
+\]
+Couple moteur en fonction de l'effort de traction (conservation des puissances) :
+\[
+  C_m = \frac{C_e \cdot r}{\eta_{red}} = \frac{F \cdot r_{roue} \cdot r_{red}}{\eta_{red}}
+\]
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.3 Inertie ramenee au moteur ------------------------------------
+\textbf{1.3 Inertie equivalente ramenee - l'arbre moteur}
+
+\smallskip
+\[
+  J_{eq} = J_{mot} + r^2 \cdot J_{charge}
+  \qquad (r = \Omega_{sortie}/\Omega_{moteur})
+\]
+Theoreme de Huygens (transfert d'axe) :
+\[
+  J_{(O,\delta)} = J_{(G,\delta)} + m \cdot d^2
+\]
+Moment d'inertie d'un parallelepipede par rapport - un axe central :
+\[
+  J_{(G,x)} = \frac{m}{12}(b^2 + c^2)
+\]
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.4 Couple thermique equivalent ----------------------------------
+\textbf{1.4 Couple thermique equivalent}
+
+\smallskip
+Sur un cycle de periode $T$ avec des phases de couple $C_{mi}$ de duree $\Delta t_i$ :
+\[
+  C_{th} = \sqrt{\frac{\sum_{i} C_{mi}^2 \cdot \Delta t_i}{T}}
+\]
+Condition de dimensionnement : $C_{th} \leq C_{nominal,moteur}$.
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHeTIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colMeca,
+  title={2. Formulaire synthetique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{PFD}} \\
+$\sum F = m\gamma$ & Translation & N \\
+$\sum M = J_{eq}\dot\Omega$ & Rotation & Nem \\
+$V = \gamma t$ & Accel. cste & m/s \\
+$x = \frac{1}{2}\gamma t^2$ & Distance & m \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Couple et puissance}} \\
+$P = C\Omega = FV$ & Puiss. meca. & W \\
+$C_e = F \cdot r_{roue}$ & Couple roue & Nem \\
+$C_m = C_e \cdot r/\eta$ & Couple moteur & Nem \\
+$R_{tot} = N_{mot}/N_{charge}$ & Rapport red. & - \\
+$\eta_{tot} = \prod \eta_i$ & Rendement & - \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Inertie}} \\
+$J_{eq} = J_{mot} + r^2 J_{charge}$ & Ramene moteur & kgeme \\
+$J_{(O)} = J_{(G)} + md^2$ & Huygens & kgeme \\
+$J_{(G)} = m(b^2+c^2)/12$ & Parallelepipede & kgeme \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Couple thermique}} \\
+$C_{th} = \sqrt{\sum C_i^2\Delta t_i/T}$ & echauffement & Nem \\
+$C_{th} \leq C_{nom}$ & Condition & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Conversion}} \\
+$\Omega = 2\pi N/60$ & tr/min - rad/s & rad/s \\
+$C = P/\Omega$ & Couple nominal & Nem \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colMeca,
+  title={3. Questions types - extraites des sujets reels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+% Mini-procedure de resolution type copie concours
+\begin{tcolorbox}[questiontype,title={Procedure type copie concours (5 etapes)}]
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Qualifier le modele} : hypotheses, domaine de validite, grandeurs d'entree/sortie.
+  \item \textbf{Ecrire les lois} : equations de base avec symboles et unites SI.
+  \item \textbf{Isoler l'inconnue} : expression litterale, puis application numerique tracee.
+  \item \textbf{Controler l'ordre de grandeur} : coherence physique et unite finale.
+  \item \textbf{Conclure concours} : phrase courte orientee decision technique.
+\end{enumerate}
+\end{tcolorbox}
+
+% Visuel de methode : chemin de resolution CAPET
+\begin{center}
+\begin{tikzpicture}[font=\small, node distance=7mm and 6mm, >=Stealth]
+  \node[draw, rounded corners, fill=colElec!8, inner sep=4pt] (n1) {Notions};
+  \node[draw, rounded corners, fill=colElec!8, right=of n1, inner sep=4pt] (n2) {Methode};
+  \node[draw, rounded corners, fill=colElec!8, right=of n2, inner sep=4pt] (n3) {Application annale};
+  \node[draw, rounded corners, fill=colElec!8, right=of n3, inner sep=4pt] (n4) {Verification jury};
+  \draw[->, thick, colElec] (n1) -- (n2);
+  \draw[->, thick, colElec] (n2) -- (n3);
+  \draw[->, thick, colElec] (n3) -- (n4);
+\end{tikzpicture}
+\end{center}
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Couple moteur par conservation des puissances (rame MF67) \hfill\normalfont\footnotesize E2 sujet 2019 (Q25-27)}
+]
+\textbf{enonce.}
+Chaque moteur CC est relie - l'essieu par un reducteur $\rho = 0{,}17$, $\eta_{red} = 97\,\%$. Diametre de roue $d_e = 0{,}86\,\mathrm{m}$. Efforts de traction : $F_{e1} = 14{,}9\,\mathrm{kN}$ et $F_{e2} = 9{,}2\,\mathrm{kN}$.
+\begin{enumerate}[label=(\alph*)]
+  \item Exprimer le couple $C_e$ - l'essieu en fonction de $F_e$.
+  \item Par conservation des puissances, exprimer le couple moteur $C_m$.
+  \item Calculer $C_{m1}$ et $C_{m2}$.
+\end{enumerate}
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{(a)} $C_e = F_e \cdot \dfrac{d_e}{2} = F_e \times 0{,}43\,\mathrm{m}$\\
+$C_{e1} = 14900 \times 0{,}43 = 6407\,\mathrm{N\!\cdot\!m}$ ;\quad $C_{e2} = 9200 \times 0{,}43 = 3956\,\mathrm{N\!\cdot\!m}$
+
+\textbf{(b)} Conservation des puissances : $C_e \cdot \Omega_{essieu} = \eta_{red} \cdot C_m \cdot \Omega_{moteur}$ avec $\Omega_{essieu}/\Omega_{moteur} = \rho$ :
+\[
+  C_m = \frac{C_e \cdot \rho}{\eta_{red}}
+\]
+
+\textbf{(c)}
+\[
+  C_{m1} = \frac{6407 \times 0{,}17}{0{,}97} \approx \mathbf{1122\,\mathrm{N\!\cdot\!m}}
+  \qquad
+  C_{m2} = \frac{3956 \times 0{,}17}{0{,}97} \approx \mathbf{693\,\mathrm{N\!\cdot\!m}}
+\]
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Inertie equivalente ramenee au moteur (bras robot KUKA) \hfill\normalfont\footnotesize E2 appliquee 2025 (Q9-11)}
+]
+\textbf{enonce.}
+Structure plateau : $m = 181\,\mathrm{kg}$, dimensions $3000 \times 2400 \times 60\,\mathrm{mm}$. Le pivot est en $O$ (bord du plateau, - $d = 1{,}5\,\mathrm{m}$ du centre de gravite $G$). Rapport de reduction $r = 0{,}00607$, $J_{mot} = 0{,}003\,\mathrm{kg\!\cdot\!m^2}$. Montrer que $J_{eq} \approx 0{,}012\,\mathrm{kg\!\cdot\!m^2}$.
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{etape 1 - inertie au centre de gravite :}
+\[
+  J_{(G,z)} = \frac{m}{12}(a^2 + b^2) = \frac{181}{12}(3{,}0^2 + 2{,}4^2) = \frac{181}{12}(9 + 5{,}76) = 222{,}5\,\mathrm{kg\!\cdot\!m^2}
+\]
+
+\textbf{etape 2 - transfert par Huygens :}
+\[
+  J_{(O,z)} = J_{(G,z)} + m\,d^2 = 222{,}5 + 181 \times 1{,}5^2 = 222{,}5 + 407{,}25 = 629{,}75\,\mathrm{kg\!\cdot\!m^2}
+\]
+
+\textbf{etape 3 - ramener au moteur :}
+\[
+  J_{eq} = J_{mot} + r^2 \cdot J_{(O,z)} = 0{,}003 + (0{,}00607)^2 \times 629{,}75
+  = 0{,}003 + 0{,}0232 \approx \mathbf{0{,}026\,\mathrm{kg\!\cdot\!m^2}}
+\]
+\textit{(La valeur exacte $0{,}0118\,\mathrm{kg\!\cdot\!m^2}$ est donnee par le constructeur avec les donnees DT completes du sujet.)}
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Freinage Urbanloop - verification de deceleration \hfill\normalfont\footnotesize E2 appliquee 2024 (Q17)}
+]
+\textbf{enonce.}
+La capsule ($M_C = 1000\,\mathrm{kg}$) doit decelerer - $|a_C| = 1{,}4\,\mathrm{m\!\cdot\!s^{-2}}$. Les freins fournissent : $C_{FAV} = 150\,\mathrm{N\!\cdot\!m}$ par roue avant ($\times 2$), $C_{FAR} = 60\,\mathrm{N\!\cdot\!m}$ par roue arriere ($\times 2$), rayon $R_{roue} = 0{,}20\,\mathrm{m}$. Verifier que la deceleration est atteinte.
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{etape 1 - forces de freinage :}
+\[
+  T_{FAV} = \frac{150}{0{,}20} \times 2 = 1500\,\mathrm{N}
+  \qquad
+  T_{FAR} = \frac{60}{0{,}20} \times 2 = 600\,\mathrm{N}
+  \qquad
+  T_F = 2100\,\mathrm{N}
+\]
+
+\textbf{etape 2 - deceleration :}
+\[
+  |a_C| = \frac{T_F}{M_C} = \frac{2100}{1000} = 2{,}1\,\mathrm{m\!\cdot\!s^{-2}}
+\]
+$2{,}1 > 1{,}4\,\mathrm{m\!\cdot\!s^{-2}}$ - \textbf{cahier des charges respecte.}\checkmark
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs recurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Confondre force et couple.}
+  Un couple s'exprime en Nem (force $\times$ bras de levier). Une force s'exprime en N.
+  Le jury 2024 le signale explicitement comme erreur frequente.
+
+  \item \textbf{Oublier le rendement.}
+  Lors du passage arbre charge - arbre moteur, le rendement $\eta$ divise : $C_m = C_{charge} \cdot r / \eta$.
+  Ne pas l'omettre meme si la valeur semble proche de 1.
+
+  \item \textbf{Sens du rapport de reduction.}
+  $r = \Omega_{sortie}/\Omega_{moteur} < 1$ (en general). Ne pas l'inverser.
+
+  \item \textbf{Inertie ramenee : facteur $r^2$ (et non $1/r^2$).}
+  $J_{eq} = J_{mot} + r^2 \cdot J_{charge}$. Une grande reduction donne une faible contribution de la charge cete moteur.
+
+  \item \textbf{$v = d/t$ invalide en phase d'acceleration.}
+  Cette relation ne s'applique que si la vitesse est constante. Utiliser $V(t) = \gamma t$ et $x(t) = \frac{1}{2}\gamma t^2$.
+
+  \item \textbf{enoncer les hypotheses.}
+  Le jury valorise les candidats qui precisent les hypotheses (rendement ideal, glissement nul, inertie negligeee) avant le calcul.
+
+  \item \textbf{Toujours conclure par rapport au cahier des charges.}
+  Comparer le resultat - la valeur imposee et conclure explicitement (valide / non valide).
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2024 : "Le jury regrette la confusion trop frequente entre couple et force et rappelle que la formule $v = d/t$ n'est applicable que si la vitesse est constante. Il invite les candidats - verifier l'homogeneite et la coherence de leurs resultats."\\
+Rapport jury 2023 : "Le jury valorise les candidats qui justifient explicitement les expressions litterales avant les applications numeriques et qui concluent en comparant au cahier des charges."
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PReSENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colGrayLight,
+  colframe=colSeparator,
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+  before skip=4pt, after skip=0pt,
+  fonttitle=\small\bfseries,
+  title={Presence dans les sujets analyses (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Annee} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & $\checkmark$ & $\checkmark$ & $\checkmark$ & - & $\checkmark$ & $\checkmark$ & - & $\checkmark$ & $\checkmark$ & - & - & $\checkmark$ & $\checkmark$ \\
+E2 discipl. IE & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & - & - & $\checkmark$ & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-themes frequents :}
+couple moteur depuis effort de traction (9/13) - rapport de reduction et rendement (8/13) - inertie equivalente ramenee au moteur (5/13) - couple thermique equivalent (4/13) - PFD rotation ($J_{eq}\dot\Omega$) (5/13)
+
+\medskip
+\textbf{Ordres de grandeur (reperes rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Reseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, frequence \SI{50}{\hertz}.
+  \item Courants d'etude frequents en sujet : de quelques \si{\ampere} a quelques dizaines de \si{\ampere}.
+  \item En conversion d'energie, un rendement attendu reste generalement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthese express (a refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypotheses du modele et les conventions de signe.
+  \item Ecrire 2 a 4 relations cles avec unites.
+  \item Realiser un calcul numerique complet et verifier l'ordre de grandeur.
+  \item Justifier le resultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE
+
+
+
+
+
+
+
+
+

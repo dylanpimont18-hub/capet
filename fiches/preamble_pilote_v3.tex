@@ -1,0 +1,91 @@
+% preamble_pilote_v3.tex — PILOTE JETABLE — direction "hybride éditorial"
+% Corps serif Palatino moderne (newpx) + titres sans Source Sans Pro,
+% barres latérales colorées, look manuel technique contemporain.
+\input{preamble}
+
+% ── Polices ──────────────────────────────────────────────────────────
+\usepackage{newpxtext}
+\usepackage{newpxmath}
+\usepackage{sourcesanspro} % \sffamily = Source Sans (titres, en-têtes)
+
+% ── Palette ──────────────────────────────────────────────────────────
+\definecolor{colInk}{RGB}{26, 30, 36}
+\definecolor{colSlate}{RGB}{92, 103, 118}
+\definecolor{colRule}{RGB}{209, 213, 219}
+\definecolor{colJuryBg}{RGB}{253, 248, 235}
+\AtBeginDocument{\color{colInk}}
+
+% ── En-tête / pied de page ───────────────────────────────────────────
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\newcommand{\ficheHeaders}[3]{%
+  \fancyhead[L]{\small\sffamily{\bfseries\textcolor{#3}{#1}}\hspace{0.7em}\textcolor{colSlate}{#2}}%
+  \fancyhead[R]{\small\sffamily\textcolor{colSlate}{CAPET SII IE\, --- \,Session 2026}}%
+  \fancyfoot[C]{\small\sffamily\textcolor{colSlate}{\thepage\,/\,\pageref{LastPage}}}%
+  \fancyhead[C]{}\fancyfoot[L]{}\fancyfoot[R]{}%
+}
+\AtBeginDocument{%
+  \renewcommand{\headrule}{{\color{colRule}\hrule width\headwidth height 0.5pt}}%
+}
+
+% ── Bloc en-tête de fiche : pavé à barre latérale épaisse ────────────
+\newcommand{\ficheEntete}[6]{%
+  \begin{tcolorbox}[enhanced, breakable,
+    colback=#3!5!white,
+    frame hidden, boxrule=0pt, arc=0mm,
+    borderline west={4pt}{0pt}{#3},
+    left=10pt, right=8pt, top=7pt, bottom=7pt,
+    before skip=0pt, after skip=6pt]
+    {\sffamily\bfseries\LARGE\textcolor{#3}{#1}\hspace{0.7em}\textcolor{colInk}{#2}}\\[4pt]
+    {\sffamily\small\textcolor{colSlate}{\MakeUppercase{#4}\quad\textbar\quad #5}}\\[1pt]
+    {\sffamily\footnotesize\textcolor{colSlate}{Sous-thèmes : #6}}
+  \end{tcolorbox}%
+}
+
+% ── Sections : barre latérale + titre sans coloré, fond blanc ────────
+\tcbset{
+  ficheSection/.style={
+    breakable, enhanced jigsaw,
+    frame hidden, boxrule=0pt, arc=0mm,
+    colback=white,
+    colbacktitle=white,
+    coltitle=#1!75!black,
+    fonttitle=\sffamily\bfseries\large,
+    borderline west={2.5pt}{0pt}{#1},
+    left=9pt, right=0pt, top=4pt, bottom=2pt,
+    toptitle=1pt, bottomtitle=2pt, lefttitle=9pt,
+    before skip=12pt, after skip=8pt,
+  }
+}
+
+% ── Questions types : carte à filet fin, titre sans sombre ───────────
+\tcbset{
+  questiontype/.style={
+    breakable, enhanced jigsaw,
+    colback=white,
+    colframe=colRule, boxrule=0.6pt, arc=1mm,
+    colbacktitle=colGrayLight,
+    coltitle=colInk,
+    fonttitle=\sffamily\bfseries\small,
+    titlerule=0pt, toptitle=2.5pt, bottomtitle=2.5pt,
+    left=7pt, right=6pt, top=4pt, bottom=4pt,
+    before skip=8pt, after skip=8pt,
+  }
+}
+
+% ── Jury : fond crème, barre ambre, titre sans ───────────────────────
+\tcbset{
+  jury/.style={
+    breakable, enhanced jigsaw,
+    colback=colJuryBg,
+    frame hidden, boxrule=0pt, arc=0mm,
+    borderline west={2.5pt}{0pt}{colJuryFrame},
+    coltitle=colJuryFrame!80!black,
+    fonttitle=\sffamily\bfseries,
+    left=9pt, right=6pt, top=4pt, bottom=4pt,
+    before skip=12pt, after skip=8pt,
+  }
+}
+
+% couleur du bloc 5 (présence)
+\definecolor{colPresence}{RGB}{83, 98, 118}

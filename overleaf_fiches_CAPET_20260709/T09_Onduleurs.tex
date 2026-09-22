@@ -1,0 +1,405 @@
+﻿\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colElec}{T09}} - Onduleurs (monophase et triphase)}
+\fancyhead[R]{\small\textit{CAPET SII IE - Session 2026}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TeTE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colElec,
+  colframe=colElec,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T09 \quad Onduleurs (monophase et triphase)}\\[2pt]
+  {\color{colElec!30!white}\small
+    \textbf{Domaine :} electrotechnique - electronique de puissance \quad
+    \textbf{Presence :} \textbf{9/13} sujets (2013-2026) - theme \emph{tres frequent}
+  }\\[1pt]
+  {\color{colElec!20!white}\footnotesize
+    Sous-themes : pleine onde (creneau) - MLI sinusoedale - THD - norme IEC 61000-2-2 - onduleur triphase (machine asynchrone, MSAP) - elotage vs reseau
+  }
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Onduleur pleine onde -----------------------------------------
+\textbf{1.1 Onduleur pleine onde - tension en creneau}
+
+\smallskip
+Un creneau $\pm V_{DC}$ a une valeur efficace egale - $V_{DC}$ (le carre est constant) :
+\[
+  V_{eff,mono} = V_{DC}
+\]
+Decomposition en serie de Fourier (harmoniques impairs seulement) :
+\[
+  V_n = \frac{4V_{DC}}{n\pi} \quad (n \text{ impair} : 1, 3, 5, 7, \ldots)
+  \qquad;\qquad
+  V_1 = \frac{4V_{DC}}{\pi} \approx 1{,}273\,V_{DC}
+\]
+Pour un onduleur triphase equilibre, les rangs multiples de 3 disparaissent des tensions composees : rangs presents = $6k \pm 1$ ($1, 5, 7, 11, 13, \ldots$).
+
+Valeur efficace tension composee (pleine onde triphase, commande $120^\circ$) :
+\[
+  V_{eff,comp} = \sqrt{\frac{2}{3}} \cdot V_{DC} \approx 0{,}816\,V_{DC}
+\]
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.2 Taux de distorsion harmonique --------------------------------
+\textbf{1.2 Taux de distorsion harmonique (THD)}
+
+\smallskip
+\[
+  \mathrm{THD} = \frac{\sqrt{\displaystyle\sum_{n=2}^{\infty} V_n^2}}{V_1}
+  \qquad \text{(denominateur = fondamental } V_1 \text{, pas la valeur efficace totale)}
+\]
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{llll}
+\toprule
+\textbf{Structure} & \textbf{THD} & \textbf{Norme IEC 61000-2-2} & \textbf{Conforme } \\
+\midrule
+Pleine onde triphase & $59\,\%$ & $< 25\,\%$ & Non \\
+MLI ($f_p = 6\,\mathrm{kHz}$) & $25\,\%$ & $< 25\,\%$ & Limite \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.3 MLI sinusoedale ----------------------------------------------
+\textbf{1.3 MLI sinusoedale - indices de modulation}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{lll}
+\toprule
+\textbf{Indice} & \textbf{Definition} & \textbf{Rele} \\
+\midrule
+Amplitude : $m_a = \hat{V}_{ref}/\hat{V}_{porteuse}$ & $m_a \leq 1$ : lineaire & Contrele l'amplitude du fondamental \\[4pt]
+Frequence : $m_f = f_{porteuse}/f_{fondamental}$ & Ex. $m_f = 6000/50 = 120$ & Localise les harmoniques - $m_f \cdot f$ \\[4pt]
+Fondamental MLI : $\hat{V}_1 = m_a \cdot V_{DC}/2$ & (monophase) & Valide pour $m_a \leq 1$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+La MLI repousse les harmoniques - haute frequence ($\approx m_f \cdot f = 6\,\mathrm{kHz}$), naturellement attenues par l'effet inductif des enroulements de la machine.
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.4 Frequence statorique (machine) -------------------------------
+\textbf{1.4 Frequence de commande - machine tournante}
+
+\smallskip
+\[
+  f_s = \frac{p \cdot n_m}{60} \qquad (p = \text{nb paires de peles},\; n_m = \text{vitesse en tr/min})
+\]
+L'onduleur doit generer \textbf{exactement} cette frequence statorique pour imposer la vitesse souhaitee.
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHeTIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthetique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Pleine onde}} \\
+$V_{eff} = V_{DC}$ & Creneau mono & V \\
+$V_{eff,comp} = \sqrt{2/3}\,V_{DC}$ & Triphase comp. & V \\
+$V_n = 4V_{DC}/(n\pi)$ & Harmonique $n$ & V \\
+$V_1 \approx 1{,}273\,V_{DC}$ & Fondamental & V \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{THD}} \\
+$\mathrm{THD} = \sqrt{\sum V_n^2}/V_1$ & General & - \\
+$\mathrm{THD}_{po,mono} \approx 0{,}484$ & Pleine onde & - \\
+Norme IEC : THD $< 25\,\%$ & Limite & - \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{MLI}} \\
+$m_a = \hat{V}_{ref}/\hat{V}_{porteuse}$ & Indice ampli & - \\
+$m_f = f_p/f$ & Indice freq. & - \\
+$\hat{V}_1 = m_a \cdot V_{DC}/2$ & Fondamental & V \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Machine tournante}} \\
+$f_s = p \cdot n_m/60$ & Freq. statoriq. & Hz \\
+$U = \sqrt{3}\,V$ & Comp./simple & V \\
+$S = V_{eff} I_{eff}$ & Puiss. app. & VA \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Donnees numeriques}} \\
+THD pleine onde trip. & $59\,\%$ & - \\
+THD MLI $6\,\mathrm{kHz}$ & $25\,\%$ & - \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets reels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+% Mini-procedure de resolution type copie concours
+\begin{tcolorbox}[questiontype,title={Procedure type copie concours (5 etapes)}]
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Qualifier le modele} : hypotheses, domaine de validite, grandeurs d'entree/sortie.
+  \item \textbf{Ecrire les lois} : equations de base avec symboles et unites SI.
+  \item \textbf{Isoler l'inconnue} : expression litterale, puis application numerique tracee.
+  \item \textbf{Controler l'ordre de grandeur} : coherence physique et unite finale.
+  \item \textbf{Conclure concours} : phrase courte orientee decision technique.
+\end{enumerate}
+\end{tcolorbox}
+
+% Visuel de methode : chemin de resolution CAPET
+\begin{center}
+\begin{tikzpicture}[font=\small, node distance=7mm and 6mm, >=Stealth]
+  \node[draw, rounded corners, fill=colElec!8, inner sep=4pt] (n1) {Notions};
+  \node[draw, rounded corners, fill=colElec!8, right=of n1, inner sep=4pt] (n2) {Methode};
+  \node[draw, rounded corners, fill=colElec!8, right=of n2, inner sep=4pt] (n3) {Application annale};
+  \node[draw, rounded corners, fill=colElec!8, right=of n3, inner sep=4pt] (n4) {Verification jury};
+  \draw[->, thick, colElec] (n1) -- (n2);
+  \draw[->, thick, colElec] (n2) -- (n3);
+  \draw[->, thick, colElec] (n3) -- (n4);
+\end{tikzpicture}
+\end{center}
+\begin{tcolorbox}[questiontype,
+  title={QT1 - THD pleine onde vs MLI - conformite norme IEC \hfill\normalfont\footnotesize E2 disciplinaire 2024 (B11-B13)}
+]
+\textbf{enonce.}
+Deux cas de commande pour un onduleur triphase (variateur d'extracteur d'air) :
+\begin{itemize}
+  \item Pleine onde : $V_1 = 170\,\mathrm{V}$, $V_5 = 95\,\mathrm{V}$, $V_7 = 27\,\mathrm{V}$, $V_{11} = 27\,\mathrm{V}$, $V_{13} = 20\,\mathrm{V}$.
+  \item MLI $f_p = 6\,\mathrm{kHz}$ : $V_1 = 170\,\mathrm{V}$, $V_{119} = 37\,\mathrm{V}$, $V_{121} = 22\,\mathrm{V}$.
+\end{itemize}
+Calculer le THD dans chaque cas. Conclure par rapport - la norme IEC/EN 61000-2-2 ($\mathrm{THD} < 25\,\%$).
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{Pleine onde :}
+\[
+  \mathrm{THD}_1 = \frac{\sqrt{95^2 + 27^2 + 27^2 + 20^2}}{170}
+  = \frac{\sqrt{9025 + 729 + 729 + 400}}{170}
+  = \frac{\sqrt{10883}}{170}
+  = \frac{104{,}3}{170} \approx \mathbf{0{,}59 = 59\,\%}
+\]
+Non conforme ($59\,\% > 25\,\%$).
+
+\textbf{MLI $6\,\mathrm{kHz}$ :}
+\[
+  \mathrm{THD}_2 = \frac{\sqrt{37^2 + 22^2}}{170}
+  = \frac{\sqrt{1369 + 484}}{170}
+  = \frac{\sqrt{1853}}{170}
+  \approx \mathbf{0{,}25 = 25\,\%}
+\]
+Conforme (limite atteinte). La MLI repousse les harmoniques aux rangs $119$ et $121$ (${\approx}\,6\,\mathrm{kHz}$), naturellement filtres par l'inductance des enroulements de la machine.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Identification des convertisseurs dans une chaene PV \hfill\normalfont\footnotesize Rapport jury 2025 (Q14)}
+]
+\textbf{enonce.}
+Dans la chaene de conversion d'un site isole de Mafate : PV - CV1 - bus DC - CV3 - reseau local $230\,\mathrm{V}$, $50\,\mathrm{Hz}$. Identifier la nature de CV1 et CV3, et justifier.
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{CV1 :} DC - DC, adapte la tension PV variable au bus DC - \textbf{Hacheur Boost} (MPPT).\\
+\textbf{CV3 :} DC - AC, convertit le bus DC en tension AC $230\,\mathrm{V}$, $50\,\mathrm{Hz}$ pour le reseau local - \textbf{Onduleur}.
+
+\textit{Le jury note : "Les fonctions explicites doivent etre nommees et justifiees, pas seulement schematisees." - justifier par le sens du flux d'energie (DCeAC = onduleur).}
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Onduleur triphase - frequence statorique (MSAP Urbanloop) \hfill\normalfont\footnotesize E2 appliquee 2024}
+]
+\textbf{enonce.}
+Une MSAP ($p = 14$ paires de peles, rayon roue $R = 0{,}137\,\mathrm{m}$) est alimentee par un onduleur triphase ($V_{DC} = 72\,\mathrm{V}$). La capsule roule - $V_0 = 60\,\mathrm{km/h}$. Calculer la vitesse de rotation $n_m$ puis la frequence statorique $f_s$ - imposer - l'onduleur.
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{etape 1 - vitesse de rotation :}
+\[
+  V_0 = 60\,\mathrm{km/h} = 16{,}67\,\mathrm{m/s}
+  \qquad
+  n_m = \frac{V_0}{2\pi R} \times 60 = \frac{16{,}67}{2\pi \times 0{,}137} \times 60 \approx 1164\,\mathrm{tr/min}
+\]
+
+\textbf{etape 2 - frequence statorique :}
+\[
+  f_s = \frac{p \cdot n_m}{60} = \frac{14 \times 1164}{60} \approx \mathbf{272\,\mathrm{Hz}}
+\]
+\textit{L'onduleur doit generer exactement $f_s \approx 272\,\mathrm{Hz}$ pour imposer la vitesse de $60\,\mathrm{km/h}$ - la MSAP.}
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs recurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{$V_{eff}$ pleine onde = $V_{DC}$, pas $V_{DC}/\sqrt{2}$.}
+  La tension en creneau $\pm V_{DC}$ a une valeur efficace egale - $V_{DC}$ (le carre vaut toujours $V_{DC}^2$).
+  Confondre avec une sinusoede ($V_{eff} = V_{DC}/\sqrt{2}$) est l'erreur la plus frequente.
+
+  \item \textbf{THD : denominateur = fondamental $V_1$, pas la valeur efficace totale.}
+  $\mathrm{THD} = \sqrt{\sum V_n^2}/V_1$. Diviser par $V_{eff}$ total donne une valeur fausse.
+
+  \item \textbf{Justifier physiquement le filtrage par la machine.}
+  Pas seulement citer que la MLI est meilleure : les harmoniques HF ($6\,\mathrm{kHz}$) sont attenues par l'effet inductif ($Z = j\omega L$ tres eleve - haute frequence).
+
+  \item \textbf{Harmoniques triphases : rangs absents des tensions composees.}
+  Pour un onduleur triphase equilibre, les rangs multiples de 3 (3, 9, 15\ldots) disparaissent. Rangs presents : $6k \pm 1$.
+
+  \item \textbf{Frequence statorique = $p \cdot n_m/60$.}
+  Ne pas confondre $p$ (paires de peles) avec le nombre de peles. Une machine - $p = 14$ paires a $28$ peles.
+
+  \item \textbf{Identifier la nature du convertisseur depuis le schema.}
+  DCeAC = onduleur ; ACeDC = redresseur ; DCeDC = hacheur. Nommer et justifier par le sens du flux.
+
+  \item \textbf{Onduleur en elotage vs connecte reseau.}
+  En elotage, l'onduleur fixe lui-meme $f = 50\,\mathrm{Hz}$ et $V = 230\,\mathrm{V}$. En mode reseau, il est synchronise.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2024 : "THD cas 1 (pleine onde) = 0,59 ; THD cas 2 (MLI 6\,kHz) = 0,25 - confirmer conformite norme IEC/EN\,61000-2-2 $< 25\,\%$. B13 : MLI limite ondulations THD, harmoniques HF supprimes par effet inductif enroulements machine."\\
+Rapport jury 2025 : "Q14 : les fonctions explicites doivent etre nommees et justifiees - ne pas se contenter de schematiser."
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PReSENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colGrayLight,
+  colframe=colSeparator,
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+  before skip=4pt, after skip=0pt,
+  fonttitle=\small\bfseries,
+  title={Presence dans les sujets analyses (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Annee} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & $\checkmark$ & - & $\checkmark$ & - & $\checkmark$ & - & - & $\checkmark$ & - & $\checkmark$ & $\checkmark$ & - \\
+E2 discipl. IE & $\checkmark$ & - & $\checkmark$ & - & $\checkmark$ & - & $\checkmark$ & $\checkmark$ & - & - & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-themes frequents :}
+MLI vs pleine onde - THD (6/13) - identification convertisseurs chaene (7/13) - onduleur triphase + machine (5/13) - calcul de $f_s$ (3/13) - elotage vs reseau (3/13)
+
+\medskip
+\textbf{Ordres de grandeur (reperes rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Reseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, frequence \SI{50}{\hertz}.
+  \item Courants d'etude frequents en sujet : de quelques \si{\ampere} a quelques dizaines de \si{\ampere}.
+  \item En conversion d'energie, un rendement attendu reste generalement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthese express (a refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypotheses du modele et les conventions de signe.
+  \item Ecrire 2 a 4 relations cles avec unites.
+  \item Realiser un calcul numerique complet et verifier l'ordre de grandeur.
+  \item Justifier le resultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE
+
+
+
+
+
+
+
+
+

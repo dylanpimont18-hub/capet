@@ -1,0 +1,640 @@
+% T23 -- Capteurs et conditionnement du signal -- banque d'exercices
+%
+% COMPLEMENTARITE AVEC LA FICHE fiches/T23_Capteurs_Conditionnement.tex
+% Les trois Questions Types de la fiche sont :
+%   QT1 = identification d'un capteur PT100 Jumo + coefficient c = 3/95 = 0,0316 V/degC
+%         (attribuee a "E2 BAC3 2026") ;
+%   QT2 = pont de Wheatstone 4 jauges, R0 = 120 Ohm, Vcc = 1 V, dR = 0,0153 Ohm,
+%         Vout = 31,9 uV et gain Ka = 1,56e5. C'est EXACTEMENT le couple de questions
+%         58/59 du sujet 2025 (epreuve ecrite disciplinaire appliquee) ;
+%   QT3 = capteur inductif f = N.Z.n/60 = 96 Hz sur Z = 24 dents a 240 tr/min. C'est
+%         EXACTEMENT la question 15 du sujet E1 2020.
+% CES TROIS TRAVAUX INTELLECTUELS NE SONT PAS REPRIS ICI :
+%   - aucun exercice ne recalcule Vout = (Vcc/4).(dR/R0) sur les donnees 120 Ohm / 1 V /
+%     0,0153 Ohm de 2025, ni le gain 1,56e5 associe ;
+%   - aucun exercice ne calcule f = N.Z.n/60 pour un capteur inductif ;
+%   - aucun exercice ne calcule un simple coefficient de pente (Vmax-Vmin)/(Tmax-Tmin).
+% Le pont de Wheatstone EST traite (ex. 5), mais par un angle que la fiche n'aborde pas :
+% la VALIDITE de l'hypothese dR << R0 sur une PT100 (ou dR/R0 = 0,58 : la linearisation
+% est fausse de 29 %), la ou la fiche applique la formule linearisee sans jamais la
+% discuter. Aucun chiffre de 2025 n'y est reemploye.
+%
+% SOURCES DE CHAQUE EXERCICE (toutes relues dans les .md de conversion Marker sous
+% docs/CAPET_Markdown-20260629T134311Z-3-001/CAPET_Markdown/docs/CAPET_SII_IE/06_PDFs_Originaux/)
+%
+%   - Ex. 1 (docTech) : 2024, "EPREUVE ECRITE DISCIPLINAIRE", option Ingenierie
+%     electrique (code EDE ENE 1 ; nom lu en tete de E2_Disciplinaire_IE_2024.md l.1-13),
+%     question D1. Le tableau du docTech est la "Figure 13 : caracteristiques en fonction
+%     du type de thermocouple", TEXTUELLEMENT presente dans
+%     E2_Disciplinaire_IE_2024.md l.463-475 (tableau markdown l.466-472) : les cinq lignes
+%     T / K / N / J / E, leurs plages, alliages, tolerances, prix et remarques de fiabilite
+%     sont recopies sans rien y ajouter. Contexte (thermocouple, principe Seebeck) : l.445-461.
+%     Plage de mesure -20 a 200 degC : l.687 et DT10 l.937-950.
+%     Corrige officiel de D1 : Rapport_Jury_2024.md l.313.
+%     ATTENTION : le rapport ecrit "une tolerance pour des temperatures autour de 40 degC de
+%     40x2,5/100 = 1 degC" ; or la figure 13 donne au type J une tolerance de +/- 1,5 (et non
+%     2,5, qui est celle des types K et N). Le "2,5" du rapport ne correspond pas au type J
+%     qu'il conclut. Le corrige ci-dessous reproduit donc la demarche du jury (comparer la
+%     tolerance a l'exigence de l'application) SANS reprendre ce calcul incoherent.
+%
+%   - Ex. 2 : 2023, "EPREUVE ECRITE DISCIPLINAIRE APPLIQUEE" (nom lu en tete de
+%     E2_Appliquee_Commune_2023.md, ligne 13 ; epreuve commune aux cinq options),
+%     questions 46, 47 et 50. Enonce : E2_Appliquee_Commune_2023.md l.607-629.
+%     Debattement mecanique -23 deg a +23 deg (l.607), signal 4-20 mA issu d'une sonde a
+%     effet Hall (l.611), trajet de mesurage SP1 = ES11 et SP2 = ES12 (l.623-627).
+%     Corrige officiel : Rapport_Jury_2023.md l.912-918 (Q46 : "Une rupture de ligne ou une
+%     panne de courant donnent I voisin de zero qui devient alors un indice de surveillance.")
+%     La question 3 (reprogrammation SP2' = 0 deg) s'appuie sur la question 50 du meme sujet
+%     (enonce l.655-657 ; plage utile -23 deg a 0 deg pour COUV <= 50 %) et sur le corrige
+%     Rapport_Jury_2023.md l.931.
+%
+%   - Ex. 3 : 2024, meme epreuve que l'ex. 1, questions E1, E2 et E3.
+%     Enonce : E2_Disciplinaire_IE_2024.md l.700-755. Valeurs R1 = 1 kOhm et R2 = 834,4 Ohm :
+%     l.738 (texte de la figure 22). Chaine des trois gains G1 / G2 = -100 / G3 = -1 : l.724
+%     (texte de la figure 21). Relation V1 = VR2.(2R1+R2)/R2 : l.752.
+%     Corrige officiel : Rapport_Jury_2024.md l.435-441 (E1 : eAB = VR2 ; E2 : G1 = 3,397 ;
+%     E3 : V3 = 340.eAB). Recalcul independant : (2000+834,4)/834,4 = 3,39693 et
+%     3,39693 x 100 = 339,69, arrondi a 340 par le jury -- confirme.
+%
+%   - Ex. 4 : 2024, meme epreuve, questions E5 et E10 (l'etude detaillee de la boucle de
+%     conversion, questions E6 a E9, n'est pas reprise : elle exige la figure 24 qui est une
+%     image omise par la conversion). Donnees : Ve = 1,34 V et V4 = 337,7.eAB + 1,34 (l.763) ;
+%     R5 = 250 Ohm (l.797) ; eABmini = -1 mV et eABmaxi = 10,8 mV pour -20 degC et 200 degC
+%     (DT10, tableau l.945-950 et l.1141) ; sortie Is 4-20 mA (l.687).
+%     Corrige officiel : Rapport_Jury_2024.md l.451-453 (V4 = 1 V et 5 V) et l.467
+%     (Is = 4 mA et 20 mA, "On obtient bien le profil de courant que doit delivrer le
+%     transmetteur soit 4 mA pour -20 degC et 20 mA pour 200 degC").
+%     Recalcul independant : 337,7 x (-0,001) + 1,34 = 1,0023 V et
+%     337,7 x 0,0108 + 1,34 = 4,98716 V, arrondis a 1 V et 5 V par le jury -- l'ecart vient
+%     de l'arrondi du coefficient 337,7 (la valeur exacte est 4/0,0118 = 338,98). Signale.
+%
+%   - Ex. 5 : EXERCICE INEDIT (aucune reference de sujet). Construit sur la formule de pont
+%     de Wheatstone quart de pont et sur les caracteristiques normalisees de la PT100
+%     (R0 = 100 Ohm a 0 degC, alpha = 3,85e-3 /degC : valeurs de la norme CEI 60751, deja
+%     presentes dans la fiche T23 bloc 1.2, non controversees, non re-verifiees).
+%     Toutes les AN sont recalculees. Interet pedagogique = MISE EN DEFAUT de l'hypothese
+%     dR << R0 : a 150 degC, dR/R0 = 0,5775 et la formule linearisee surestime de 28,9 %.
+%     Verifications : dR(150) = 100 x 3,85e-3 x 150 = 57,75 Ohm ;
+%       Vout_lin  = (5/4) x 0,5775            = 0,721875 V ;
+%       Vout_exact= (5/2) x 57,75/257,75      = 0,560136 V ;
+%       erreur    = 0,721875/0,560136 - 1     = +28,875 % = 1 + 57,75/200 - 1. OK.
+%       K = 3/0,560136 = 5,3558 ; K_faux = 3/0,721875 = 4,1558 (-22,4 %).
+%
+%   - Ex. 6 : 2022, "EPREUVE ECRITE DISCIPLINAIRE", option Ingenierie electrique
+%     (code EDE ENE 1 ; nom lu en tete de E2_Disciplinaire_IE_2022.md l.1-5), question 24.
+%     Enonce : E2_Disciplinaire_IE_2022.md l.445-467. Tension de reference du CAN 3,5 V
+%     (l.455) ; CAN 12 bits du PIC 18F8723 (l.457 et Q23) ; pont diviseur R4/R5 de rapport 2
+%     entre le module Peltier et l'entree ADC2 ; alarme sur 0xAF = 175 (l.469).
+%     Corrige officiel : Rapport_Jury_2022.md l.305-319 (quantum = 0,85 mV/LSB ;
+%     N = 1170 pour UPELTIER = 2 V ; ADC2 = 0,15 V et UPELTIER = 0,3 V pour 175).
+%     Recalcul independant : 3,5/4095 = 0,854701 mV/LSB ; 1/(3,5/4095) = 1170,0 exactement ;
+%     175 x 3,5/4095 = 0,149573 V, x2 = 0,299145 V. Confirme.
+%     ATTENTION : le corrige du jury conclut "donc inferieure au 0,4 V minimum impose sur le
+%     diagramme des exigences" alors que l'enonce du sujet (l.523) ecrit "Cette valeur de la
+%     tension ne doit pas etre inferieure a 0,9 V". Les deux seuils divergent (le diagramme
+%     des exigences est une image omise par la conversion, impossible de trancher). Le
+%     corrige ci-dessous utilise le seuil de 0,9 V de l'ENONCE et signale la divergence : la
+%     conclusion (alarme justifiee) est la meme dans les deux cas puisque 0,3 < 0,4 < 0,9.
+%
+% CITATIONS DE RAPPORT DE JURY -- verbatim exacts verifies par grep, avec ligne :
+%   - Ex. 1  : Rapport_Jury_2024.md l.515 (analyse globale, epreuve ecrite disciplinaire).
+%   - Ex. 5  : Rapport_Jury_2025.md l.1024 (commentaire de la partie 5).
+%   - Ex. 6  : Rapport_Jury_2022.md l.389 (commentaires de l'epreuve ecrite disciplinaire).
+% Aucune autre citation n'est produite. Aucune valeur n'est attribuee a un sujet sans avoir
+% ete relue ligne a ligne dans le .md correspondant.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+% \degree n'est pas defini par le preambule partage (ni par gensymb, non charge) :
+% on le fournit localement, sans ecraser une eventuelle definition future.
+\providecommand{\degree}{\ensuremath{^\circ}}
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T23}} - Exercices - Capteurs et conditionnement}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T23 \quad Capteurs et conditionnement du signal}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 1 -- docTech -- 2024, question D1
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2024, \'epreuve \'ecrite disciplinaire (option IE), question D1 (figure 13)}
+]
+\CAPETSHOW{
+La temp\'erature $T_{ARM}$ \`a l'int\'erieur de l'armoire \'electrique d'un extracteur d'air industriel doit \^etre surveill\'ee afin de piloter un ventilateur de refroidissement. Le capteur retenu est un \textbf{thermocouple}.
+
+\emph{Principe de fonctionnement rappel\'e par le sujet} : si l'on r\'eunit \`a une extr\'emit\'e (jonction) deux fils m\'etalliques de natures diff\'erentes et que l'on \'el\`eve la temp\'erature de cette extr\'emit\'e, il appara\^it une tension $e_{AB}$ aux extr\'emit\'es rest\'ees libres.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.9, every node/.style={scale=0.9}]
+  \draw[thick] (4.0,0.0) -- (1.2,0.55);
+  \draw[thick] (4.0,0.0) -- (1.2,-0.55);
+  \fill (4.0,0.0) circle (2.2pt);
+  \node[right, font=\scriptsize, align=left] at (4.15,0.0) {soudure\\\`a la jonction\\($T_{ARM}$)};
+  \node[above, font=\scriptsize] at (2.6,0.36) {M\'etal A};
+  \node[below, font=\scriptsize] at (2.6,-0.36) {M\'etal B};
+  \draw[thick] (1.2,0.55) -- (0.55,0.55);
+  \draw[thick] (1.2,-0.55) -- (0.55,-0.55);
+  \fill (0.55,0.55) circle (1.6pt);
+  \fill (0.55,-0.55) circle (1.6pt);
+  \draw[<->, thin] (0.28,0.55) -- (0.28,-0.55);
+  \node[left, font=\scriptsize] at (0.22,0.0) {$e_{AB}$};
+\end{tikzpicture}
+\end{center}
+
+\begin{tcolorbox}[docTech, title={Document technique -- Figure 13 du sujet : caract\'eristiques en fonction du type de thermocouple}]
+\footnotesize
+\renewcommand{\arraystretch}{1.15}
+\begin{center}
+\begin{tabular}{@{}l p{1.65cm} p{1.75cm} c p{1.35cm} p{2.9cm}@{}}
+\toprule
+\textbf{Type} & \textbf{Plage de mesure conseill\'ee en \degree C} & \textbf{Alliages} & \textbf{Tol\'erance (\degree C)} & \textbf{Compa\-raison des prix} & \textbf{Fiabilit\'e, dur\'ee de vie, maintenance} \\
+\midrule
+T & $-200$ \`a $350$  & Cuivre et Constantan & $+/-1$   & Tr\`es \'elev\'e & R\'ep\'etabilit\'e exceptionnelle de $+/-0{,}1$ \degree C de $-200$ \`a $200$\degree C \\
+K & $-10$ \`a $1\,100$ & Chromel et Alumel   & $+/-2{,}5$ & Faible          & Stabilit\'e moins satisfaisante que d'autres thermocouples \\
+N & $0$ \`a $1250$     & Nicrosil et Nisil   & $+/-2{,}5$ & Tr\`es \'elev\'e & Stabilit\'e sup\'erieure aux autres thermocouples courants \\
+J & $-30$ \`a $700$    & Fer et Constantan   & $+/-1{,}5$ & \'Elev\'e        & S'oxyde rapidement en milieu humide \\
+E & $0$ \`a $800$      & Chromel et Constantan & $+/-2$ & \'Elev\'e        & Thermocouple \`a la FEM la plus \'elev\'ee \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{tcolorbox}
+
+Le cahier des charges impose une \'etendue de mesure de \textbf{$-20$\degree C \`a $+200$\degree C}. L'armoire \'electrique est un \textbf{milieu sec} (local technique ventil\'e), et la temp\'erature de d\'eclenchement du ventilateur est de l'ordre de \SI{40}{\degreeCelsius}. Le co\^ut est un crit\`ere de s\'election explicite du dossier.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever} dans le document technique, pour chacun des cinq types de thermocouple, la plage de mesure conseill\'ee, et \textbf{indiquer} lesquels couvrent int\'egralement l'\'etendue $[-20\,;\,200]$\degree C impos\'ee par le cahier des charges.
+  \item Parmi les types ainsi retenus, \textbf{justifier} le choix d'un thermocouple de \textbf{type J} en confrontant successivement les crit\`eres de tol\'erance, de prix et de tenue au milieu.
+  \item Le thermocouple est un capteur \textbf{actif}. Rappeler ce que signifie ce qualificatif, et en d\'eduire pourquoi la cha\^ine d'acquisition ne peut pas se limiter \`a relier directement le capteur \`a l'entr\'ee analogique de l'automate.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{\'Etape 1 -- Extraction des donn\'ees.} Lecture directe de la colonne « plage de mesure conseill\'ee » et confrontation \`a l'exigence $[-20\,;\,200]$\degree C :
+  \begin{center}
+  \begin{tabular}{@{}lcc@{}}
+  \toprule
+  Type & Plage conseill\'ee (\degree C) & Couvre $[-20\,;\,200]$ ? \\
+  \midrule
+  T & $-200$ \`a $350$   & \textbf{oui} \\
+  K & $-10$ \`a $1\,100$ & \textbf{non} ($-10 > -20$) \\
+  N & $0$ \`a $1250$     & \textbf{non} ($0 > -20$) \\
+  J & $-30$ \`a $700$    & \textbf{oui} \\
+  E & $0$ \`a $800$      & \textbf{non} ($0 > -20$) \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  C'est la \textbf{borne basse} qui \'elimine : pour mesurer jusqu'\`a $-20$\degree C, seuls les types \textbf{T} et \textbf{J} conviennent. Les types K, N et E ont une borne haute tr\`es confortable mais ne descendent pas assez bas.
+  \item Il reste \`a d\'epartager le type T et le type J :
+  \begin{itemize}
+    \item \textbf{Tol\'erance} : le type T est nettement meilleur ($\pm 1$\degree C, avec une r\'ep\'etabilit\'e annonc\'ee de $\pm 0{,}1$\degree C entre $-200$ et $200$\degree C) que le type J ($\pm 1{,}5$\degree C). Mais l'application est un simple \textbf{seuil de ventilation} autour de \SI{40}{\degreeCelsius} : une incertitude de $\pm 1{,}5$\degree C sur l'instant d'enclenchement d'un ventilateur est sans cons\'equence. \textbf{L'exigence n'impose pas la pr\'ecision du type T.}
+    \item \textbf{Prix} : le type T est class\'e « tr\`es \'elev\'e », le type J « \'elev\'e ». \`A performance suffisante des deux c\^ot\'es, le crit\`ere \'economique tranche en faveur du \textbf{type J}.
+    \item \textbf{Tenue au milieu} : le seul d\'efaut r\'edhibitoire du type J est qu'il « s'oxyde rapidement en milieu humide ». L'armoire \'electrique \'etant un \textbf{milieu sec}, cette limitation ne s'applique pas ici.
+  \end{itemize}
+  \textbf{Le type J est donc retenu} : il couvre l'\'etendue de mesure, sa tol\'erance est suffisante au regard de l'usage, il est moins cher que le type T, et son unique faiblesse (l'humidit\'e) est hors du domaine d'emploi.
+
+  \smallskip
+  \emph{Remarque de m\'ethode.} Le raisonnement attendu est un \textbf{tri s\'equentiel} : d'abord \'eliminer sur le crit\`ere \emph{imp\'eratif} (l'\'etendue de mesure), puis arbitrer entre les survivants sur les crit\`eres \emph{pond\'er\'es} (pr\'ecision, co\^ut, environnement). Annoncer « type J » sans avoir \'elimin\'e K, N et E sur la borne $-20$\degree C ne r\'epond pas \`a la question pos\'ee.
+  \item Un capteur \textbf{actif} \textbf{g\'en\`ere lui-m\^eme} la grandeur \'electrique de sortie \`a partir de l'\'energie pr\'elev\'ee sur le mesurande : il se comporte en \textbf{g\'en\'erateur} (ici une f.\,\'e.\,m. $e_{AB}$ par effet Seebeck) et ne n\'ecessite aucune source d'alimentation ext\'erieure. Il s'oppose au capteur \textbf{passif} (PT100, jauge), simple \textbf{imp\'edance variable} exigeant un circuit d'alimentation pour produire un signal.
+
+  La f.\,\'e.\,m. d'un thermocouple est de l'ordre de \textbf{quelques millivolts} sur toute l'\'etendue de mesure. Elle est donc :
+  \begin{itemize}
+    \item \textbf{trop faible} devant la pleine \'echelle d'une entr\'ee analogique d'automate (typiquement \SIrange{0}{10}{\volt} ou \SIrange{4}{20}{\milli\ampere}) : num\'eris\'ee telle quelle, elle n'occuperait qu'une fraction infime du codage, d'o\`u une r\'esolution effective d\'erisoire ;
+    \item \textbf{tr\`es vuln\'erable aux perturbations} sur la liaison capteur/armoire : quelques millivolts de mode commun induits par le c\^ablage de puissance voisin suffisent \`a noyer le signal utile.
+  \end{itemize}
+  Il faut donc interposer un \textbf{transmetteur} qui amplifie, d\'ecale puis convertit la tension en un \textbf{courant normalis\'e \SIrange{4}{20}{\milli\ampere}} (objet des exercices 3 et 4).
+
+  \smallskip
+  \textbf{Conclusion.} Le thermocouple de \textbf{type J} satisfait l'exigence d'\'etendue $[-20\,;\,200]$\degree C avec la tol\'erance requise pour une r\'egulation de ventilation, au co\^ut le plus bas compatible avec cette exigence, et sans exposition au seul milieu qui le d\'egraderait. Son caract\`ere actif et le tr\`es faible niveau de sa f.\,\'e.\,m. imposent en revanche un conditionnement complet en amont de l'automate : le choix du capteur \textbf{engage la cha\^ine d'acquisition enti\`ere}, il ne se r\'eduit pas \`a une lecture de catalogue.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2024, analyse globale de l'\'epreuve \'ecrite disciplinaire) : \guillemotleft\ Le jury attend des r\'eponses d\'etaill\'ees et argument\'ees. Des r\'esultats donn\'es directement, sans calcul et sans justification ne r\'epondent pas aux attendus de l'\'epreuve. \guillemotright}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 2 -- 2023, questions 46, 47 et 50
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{1} \hfill\normalfont\footnotesize 2023, \'epreuve \'ecrite disciplinaire appliqu\'ee, questions 46, 47 et 50}
+]
+\CAPETSHOW{
+Les ch\^assis de surpression d'une serre horticole sont manoeuvr\'es par un motor\'educteur. Leur position angulaire $\alpha$ est mesur\'ee par un capteur \textbf{RPU} (\emph{Ridder Positioning Unit}), qui communique constamment la position au r\'egulateur climatique \`a l'aide d'un \textbf{signal \SIrange{4}{20}{\milli\ampere}}. Ce signal est g\'en\'er\'e par une sonde \`a effet Hall int\'egr\'ee au capteur, tournant sans contact devant un axe magn\'etique.
+
+Le syst\`eme de fin de course RSU d\'efinit le \textbf{d\'ebattement angulaire m\'ecanique maximal} des ch\^assis : $-23\degree \leq \alpha \leq +23\degree$. Le capteur RPU est programm\'e \`a la mise en service en lui faisant apprendre un \textbf{trajet de mesurage} d\'elimit\'e par deux positions m\'emoris\'ees $SP_1$ et $SP_2$.
+
+Dans un premier temps, le technicien programme le capteur avec $SP_1 = ES_{11}$ et $SP_2 = ES_{12}$, c'est-\`a-dire un trajet de mesurage confondu avec le d\'ebattement m\'ecanique maximal.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.9, every node/.style={scale=0.9}]
+  \draw[->] (0,0) -- (7.2,0) node[right, font=\scriptsize] {$\alpha$ (\degree)};
+  \draw[->] (0,0) -- (0,3.5) node[above, font=\scriptsize] {$I$ (mA)};
+  \draw[thick, colExo] (0.6,0.6) -- (6.0,3.0);
+  \fill[colExo] (0.6,0.6) circle (2pt);
+  \fill[colExo] (6.0,3.0) circle (2pt);
+  \draw[dotted] (0.6,0) -- (0.6,0.6) -- (0,0.6);
+  \draw[dotted] (6.0,0) -- (6.0,3.0) -- (0,3.0);
+  \draw[dotted] (3.3,0) -- (3.3,1.8) -- (0,1.8);
+  \fill[colExo!60] (3.3,1.8) circle (1.6pt);
+  \node[below, font=\scriptsize] at (0.6,-0.05) {$-23$};
+  \node[below, font=\scriptsize] at (3.3,-0.05) {$0$};
+  \node[below, font=\scriptsize] at (6.0,-0.05) {$+23$};
+  \node[left, font=\scriptsize] at (-0.05,0.6) {$4$};
+  \node[left, font=\scriptsize] at (-0.05,1.8) {?};
+  \node[left, font=\scriptsize] at (-0.05,3.0) {$20$};
+  \node[font=\scriptsize, align=center, colExo] at (4.95,1.05) {trajet de mesurage\\initial};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Justifier} l'int\'er\^et de travailler avec la plage \SIrange{4}{20}{\milli\ampere} plut\^ot qu'avec la plage \SIrange{0}{20}{\milli\ampere}.
+  \item \'Etablir l'expression de l'intensit\'e $I$ (en \si{\milli\ampere}) d\'elivr\'ee par le capteur en fonction de la position angulaire $\alpha$ (en degr\'es), puis calculer $I$ pour $\alpha = 0\degree$.
+  \item En fonctionnement normal, la consigne d'ouverture des ch\^assis n'exc\`ede jamais \SI{50}{\percent}, ce qui correspond \`a $-23\degree \leq \alpha_{cons} \leq 0\degree$. Le technicien reprogramme alors $SP_2' = 0\degree$ (le trajet de mesurage devient plus court que le d\'ebattement m\'ecanique). \'Etablir la nouvelle expression de $I$ et \textbf{quantifier} le gain obtenu sur la r\'esolution de la mesure. Conclure.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Avec une plage \SIrange{4}{20}{\milli\ampere}, la valeur minimale du mesurande correspond \`a un courant \textbf{non nul} de \SI{4}{\milli\ampere}. C'est ce que l'on appelle le \textbf{z\'ero vivant} (\emph{live zero}).
+
+  Cons\'equence directe : une \textbf{rupture de ligne} ou une \textbf{panne d'alimentation} du capteur donnent un courant voisin de \textbf{z\'ero}, valeur qui n'appartient pas \`a la plage de mesure utile. Le r\'egulateur peut donc \textbf{distinguer sans ambigu\"it\'e} une position basse l\'egitime ($\alpha = -23\degree \Rightarrow I = \SI{4}{\milli\ampere}$) d'une \textbf{d\'efaillance de la cha\^ine de mesure} ($I \approx 0$) : le z\'ero devient un indice de surveillance et permet de d\'eclencher une alarme.
+
+  Avec une plage \SIrange{0}{20}{\milli\ampere}, $I = 0$ serait une valeur de mesure parfaitement valide : une rupture de c\^able serait interpr\'et\'ee comme « ch\^assis en but\'ee basse », erreur silencieuse et potentiellement dangereuse pour la culture.
+
+  \emph{Avantage annexe} : la consommation minimale de \SI{4}{\milli\ampere} permet d'\textbf{alimenter l'\'electronique du capteur par la boucle elle-m\^eme} (transmetteur 2 fils), ce qu'une plage partant de \SI{0}{\milli\ampere} interdirait.
+  \item La caract\'eristique est \textbf{lin\'eaire} et le trajet de mesurage couvre tout le d\'ebattement :
+  \[ \alpha = -23\degree \;\longrightarrow\; I = \SI{4}{\milli\ampere} \qquad\text{et}\qquad \alpha = +23\degree \;\longrightarrow\; I = \SI{20}{\milli\ampere} \]
+  La pente vaut :
+  \[ k = \frac{20 - 4}{23 - (-23)} = \frac{16}{46} \approx 0{,}348~\mathrm{mA/\degree} \]
+  et l'expression s'\'ecrit, en prenant le point $(-23\degree;\SI{4}{\milli\ampere})$ comme origine :
+  \[ \boxed{\; I = 4 + \frac{16}{46}\,(\alpha + 23) \;} \qquad (I \text{ en mA},\; \alpha \text{ en degr\'es}) \]
+  Pour $\alpha = 0\degree$ (ch\^assis \`a l'horizontale, milieu du d\'ebattement) :
+  \[ I = 4 + \frac{16}{46}\times 23 = 4 + 8 = \boldsymbol{\SI{12}{\milli\ampere}} \]
+  R\'esultat coh\'erent : le milieu de la plage angulaire donne bien le milieu de la plage de courant.
+  \item Le trajet de mesurage est maintenant $[-23\degree\,;\,0\degree]$, et c'est sur cette \textbf{seule} plage que le capteur \'etale ses \SIrange{4}{20}{\milli\ampere} :
+  \[ k' = \frac{20 - 4}{0 - (-23)} = \frac{16}{23} \approx 0{,}696~\mathrm{mA/\degree} \qquad\Longrightarrow\qquad \boxed{\; I = 4 + \frac{16}{23}\,(\alpha + 23) \;} \]
+  La \textbf{sensibilit\'e} du capteur est donc multipli\'ee par :
+  \[ \frac{k'}{k} = \frac{16/23}{16/46} = \frac{46}{23} = \boldsymbol{2} \]
+  Autrement dit, un m\^eme \'ecart angulaire produit un \'ecart de courant \textbf{deux fois plus grand}. Pour une r\'esolution donn\'ee de la cha\^ine de num\'erisation en aval (quantum du convertisseur du r\'egulateur, exprim\'e en \si{\milli\ampere}), l'incertitude de positionnement angulaire est donc \textbf{divis\'ee par deux}. La zone $0\degree < \alpha \leq +23\degree$ sort en revanche du trajet de mesurage : elle n'est plus mesur\'ee (le capteur y sature \`a \SI{20}{\milli\ampere}).
+
+  \smallskip
+  \textbf{Conclusion.} Restreindre le trajet de mesurage \`a la seule plage r\'eellement exploit\'ee en fonctionnement normal double la r\'esolution effective de la mesure \textbf{sans changer de capteur ni toucher au r\'egulateur} : c'est un r\'eglage, pas un investissement. C'est la d\'emarche \`a engager d\`es lors qu'une exigence de pr\'ecision de positionnement n'est pas satisfaite avec le r\'eglage par d\'efaut. Le prix \`a payer -- la perte de mesure au-del\`a de $0\degree$ -- est ici acceptable puisque le cahier des charges garantit que la consigne n'exc\`ede jamais \SI{50}{\percent} d'ouverture ; il ne le serait pas si les ch\^assis devaient \^etre pilot\'es sur tout leur d\'ebattement.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 3 -- 2024, questions E1, E2 et E3
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize 2024, \'epreuve \'ecrite disciplinaire (option IE), questions E1, E2 et E3}
+]
+\CAPETSHOW{
+On \'etudie l'\'etage d'\textbf{amplification} du transmetteur de temp\'erature qui met en forme la f.\,\'e.\,m. $e_{AB}$ du thermocouple de l'exercice 1. Cet \'etage est constitu\'e de \textbf{trois sous-\'etages en cascade} :
+\[ e_{AB} \;\xrightarrow{\;\text{gain } G_1\;} \; V_1 \;\xrightarrow{\;G_2 = -100\;} \; V_2 \;\xrightarrow{\;G_3 = -1\;} \; V_3 \]
+
+Le premier sous-\'etage est le montage ci-dessous, \`a deux amplificateurs op\'erationnels suppos\'es \textbf{parfaits} et fonctionnant en \textbf{r\'egime lin\'eaire}. Le thermocouple est connect\'e entre les deux entr\'ees non inverseuses ; $\varepsilon_1$ et $\varepsilon_2$ d\'esignent les tensions diff\'erentielles d'entr\'ee des deux AOP.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.92, every node/.style={scale=0.92}]
+  % --- AOP : sorties en haut (y=4,4) et en bas (y=0) ; reseau resistif a droite
+  \node [op amp, scale=0.85] (A1) at (3.0,4.4) {};
+  \node [op amp, scale=0.85, yscale=-1] (A2) at (3.0,0.0) {};
+  \node[font=\scriptsize, above] at (3.0,5.1) {AOP 1};
+  \node[font=\scriptsize, below] at (3.0,-0.7) {AOP 2};
+  % --- source eAB : segment vertical isole, relie aux deux entrees +
+  \draw (0.5,4.4) to[battery1, l=$e_{AB}$, invert] (0.5,0.0);
+  \draw (0.5,4.4) -- (A1.+);
+  \draw (0.5,0.0) -- (A2.+);
+  % tensions differentielles d'entree, decalees pour ne pas recouvrir les broches
+  \draw[<->, thin] (2.08,4.68) -- (2.08,4.12);
+  \node[left, font=\scriptsize] at (2.02,4.4) {$\varepsilon_1$};
+  \draw[<->, thin] (2.08,0.28) -- (2.08,-0.28);
+  \node[left, font=\scriptsize] at (2.02,0.0) {$\varepsilon_2$};
+  % --- reseau R1 - R2 - R1 entre les deux sorties (bien espace)
+  \draw (A1.out) -- (5.6,4.4);
+  \draw (5.6,4.4) to[R, l_=$R_1$] (5.6,3.0);
+  \draw (5.6,3.0) to[R, l_=$R_2$] (5.6,1.4);
+  \draw (5.6,1.4) to[R, l_=$R_1$] (5.6,0.0);
+  \draw (5.6,0.0) -- (A2.out);
+  \node[circ] at (5.6,3.0) {};
+  \node[circ] at (5.6,1.4) {};
+  % --- contre-reaction : sorties des diviseurs vers les entrees inverseuses
+  \draw (A1.-) -- (1.55,3.75) -- (1.55,3.0) -- (5.6,3.0);
+  \draw (A2.-) -- (1.55,0.65) -- (1.55,1.4) -- (5.6,1.4);
+  % --- VR2, mesuree aux bornes de R2
+  \draw (5.6,3.0) -- (7.1,3.0);
+  \draw (5.6,1.4) -- (7.1,1.4);
+  \draw[<->, thin] (7.1,3.0) -- (7.1,1.4);
+  \node[right, font=\scriptsize] at (7.2,2.2) {$V_{R2}$};
+  % --- V1, mesuree entre les deux sorties d'AOP
+  \draw (5.6,4.4) -- (8.5,4.4) node[circ]{};
+  \draw (5.6,0.0) -- (8.5,0.0) node[circ]{};
+  \draw[<->, thin] (8.85,4.4) -- (8.85,0.0);
+  \node[right, font=\scriptsize] at (8.95,2.2) {$V_1$};
+  \node[font=\scriptsize] at (4.6,-1.4) {$R_1 = \SI{1}{\kilo\ohm}$ \qquad $R_2 = \SI{834,4}{\ohm}$};
+\end{circuitikz}
+\end{center}
+
+On donne la relation de sortie de ce premier sous-\'etage :
+\[ V_1 = \frac{V_{R2}\,(2R_1 + R_2)}{R_2} \]
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Justifier que les deux AOP fonctionnent bien en r\'egime lin\'eaire, puis \textbf{\'ecrire} la loi des mailles impliquant $e_{AB}$, $\varepsilon_1$, $\varepsilon_2$ et $V_{R2}$. En d\'eduire que $e_{AB} = V_{R2}$.
+  \item \textbf{Calculer} num\'eriquement le gain $G_1$ permettant d'\'ecrire $V_1 = G_1\,V_{R2} = G_1\,e_{AB}$.
+  \item \textbf{Exprimer} la relation entre $e_{AB}$, $G_1$, $G_2$, $G_3$ et $V_3$, puis \textbf{exprimer} num\'eriquement $V_3$ en fonction de $e_{AB}$. Conclure sur l'ordre de grandeur obtenu et sur le r\^ole de la structure diff\'erentielle du premier \'etage.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{R\'egime lin\'eaire.} La sortie de chaque AOP est reboucl\'ee sur sa borne inverseuse ($-$) \`a travers le r\'eseau r\'esistif : la contre-r\'eaction est \textbf{n\'egative}, les AOP fonctionnent donc en \textbf{r\'egime lin\'eaire}. Les AOP \'etant suppos\'es parfaits, il vient :
+  \[ \varepsilon_1 = \varepsilon_2 = \SI{0}{\volt} \qquad\text{et}\qquad i^+ = i^- = \SI{0}{\ampere} \]
+  \textbf{Loi des mailles.} En parcourant la maille qui part de la borne $+$ de l'AOP 1, traverse le thermocouple, remonte par la branche $R_2$ puis se referme par l'entr\'ee de l'AOP 2 :
+  \[ e_{AB} = \varepsilon_1 + V_{R2} - \varepsilon_2 \]
+  Comme $\varepsilon_1 = \varepsilon_2 = 0$ :
+  \[ \boxed{\; e_{AB} = V_{R2} \;} \]
+  \emph{Interpr\'etation physique} : la f.\,\'e.\,m. du thermocouple se retrouve \textbf{int\'egralement} aux bornes de $R_2$. Le courant qui traverse la branche $R_1 - R_2 - R_1$ vaut donc $e_{AB}/R_2$ : c'est ce courant, \textbf{impos\'e par le capteur}, qui produit la tension de sortie. Les entr\'ees des AOP n'absorbant aucun courant ($i^+ = 0$), \textbf{le capteur n'est pas charg\'e} -- point essentiel pour une source de quelques millivolts \`a imp\'edance non n\'egligeable.
+  \item En reportant $V_{R2} = e_{AB}$ dans la relation donn\'ee :
+  \[ V_1 = \frac{V_{R2}\,(2R_1 + R_2)}{R_2} = \frac{2R_1 + R_2}{R_2}\;e_{AB} \]
+  d'o\`u, num\'eriquement :
+  \[ G_1 = \frac{2R_1 + R_2}{R_2} = \frac{2\times 1\,000 + 834{,}4}{834{,}4} = \frac{2\,834{,}4}{834{,}4} \approx \boldsymbol{3{,}397} \]
+  \item Les trois sous-\'etages \'etant en cascade, les gains se \textbf{multiplient} :
+  \[ V_3 = G_1\,G_2\,G_3\;e_{AB} \]
+  \[ V_3 = 3{,}397 \times (-100) \times (-1) \times e_{AB} = \boldsymbol{340\;e_{AB}} \]
+  Les deux inversions successives ($G_2 = -100$ puis $G_3 = -1$) se \textbf{compensent} : le gain global est \textbf{positif}, la tension $V_3$ varie donc dans le m\^eme sens que la temp\'erature. Un seul \'etage inverseur aurait donn\'e une caract\'eristique d\'ecroissante, incompatible avec la mise \`a l'\'echelle qui suit.
+
+  \smallskip
+  \textbf{Conclusion.} Le gain total de $340$ transforme une f.\,\'e.\,m. de quelques millivolts en une tension de quelques volts : pour $e_{AB} = \SI{10,8}{\milli\volt}$ (borne haute de la plage), $V_3 \approx 340 \times 10{,}8\times 10^{-3} \approx \SI{3,7}{\volt}$, valeur enfin compatible avec les \'etages suivants. Le choix d'un \textbf{premier \'etage \`a deux AOP en structure diff\'erentielle}, plut\^ot qu'un simple amplificateur non inverseur, est dict\'e par la nature du capteur : imp\'edance d'entr\'ee tr\`es \'elev\'ee (le thermocouple n'est pas charg\'e) et \textbf{r\'ejection du mode commun} (les perturbations induites de fa\c{c}on identique sur les deux fils de la liaison capteur/armoire sont \'elimin\'ees, seule la diff\'erence $e_{AB}$ est amplifi\'ee). Amplifier $340$ fois sans cette pr\'ecaution reviendrait \`a amplifier $340$ fois le bruit du c\^ablage de puissance voisin.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 4 -- 2024, questions E5 et E10
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize 2024, \'epreuve \'ecrite disciplinaire (option IE), questions E5 et E10}
+]
+\CAPETSHOW{
+On poursuit l'\'etude du transmetteur de temp\'erature de l'exercice 3. Apr\`es l'\'etage d'amplification vient un \'etage de \textbf{d\'ecalage en tension} puis un \'etage de \textbf{conversion tension-courant} :
+\[ e_{AB} \;\xrightarrow{\;\text{amplifier}\;}\; V_3 \;\xrightarrow{\;\text{d\'ecaler } (+V_e)\;}\; V_4 \;\xrightarrow{\;\text{convertir}\;}\; I_s \]
+
+Le sujet donne, pour l'\'etage de d\'ecalage, la tension de r\'ef\'erence $V_e = \SI{1,34}{\volt}$ et la relation globale :
+\[ V_4 = 337{,}7\,e_{AB} + 1{,}34 \qquad (V_4 \text{ en volts},\; e_{AB} \text{ en volts}) \]
+
+L'\'etude de l'\'etage de conversion conduit \`a l'expression $I_s = V_4/R_5$, \textbf{ind\'ependante} de la r\'esistance de charge $R_{ana}$ (imp\'edance d'entr\'ee de la carte analogique de l'automate), avec $R_5 = \SI{250}{\ohm}$.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.9, every node/.style={scale=0.9}]
+  \node[draw, minimum width=1.7cm, minimum height=0.9cm, align=center, font=\scriptsize] (a) at (1.5,0) {Amplifier\\$\times\,340$};
+  \node[draw, minimum width=1.7cm, minimum height=0.9cm, align=center, font=\scriptsize] (b) at (4.2,0) {D\'ecaler\\$+\,V_e$};
+  \node[draw, minimum width=1.9cm, minimum height=0.9cm, align=center, font=\scriptsize] (c) at (7.1,0) {Convertir\\$U \rightarrow I$};
+  \draw[->] (-0.4,0) -- (a.west) node[midway, above, font=\scriptsize] {$e_{AB}$};
+  \draw[->] (a.east) -- (b.west) node[midway, above, font=\scriptsize] {$V_3$};
+  \draw[->] (b.east) -- (c.west) node[midway, above, font=\scriptsize] {$V_4$};
+  \draw[->] (c.east) -- (9.1,0) node[midway, above, font=\scriptsize] {$I_s$};
+  \node[font=\scriptsize] at (-0.55,-0.6) {mV};
+  \node[font=\scriptsize] at (9.1,-0.6) {4-20 mA};
+\end{tikzpicture}
+\end{center}
+
+Le capteur thermocouple de type J retenu \`a l'exercice 1 est \'etalonn\'e sur la plage $-20\degree$C $\rightarrow$ $200\degree$C ; le document technique DT10 du sujet donne les deux points caract\'eristiques extr\^emes :
+
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Temp\'erature mesur\'ee (\degree C) & $-20$ & $200$ \\
+Tension d\'elivr\'ee par le capteur (mV) & $e_{AB\,mini} = -1$ & $e_{AB\,maxi} = 10{,}8$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Calculer} $V_4$ pour les deux tensions extr\^emes de $e_{AB}$.
+  \item En d\'eduire le r\^ole pr\'ecis du terme $+\,V_e = \SI{1,34}{\volt}$ : \`a quelle contrainte de la cha\^ine r\'epond-il, et que se passerait-il s'il \'etait omis ?
+  \item \textbf{Calculer} $I_s$ pour les deux valeurs extr\^emes de $V_4$ et \textbf{conclure} quant \`a la conformit\'e du transmetteur de temp\'erature.
+  \item L'expression $I_s = V_4/R_5$ ne fait pas intervenir $R_{ana}$. Expliquer en quoi cette propri\'et\'e est d\'eterminante pour une liaison industrielle.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Application directe de $V_4 = 337{,}7\,e_{AB} + 1{,}34$, avec $e_{AB}$ \textbf{exprim\'ee en volts} (attention \`a la conversion mV $\rightarrow$ V) :
+  \[ e_{AB\,mini} = \SI{-1}{\milli\volt} \;\Longrightarrow\; V_4 = 337{,}7\times(-0{,}001) + 1{,}34 = -0{,}338 + 1{,}34 \approx \boldsymbol{\SI{1}{\volt}} \]
+  \[ e_{AB\,maxi} = \SI{10,8}{\milli\volt} \;\Longrightarrow\; V_4 = 337{,}7\times 0{,}0108 + 1{,}34 = 3{,}647 + 1{,}34 \approx \boldsymbol{\SI{5}{\volt}} \]
+
+  \emph{Remarque de rigueur.} Les valeurs exactes sont $\SI{1,0023}{\volt}$ et $\SI{4,987}{\volt}$ : le coefficient $337{,}7$ est lui-m\^eme un arrondi. Le coefficient qui donnerait \textbf{exactement} \SIrange{1}{5}{\volt} sur $[-1\,;\,10{,}8]$\,mV vaut $\frac{5-1}{(10{,}8+1)\times 10^{-3}} = \frac{4}{0{,}0118} \approx 339$, tr\`es proche du gain $340$ \'etabli \`a l'exercice 3. L'\'ecart de \SI{0,3}{\percent} sur la pleine \'echelle est sans cons\'equence pratique, mais il faut savoir d'o\`u il vient plut\^ot que de « retrouver » $1$ et $5$ par complaisance.
+  \item L'\'etage d'amplification seul produit une tension $V_3$ qui, pour $e_{AB} = \SI{-1}{\milli\volt}$, vaut $340\times(-0{,}001) \approx \SI{-0,34}{\volt}$ : elle est \textbf{n\'egative}. Or l'\'etage suivant doit fournir un courant $I_s$ \textbf{strictement positif}, compris entre $4$ et \SI{20}{\milli\ampere}.
+
+  Le terme $+\,V_e$ r\'ealise la \textbf{translation d'origine} (l'\emph{offset}) qui transforme la plage $[-0{,}34\,;\,3{,}65]$\,V, \`a cheval sur z\'ero, en la plage $[1\,;\,5]$\,V enti\`erement positive :
+  \[ V_4 = \underbrace{340\,e_{AB}}_{\text{plage } [-0{,}34\,;\,+3{,}65]\,\mathrm{V}} + \underbrace{1{,}34}_{\text{d\'ecalage}} \;\longrightarrow\; \text{plage } [1\,;\,5]\,\mathrm{V} \]
+  Sans ce d\'ecalage, toute la partie n\'egative de l'\'etendue de mesure (les temp\'eratures les plus basses) serait \textbf{perdue} : le convertisseur tension-courant ne pouvant d\'elivrer de courant n\'egatif, il saturerait \`a \SI{0}{\milli\ampere} et toutes ces temp\'eratures seraient confondues. Le d\'ecalage est donc la traduction \'electronique du \textbf{z\'ero vivant} de la boucle \SIrange{4}{20}{\milli\ampere} (cf. exercice 2).
+  \item Avec $I_s = V_4/R_5$ et $R_5 = \SI{250}{\ohm}$ :
+  \[ V_4 = \SI{1}{\volt} \;\Longrightarrow\; I_s = \frac{1}{250} = \SI{4e-3}{\ampere} = \boldsymbol{\SI{4}{\milli\ampere}} \]
+  \[ V_4 = \SI{5}{\volt} \;\Longrightarrow\; I_s = \frac{5}{250} = \SI{20e-3}{\ampere} = \boldsymbol{\SI{20}{\milli\ampere}} \]
+
+  \smallskip
+  \textbf{Conclusion.} La cha\^ine compl\`ete transforme bien l'\'etendue de mesure $[-20\,;\,200]$\degree C du thermocouple de type J en la plage de sortie normalis\'ee $[4\,;\,20]$\,\si{\milli\ampere} attendue par le module d'entr\'ees analogiques de l'automate : \textbf{le transmetteur est conforme}. Les trois \'etages se lisent maintenant comme les trois op\'erations d'une \textbf{mise \`a l'\'echelle affine} : l'amplification fixe la \textbf{pente} ($\times 340$, du millivolt au volt), le d\'ecalage fixe l'\textbf{origine} ($+\SI{1,34}{\volt}$, pour rendre la plage positive), la conversion fixe la \textbf{nature du signal} transmis ($\div\,\SI{250}{\ohm}$, de la tension au courant). Aucun des trois n'est optionnel, et chacun se dimensionne \`a partir des deux points extr\^emes du cahier des charges.
+  \item La grandeur transmise sur la ligne est un \textbf{courant}, et ce courant est \textbf{impos\'e} par le montage ind\'ependamment de la charge : le convertisseur se comporte en \textbf{source de courant} (tant que l'AOP ne sature pas, c'est-\`a-dire dans sa plage de conformit\'e). Trois cons\'equences industrielles majeures :
+  \begin{itemize}
+    \item la \textbf{chute de tension dans les conducteurs} (r\'esistance de ligne, qui s'ajoute \`a $R_{ana}$ sur des dizaines ou des centaines de m\`etres) n'affecte pas la valeur transmise -- alors qu'elle fausserait imm\'ediatement une transmission en tension ;
+    \item la valeur ne d\'epend pas de l'imp\'edance d'entr\'ee exacte du r\'ecepteur : on peut changer de carte d'entr\'ees automate sans r\'e\'etalonner le transmetteur ;
+    \item la boucle de courant est \textbf{intrins\`equement immunis\'ee} contre les perturbations \'electromagn\'etiques induites en mode commun sur la paire, qui n'injectent pas de courant dans une boucle ferm\'ee \`a faible imp\'edance.
+  \end{itemize}
+  C'est pr\'ecis\'ement ce qui justifie que le standard \SIrange{4}{20}{\milli\ampere} se soit impos\'e en instrumentation industrielle, l\`a o\`u le signal doit parcourir une distance notable entre le capteur et l'automate.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 5 -- INEDIT -- pont de Wheatstone PT100, validite de dR << R0
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Une sonde \textbf{PT100} mesure la temp\'erature $T$ d'un fluide caloporteur sur l'\'etendue $[0\,;\,150]$\degree C. C'est un capteur \textbf{passif} : sa r\'esistance suit la loi
+\[ R_T = R_0\,(1 + \alpha T) \qquad\text{avec}\qquad R_0 = \SI{100}{\ohm} \;(\text{\`a } 0\degree\mathrm{C}), \quad \alpha = \SI{3,85e-3}{\per\degreeCelsius} \]
+
+Elle est ins\'er\'ee dans un \textbf{pont de Wheatstone en quart de pont} (une seule branche active, les trois autres \'etant des r\'esistances fixes de valeur $R_0$), aliment\'e sous $V_{cc} = \SI{5}{\volt}$. La tension de d\'es\'equilibre $V_{out} = V_A - V_B$ attaque ensuite un amplificateur d'instrumentation de gain $K$, dont la sortie alimente un CAN d'entr\'ee \SIrange{0}{3}{\volt}.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.9, every node/.style={scale=0.9}]
+  \draw (0,2.7) to[R, l_=$R_0$] (-1.9,1.35);
+  \draw (-1.9,1.35) to[R, l_=$R_0$] (0,0);
+  \draw (0,2.7) to[R, l=$R_0$] (1.9,1.35);
+  \draw (1.9,1.35) to[R, l=$R_T$] (0,0);
+  \node[circ] at (0,2.7) {};
+  \node[circ] at (0,0) {};
+  \node[circ] at (-1.9,1.35) {};
+  \node[circ] at (1.9,1.35) {};
+  \draw (0,2.7) -- (0,3.25) node[above, font=\scriptsize] {$+V_{cc} = \SI{5}{\volt}$};
+  \draw (0,0) -- (0,-0.55) node[ground]{};
+  \node[above left, font=\scriptsize] at (-1.95,1.4) {$B$};
+  \node[above right, font=\scriptsize] at (1.95,1.4) {$A$};
+  % tension de desequilibre, annotee au-dessus du centre du pont (hors des bras)
+  \node[font=\scriptsize] at (0,1.35) {$V_{out} = V_A - V_B$};
+  % liaisons vers ampli instrumentation
+  \draw (1.9,1.35) -- (3.1,1.35) -- (3.1,1.75) -- (4.15,1.75);
+  \draw (-1.9,1.35) -- (-2.9,1.35) -- (-2.9,-1.5) -- (3.55,-1.5) -- (3.55,0.95) -- (4.15,0.95);
+  \node[draw, minimum width=1.9cm, minimum height=1.1cm, align=center, font=\scriptsize] (ai) at (5.15,1.35) {Ampli\\instrum.\\gain $K$};
+  \node[font=\scriptsize] at (3.95,1.98) {$+$};
+  \node[font=\scriptsize] at (3.95,0.7) {$-$};
+  \draw[->] (ai.east) -- (7.1,1.35) node[right, font=\scriptsize, align=left] {vers CAN\\$[0\,;\,3]$ V};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \'Etablir l'\textbf{expression exacte} de $V_{out} = V_A - V_B$ en fonction de $V_{cc}$, $R_0$ et $\Delta R = R_T - R_0$. Montrer que, \textbf{sous l'hypoth\`ese $\Delta R \ll R_0$}, elle se simplifie en $V_{out} \approx \dfrac{V_{cc}}{4}\cdot\dfrac{\Delta R}{R_0}$.
+  \item Calculer $\Delta R$ et le rapport $\Delta R/R_0$ pour $T = \SI{10}{\degreeCelsius}$ puis pour $T = \SI{150}{\degreeCelsius}$. \textbf{L'hypoth\`ese de lin\'earisation est-elle l\'egitime sur toute l'\'etendue de mesure ?}
+  \item Calculer, pour $T = \SI{150}{\degreeCelsius}$, la valeur de $V_{out}$ donn\'ee par la formule lin\'earis\'ee puis par l'expression exacte. Chiffrer l'\textbf{erreur relative} commise en utilisant la formule lin\'earis\'ee.
+  \item D\'eterminer le gain $K$ de l'amplificateur d'instrumentation pour que la pleine \'echelle du CAN ($\SI{3}{\volt}$) soit atteinte \`a $T = \SI{150}{\degreeCelsius}$. Conclure sur la validit\'e de la cha\^ine ainsi con\c{c}ue.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Chaque branche du pont est un \textbf{diviseur de tension} entre $+V_{cc}$ et la masse. Les entr\'ees de l'amplificateur d'instrumentation n'absorbant aucun courant, les deux diviseurs sont ind\'ependants :
+  \[ V_A = V_{cc}\,\frac{R_T}{R_0 + R_T} = V_{cc}\,\frac{R_0 + \Delta R}{2R_0 + \Delta R} \qquad\qquad V_B = V_{cc}\,\frac{R_0}{R_0 + R_0} = \frac{V_{cc}}{2} \]
+  D'o\`u l'\textbf{expression exacte} :
+  \[ V_{out} = V_A - V_B = V_{cc}\left(\frac{R_0 + \Delta R}{2R_0 + \Delta R} - \frac{1}{2}\right) = V_{cc}\,\frac{2(R_0 + \Delta R) - (2R_0 + \Delta R)}{2\,(2R_0 + \Delta R)} \]
+  \[ \boxed{\; V_{out} = \frac{V_{cc}}{2}\cdot\frac{\Delta R}{2R_0 + \Delta R} \;} \]
+  \textbf{Lin\'earisation.} Si et seulement si $\Delta R \ll R_0$, le terme $\Delta R$ est n\'egligeable devant $2R_0$ au d\'enominateur :
+  \[ V_{out} \approx \frac{V_{cc}}{2}\cdot\frac{\Delta R}{2R_0} = \boxed{\;\frac{V_{cc}}{4}\cdot\frac{\Delta R}{R_0}\;} \]
+  Il faut mesurer ce que l'on n\'eglige : l'approximation consiste \`a remplacer $2R_0 + \Delta R$ par $2R_0$, elle \textbf{surestime} donc $V_{out}$ d'un facteur $1 + \dfrac{\Delta R}{2R_0}$.
+  \item $\Delta R = R_T - R_0 = R_0\,\alpha\,T$, soit num\'eriquement $\Delta R = 100 \times 3{,}85\times 10^{-3}\times T = 0{,}385\,T$ (en \si{\ohm}) :
+  \begin{center}
+  \begin{tabular}{@{}lccc@{}}
+  \toprule
+  $T$ & $\Delta R$ & $R_T = R_0 + \Delta R$ & $\Delta R / R_0$ \\
+  \midrule
+  \SI{10}{\degreeCelsius}  & \SI{3,85}{\ohm}  & \SI{103,85}{\ohm} & $0{,}0385$ \\
+  \SI{150}{\degreeCelsius} & \SI{57,75}{\ohm} & \SI{157,75}{\ohm} & $\boldsymbol{0{,}5775}$ \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  \`A \SI{10}{\degreeCelsius}, $\Delta R/R_0 \approx \SI{3,9}{\percent}$ : l'hypoth\`ese est raisonnable. Mais \`a \SI{150}{\degreeCelsius}, $\Delta R$ vaut \textbf{plus de la moiti\'e} de $R_0$ : \textbf{l'hypoth\`ese $\Delta R \ll R_0$ est manifestement fausse} en haut de l'\'etendue de mesure. C'est une diff\'erence de nature avec une \textbf{jauge de contrainte}, dont la variation relative reste de l'ordre de $10^{-4}$ et pour laquelle la lin\'earisation est toujours l\'egitime : \textbf{la formule $V_{cc}/4 \cdot \Delta R/R_0$ ne se transpose pas telle quelle d'un capteur \`a l'autre.}
+  \item Pour $T = \SI{150}{\degreeCelsius}$, $\Delta R = \SI{57,75}{\ohm}$ :
+  \[ V_{out}^{lin} = \frac{V_{cc}}{4}\cdot\frac{\Delta R}{R_0} = \frac{5}{4}\times\frac{57{,}75}{100} = 1{,}25\times 0{,}5775 \approx \boldsymbol{\SI{722}{\milli\volt}} \]
+  \[ V_{out}^{exact} = \frac{V_{cc}}{2}\cdot\frac{\Delta R}{2R_0 + \Delta R} = \frac{5}{2}\times\frac{57{,}75}{200 + 57{,}75} = 2{,}5\times\frac{57{,}75}{257{,}75} \approx \boldsymbol{\SI{560}{\milli\volt}} \]
+  Erreur relative de la formule lin\'earis\'ee :
+  \[ \frac{V_{out}^{lin} - V_{out}^{exact}}{V_{out}^{exact}} = \frac{721{,}9 - 560{,}1}{560{,}1} \approx \boldsymbol{+\SI{28,9}{\percent}} \]
+  On v\'erifie la coh\'erence avec l'analyse du 1. : le facteur de surestimation pr\'evu vaut $1 + \frac{\Delta R}{2R_0} = 1 + \frac{57{,}75}{200} = 1{,}289$, soit exactement les \SI{28,9}{\percent} trouv\'es. Une erreur de pr\`es de \SI{30}{\percent} sur la pleine \'echelle est \textbf{r\'edhibitoire} pour une mesure de temp\'erature.
+  \item Le gain doit \^etre calcul\'e sur la valeur \textbf{exacte} de $V_{out}$ en haut d'\'echelle, sous peine de reproduire l'erreur pr\'ec\'edente :
+  \[ K = \frac{V_{CAN\,max}}{V_{out}^{exact}(150\degree\mathrm{C})} = \frac{3}{0{,}5601} \approx \boldsymbol{5{,}36} \]
+  \emph{Contre-exemple \`a ne pas commettre} : avec la formule lin\'earis\'ee on aurait trouv\'e $K = 3/0{,}7219 \approx 4{,}16$, gain \textbf{trop faible de \SI{22}{\percent}}. La sortie plafonnerait alors \`a $4{,}16\times 0{,}5601 \approx \SI{2,33}{\volt}$ \`a \SI{150}{\degreeCelsius} : plus de \SI{22}{\percent} de la dynamique du CAN resterait inutilis\'ee, d\'egradant d'autant la r\'esolution effective.
+
+  \smallskip
+  \textbf{Conclusion.} Avec $K \approx 5{,}4$, la cha\^ine couvre bien $[0\,;\,3]$\,V sur $[0\,;\,150]$\degree C \textbf{aux deux extr\'emit\'es}, mais elle reste \textbf{intrins\`equement non lin\'eaire} entre les deux : le pont de Wheatstone associ\'e \`a une PT100 sur une aussi large \'etendue ne fournit pas une tension proportionnelle \`a la temp\'erature. La conformit\'e de la cha\^ine ne peut donc pas \^etre prononc\'ee sur les seuls points extr\^emes -- il faut, soit \textbf{lin\'eariser par calcul} en aval (le traitement num\'erique inverse la relation exacte, solution retenue en pratique dans les automates et transmetteurs num\'eriques), soit \textbf{restreindre l'\'etendue de mesure} \`a un domaine o\`u $\Delta R \ll R_0$ est v\'erifi\'ee (par exemple $[0\,;\,20]$\degree C, o\`u l'erreur de lin\'earisation reste sous \SI{4}{\percent}). \'Ecrire $V_{out} = \frac{V_{cc}}{4}\frac{\Delta R}{R_0}$ sans jamais v\'erifier l'hypoth\`ese qui la fonde est l'erreur de fond \`a \'eviter.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2025, commentaire de la partie 5) : \guillemotleft\ L'int\'er\^et d'un pont de Wheatstone et l'expression simplifi\'ee de la tension de sortie ont \'et\'e trait\'es par moins de vingt pour cent des candidats. \guillemotright}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 6 -- 2022, question 24
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize 2022, \'epreuve \'ecrite disciplinaire (option IE), question 24}
+]
+\CAPETSHOW{
+Un module de t\'el\'etransmission TRT200, install\'e dans un poste de purge de r\'eseau vapeur, surveille l'\'etat de sa propre alimentation. Celle-ci est assur\'ee par un \textbf{module Peltier} (r\'ecup\'eration d'\'energie thermique sur la conduite) qui recharge des accumulateurs.
+
+La tension $U_{Peltier}$ d\'elivr\'ee par le module est ramen\'ee \`a l'entr\'ee analogique \textbf{ADC2} du microcontr\^oleur PIC~18F8723 au travers d'un \textbf{pont diviseur} form\'e de deux r\'esistances \textbf{\'egales} $R_4$ et $R_5$ ; la tension appliqu\'ee sur ADC2 vaut donc la \textbf{moiti\'e} de la tension du module Peltier. Une diode $D_1$ prot\`ege l'entr\'ee contre les tensions n\'egatives.
+
+Le convertisseur analogique-num\'erique interne au microcontr\^oleur est un \textbf{CAN 12 bits}, dont la tension de r\'ef\'erence vaut $V_{REF+} = \SI{3,5}{\volt}$ (et $V_{REF-} = \SI{0}{\volt}$).
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.9, every node/.style={scale=0.9}]
+  % --- pont diviseur R4 / R5, branche verticale bien etiree
+  \draw (0.9,4.0) node[above, font=\scriptsize, align=center] {module Peltier\\$U_{Peltier}$} -- (0.9,3.6);
+  \draw (0.9,3.6) to[R, l=$R_4$] (0.9,2.1);
+  \draw (0.9,2.1) to[R, l=$R_5$] (0.9,0.6);
+  \draw (0.9,0.6) -- (0.9,0.1) node[ground]{};
+  \node[circ] at (0.9,2.1) {};
+  % --- point milieu -> diode de protection (branche separee) -> CAN
+  \draw (0.9,2.1) -- (2.9,2.1);
+  \node[circ] at (2.9,2.1) {};
+  \draw (2.9,2.1) to[D, l_=$D_1$] (2.9,0.6);
+  \draw (2.9,0.6) -- (2.9,0.1) node[ground]{};
+  \draw (2.9,2.1) -- (4.5,2.1) node[midway, above, font=\scriptsize] {ADC2};
+  \node[draw, minimum width=2.6cm, minimum height=1.7cm, align=center, font=\scriptsize] (can) at (5.85,2.1) {CAN 12 bits\\PIC 18F8723\\$V_{REF+}{=}\SI{3,5}{\volt}$};
+  \draw[->] (can.east) -- (7.85,2.1) node[right, font=\scriptsize, align=left] {$N$\\(0 \`a 4095)};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Calculer} le quantum $q$ du convertisseur analogique-num\'erique, en \si{\milli\volt} par LSB.
+  \item En d\'eduire la valeur en sortie du CAN, exprim\'ee en base d\'ecimale, lorsque la tension aux bornes du module Peltier est de \SI{2}{\volt}.
+  \item Le module TRT200 t\'el\'etransmet une alarme lorsque la sortie du CAN prend la valeur \texttt{0xAF} ($175$ en base d\'ecimale). Sachant que le cahier des charges impose que la tension aux bornes du module Peltier ne soit \textbf{pas inf\'erieure \`a \SI{0,9}{\volt}}, \textbf{justifier} le d\'eclenchement de cette alarme.
+  \item Le pont diviseur divise la tension par deux \textbf{avant} la num\'erisation. Analyser l'effet de ce choix sur la r\'esolution de la mesure, et indiquer \`a quelle contrainte il r\'epond n\'eanmoins.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le quantum est le pas de num\'erisation, c'est-\`a-dire la plus petite variation de tension d'entr\'ee qui fasse changer le code de sortie d'une unit\'e (LSB). Pour un convertisseur de $n$ bits, la plage $[V_{REF-}\,;\,V_{REF+}]$ est d\'ecoup\'ee en $2^n - 1$ intervalles :
+  \[ q = \frac{V_{REF+} - V_{REF-}}{2^n - 1} = \frac{3{,}5 - 0}{2^{12} - 1} = \frac{3{,}5}{4\,095} \approx \SI{0,855e-3}{\volt} \approx \boldsymbol{\SI{0,85}{\milli\volt}\;/\;\mathrm{LSB}} \]
+  \emph{Attention} : c'est bien $2^n - 1 = 4\,095$ et non $2^n = 4\,096$ qu'il faut \'ecrire au d\'enominateur, puisque le code varie de $0$ \`a $4\,095$, soit $4\,095$ intervalles pour $4\,096$ valeurs. L'\'ecart est faible (\SI{0,02}{\percent}) mais la confusion est syst\'ematiquement relev\'ee.
+  \item Le pont diviseur \`a r\'esistances \'egales divise la tension par deux :
+  \[ V_{ADC2} = \frac{U_{Peltier}}{2} = \frac{2}{2} = \SI{1}{\volt} \]
+  Le code de sortie s'obtient en divisant la tension appliqu\'ee par le quantum, ou de fa\c{c}on \'equivalente par produit en croix sur la pleine \'echelle :
+  \[ N = \frac{V_{ADC2}}{q} = V_{ADC2}\cdot\frac{4\,095}{V_{REF+}} = 1\times\frac{4\,095}{3{,}5} = \boldsymbol{1\,170} \]
+  (valeur enti\`ere exacte ici, le CAN tronquant sinon \`a l'entier inf\'erieur).
+  \item Il faut parcourir la cha\^ine \textbf{en sens inverse} : du code num\'erique vers la grandeur physique.
+
+  \textbf{Du code vers la tension d'entr\'ee du CAN :}
+  \[ V_{ADC2} = N\times q = 175\times\frac{3{,}5}{4\,095} \approx \SI{0,1496}{\volt} \approx \SI{0,15}{\volt} \]
+  \textbf{De l'entr\'ee du CAN vers le module Peltier} (il faut « remonter » le pont diviseur, donc \textbf{multiplier} par deux) :
+  \[ U_{Peltier} = 2\times V_{ADC2} = 2\times 0{,}15 = \boldsymbol{\SI{0,3}{\volt}} \]
+  \textbf{Comparaison \`a l'exigence :} $\SI{0,3}{\volt} < \SI{0,9}{\volt}$. La tension d\'elivr\'ee par le module Peltier est donc \textbf{tr\`es en de\c{c}\`a} du minimum impos\'e : le d\'eclenchement de l'alarme t\'el\'etransmise est \textbf{pleinement justifi\'e}.
+
+  \smallskip
+  \emph{Pi\`ege de la cha\^ine inverse.} L'erreur classique est d'oublier le pont diviseur et de conclure sur les \SI{0,15}{\volt} de l'entr\'ee du CAN. Ici, elle ne change pas la conclusion (les deux valeurs sont sous le seuil), mais elle fausserait le diagnostic d\`es que la mesure s'approcherait de la limite : \textbf{le seuil du cahier des charges porte sur la grandeur physique, pas sur le signal conditionn\'e}. Chaque \'etage de la cha\^ine d'acquisition doit \^etre remont\'e explicitement.
+  \item Le pont diviseur \textbf{divise par deux} la tension pr\'esent\'ee au CAN. \`A quantum constant (\SI{0,85}{\milli\volt} / LSB, fix\'e par $V_{REF+}$ et par les 12 bits), cela signifie qu'une variation donn\'ee de $U_{Peltier}$ ne produit plus que \textbf{moiti\'e moins} de codes : la r\'esolution rapport\'ee \`a la grandeur mesur\'ee passe de \SI{0,85}{\milli\volt} \`a \textbf{\SI{1,7}{\milli\volt} par LSB}. De plus, si $U_{Peltier}$ ne d\'epasse jamais quelques volts, une partie de la dynamique du CAN reste inutilis\'ee.
+
+  Ce choix r\'epond n\'eanmoins \`a une \textbf{contrainte imp\'erative} : la tension d'entr\'ee d'un CAN ne doit \textbf{jamais} exc\'eder sa tension de r\'ef\'erence $V_{REF+} = \SI{3,5}{\volt}$, sous peine de saturation du code (\emph{clipping}, mesure fausse) voire de destruction de l'entr\'ee. Le module Peltier, selon son point de fonctionnement, peut d\'elivrer nettement plus de \SI{3,5}{\volt} ; le pont diviseur garantit que l'entr\'ee reste dans le domaine admissible sur toute la plage de fonctionnement. La diode $D_1$ compl\`ete ce r\^ole de protection du c\^ot\'e des tensions n\'egatives.
+
+  \smallskip
+  \textbf{Conclusion.} L'adaptation de niveau par pont diviseur est le \textbf{compromis classique du conditionnement} : on sacrifie d\'elib\'er\'ement une part de r\'esolution pour garantir l'\textbf{int\'egrit\'e} de l'entr\'ee de num\'erisation sur toute la plage de fonctionnement, protection qui prime sur la finesse de mesure d\`es lors que, comme ici, la fonction attendue est une \textbf{surveillance de seuil} ($U_{Peltier} \geq \SI{0,9}{\volt}$) et non une mesure de pr\'ecision. Dimensionner la r\'esolution au plus juste pour une simple fonction d'alarme serait l'erreur de conception inverse.
+
+  \smallskip
+  \emph{Remarque sur la source.} Le corrig\'e officiel de ce sujet compare la tension retrouv\'ee (\SI{0,3}{\volt}) \`a un seuil de \SI{0,4}{\volt} lu sur le diagramme des exigences, alors que l'\'enonc\'e du sujet \'enonce un minimum de \SI{0,9}{\volt}. Les deux seuils divergent dans les documents publi\'es ; la conclusion est identique dans les deux cas, puisque \SI{0,3}{\volt} est inf\'erieure \`a l'une comme \`a l'autre.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2022, commentaires de l'\'epreuve \'ecrite disciplinaire) : \guillemotleft\ De nombreuses r\'eponses n'ont pas \'et\'e justifi\'ees ou reprennent sans aucune explication des donn\'ees issues de documentations techniques fournies. \guillemotright}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

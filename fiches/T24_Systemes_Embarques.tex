@@ -1,0 +1,346 @@
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ficheHeaders{T24}{Systèmes embarqués}{colElec}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TETE
+% -----------------------------------------------------------------------
+
+\ficheEntete{T24}{Systèmes embarqués - Microcontrôleurs, API, FPGA}{colElec}%
+  {électronique - Commande numérique et systèmes programmables}%
+  {\textbf{Présence :} \textbf{6/13} sujets (2013-2026) - thème \emph{fréquent}}%
+  {microcontrôleur (Arduino, PIC) - registre ADCON0 - API S7-1500 - PWM - bus CAN/OneWire/LoRa - DSP - FPGA/VHDL (programme) - mise à l'échelle automate}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Architecture systemes embarques -------------------------------
+\textbf{1.1 Architecture des systèmes embarqués}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{llll}
+\toprule
+\textbf{Composant} & \textbf{Rôle} & \textbf{Exemples CAPET} & \textbf{Prog.} \\
+\midrule
+Microcontrôleur & CPU + périphériques intégrés & Arduino, PIC 18F8723 & C/Python \\
+DSP & Traitement signal haute vitesse & DSP 40 MHz (2024) & C optimisé \\
+API/PLC & Contrôle industriel robuste & Siemens S7-1500 (2024) & Ladder/Grafcet \\
+FPGA & Circuit reconfigurable parallèle & (Programme SII) & VHDL \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 Microcontroleur - CAN interne --------------------------------
+\textbf{1.2 Microcontrôleur - CAN interne (PIC 18F8723)}
+
+\begin{itemize}
+  \item 1 CAN partagé entre 16 entrées analogiques AN0→AN15 via multiplexeur
+  \item Sélection de la voie : registre ADCON0, champs CHS3:CHS0
+  \item Résolution 10 bits ; Quantum $q = V_{ref}/2^{10} = V_{ref}/1024$
+  \item Démarrage conversion : bit GO/DONE = 1
+\end{itemize}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 PWM ----------------------------------------------------------
+\textbf{1.3 PWM - Modulation de Largeur d'Impulsion}
+
+Signal créneau à fréquence fixe (50 Hz pour servomoteur), rapport cyclique $\alpha = t_{on}/T$.
+
+\smallskip
+\begin{center}
+\begin{tikzpicture}[scale=0.85, font=\footnotesize]
+  \draw[->] (0,0) -- (6.3,0) node[right] {$t$};
+  \draw[->] (0,-0.3) -- (0,2.0) node[above] {$V_{PWM}$};
+  \draw[thick, colElec] (0,1.4) -- (1.5,1.4) -- (1.5,0) -- (6,0);
+  \draw[dotted] (1.5,0) -- (1.5,1.4);
+  \node[below] at (0.75,0) {\scriptsize $t_{on}$};
+  \draw[dashed] (6,0) -- (6,-0.3);
+  \node[below] at (6,-0.3) {\scriptsize $T = 20\,\mathrm{ms}$ (50 Hz)};
+\end{tikzpicture}
+\end{center}
+
+\[
+  t_{on} = \frac{\theta - \theta_{min}}{\theta_{max} - \theta_{min}}\,(t_{on,max} - t_{on,min}) + t_{on,min}
+\]
+
+Fréquence d'échantillonnage pour résolution angulaire $\delta\theta$ :
+\[
+  f_{ech} = \frac{\theta_{max} - \theta_{min}}{\delta\theta \cdot T} = \frac{N_{positions}}{T}
+  \quad \Rightarrow \quad
+  f_{ech} = N_{pos} \times f_{PWM}
+\]
+Exemple (2025) : $\delta\theta = 0{,}1^\circ$, plage $180^\circ$ - $N = 1800$ - $f_{ech} = 90\,\mathrm{kHz}$ (PWM à 50 Hz).
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 API Siemens S7-1500 ------------------------------------------
+\textbf{1.4 Automate S7-1500 - Mise à l'échelle}
+
+\[
+  T = T_{min} + \frac{PIW8 - 0}{27\,648 - 0}\,(T_{max} - T_{min})
+\]
+\begin{itemize}
+  \item Module AI : PIW8 $\in [0\,;\,27\,648]$ pour $I_s \in [4\,;\,20]\,\mathrm{mA}$
+  \item Programme cyclique : lecture entrées - traitement - écriture sorties
+  \item Capteur OneWire DS1820 : commande 0x44 (conversion) ; 0xBE (lecture scratchpad)
+\end{itemize}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.5 DSP ----------------------------------------------------------
+\textbf{1.5 DSP - Calcul de fréquence maximale}
+
+\[
+  f_{max} = \frac{P \cdot n}{60}
+  \quad P : \text{points/tour codeur}, \quad n : \text{vitesse (tr/min)}
+\]
+Condition : $f_{DSP} \geq f_{max}$. Exemple (2024) : $f_{max} = 1326\,\mathrm{Hz}$, $f_{DSP} = 40\,\mathrm{MHz}$.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.6 Bus CAN Controller Area Network -------------------------------
+\textbf{1.6 Bus CAN (Controller Area Network)}
+
+Bus série différentiel multi-maîtres, débit jusqu'à 1 Mbit/s.\\
+Structure de trame : SOF (1) + ID (11) + RTR (1) + IDE+r0 (2) + DLC (4) + Data (0-64) + CRC (15) + délimiteur CRC (1) + ACK (2) + EOF (7) = 108 bits max (hors bits de stuffing).
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHETIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthétique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{5cm}l@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} \\
+\midrule
+\multicolumn{2}{@{}l}{\footnotesize\textit{PWM}} \\
+$\alpha = t_{on}/T$ & Rapport cyclique \\
+$f_{ech} = N_{pos} \times f_{PWM}$ & Résolution angulaire \\
+$N_{pos} = (\theta_{max}-\theta_{min})/\delta\theta$ & Nb positions \\
+\midrule
+\multicolumn{2}{@{}l}{\footnotesize\textit{DSP}} \\
+$f_{max} = P \cdot n / 60$ & Fréquence codeur \\
+Condition : $f_{DSP} \geq f_{max}$ & Choix DSP \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{5cm}l@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} \\
+\midrule
+\multicolumn{2}{@{}l}{\footnotesize\textit{API S7-1500}} \\
+$T = T_{min} + PIW8/27648 \cdot \Delta T$ & Mise à l'échelle \\
+PIW8 $\in [0\,;\,27\,648]$ & Plage module AI \\
+\midrule
+\multicolumn{2}{@{}l}{\footnotesize\textit{Bus CAN}} \\
+Débit max : 1\,Mbit/s & CAN 2.0 \\
+Trame max : 108\,bits (8 octets data) & Structure \\
+$D_b = 1/T_b$ & Débit depuis chrono. \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets réels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Registre ADCON0 du PIC - configuration CAN \hfill\normalfont\footnotesize E1/E2 2022 (PIC 18F8723)}
+]
+\textbf{Énoncé.}
+Pour sélectionner l'entrée AN2 du PIC 18F8723 et lancer la conversion, remplir le registre ADCON0 champ par champ. Donner la valeur hexadécimale.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Structure ADCON0.} [ADON | GO/DONE | CHS3 | CHS2 | CHS1 | CHS0 | - | ]
+\begin{itemize}
+  \item ADON = 1 (CAN activé)
+  \item GO/DONE = 1 (lancer la conversion)
+  \item CHS3:CHS0 = 0010 (voie AN2)
+\end{itemize}
+
+\textbf{Étape 2 — Assemblage.} Registre : $1\,1\,0010\,00_2$ (si les 2 LSB non utilisés = 0) = $\mathrm{C8_{16}}$ (à vérifier sur le datasheet exact).
+
+\textbf{Conclusion.} Le codage binaire et la méthode de configuration bit par bit sont corrects ; la valeur hexadécimale finale reste \textbf{[corrigé reconstitué]} tant que la table officielle ADCON0 fournie dans le sujet n'est pas confirmée — l'attitude attendue est de le signaler plutôt que d'affirmer un résultat non vérifiable.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - PWM servomoteur - fréquence d'échantillonnage \hfill\normalfont\footnotesize E2 Commune 2025 (Q18-Q19)}
+]
+\textbf{Énoncé.}
+Signal PWM à 50 Hz pour un servomoteur ($-90^\circ$ à $+90^\circ$). Précision angulaire requise : $\delta\theta = 0{,}1^\circ$. À quelle fréquence le récepteur doit-il échantillonner le signal PWM ? Le microcontrôleur Arduino (84 MHz) est-il compatible ?
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Nombre de positions.} $N = \dfrac{180^\circ}{0{,}1^\circ} = 1800$.
+
+\textbf{Étape 2 — Fréquence d'échantillonnage nécessaire.}
+\[
+  f_{ech} = N \times f_{PWM} = 1800 \times 50 = \mathbf{90\,000\,\mathrm{Hz}} = 90\,\mathrm{kHz}
+\]
+
+\textbf{Étape 3 — Vérification Arduino.} $f_{horloge} = 84\,\mathrm{MHz} \gg 90\,\mathrm{kHz}$.
+
+\textbf{Conclusion.} L'exigence d'échantillonnage est très largement respectée par l'horloge Arduino : la solution est \textbf{conforme au cahier des charges} sur ce critère, à condition que le code de mesure du temps haut reste suffisamment optimisé pour ne pas introduire de latence logicielle.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Mise à l'échelle automate - programme de conversion \hfill\normalfont\footnotesize E1 2024 (S7-1500)}
+]
+\textbf{Énoncé.}
+Le module AI du S7-1500 reçoit un signal 4-20\,mA d'un thermocouple type J ($T \in [-20\,;\,+200]\,^\circ\mathrm{C}$). PIW8 $\in [0\,;\,27\,648]$. Écrire la relation de mise à l'échelle.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Relation affine.}
+\[
+  T = T_{min} + \frac{PIW8 - 0}{27\,648 - 0}\,(T_{max} - T_{min})
+  = -20 + \frac{PIW8}{27\,648} \times 220
+\]
+
+\textbf{Étape 2 — Implémentation.} En Ladder/Blocs fonctionnels S7-1500 : instruction SCALE ou calcul avec blocs ADD, MUL, DIV avec les coefficients $a = 220/27648$ et $b = -20$.
+
+\textbf{Étape 3 — Vérification aux bornes.} $PIW8 = 0 \Rightarrow T = -20^\circ$C ; $PIW8 = 27\,648 \Rightarrow T = 200^\circ$C.
+
+\textbf{Conclusion.} La loi affine est validée aux deux bornes de la plage : la conversion respecte le cahier des charges de mesure sur l'intégralité de l'étendue utile du capteur.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs récurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Configurer un registre bit par bit.} Justifier chaque bit de ADCON0 (ou tout autre registre de microcontrôleur) - écrire la valeur hex sans justification est insuffisant.
+
+  \item \textbf{Câblage d'une entrée/sortie automate.} Jury 2021 : "Un candidat au CAPET doit être capable de câbler une entrée TOR/analogique d'un API industriel."
+
+  \item \textbf{Confusion API vs microcontrôleur.} L'API est robuste, programmé en Ladder/Grafcet pour l'industrie. Le microcontrôleur est compact, programmé en C/Python pour les fonctions embarquées légères. Ne pas interchanger.
+
+  \item \textbf{Mise à l'échelle API.} Ne pas oublier le décalage (offset) quand la plage ne commence pas à zéro (ex. $PIW8 = 0 \Rightarrow T = -20^\circ$C). Vérifier les deux bornes.
+
+  \item \textbf{Bus CAN vs CAN (convertisseur).} Dans les sujets, les deux coexistent (2026 E1). Distinguer par le contexte : bus de terrain vs convertisseur analogique-numérique.
+
+  \item \textbf{FPGA/VHDL.} Absent des sujets réels 2013-2026 mais au programme. Si la question apparaît : entité + architecture, signal, process concurrent vs séquentiel.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2023 : «~Notions d'algorithmes, variables informatiques, boucles, systèmes embarqués sont des connaissances de base attendues des candidats.~»\\
+Rapport jury 2021 : «~Un candidat au CAPET doit être capable de câbler une entrée ou une sortie TOR/analogique d'un API industriel programmable.~»
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PRESENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colPresence,
+  title={Présence dans les sujets analysés (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Année} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & $\checkmark$ & - & - & - & - & - & - & $\checkmark$ & $\checkmark$ & - & $\checkmark$ & - \\
+E2 discipl. IE & - & - & - & - & - & - & $\checkmark$ & - & - & - & - & $\checkmark$ & $\checkmark$ \\
+E2 appl. comm. & - & - & - & - & - & - & - & - & - & - & - & $\checkmark$ & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-thèmes fréquents :}
+registre CAN microcontrôleur (PIC ADCON0) - OneWire DS1820 - mise à l'échelle API S7-1500 - PWM servomoteur - DSP fréquence - bus CAN trame - LoRaWAN IoT
+
+\medskip
+\textbf{Ordres de grandeur (repères rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Réseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, fréquence \SI{50}{\hertz}.
+  \item Courants d'étude fréquents en sujet : de quelques \si{\ampere} à quelques dizaines de \si{\ampere}.
+  \item En conversion d'énergie, un rendement attendu reste généralement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthèse express (à refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypothèses du modèle et les conventions de signe.
+  \item Écrire 2 à 4 relations clés avec unités.
+  \item Réaliser un calcul numérique complet et vérifier l'ordre de grandeur.
+  \item Justifier le résultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE

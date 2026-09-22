@@ -1,0 +1,379 @@
+﻿\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colElec}{T22}} - CAN/CNA - Numerisation et echantillonnage}
+\fancyhead[R]{\small\textit{CAPET SII IE - Session 2026}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TeTE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colElec,
+  colframe=colElec,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T22 \quad CAN/CNA - Numerisation et echantillonnage}\\[2pt]
+  {\color{colElec!30!white}\small
+    \textbf{Domaine :} electronique - Chaene d'acquisition numerique \quad
+    \textbf{Presence :} \textbf{8/13} sujets (2013-2026) - theme \emph{tres frequent}
+  }\\[1pt]
+  {\color{colElec!20!white}\footnotesize
+    Sous-themes : quantum - nombre de bits - codage binaire/hex - theoreme de Shannon - filtre anti-repliement - chaene capteureconditionneureCAN - CNA en sortie de correcteur
+  }
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 CAN - Quantum et resolution -----------------------------------
+\textbf{1.1 Convertisseur Analogique-Numerique (CAN) - Quantum}
+
+\[
+  q = \frac{V_{ref}}{2^n - 1} \approx \frac{V_{ref}}{2^n} \quad (n \geq 8)
+  \qquad
+  N = \frac{V_E}{q} = \frac{V_E \cdot 2^n}{V_{ref}}
+  \qquad
+  \text{Erreur max :} \pm\frac{q}{2}
+\]
+
+\textbf{Nombre de bits necessaires} pour une precision $\delta$ sur la plage $V_{ref}$ :
+\[
+  2^n \geq \frac{V_{ref}}{\delta}
+  \qquad \Rightarrow \qquad
+  n \geq \log_2\!\left(\frac{V_{ref}}{\delta}\right)
+\]
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{cccc}
+\toprule
+$n$ (bits) & $2^n$ & $q$ pour $V_{ref}=5\,\mathrm{V}$ & $q$ pour $V_{ref}=10\,\mathrm{V}$ \\
+\midrule
+8  & 256   & $\approx 19{,}6\,\mathrm{mV}$ & $\approx 39{,}2\,\mathrm{mV}$ \\
+10 & 1\,024 & $\approx 4{,}9\,\mathrm{mV}$  & $\approx 9{,}8\,\mathrm{mV}$ \\
+12 & 4\,096 & $\approx 1{,}2\,\mathrm{mV}$  & $\approx 2{,}44\,\mathrm{mV}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 CNA ----------------------------------------------------------
+\textbf{1.2 Convertisseur Numerique-Analogique (CNA)}
+
+\[
+  V_S = N \cdot q = N \cdot \frac{V_{ref}}{2^n}
+\]
+Utilise en sortie du correcteur numerique dans une boucle d'asservissement echantillonne.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 Shannon ------------------------------------------------------
+\textbf{1.3 Theoreme de Shannon - echantillonnage}
+
+\[
+  f_e \geq 2\,f_{max}
+\]
+\begin{itemize}
+  \item Filtre anti-repliement (passe-bas) avant le CAN : $f_c \leq f_e/2$
+  \item Periode d'echantillonnage en asservissement : $T_e \leq T_{systeme}/10$ (regle pratique)
+  \item Aliasing (repliement spectral) si $f_e < 2\,f_{max}$ - signal reconstruit corrompu
+\end{itemize}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 Chaene d'acquisition -----------------------------------------
+\textbf{1.4 Chaene d'acquisition complete}
+
+\[
+  \text{Grandeur physique} \xrightarrow{\text{Capteur}} v_T
+  \xrightarrow{\text{Conditionneur+AMP}} v_A \in [0\,;\,V_{ref}]
+  \xrightarrow{\text{CAN}} G_N
+\]
+La tension $v_A$ doit couvrir \textbf{toute} la plage $[0\,;\,V_{ref}]$ pour utiliser au maximum la resolution.
+
+\textbf{Sensibilite globale de la chaene :}
+\[
+  S = \frac{\Delta G_N}{\Delta x} \quad [\text{LSB/unite physique}]
+\]
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.5 Codage hexadecimal --------------------------------------------
+\textbf{1.5 Codage hexadecimal}
+
+Grouper par 4 bits depuis le bit de poids faible (LSB) : ex. $1842_{10} = 0111\,0011\,0010_2 = 732_{16}$.
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHeTIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthetique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.8cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{CAN}} \\
+$q = V_{ref}/(2^n-1)$ & Quantum exact & V \\
+$q \approx V_{ref}/2^n$ & Quantum approx. & V \\
+$N = V_E/q$ & Code numerique & LSB \\
+$n \geq \log_2(V_{ref}/\delta)$ & Nbre de bits & - \\
+Erreur max $= \pm q/2$ & Quantification & V \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{CNA}} \\
+$V_S = N \cdot V_{ref}/2^n$ & Reconstruction & V \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.8cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Shannon}} \\
+$f_e \geq 2\,f_{max}$ & echantillonnage & Hz \\
+$f_c \leq f_e/2$ & Filtre AR & Hz \\
+$T_e \leq T_{syst}/10$ & Asservissement & s \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Donnees types}} \\
+10 bits / 5\,V : $q \approx 4{,}9\,\mathrm{mV}$ & PIC 18F & - \\
+12 bits / 10\,V : $q \approx 2{,}44\,\mathrm{mV}$ & Precision & - \\
+S7-1500 : PIW8 $\in [0\,;\,27\,648]$ pour 4-20\,mA & API & - \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets reels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+% Mini-procedure de resolution type copie concours
+\begin{tcolorbox}[questiontype,title={Procedure type copie concours (5 etapes)}]
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Qualifier le modele} : hypotheses, domaine de validite, grandeurs d'entree/sortie.
+  \item \textbf{Ecrire les lois} : equations de base avec symboles et unites SI.
+  \item \textbf{Isoler l'inconnue} : expression litterale, puis application numerique tracee.
+  \item \textbf{Controler l'ordre de grandeur} : coherence physique et unite finale.
+  \item \textbf{Conclure concours} : phrase courte orientee decision technique.
+\end{enumerate}
+\end{tcolorbox}
+
+% Visuel de methode : chemin de resolution CAPET
+\begin{center}
+\begin{tikzpicture}[font=\small, node distance=7mm and 6mm, >=Stealth]
+  \node[draw, rounded corners, fill=colElec!8, inner sep=4pt] (n1) {Notions};
+  \node[draw, rounded corners, fill=colElec!8, right=of n1, inner sep=4pt] (n2) {Methode};
+  \node[draw, rounded corners, fill=colElec!8, right=of n2, inner sep=4pt] (n3) {Application annale};
+  \node[draw, rounded corners, fill=colElec!8, right=of n3, inner sep=4pt] (n4) {Verification jury};
+  \draw[->, thick, colElec] (n1) -- (n2);
+  \draw[->, thick, colElec] (n2) -- (n3);
+  \draw[->, thick, colElec] (n3) -- (n4);
+\end{tikzpicture}
+\end{center}
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Calcul du quantum et codage hexadecimal \hfill\normalfont\footnotesize E1 2013 (tour laboratoire)}
+]
+\textbf{enonce.}
+Signal de temperature compris entre $-50^\circ$C et $+50^\circ$C, precision $0{,}1^\circ$C, tension de sortie du capteur-conditionneur : $V \in [0\,;\,10]\,\mathrm{V}$. Determiner le nombre de bits du CAN et calculer le mot hexadecimal pour $\theta = -5^\circ$C.
+
+\tcbline
+
+\textbf{Corrige.}
+
+Precision en tension : $\delta = \dfrac{0{,}1}{100} \times 10 = 10\,\mathrm{mV}$.
+
+\[
+  2^n \geq \frac{10}{0{,}01} = 1000 \quad \Rightarrow \quad n \geq 10 \; \Rightarrow \; \text{choix : } \mathbf{n = 12\,\text{bits}}
+\]
+
+Quantum : $q = 10/(4095) \approx 2{,}44\,\mathrm{mV}$.
+
+Tension pour $\theta = -5^\circ$C : $V_E = \dfrac{10}{100}(-5+50) = 4{,}5\,\mathrm{V}$.
+
+\[
+  N = \frac{4{,}5}{2{,}44 \times 10^{-3}} = 1842_{10} \quad = \quad 0111\,0011\,0010_2 \quad = \quad \mathbf{732_{16}}
+\]
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Sensibilite de la chaene et mot numerique \hfill\normalfont\footnotesize E2 BAC3 2026 (Q16-Q17)}
+]
+\textbf{enonce.}
+Capteur Jumo + conditionneur + CAN 10 bits, $V_{ref} = 3\,\mathrm{V}$, plage $T \in [-5\,;\,90\mathrm{C}]$. La sensibilite globale est $S = 2{,}684\,\mathrm{LSB/C}$. Calculer le mot numerique $G_N$ pour $T_C = 55^\circ$C.
+
+\tcbline
+
+\textbf{Corrige.}
+
+Verification : plage de $95^\circ$C, $V_{ref} = 3\,\mathrm{V}$, $q = 3/1023 \approx 2{,}933\,\mathrm{mV}$, gain conditionneur $c = 3/95 \approx 0{,}0316\,\mathrm{V/C}$ - $S = c/q = 0{,}0316/2{,}933 \times 10^{-3} = 2{,}684\,\mathrm{LSB/C}$. - 
+Pour $T_C = 55^\circ$C (par rapport - $T_{min} = -5^\circ$C) :
+\[
+  G_N = S \times (T_C - T_{min}) = 2{,}684 \times (55 - (-5)) = 2{,}684 \times 60 \approx \mathbf{161\,\mathrm{LSB}}
+\]
+En hexadecimal : $161_{10} = 1010\,0001_2 = \mathrm{A1_{16}}$.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Theoreme de Shannon - filtre anti-repliement \hfill\normalfont\footnotesize E1 2026 (B17)}
+]
+\textbf{enonce.}
+Rappeler le theoreme de Shannon. Definir le rele du filtre anti-repliement. Deduire sa frequence de coupure $f_c$ si la frequence d'echantillonnage est $f_e$.
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{Theoreme de Shannon :} Pour reconstituer sans aliasing un signal de frequence maximale $f_{max}$, la frequence d'echantillonnage $f_e$ doit verifier $f_e \geq 2\,f_{max}$.
+
+\textbf{Filtre anti-repliement :} filtre passe-bas place \textbf{avant le CAN}, qui elimine toutes les composantes spectrales superieures - $f_e/2$. Sans ce filtre, ces composantes se replient dans la bande utile (aliasing) et corrompent le signal numerique.
+
+\textbf{Frequence de coupure (filtre parfait) :}
+\[
+  f_c = \frac{f_e}{2}
+\]
+En pratique, $f_c < f_e/2$ pour tenir compte de la transition finie du filtre reel.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs recurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Maetriser la formule du quantum} et la distinguer de la precision physique. Resolution $= q$ en volt ; precision physique $= q / (\text{sensibilite capteur})$ en unite mesuree.
+
+  \item \textbf{Utiliser $2^n - 1$ ou $2^n$} selon le contexte. Pour $n \geq 8$, l'approximation $2^n$ est admise mais doit etre justifiee.
+
+  \item \textbf{Shannon : ne pas se limiter - l'enonce.} Appliquer la consequence immediate : $f_c \leq f_e/2$ pour le filtre anti-repliement, $T_e \leq T_{syst}/10$ pour l'asservissement.
+
+  \item \textbf{Filtre anti-repliement obligatoire.} Le jury attend sa mention des qu'un CAN apparaet dans une boucle de mesure - meme si la question ne le demande pas explicitement.
+
+  \item \textbf{Codage hexadecimal.} Grouper 4 bits depuis le LSB, pas depuis le MSB. Verifier la coherence : $N_{10} \times q$ doit retrouver $V_E$.
+
+  \item \textbf{Confondre CAN et CNA.} Le CAN est en voie de mesure (entree analogique - code numerique) ; le CNA est en voie de commande (sortie correcteur numerique - actionneurs analogiques).
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2020 : "La majeure partie des candidats ne sait pas determiner la resolution d'un capteur. Les resultats doivent etre encadres, les unites coherentes, la verification de coherence dimensionnelle obligatoire."
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PReSENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colGrayLight,
+  colframe=colSeparator,
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+  before skip=4pt, after skip=0pt,
+  fonttitle=\small\bfseries,
+  title={Presence dans les sujets analyses (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Annee} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & $\checkmark$ & - & - & - & - & - & - & - & - & $\checkmark$ & - & - & $\checkmark$ \\
+E2 discipl. IE & - & - & - & - & - & $\checkmark$ & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & - & - & $\checkmark$ \\
+E2 appl. comm. & - & - & - & - & - & - & - & - & - & - & - & - & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-themes frequents :}
+calcul du quantum - choix du nombre de bits - codage hexa - theoreme de Shannon - filtre anti-repliement - chaene capteureCAN complete - sensibilite globale
+
+\medskip
+\textbf{Ordres de grandeur (reperes rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Reseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, frequence \SI{50}{\hertz}.
+  \item Courants d'etude frequents en sujet : de quelques \si{\ampere} a quelques dizaines de \si{\ampere}.
+  \item En conversion d'energie, un rendement attendu reste generalement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthese express (a refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypotheses du modele et les conventions de signe.
+  \item Ecrire 2 a 4 relations cles avec unites.
+  \item Realiser un calcul numerique complet et verifier l'ordre de grandeur.
+  \item Justifier le resultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE
+
+
+
+
+
+
+
+
+

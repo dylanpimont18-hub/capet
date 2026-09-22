@@ -1,0 +1,895 @@
+% T28 -- Logique combinatoire -- banque d'exercices
+%
+% DOMAINE : la fiche de cours fiches/T28_Logique_Combinatoire.tex est en colAuto
+% (Automatique). Les exercices gardent colExo comme toute la banque.
+%
+% =====================================================================
+% MOISSON EN SUJETS REELS : MAIGRE, ET C'EST DOCUMENTE ICI
+% =====================================================================
+% Recherche exhaustive dans le corpus 2013-2026
+% (docs/CAPET_Markdown-20260629T134311Z-3-001/.../06_PDFs_Originaux/{annee}/*.md)
+% sur les mots-cles : karnaugh, table de verite, equation logique, combinatoire,
+% booleen, porte ET / OU / NAND / NOR, logigramme, De Morgan, minterme,
+% multiplexeur, decodeur, 74HC, CD40, VIH, VIL, niveau logique, codeur, encodeur.
+% Resultat :
+%   - "karnaugh"        : 0 occurrence dans tout le corpus ;
+%   - "table de verite" : 0 occurrence (les 8 hits de 2022 sont des "tables de
+%     VAPEUR saturee", pas des tables de verite) ;
+%   - "De Morgan", "minterme", "NAND", "porte OU" : 0 occurrence ;
+%   - "logigramme"      : 4 hits, mais ce sont des ALGORIGRAMMES (organigrammes de
+%     programme : 2018 E1 Q25, 2019 E1 Q5) -- PAS des schemas a portes logiques,
+%     donc hors T28 ;
+%   - "booleen"         : uniquement des annexes de syntaxe de langage (Arduino
+%     2020, Python 2019) et des noms de variables (2017, 2024).
+% => LA LOGIQUE COMBINATOIRE "ACADEMIQUE" (Karnaugh, SOP/POS, logigrammes a portes)
+%    EST TOTALEMENT ABSENTE DES SUJETS CAPET SII IE 2013-2026.
+%    Ce constat recoupe le Bloc 4 point 6 de la fiche T28 et sa ligne de presence
+%    "Logique comb. pure : aucun sujet 2013-2025".
+% Ce qui EXISTE reellement dans les sujets, et qui releve bien de T28 (logique
+% combinatoire au sens large : codage binaire, operations bit a bit, comparaison
+% bit a bit, decodage de trames) est exploite ci-dessous aux exercices 1 a 4.
+% Les exercices 5 et 6, qui portent sur la logique combinatoire au sens strict
+% (equations, Karnaugh, logigramme, realisation NAND), sont des EXERCICES INEDITS
+% et sont etiquetes comme tels -- aucune reference de sujet ne leur est attribuee.
+%
+% =====================================================================
+% COMPLEMENTARITE AVEC LA FICHE fiches/T28_Logique_Combinatoire.tex
+% =====================================================================
+% Les trois Questions Types de la fiche, a NE PAS refaire ici :
+%   QT1 = codeur incremental 0,15 mm / 680 mm -> 13 bits, puis resolution effective
+%         avec les 8 bits de poids fort (2023, questions D2-D3) ;
+%   QT2 = application de De Morgan sur S = NON(Abarre . Bbarre) et F = NON(A+B+C)
+%         ("cours programme", pas un sujet) ;
+%   QT3 = conversion 0x2A -> 42 et masquage ET avec 0x0F (annonce "2022 Q.17").
+% => Consequences pour cette banque :
+%   - le sujet 2023 est exploite ici par ses questions E4-E7 (liaison serie ASCII),
+%     PAS par D2-D3 (QT1) ;
+%   - le sujet 2022 est exploite ici par ses questions 16 et 17 (identifiant DS1820
+%     et decodage de la temperature du Scratchpad), PAS par le masquage evoque en
+%     QT3. NB : la QT3 de la fiche annonce "E2 disciplinaire 2022 (Q.17)" alors que
+%     la question 17 REELLE du sujet 2022 porte sur le Scratchpad du DS1820 et non
+%     sur un registre Siemens S7-1500 masque par 0x0F ; l'enonce de la QT3 est donc
+%     un exercice de cours, pas la question 17 du sujet. L'exercice 2 ci-dessous
+%     restitue la question 17 authentique ;
+%   - De Morgan (QT2) n'est PAS re-demande a l'identique : il n'apparait ici qu'en
+%     outil de la realisation NAND de l'exercice 6, sur une fonction differente.
+% ETANCHEITE AVEC T29 (sequentiel / GRAFCET) : aucun exercice n'utilise de memoire
+% d'etat, de bascule, d'etape ou de transition. Tout est combinatoire pur : la
+% sortie ne depend que de l'etat courant des entrees.
+%
+% =====================================================================
+% SOURCES, FICHIER PAR FICHIER ET LIGNE PAR LIGNE
+% =====================================================================
+%  - Ex. 1 : 2022, "EPREUVE ECRITE DISCIPLINAIRE" (CAPET SII option Ingenierie
+%    electrique, en-tete EDE ENE 1 -- titre lu dans E2_Disciplinaire_IE_2022.md
+%    l.1-18), QUESTION 16.
+%    Enonce et figure 6 (identifiant du DS1820, 8 octets 0xCC 0x3C 0x01 0xA8 0x16
+%    0x48 0xC8 0x28) : E2_Disciplinaire_IE_2022.md l.325-351.
+%    Documents techniques DT C1 (OneWire) et DT C2 (identifiant) : l.713-725.
+%    Corrige officiel : Rapport_Jury_2022.md l.244-246 -- verbatim :
+%      "le numero de serie est code sur 48 bits (plus 2 familles : 18B20 et 18S20)
+%       donc 2[48] = 2,81 x 10[14] par famille [...] Le CRC est utilise pour
+%       verifier l'integrite lors de l'envoi de l'identifiant (numero de serie et
+%       famille). Le composant fait partie de la famille DS18B20 (code family 28
+%       dans la documentation)."
+%    Recalcul independant : 2^48 = 281 474 976 710 656 = 2,815e14 -> confirme.
+%  - Ex. 2 (docTech) : MEME sujet 2022, QUESTION 17.
+%    Enonce + figure 7 (Scratchpad, Byte 8..Byte 0 = 0xE0 0x10 0x0C 0xFF 0x7F 0x46
+%    0x4B 0x03 0x36) : E2_Disciplinaire_IE_2022.md l.353-381.
+%    Le docTech reproduit DT C5 ("Operations en MicroPython", tableau & | ^ ~ << >>)
+%    qui est TEXTUELLEMENT present dans le sujet a l.741-755, ainsi que la figure 7
+%    (l.363-369) et la mention du Byte 4 (l.377). Rien n'y est reconstitue : les
+%    tables DT C3/DT C4 elles-memes sont des images omises par Marker, elles ne sont
+%    donc PAS reproduites, seul leur contenu utile confirme par le corrige officiel
+%    (12 bits, format dyadique) est mobilise.
+%    Corrige officiel : Rapport_Jury_2022.md l.248-256 -- verbatim :
+%      "La variable Temp prend la valeur 0x0336 soit en binaire 0000 0011 0011 0110
+%       ou 822 (en decimale). Il s'agit d'un decalage a gauche de l'octet 1 puis un
+%       OU logique avec l'octet 0. L'operation informatique est une concatenation.
+%       La temperature est codee sur 12 bits (byte 4 = 7F)"
+%      "La valeur de la temperature est de 822/16 = 51,375 C [...] 2[5] x 1 + 2[4]
+%       x 1 + 2[1] x 1 + 2[0] x 1 + 2[-2] x 1 + 2[-3] x 1 = 32 + 16 + 2 + 1 + 0,25
+%       + 0,125 = 51,375 (nombre dyadique d'ou la division par 16)."
+%      "Le technicien peut intervenir en toute securite car la temperature est
+%       inferieure a 60 C."
+%    Recalcul independant : (0x03 << 8) | 0x36 = 0x0336 = 822 ; 822/16 = 51,375 ;
+%    32+16+2+1+0,25+0,125 = 51,375 -> confirme.
+%  - Ex. 3 : 2023, "EPREUVE ECRITE DISCIPLINAIRE" (l'en-tete du sujet imprime
+%    "EPREUVE ECRITE DSICIPLINAIRE", coquille du sujet -- titre lu dans
+%    E2_Disciplinaire_IE_2023.md l.1-13), QUESTIONS E4, E5 et E7.
+%    Enonce : E2_Disciplinaire_IE_2023.md l.487-521.
+%    Corrige officiel : Rapport_Jury_2023.md l.397 (E4), l.403 (E5), l.405 (E6),
+%    l.409 (E7 et E8) -- verbatim E5 : "0100 0101(2) = 45(16) ce qui correspond au
+%    caractere << E >> de la table ASCII" ; E6 : "<< W >> = 57(16) = 0101 0111(2)".
+%    ATTENTION, DEUX INCOHERENCES DU RAPPORT 2023, signalees dans le corrige :
+%      (a) l.409 ecrit "710 bits soit 89 octets" : 710/8 = 88,75, et surtout la
+%          trame porte 71 caracteres utiles = 71 OCTETS utiles. Les 710 bits
+%          incluent les bits de start/stop, qui ne sont pas des donnees. On retient
+%          ici 71 octets utiles et 710 bits transmis ;
+%      (b) l.409 (E8) ecrit "1,03 m" pour la distance parcourue pendant la trame :
+%          (6/3,6) x (710/115200) = 1,03e-2 m = 1,03 CM, pas 1,03 m. L'unite du
+%          rapport est fausse d'un facteur 100 ; sa CONCLUSION (precision de 1 cm
+%          non tenue) reste juste, mais de justesse. L'exercice retient 1,03 cm.
+%    Citation jury de fin de corrige : verbatim exact de Rapport_Jury_2023.md l.463.
+%  - Ex. 4 : 2026, "ADMISSIBILITE : EPREUVE 1" (CAPET SII option Ingenierie
+%    electrique, BAC+3, en-tete LDE ENE 1 -- titre lu dans E1_Sujet_2026.md l.1-25),
+%    QUESTION D8 (et contexte des questions D6-D7).
+%    Regle d'arbitrage bit a bit et enonce : E1_Sujet_2026.md l.519-533.
+%    Identifiant Climatisation = 110(16) : l.531.
+%    Contenu du document reponse DRD2 (Porte 2 = 0 0 1 1 0 1 0 0 0 0 0 et
+%    Porte 1 = 0 0 1 1 1 1 1 0 0 0 1, ligne Climatisation vide a completer) :
+%    E1_Sujet_2026.md l.756-758 -- present TEXTUELLEMENT, rien n'est reconstitue.
+%    Codage NRZ recessif = 1 / dominant = 0 : l.477-481.
+%    PAS DE CORRIGE OFFICIEL : aucun Rapport_Jury_2026 n'existe dans le corpus
+%    (le dossier 2026/ ne contient que E1_Sujet_2026 et E2_Sujet_2026_BAC3).
+%    Tous les resultats de l'exercice 4 sont donc des calculs PROPRES, verifies
+%    par recalcul exhaustif (0x110 = 00100010000 = 272 ; Porte 2 = 0x1A0 = 416 ;
+%    Porte 1 = 0x1F1 = 497 ; l'arbitrage se decide en a7).
+%    NON EXPLOITEE : la question D9 (temperatures lues sur la figure D3) est
+%    DELIBEREMENT ECARTEE -- la sequence de bits de la figure D3 est illisible dans
+%    la conversion Marker (E1_Sujet_2026.md l.565, cellules vides eparpillees,
+%    ~40 bits recuperables sur les 36 requis dans le desordre). Inventer les
+%    temperatures aurait ete une fabrication de donnees de sujet.
+%  - Ex. 5 : EXERCICE INEDIT. Le CONTEXTE (pile a combustible d'autobus hydrogene,
+%    trois alertes booleennes deduites de trois temperatures, seuils 85 C / 10 C /
+%    6 C, commande de pompe de refroidissement) est celui du sujet 2026
+%    (E1_Sujet_2026.md l.537-557), mais la FONCTION LOGIQUE demandee et sa
+%    simplification sont construites pour l'exercice : elles ne figurent dans aucune
+%    question du sujet. Etiquete "exercice inedit", aucune reference n'est attribuee.
+%  - Ex. 6 : EXERCICE INEDIT (Karnaugh 4 variables + realisation NAND). Contexte de
+%    poste de purge librement construit. Aucune reference de sujet.
+%
+% =====================================================================
+% VERIFICATION DES SIMPLIFICATIONS BOOLEENNES
+% =====================================================================
+% Toutes les equations simplifiees des exercices 5 et 6 ont ete verifiees par
+% RECONSTRUCTION EXHAUSTIVE de la table de verite (comparaison ligne a ligne des
+% 2^n combinaisons entre la fonction du cahier des charges et la forme simplifiee) :
+%   - Ex. 5 : C = A5 + A4.A3 -- 8 lignes verifiees, concordance totale ;
+%   - Ex. 6 : Y = P.S.N + P.Sbar.T -- 16 lignes verifiees, concordance totale ;
+%     realisation NAND de Y verifiee sur les 16 lignes egalement.
+% Les tables de verite completes sont d'ailleurs reproduites dans les corriges,
+% ce qui permet au lecteur de refaire la verification.
+%
+% VERIFICATION WEB : aucune valeur de composant du commerce, norme ou ordre de
+% grandeur professionnel n'est introduit hors des sujets cites. Les seules donnees
+% numeriques proviennent des sujets reels (exercices 1-4) ou sont posees par
+% l'enonce inedit lui-meme (exercices 5-6). Aucune recherche web n'etait donc
+% requise.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ifdefined\baud\else\DeclareSIUnit{\baud}{Bd}\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T28}} - Exercices - Logique combinatoire}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T28 \quad Logique combinatoire}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 1 -- 2022, question 16
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2022, \'epreuve \'ecrite disciplinaire (option IE), question 16}
+]
+\CAPETSHOW{
+Les postes de purge du r\'eseau de vapeur d'une ville sont \'equip\'es de capteurs de temp\'erature \textbf{DS1820} communiquant sur un bus \textbf{OneWire} (bus \`a deux fils : une ligne de donn\'ees et une masse). Chaque capteur porte un \textbf{identifiant unique} cod\'e sur \textbf{8 octets}, structur\'e ainsi :
+
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}lccccccc c@{}}
+\toprule
+\textbf{Octet} & \multicolumn{1}{c}{\textbf{CRC}} & \multicolumn{6}{c}{\textbf{Num\'ero de s\'erie}} & \textbf{Code famille} \\
+\midrule
+\textbf{Valeur} & 0xCC & 0x3C & 0x01 & 0xA8 & 0x16 & 0x48 & 0xC8 & 0x28 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Le constructeur d\'ecline ce composant en \textbf{deux familles} : le \textbf{DS18B20} (temp\'erature cod\'ee sur 9 \`a 12 bits, configurable, code famille \textbf{0x28}) et le \textbf{DS18S20} (temp\'erature cod\'ee sur 9 bits, code famille \textbf{0x10}).
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{D\'eterminer}, en s'appuyant sur la structure de l'identifiant, le nombre de bits r\'eserv\'es au num\'ero de s\'erie. En d\'eduire le nombre total de capteurs d'une m\^eme famille pouvant th\'eoriquement \^etre fabriqu\'es avec un identifiant unique.
+  \item \textbf{Donner} le r\^ole du champ CRC.
+  \item \`A partir de la mesure ci-dessus, \textbf{indiquer} la famille de ce composant, et conclure sur la r\'esolution de temp\'erature dont on dispose.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item L'identifiant compte \textbf{8 octets, soit $8 \times 8 = 64$ bits}. Un octet est consacr\'e au CRC et un octet au code famille ; il reste donc \textbf{6 octets pour le num\'ero de s\'erie}, soit :
+  \[ n = 6 \times 8 = \boldsymbol{48\ \text{bits}} \]
+  Chaque bit prenant deux valeurs ind\'ependamment des autres, le nombre de combinaisons distinctes vaut :
+  \[ N = 2^{48} = 281\,474\,976\,710\,656 \approx \boldsymbol{2{,}81 \times 10^{14}}\ \text{capteurs par famille} \]
+  \emph{Attention au piège bit / octet} : c'est l'erreur la plus fréquente sur ce type de question. On raisonne bien sur $2^{48}$, et non sur $2^{6}$ (nombre d'octets) ni sur $48^{2}$.
+  \item Le \textbf{CRC} (\emph{Cyclic Redundancy Check}, contr\^ole de redondance cyclique) est un champ de \textbf{contr\^ole d'int\'egrit\'e}. Il est calcul\'e par le capteur \`a partir des 7 autres octets et transmis avec eux ; le ma\^itre recalcule le CRC sur les octets re\c{c}us et le compare \`a celui de la trame. Une divergence r\'ev\`ele une \textbf{alt\'eration de l'identifiant pendant la transmission} (parasite \'electromagn\'etique sur le bus, faux contact). Le CRC \textbf{d\'etecte} l'erreur ; il ne la corrige pas.
+  \item Le \textbf{code famille} est le dernier octet de l'identifiant, ici \textbf{0x28}. D'apr\`es la documentation, le composant appartient donc \`a la famille \textbf{DS18B20}.
+
+  \smallskip
+  \textbf{Conclusion.} L'identification de la famille n'est pas une formalit\'e : le \textbf{DS18B20} code la temp\'erature sur \textbf{9 \`a 12 bits configurables}, l\`a o\`u le DS18S20 se limite \`a 9 bits. C'est donc cette lecture d'un seul octet qui \textbf{conditionne le format de d\'ecodage} de toutes les mesures qui suivront (exercice 2) : d\'ecoder une trame DS18B20 avec le format DS18S20 conduirait \`a une temp\'erature fausse, donc \`a une d\'ecision d'intervention erron\'ee sur un poste de purge pouvant d\'epasser \SI{60}{\degreeCelsius}. Par ailleurs, avec $2{,}81 \times 10^{14}$ identifiants disponibles, le risque de collision d'adresses sur le bus OneWire est nul \`a l'\'echelle d'un r\'eseau urbain.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 2 -- docTech -- 2022, question 17
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{2} \hfill\normalfont\footnotesize 2022, \'epreuve \'ecrite disciplinaire (option IE), question 17 (documents DT C3 \`a DT C5)}
+]
+\CAPETSHOW{
+On poursuit l'\'etude du capteur DS18B20 de l'exercice 1, install\'e dans le poste de purge \og PstPurge102 \fg{}.
+
+Le microcontr\^oleur envoie la valeur \textbf{0x44} au capteur : cette commande lance une conversion de temp\'erature (temporisation de \SI{750}{\milli\second} n\'ecessaire pour un codage sur 12 bits). Il envoie ensuite \textbf{0xBE}, qui provoque la restitution des \textbf{9 octets} de la m\'emoire interne du capteur, appel\'ee \emph{Scratchpad}.
+
+\begin{tcolorbox}[docTech, title={Documents techniques DT C3 et DT C5 -- Scratchpad du DS1820 et op\'erations bit \`a bit en MicroPython}]
+\footnotesize
+\textbf{DT C3 -- R\'esultat de la conversion lu dans le Scratchpad :}
+
+\begin{center}
+\begin{tabular}{@{}lccccccccc@{}}
+\toprule
+\textbf{N\textsuperscript{o} Octet} & Byte 8 & Byte 7 & Byte 6 & Byte 5 & Byte 4 & Byte 3 & Byte 2 & Byte 1 & Byte 0 \\
+\midrule
+\textbf{Valeur} & 0xE0 & 0x10 & 0x0C & 0xFF & \textbf{0x7F} & 0x46 & 0x4B & \textbf{0x03} & \textbf{0x36} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\emph{Les octets \textbf{Byte 0} et \textbf{Byte 1} contiennent la temp\'erature ; le \textbf{Byte 4} est le registre de configuration, dont deux bits fixent la r\'esolution de conversion.}
+
+\smallskip
+\textbf{DT C5 -- Op\'erations en MicroPython :}
+
+\begin{center}
+\begin{tabular}{@{}cl@{}}
+\toprule
+\textbf{Op\'erateur} & \textbf{Op\'eration} \\
+\midrule
+\texttt{\&}  & Op\'eration \textbf{et} bit \`a bit \\
+\texttt{|}   & Op\'eration \textbf{ou} bit \`a bit \\
+\texttt{\^{}}  & Op\'eration \textbf{ou exclusif} bit \`a bit \\
+\texttt{\textasciitilde} & Op\'eration \textbf{non} bit \`a bit \\
+\texttt{<\kern0pt<} & D\'ecalage \`a gauche \\
+\texttt{>\kern0pt>} & D\'ecalage \`a droite \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\textbf{Ligne 1 de la fonction de lecture, en MicroPython :}
+\begin{center}
+\texttt{temp = (byte1 <\kern0pt< 8) | byte0}
+\end{center}
+
+\smallskip
+\textbf{Format de temp\'erature du DS18B20 (DT C4).} La valeur enti\`ere lue est un \textbf{nombre dyadique} : les \textbf{4 bits de poids faible repr\'esentent la partie fractionnaire} (poids $2^{-1}$ \`a $2^{-4}$), le bit de poids fort \'etant un bit de signe.
+\end{tcolorbox}
+
+Le technicien ne peut intervenir dans le poste de purge que si la temp\'erature y est \textbf{inf\'erieure \`a \SI{60}{\degreeCelsius}}.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever} dans le Scratchpad les deux octets porteurs de la temp\'erature, ainsi que l'octet de configuration. \textbf{Donner} pour chacun sa valeur en hexad\'ecimal \emph{et} en binaire sur 8 bits.
+  \item En appliquant la ligne 1 du programme, \textbf{donner} la valeur de la variable \texttt{temp} en binaire puis en d\'ecimal. \textbf{Nommer} l'op\'eration informatique ainsi r\'ealis\'ee.
+  \item Le registre de configuration porte les deux bits de r\'esolution en positions 6 et 5. \textbf{En d\'eduire} sur combien de bits la temp\'erature est cod\'ee.
+  \item \textbf{D\'ecoder} la valeur de \texttt{temp} et \textbf{donner} la temp\'erature en \SI{}{\degreeCelsius}, par deux m\'ethodes ind\'ependantes. \textbf{Conclure} sur la possibilit\'e d'une intervention.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\textbf{\'Etape 1 -- Extraction des donn\'ees du document.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Lecture directe du Scratchpad (DT C3) :
+  \begin{center}
+  \begin{tabular}{@{}lccl@{}}
+  \toprule
+  Octet & Hexad\'ecimal & Binaire (8 bits) & R\^ole \\
+  \midrule
+  Byte 0 & 0x36 & $0011\,0110$ & temp\'erature, poids faible (LSB) \\
+  Byte 1 & 0x03 & $0000\,0011$ & temp\'erature, poids fort (MSB) \\
+  Byte 4 & 0x7F & $0111\,1111$ & registre de configuration \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  Les six autres octets (Byte 2, 3, 5, 6, 7, 8) ne sont pas exploit\'es ici : ce sont les seuils d'alarme, des octets r\'eserv\'es et le CRC du Scratchpad. \emph{Savoir \'ecarter les donn\'ees inutiles d'un document technique fait partie de l'exercice.}
+
+  \item \textbf{Reconstruction de la variable \texttt{temp}.} L'op\'erateur \texttt{<\kern0pt<~8} d\'ecale le Byte 1 de 8 rangs vers la gauche, ce qui le place dans l'octet de poids fort d'un mot de 16 bits et introduit huit z\'eros \`a droite ; l'op\'erateur \texttt{|} (ou bit \`a bit) vient alors \emph{y loger} le Byte 0 sans le modifier, puisqu'en face de chaque bit du Byte 0 se trouve un z\'ero :
+  \[ \texttt{byte1 <\kern0pt< 8} \;=\; 0000\,0011\,0000\,0000 \qquad \texttt{byte0} \;=\; 0000\,0000\,0011\,0110 \]
+  \[ \texttt{temp} = 0000\,0011\,0000\,0000 \;|\; 0000\,0000\,0011\,0110 = \boldsymbol{0000\,0011\,0011\,0110_2} \]
+  soit en hexad\'ecimal $\text{0x}0336$, et en d\'ecimal :
+  \[ \texttt{temp} = 2^9 + 2^8 + 2^5 + 2^4 + 2^2 + 2^1 = 512 + 256 + 32 + 16 + 4 + 2 = \boldsymbol{822} \]
+  L'op\'eration informatique r\'ealis\'ee (d\'ecalage puis \emph{ou} bit \`a bit, pour assembler deux octets en un mot) porte le nom de \textbf{concat\'enation}.
+
+  \item \textbf{R\'esolution.} Le registre de configuration vaut $\text{0x}7F = 0111\,1111_2$. Ses bits de position 6 et 5 valent tous deux \textbf{1}, soit le mot de r\'esolution $R_1R_0 = 11$ : c'est la valeur maximale, qui correspond \`a la temp\'erature cod\'ee sur \textbf{12 bits}. C'est coh\'erent avec la temporisation de \SI{750}{\milli\second} annonc\'ee dans l'\'enonc\'e, qui est pr\'ecis\'ement le temps de conversion du DS18B20 en 12 bits.
+
+  \item \textbf{D\'ecodage de la temp\'erature.}
+
+  \emph{M\'ethode 1 -- par la division.} Les 4 bits de poids faible \'etant la partie fractionnaire, la valeur enti\`ere lue vaut $2^4 = 16$ fois la temp\'erature r\'eelle :
+  \[ \theta = \frac{\texttt{temp}}{2^4} = \frac{822}{16} = \boldsymbol{\SI{51,375}{\degreeCelsius}} \]
+
+  \emph{M\'ethode 2 -- par les poids binaires.} On \'ecrit le mot en pla\c{c}ant la virgule apr\`es les 4 bits de poids faible. Le bit de poids fort \'etant \`a 0, la temp\'erature est \textbf{positive} :
+  \[ \underbrace{0000\,0011\,0011}_{\text{partie enti\`ere}}\!\!,\underbrace{0110}_{\text{fraction}} \]
+  \[ \theta = 2^{5} + 2^{4} + 2^{1} + 2^{0} + 2^{-2} + 2^{-3} = 32 + 16 + 2 + 1 + 0{,}25 + 0{,}125 = \SI{51,375}{\degreeCelsius} \]
+  Les deux m\'ethodes concordent, ce qui valide le d\'ecodage.
+
+  \smallskip
+  \textbf{Conclusion.} La temp\'erature relev\'ee dans le poste de purge est de \textbf{\SI{51,375}{\degreeCelsius}}, valeur \textbf{inf\'erieure au seuil de \SI{60}{\degreeCelsius}} fix\'e par la consigne de s\'ecurit\'e : \textbf{le technicien peut intervenir}. La marge n'est toutefois que de \SI{8,6}{\degreeCelsius}, ce qui impose une intervention courte. On notera que la cha\^ine compl\`ete -- identification de la famille du capteur (exercice 1), lecture de la r\'esolution, concat\'enation puis d\'ecodage dyadique -- doit \^etre men\'ee int\'egralement : une erreur sur un seul de ces maillons, par exemple un \emph{ou} bit \`a bit confondu avec une addition, ou un oubli de la division par 16, donnerait $\SI{822}{\degreeCelsius}$ et d\'eclencherait \`a tort l'interdiction d'acc\`es.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2022, commentaires sur la troisi\`eme partie) : \guillemotleft\ Le jury d\'eplore n\'eanmoins la m\'econnaissance de notions \'el\'ementaires de nombreux candidats. Peu de candidats sont capables de d\'efinir le r\^ole du CRC. Le micro-python tout comme les requ\^etes SQL ne sont pas ma\^itris\'es. \guillemotright}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 3 -- 2023, questions E4, E5 et E7
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize 2023, \'epreuve \'ecrite disciplinaire (option IE), questions E4, E5 et E7}
+]
+\CAPETSHOW{
+Un robot enjambeur de vigne embarque un \textbf{module GPS} reli\'e \`a sa carte de contr\^ole par une \textbf{liaison s\'erie asynchrone}. Les donn\'ees sont transmises sous forme de \textbf{caract\`eres cod\'es en ASCII sur un octet}. Le format de trame utilis\'e est le suivant, et la vitesse de transmission est fix\'ee \`a \textbf{\SI{115200}{\baud}} :
+
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item un \textbf{bit de start}, \`a l'\'etat bas, ouvre la transmission de chaque caract\`ere ;
+  \item les \textbf{8 bits de donn\'ees} sont transmis \textbf{du poids faible (LSB) vers le poids fort (MSB)} ;
+  \item un \textbf{bit de stop}, \`a l'\'etat haut, cl\^ot la transmission du caract\`ere.
+\end{itemize}
+
+Le chronogramme ci-dessous reproduit un caract\`ere captur\'e sur la ligne :
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.95, every node/.style={scale=0.95}]
+  % axes
+  \draw[->] (-0.4,0) -- (11.4,0) node[right,font=\scriptsize]{$t$};
+  \draw[->] (-0.4,0) -- (-0.4,1.6) node[above,font=\scriptsize]{niveau};
+  \node[left,font=\scriptsize] at (-0.5,0) {0};
+  \node[left,font=\scriptsize] at (-0.5,1.1) {1};
+  \draw[dotted] (-0.4,1.1) -- (11.2,1.1);
+  % niveau de repos haut avant start
+  % sequence : repos(1) start(0) d0..d7 = 1,0,1,0,0,0,1,0  stop(1)
+  % 0x45 = 0100 0101 -> LSB first : 1,0,1,0,0,0,1,0
+  \def\bitw{0.92}
+  % repos
+  \draw[thick] (-0.4,1.1) -- (0.0,1.1);
+  % start bit (0)
+  \draw[thick] (0.0,1.1) -- (0.0,0) -- (\bitw,0);
+  % data bits LSB first : 1 0 1 0 0 0 1 0
+  \draw[thick] (0.92,0)    -- (0.92,1.1) -- (1.84,1.1); % d0 = 1
+  \draw[thick] (1.84,1.1)  -- (1.84,0)   -- (2.76,0);   % d1 = 0
+  \draw[thick] (2.76,0)    -- (2.76,1.1) -- (3.68,1.1); % d2 = 1
+  \draw[thick] (3.68,1.1)  -- (3.68,0)   -- (4.60,0);   % d3 = 0
+  \draw[thick] (4.60,0)    -- (5.52,0);                  % d4 = 0
+  \draw[thick] (5.52,0)    -- (6.44,0);                  % d5 = 0
+  \draw[thick] (6.44,0)    -- (6.44,1.1) -- (7.36,1.1); % d6 = 1
+  \draw[thick] (7.36,1.1)  -- (7.36,0)   -- (8.28,0);   % d7 = 0
+  % stop bit (1)
+  \draw[thick] (8.28,0)    -- (8.28,1.1) -- (9.60,1.1); % stop
+  % separateurs et etiquettes
+  \foreach \x in {0,0.92,1.84,2.76,3.68,4.60,5.52,6.44,7.36,8.28,9.20}
+    { \draw[dotted,gray] (\x,-0.15) -- (\x,1.35); }
+  \node[below,font=\tiny] at (0.46,-0.18) {start};
+  \foreach \i/\lbl in {1/$D_0$,2/$D_1$,3/$D_2$,4/$D_3$,5/$D_4$,6/$D_5$,7/$D_6$,8/$D_7$}
+    { \node[below,font=\tiny] at ({0.92*\i - 0.46 + 0.92},-0.18) {\lbl}; }
+  \node[below,font=\tiny] at (8.74,-0.18) {stop};
+\end{tikzpicture}
+\end{center}
+
+Un extrait de la table ASCII est reproduit ci-dessous :
+
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}lcccccccc@{}}
+\toprule
+Caract\`ere & A & B & C & D & \textbf{E} & F & G & \textbf{W} \\
+\midrule
+Code hexad\'ecimal & 41 & 42 & 43 & 44 & \textbf{45} & 46 & 47 & \textbf{57} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{D\'eterminer} le nombre total de bits transmis pour un caract\`ere ASCII.
+  \item \`A partir du chronogramme, \textbf{d\'eterminer} la valeur transmise en binaire puis en hexad\'ecimal, et \textbf{identifier} le caract\`ere correspondant dans la table ASCII.
+  \item \textbf{Donner} la s\'equence binaire qui serait \'emise, \`a la m\^eme \'echelle, pour le caract\`ere \og W \fg{}.
+  \item Une trame compl\`ete du module GPS comporte \textbf{71 caract\`eres}. \textbf{D\'eterminer} le nombre de bits transmis et la dur\'ee de transmission de cette trame. Le robot se d\'epla\c{c}ant \`a \SI{6}{\kilo\metre\per\hour} et la pr\'ecision exig\'ee sur sa position \'etant de \SI{1}{\centi\metre}, \textbf{conclure}.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Chaque caract\`ere est encadr\'e par ses bits de service. Le format est donc :
+  \[ N = \underbrace{1}_{\text{start}} + \underbrace{8}_{\text{donn\'ees}} + \underbrace{1}_{\text{stop}} = \boldsymbol{10\ \text{bits}} \]
+  \emph{C'est le point nodal de l'exercice} : \textbf{10 bits sont transmis pour 8 bits utiles}. Confondre le caract\`ere (1 octet) avec ce qui circule r\'eellement sur la ligne (10 bits) fausse tous les calculs de d\'ebit qui suivent.
+
+  \item \textbf{Lecture du chronogramme.} Apr\`es le bit de start (front descendant), les bits de donn\'ees se lisent dans l'ordre \textbf{du LSB vers le MSB} :
+  \[ D_0 D_1 D_2 D_3 D_4 D_5 D_6 D_7 = 1\,0\,1\,0\,0\,0\,1\,0 \]
+  Pour reconstituer l'octet, il faut donc \textbf{inverser l'ordre de lecture}, le poids fort $D_7$ s'\'ecrivant \`a gauche :
+  \[ D_7 D_6 D_5 D_4 D_3 D_2 D_1 D_0 = \boldsymbol{0100\,0101_2} \]
+  \[ 0100\,0101_2 = 2^6 + 2^2 + 2^0 = 64 + 4 + 1 = 69_{10} = \boldsymbol{\text{0x}45} \]
+  D'apr\`es la table ASCII, $\text{0x}45$ correspond au caract\`ere \textbf{\og E \fg}.
+
+  \item Le caract\`ere \og W \fg{} a pour code $\text{0x}57$, soit :
+  \[ \text{0x}57 = 0101\,0111_2 \]
+  \'Emis \textbf{LSB en t\^ete} et encadr\'e des bits de service, la ligne porterait la s\'equence :
+  \[ \underbrace{0}_{\text{start}}\;\; \underbrace{1\,1\,1\,0\,1\,0\,1\,0}_{D_0 \to D_7}\;\; \underbrace{1}_{\text{stop}} \]
+
+  \item \textbf{Dur\'ee de la trame.} La trame comporte 71 caract\`eres, chacun transmis sur 10 bits :
+  \[ N_{bits} = 71 \times 10 = \boldsymbol{710\ \text{bits}} \qquad\text{pour}\qquad 71\ \text{octets utiles} \]
+  \`A \SI{115200}{\baud}, soit \num{115200} bits transmis par seconde :
+  \[ t_{trame} = \frac{710}{115\,200} = \SI{6,16e-3}{\second} = \boldsymbol{\SI{6,16}{\milli\second}} \]
+  Pendant ce temps, le robot avan\c{c}ant \`a $v = \SI{6}{\kilo\metre\per\hour} = 6/3{,}6 = \SI{1,67}{\metre\per\second}$ parcourt :
+  \[ d = v\,t_{trame} = 1{,}67 \times 6{,}16\times 10^{-3} = \SI{1,03e-2}{\metre} = \boldsymbol{\SI{1,03}{\centi\metre}} \]
+
+  \smallskip
+  \textbf{Conclusion.} La position transmise par le GPS est \textbf{p\'erim\'ee de \SI{1,03}{\centi\metre}} au moment o\`u la carte de contr\^ole en dispose, alors que l'exigence du cahier des charges porte sur \textbf{\SI{1}{\centi\metre}}. \textbf{L'exigence n'est pas satisfaite}, de tr\`es peu (d\'epassement de \SI{3}{\percent}), mais elle ne l'est pas : le seul temps de transmission de la trame consomme d\'ej\`a la totalit\'e du budget de pr\'ecision, avant m\^eme de compter l'incertitude propre du r\'ecepteur GPS et le temps de traitement. Deux leviers sont disponibles : \textbf{augmenter la vitesse de transmission} de la liaison s\'erie, ou \textbf{r\'eduire le nombre de caract\`eres} de la trame en ne transmettant que les champs utiles \`a l'asservissement.
+
+  \smallskip
+  \emph{Remarques sur le corrig\'e officiel.} Le rapport de jury 2023 \'ecrit pour cette question \og 710 bits soit 89 octets \fg{} : $710/8 = 88{,}75$, et surtout les \textbf{71 caract\`eres repr\'esentent 71 octets utiles}, les 710 bits incluant les bits de start et de stop qui ne sont pas des donn\'ees. Le m\^eme rapport annonce par ailleurs \og 1,03 m \fg{} pour la distance parcourue : l'application num\'erique donne \SI{1,03e-2}{\metre}, soit \SI{1,03}{\centi\metre} -- l'unit\'e du rapport est erron\'ee d'un facteur 100, m\^eme si sa conclusion (exigence non tenue) demeure exacte.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2023, commentaires sur la cinqui\`eme partie) : \guillemotleft\ La cinqui\`eme partie permettait d'aborder l'\'electronique num\'erique et la communication par liaison s\'erie. Le jury constate beaucoup d'amalgames entre bit et octet et invite les candidats \`a revoir le principe d'une liaison s\'erie. \guillemotright}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 4 -- 2026, question D8
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize 2026, admissibilit\'e : \'epreuve 1 (option IE), question D8}
+]
+\CAPETSHOW{
+Les calculateurs d'un autobus \`a hydrog\`ene communiquent sur un \textbf{bus CAN}. La couche physique code les bits en \textbf{NRZ} sur la diff\'erence de tension $U_D$ entre les deux conducteurs :
+
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item si $U_D \leq \SI{0,5}{\volt}$, le bus pr\'esente un \'etat \textbf{r\'ecessif}, \'etat logique \og \textbf{1} \fg{} ;
+  \item si $U_D \geq \SI{0,9}{\volt}$, le bus pr\'esente un \'etat \textbf{dominant}, \'etat logique \og \textbf{0} \fg{}.
+\end{itemize}
+
+Chaque message porte un \textbf{identificateur sur 11 bits}, not\'e $a_{10}\,a_9\,\dots\,a_0$ ($a_{10}$ \'etant le bit de poids fort, \'emis en premier).
+
+\medskip
+\textbf{Principe d'arbitrage.} Les stations qui \'emettent simultan\'ement comparent \textbf{bit \`a bit} leur identificateur \`a celui des messages concurrents. En cas de conflit, \textbf{l'\'etat \og 0 \fg{} (dominant) \'ecrase l'\'etat \og 1 \fg{} (r\'ecessif)}. D\`es qu'une station \'emettrice se trouve en \'etat r\'ecessif et lit un \'etat dominant sur le bus, elle \textbf{perd la comp\'etition} et cesse d'\'emettre.
+
+\medskip
+Le tableau ci-dessous rassemble les identifiants de messages captur\'es sur le bus. L'identifiant du message \textbf{Climatisation} vaut $110_{(16)}$ ; sa ligne est \`a compl\'eter.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}l|ccccccccccc@{}}
+\toprule
+\textbf{Message} & $a_{10}$ & $a_9$ & $a_8$ & $a_7$ & $a_6$ & $a_5$ & $a_4$ & $a_3$ & $a_2$ & $a_1$ & $a_0$ \\
+\midrule
+Porte 2 & 0 & 0 & 1 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+Porte 1 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 1 \\
+Climatisation & \multicolumn{11}{c}{\textit{\`a compl\'eter}} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Compl\'eter} la ligne \og Climatisation \fg{} du tableau en convertissant $110_{(16)}$ sur 11 bits.
+  \item L'arbitrage se d\'eroulant du bit $a_{10}$ vers le bit $a_0$, \textbf{d\'eterminer} le message qui remporte la comp\'etition entre les trois, et \textbf{pr\'eciser} le rang du bit \`a partir duquel la d\'ecision est acquise.
+  \item \textbf{\'Enoncer} la r\`egle g\'en\'erale reliant la valeur num\'erique d'un identificateur et son niveau de priorit\'e. \textbf{Justifier}-la \`a partir du seul principe \og le dominant \'ecrase le r\'ecessif \fg{}.
+  \item \textbf{Proposer} un identifiant en hexad\'ecimal pour le message \og Pile \fg{}, qui doit \^etre de priorit\'e sup\'erieure \`a celle des trois messages pr\'ec\'edents. Conclure sur l'int\'er\^et de cette m\'ethode d'arbitrage pour une alerte de s\'ecurit\'e.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Conversion.} Chaque chiffre hexad\'ecimal vaut 4 bits :
+  \[ 110_{(16)} \;=\; \underbrace{0001}_{1}\;\underbrace{0001}_{1}\;\underbrace{0000}_{0} \;=\; 0000\,1000\,1\,0000_2 \]
+  soit, en ne conservant que les 11 bits utiles (les 12 bits de la conversion hexad\'ecimale donnent $0001\,0001\,0000$, dont le bit de poids fort est nul) :
+  \[ a_{10}\dots a_0 = \boldsymbol{0\,0\,1\,0\,0\,0\,1\,0\,0\,0\,0} \qquad (= 272_{10}) \]
+  Le tableau compl\'et\'e devient :
+  \begin{center}
+  \renewcommand{\arraystretch}{1.25}
+  \begin{tabular}{@{}l|ccccccccccc|cc@{}}
+  \toprule
+  \textbf{Message} & $a_{10}$ & $a_9$ & $a_8$ & $a_7$ & $a_6$ & $a_5$ & $a_4$ & $a_3$ & $a_2$ & $a_1$ & $a_0$ & hex & d\'ec \\
+  \midrule
+  Porte 2 & 0 & 0 & 1 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1A0 & 416 \\
+  Porte 1 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 1 & 1F1 & 497 \\
+  \textbf{Climatisation} & 0 & 0 & 1 & \textbf{0} & 0 & 0 & 1 & 0 & 0 & 0 & 0 & \textbf{110} & \textbf{272} \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+
+  \item \textbf{D\'eroulement de l'arbitrage}, bit par bit en partant de $a_{10}$ :
+  \begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+    \item $a_{10}$ : les trois stations \'emettent 0 (dominant). Aucune ne peut d\'etecter de contradiction : \textbf{\'egalit\'e}, la comp\'etition continue ;
+    \item $a_9$ : les trois \'emettent 0. \textbf{\'Egalit\'e} ;
+    \item $a_8$ : les trois \'emettent 1 (r\'ecessif). Le bus reste r\'ecessif, aucune n'est \'evinc\'ee : \textbf{\'egalit\'e} ;
+    \item $a_7$ : \textbf{Climatisation \'emet 0 (dominant)}, tandis que Porte 1 et Porte 2 \'emettent 1 (r\'ecessif). Le niveau dominant s'impose sur le bus : Porte 1 et Porte 2, qui se voulaient r\'ecessives, \textbf{lisent un \'etat dominant} et se retirent imm\'ediatement.
+  \end{itemize}
+  Le message \textbf{Climatisation} remporte donc la comp\'etition, et la d\'ecision est acquise d\`es le bit \textbf{$\boldsymbol{a_7}$} -- soit le 4\textsuperscript{e} bit \'emis, bien avant la fin de l'identificateur.
+
+  \item \textbf{R\`egle g\'en\'erale : l'identificateur de plus petite valeur num\'erique est le plus prioritaire.}
+
+  \emph{Justification.} Les identificateurs sont compar\'es du poids fort vers le poids faible, ce qui est exactement l'ordre dans lequel on compare deux nombres binaires. Au premier rang o\`u deux identificateurs diff\`erent, celui qui porte un \textbf{0} l'emporte (le dominant \'ecrase le r\'ecessif) ; or c'est pr\'ecis\'ement celui qui porte un 0 \`a ce rang, tous les bits de poids sup\'erieur \'etant identiques, qui est le \textbf{plus petit des deux nombres}. L'arbitrage bit \`a bit r\'ealise donc, \emph{en logique combinatoire pure et sans aucun arbitre centralis\'e}, une \textbf{comparaison num\'erique} des identificateurs. On v\'erifie sur les valeurs : $272 < 416 < 497$, et c'est bien Climatisation ($272$) qui l'emporte.
+
+  \item \textbf{Identifiant pour le message \og Pile \fg.} Il doit \^etre \textbf{strictement inf\'erieur \`a $272 = 110_{(16)}$}, le plus petit des trois. Toute valeur de $000_{(16)}$ \`a $10F_{(16)}$ convient ; on peut proposer par exemple :
+  \[ \boxed{\;\text{identifiant Pile} = 010_{(16)} = 0\,0\,0\,0\,0\,0\,1\,0\,0\,0\,0_2 = 16_{10}\;} \]
+  V\'erification par l'arbitrage : d\`es le bit $a_8$, Pile \'emet 0 (dominant) alors que les trois autres messages \'emettent 1 -- ils se retirent tous, et Pile gagne le bus en trois bits.
+
+  \smallskip
+  \textbf{Conclusion.} R\'eserver aux alertes de la pile \`a combustible les identificateurs de plus faible valeur garantit qu'un \textbf{message d'urgence (surchauffe, d\'efaut grave) prend syst\'ematiquement le pas} sur le trafic de confort (portes, climatisation), et ce \textbf{sans jamais perdre un seul bit ni provoquer de collision destructive} : les stations perdantes se retirent silencieusement et le message prioritaire poursuit son \'emission sans \^etre corrompu. C'est la propri\'et\'e qui rend le bus CAN apte aux fonctions de s\'ecurit\'e embarqu\'ees, o\`u le cahier des charges impose une transmission de l'alerte en moins de \SI{1}{\milli\second}. L'attribution du plan d'adressage n'est donc pas une convention arbitraire : \textbf{c'est un choix de conception de s\'ecurit\'e}, qui doit \^etre justifi\'e au m\^eme titre qu'un calibre de protection.
+
+  \smallskip
+  \emph{Remarque.} Aucun rapport de jury n'est disponible pour la session 2026 : les r\'esultats ci-dessus proviennent d'un calcul direct \`a partir des donn\'ees du sujet, et non d'un corrig\'e officiel.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 5 -- INEDIT
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+\emph{Le contexte de cet exercice (surveillance thermique d'une pile \`a combustible d'autobus \`a hydrog\`ene, alertes transmises sur bus CAN) est celui du sujet 2026 ; la fonction logique \'etudi\'ee ci-dessous et sa simplification sont en revanche construites pour l'exercice et ne figurent dans aucune question de ce sujet.}
+
+\medskip
+Le calculateur d'une pile \`a combustible surveille trois temp\'eratures : celle de la \textbf{partie solide de la pile} $\theta_p$, celle des \textbf{gaz en entr\'ee} $\theta_g$ et celle de \textbf{l'eau en sortie} $\theta_e$. Il en d\'eduit, par comparaison, trois \textbf{bits d'alerte} plac\'es dans un octet d'\'etat :
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}clp{7.4cm}@{}}
+\toprule
+\textbf{Bit} & \textbf{Nom} & \textbf{Condition de mise \`a 1} \\
+\midrule
+$A_5$ & alerte temp\'erature pile & $\theta_p > \SI{85}{\degreeCelsius}$ \\
+$A_4$ & alerte \'ecart pile / gaz & $|\theta_p - \theta_g| > \SI{10}{\degreeCelsius}$ \\
+$A_3$ & alerte \'ecart gaz / eau & $|\theta_g - \theta_e| > \SI{6}{\degreeCelsius}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+La \textbf{consigne de la pompe de refroidissement} $C$ est \'elabor\'ee \`a partir de ces trois bits, selon le cahier des charges suivant :
+
+\begin{quote}
+\emph{La pompe de refroidissement est command\'ee d\`es que la temp\'erature de la pile d\'epasse son seuil. Elle est \'egalement command\'ee, par anticipation, lorsque les \textbf{deux} \'ecarts de temp\'erature sont simultan\'ement en alerte, signe d'un \'echange thermique d\'egrad\'e, m\^eme si le seuil de la pile n'est pas encore atteint.}
+\end{quote}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{\'Etablir} la table de v\'erit\'e compl\`ete de $C$ en fonction de $A_5$, $A_4$ et $A_3$.
+  \item \textbf{Donner} la forme canonique de $C$ (somme de mintermes), puis \textbf{simplifier} cette expression. \textbf{V\'erifier} la simplification en reconstruisant la table de v\'erit\'e.
+  \item \textbf{Tracer} le logigramme de la fonction simplifi\'ee.
+  \item Les trois temp\'eratures relev\'ees sont $\theta_p = \SI{78}{\degreeCelsius}$, $\theta_g = \SI{64}{\degreeCelsius}$ et $\theta_e = \SI{71}{\degreeCelsius}$. \textbf{D\'eterminer} l'\'etat des trois bits d'alerte, puis celui de la consigne $C$. \textbf{Conclure} sur le comportement du syst\`eme.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Table de v\'erit\'e.} Le cahier des charges se traduit litt\'eralement par : \og $C = 1$ si $A_5 = 1$, \emph{ou} si $A_4$ et $A_3$ valent tous deux 1 \fg.
+  \begin{center}
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabular}{@{}ccc|c|l@{}}
+  \toprule
+  $A_5$ & $A_4$ & $A_3$ & $C$ & Commentaire \\
+  \midrule
+  0 & 0 & 0 & 0 & aucune alerte \\
+  0 & 0 & 1 & 0 & un seul \'ecart : insuffisant \\
+  0 & 1 & 0 & 0 & un seul \'ecart : insuffisant \\
+  0 & 1 & 1 & \textbf{1} & les deux \'ecarts : anticipation \\
+  1 & 0 & 0 & \textbf{1} & seuil pile atteint \\
+  1 & 0 & 1 & \textbf{1} & seuil pile atteint \\
+  1 & 1 & 0 & \textbf{1} & seuil pile atteint \\
+  1 & 1 & 1 & \textbf{1} & seuil pile atteint \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+
+  \item \textbf{Forme canonique.} La somme des mintermes pour lesquels $C = 1$ compte \textbf{cinq termes} :
+  \[ C = \overline{A_5}A_4A_3 \;+\; A_5\overline{A_4}\,\overline{A_3} \;+\; A_5\overline{A_4}A_3 \;+\; A_5A_4\overline{A_3} \;+\; A_5A_4A_3 \]
+
+  \textbf{Simplification.} Les quatre derniers mintermes ont $A_5$ en facteur et \'epuisent toutes les combinaisons de $A_4$ et $A_3$ ; leur somme se r\'eduit donc \`a $A_5$ :
+  \[ A_5\overline{A_4}\,\overline{A_3} + A_5\overline{A_4}A_3 + A_5A_4\overline{A_3} + A_5A_4A_3 = A_5(\overline{A_4}+A_4)(\overline{A_3}+A_3) = A_5 \]
+  Il reste :
+  \[ C = A_5 + \overline{A_5}A_4A_3 \]
+  On applique alors l'identit\'e d'absorption $X + \overline{X}Y = X + Y$ (avec $X = A_5$ et $Y = A_4A_3$) :
+  \[ \boxed{\;C = A_5 + A_4 \cdot A_3\;} \]
+
+  \textbf{V\'erification par reconstruction de la table de v\'erit\'e} -- on \'evalue $A_5 + A_4A_3$ sur les 8 combinaisons et on compare ligne \`a ligne :
+  \begin{center}
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabular}{@{}ccc|c|c|c@{}}
+  \toprule
+  $A_5$ & $A_4$ & $A_3$ & $A_4\cdot A_3$ & $A_5 + A_4A_3$ & $C$ attendu \\
+  \midrule
+  0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 1 & 0 & 0 & 0 \\
+  0 & 1 & 0 & 0 & 0 & 0 \\
+  0 & 1 & 1 & 1 & 1 & 1 \\
+  1 & 0 & 0 & 0 & 1 & 1 \\
+  1 & 0 & 1 & 0 & 1 & 1 \\
+  1 & 1 & 0 & 0 & 1 & 1 \\
+  1 & 1 & 1 & 1 & 1 & 1 \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  Les huit lignes concordent : \textbf{la simplification est valid\'ee}. On est pass\'e de \textbf{5 mintermes} (5 portes ET \`a 3 entr\'ees, 1 porte OU \`a 5 entr\'ees et 2 inverseurs, soit 8 portes) \`a \textbf{2 portes} seulement.
+
+  \item \textbf{Logigramme de $C = A_5 + A_4 \cdot A_3$ :}
+  \begin{center}
+  \begin{circuitikz}[scale=0.95, transform shape, font=\small]
+    % porte ET (produit A4.A3), puis porte OU avec A5
+    \node[and port] (et) at (3.0,-0.7) {};
+    \node[or port]  (ou) at (6.4,0.0)  {};
+    % entrees de la porte ET
+    \draw (et.in 1) -- (0.6,-0.45) node[left, font=\small] {$A_4$};
+    \draw (et.in 2) -- (0.6,-0.95) node[left, font=\small] {$A_3$};
+    % entree directe A5 sur l'entree HAUTE du OU (trajet degage, au-dessus du ET)
+    \draw (ou.in 1) -- (0.6,0.25) node[left, font=\small] {$A_5$};
+    % liaison sortie du ET -> entree BASSE du OU
+    \draw (et.out) -- (5.0,-0.7) -- (5.0,-0.25) -- (ou.in 2);
+    % sortie
+    \draw (ou.out) -- ++(1.4,0) node[right, font=\small] {$C$};
+  \end{circuitikz}
+  \end{center}
+
+  \item \textbf{Application num\'erique.} On \'evalue les trois conditions de comparaison :
+  \begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+    \item $A_5$ : $\theta_p = \SI{78}{\degreeCelsius} \leq \SI{85}{\degreeCelsius}$ \quad$\Rightarrow$\quad $\boldsymbol{A_5 = 0}$ ;
+    \item $A_4$ : $|\theta_p - \theta_g| = |78 - 64| = \SI{14}{\degreeCelsius} > \SI{10}{\degreeCelsius}$ \quad$\Rightarrow$\quad $\boldsymbol{A_4 = 1}$ ;
+    \item $A_3$ : $|\theta_g - \theta_e| = |64 - 71| = \SI{7}{\degreeCelsius} > \SI{6}{\degreeCelsius}$ \quad$\Rightarrow$\quad $\boldsymbol{A_3 = 1}$.
+  \end{itemize}
+  D'o\`u :
+  \[ C = A_5 + A_4\cdot A_3 = 0 + 1\times 1 = \boldsymbol{1} \]
+
+  \smallskip
+  \textbf{Conclusion.} La pompe de refroidissement est \textbf{command\'ee} alors m\^eme que la temp\'erature de la pile (\SI{78}{\degreeCelsius}) reste \`a \SI{7}{\degreeCelsius} sous son seuil d'alerte. C'est exactement le comportement recherch\'e par le cahier des charges : les deux \'ecarts \'etant simultan\'ement hors tol\'erance, l'\'echange thermique entre la pile, les gaz et le circuit d'eau est d\'egrad\'e, et la temp\'erature de la pile \emph{va} monter si rien n'est fait. Le terme $A_4 \cdot A_3$ est donc une \textbf{fonction d'anticipation} : il \'evite d'attendre le d\'epassement du seuil de \SI{85}{\degreeCelsius}, qui imposerait alors un refroidissement d'urgence, voire l'arr\^et de la pile. \`A l'inverse, exiger les deux \'ecarts (et non un seul) \'evite les d\'eclenchements intempestifs de la pompe sur un transitoire isol\'e -- c'est le r\^ole du ET, qui ne co\^ute ici qu'\textbf{une seule porte} apr\`es simplification.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 6 -- INEDIT
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Un poste de purge d'un r\'eseau de vapeur urbain est \'equip\'e d'une \textbf{vanne de purge motoris\'ee} dont l'ouverture, not\'ee $Y$, est \'elabor\'ee en \textbf{logique c\^abl\'ee} (sans automate, pour garantir la disponibilit\'e de la fonction m\^eme en cas de d\'efaut du calculateur). Quatre informations tout-ou-rien sont disponibles :
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}clp{8.2cm}@{}}
+\toprule
+\textbf{Variable} & \textbf{Capteur / organe} & \textbf{Signification de l'\'etat 1} \\
+\midrule
+$P$ & pressostat de conduite & la pression dans la conduite est suffisante pour \'evacuer les condensats \\
+$T$ & thermostat de s\'ecurit\'e & la temp\'erature de l'eau est inf\'erieure \`a \SI{30}{\degreeCelsius} (\'evacuation vers l'\'egout autoris\'ee) \\
+$N$ & d\'etecteur de niveau & le niveau haut de condensats est atteint dans le poste \\
+$S$ & s\'electeur de mode & mode \textbf{automatique} ($S = 1$) ou \textbf{manuel} ($S = 0$) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Le cahier des charges de la commande de la vanne est le suivant :
+
+\begin{quote}
+\emph{La vanne ne peut en aucun cas s'ouvrir si la pression de conduite est insuffisante. Cette condition satisfaite :}
+\begin{itemize}[leftmargin=1.2em, itemsep=1pt]
+  \item \emph{en mode \textbf{automatique}, la vanne s'ouvre d\`es que le niveau haut de condensats est atteint ;}
+  \item \emph{en mode \textbf{manuel}, la vanne s'ouvre d\`es que le thermostat de s\'ecurit\'e autorise l'\'evacuation.}
+\end{itemize}
+\end{quote}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{\'Etablir} la table de v\'erit\'e compl\`ete de $Y$ pour les 16 combinaisons de $(P, T, N, S)$.
+  \item \textbf{Reporter} la fonction dans un tableau de Karnaugh \`a 4 variables et \textbf{en d\'eduire} l'\'equation simplifi\'ee de $Y$. \textbf{V\'erifier} le r\'esultat par reconstruction de la table de v\'erit\'e.
+  \item Le fabricant de l'armoire ne dispose en stock que de \textbf{circuits NAND \`a deux entr\'ees}. \textbf{\'Etablir} la r\'ealisation de $Y$ avec ces seules portes, et \textbf{tracer} le logigramme correspondant.
+  \item Un technicien propose de supprimer la variable $T$ du montage \og puisqu'en mode automatique, elle n'intervient pas \fg. \textbf{Analyser} cette proposition et \textbf{conclure} vis-\`a-vis de la fonction de s\'ecurit\'e.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Table de v\'erit\'e.} Le cahier des charges impose $P$ en condition n\'ecessaire, puis un aiguillage par $S$ :
+  \begin{center}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabular}{@{}cccc|c@{}}
+  \toprule
+  $P$ & $T$ & $N$ & $S$ & $Y$ \\
+  \midrule
+  0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 1 & 0 \\
+  0 & 0 & 1 & 0 & 0 \\
+  0 & 0 & 1 & 1 & 0 \\
+  0 & 1 & 0 & 0 & 0 \\
+  0 & 1 & 0 & 1 & 0 \\
+  0 & 1 & 1 & 0 & 0 \\
+  0 & 1 & 1 & 1 & 0 \\
+  \bottomrule
+  \end{tabular}
+  \hspace{1.2cm}
+  \begin{tabular}{@{}cccc|c@{}}
+  \toprule
+  $P$ & $T$ & $N$ & $S$ & $Y$ \\
+  \midrule
+  1 & 0 & 0 & 0 & 0 \\
+  1 & 0 & 0 & 1 & 0 \\
+  1 & 0 & 1 & 0 & 0 \\
+  1 & 0 & 1 & 1 & \textbf{1} \\
+  1 & 1 & 0 & 0 & \textbf{1} \\
+  1 & 1 & 0 & 1 & 0 \\
+  1 & 1 & 1 & 0 & \textbf{1} \\
+  1 & 1 & 1 & 1 & \textbf{1} \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  La moiti\'e gauche est enti\`erement \`a 0 : d\`es que $P = 0$, la vanne reste ferm\'ee quelles que soient les autres entr\'ees, conform\'ement \`a la condition imp\'erative du cahier des charges.
+
+  \item \textbf{Tableau de Karnaugh} (variables $P,T$ en lignes, $N,S$ en colonnes, en code de Gray) :
+  \begin{center}
+  \renewcommand{\arraystretch}{1.5}
+  \begin{tabular}{@{}c|cccc@{}}
+  \toprule
+  $PT \;\backslash\; NS$ & $00$ & $01$ & $11$ & $10$ \\
+  \midrule
+  $00$ & 0 & 0 & 0 & 0 \\
+  $01$ & 0 & 0 & 0 & 0 \\
+  $11$ & \textbf{1} & 0 & \textbf{1} & \textbf{1} \\
+  $10$ & 0 & 0 & \textbf{1} & 0 \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+
+  On rel\`eve \textbf{deux groupements de deux cases} (aucun groupement de quatre n'est possible, les quatre \og 1 \fg{} n'\'etant pas adjacents deux \`a deux dans une m\^eme rang\'ee ni une m\^eme colonne) :
+  \begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+    \item les cases $(PT,NS) = (11,00)$ et $(11,10)$ : $P = 1$, $T = 1$, $S = 0$, $N$ indiff\'erent \quad$\Rightarrow$\quad terme $P \cdot T \cdot \overline{S}$ ;
+    \item les cases $(11,11)$ et $(10,11)$ : $P = 1$, $N = 1$, $S = 1$, $T$ indiff\'erent \quad$\Rightarrow$\quad terme $P \cdot N \cdot S$.
+  \end{itemize}
+  D'o\`u :
+  \[ \boxed{\;Y = P\cdot S\cdot N \;+\; P\cdot\overline{S}\cdot T\;} \qquad\text{ou encore}\qquad Y = P\cdot\left(S\cdot N + \overline{S}\cdot T\right) \]
+
+  \textbf{V\'erification par reconstruction de la table de v\'erit\'e} -- on \'evalue chacun des deux termes puis leur somme sur les 16 lignes :
+  \begin{center}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.1}
+  \begin{tabular}{@{}cccc|ccc|c@{}}
+  \toprule
+  $P$ & $T$ & $N$ & $S$ & $P S N$ & $P\overline{S}T$ & somme & $Y$ attendu \\
+  \midrule
+  0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 \\
+  0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 1 & 0 & 1 & 0 & 0 & 0 & 0 \\
+  0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 1 & 1 & 1 & 0 & 0 & 0 & 0 \\
+  1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+  1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+  1 & 0 & 1 & 1 & \textbf{1} & 0 & \textbf{1} & \textbf{1} \\
+  1 & 1 & 0 & 0 & 0 & \textbf{1} & \textbf{1} & \textbf{1} \\
+  1 & 1 & 0 & 1 & 0 & 0 & 0 & 0 \\
+  1 & 1 & 1 & 0 & 0 & \textbf{1} & \textbf{1} & \textbf{1} \\
+  1 & 1 & 1 & 1 & \textbf{1} & 0 & \textbf{1} & \textbf{1} \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  Les \textbf{16 lignes concordent} : la simplification est valid\'ee. On est pass\'e de \textbf{4 mintermes} \`a \textbf{2 termes produits} de 3 variables.
+
+  \emph{Lecture structurelle.} La forme factoris\'ee $Y = P \cdot (S\cdot N + \overline{S}\cdot T)$ fait appara\^itre un \textbf{multiplexeur 2 vers 1} : $S$ est l'entr\'ee de s\'election qui aiguille soit $N$ (mode automatique), soit $T$ (mode manuel), vers une porte ET finale valid\'ee par $P$.
+
+  \item \textbf{R\'ealisation en NAND \`a deux entr\'ees.} On part de $Y = X_1 + X_2$ avec $X_1 = P\cdot S\cdot N$ et $X_2 = P\cdot\overline{S}\cdot T$. Le th\'eor\`eme de De Morgan donne :
+  \[ Y = X_1 + X_2 = \overline{\overline{X_1 + X_2}} = \overline{\overline{X_1}\cdot\overline{X_2}} = \text{NAND}\!\left(\overline{X_1},\,\overline{X_2}\right) \]
+  Or $\overline{X_1} = \overline{P\cdot S\cdot N}$ et $\overline{X_2} = \overline{P\cdot\overline{S}\cdot T}$ sont pr\'ecis\'ement les sorties de portes NAND. Un OU final se r\'ealise donc par une \textbf{troisi\`eme NAND aliment\'ee par les sorties des deux premi\`eres} -- c'est la structure NAND-NAND classique de toute forme SOP.
+
+  Avec des NAND \`a \textbf{deux} entr\'ees seulement, un produit de trois variables $A\cdot B\cdot C$ s'obtient en cascadant deux NAND puis en inversant, l'inverseur \'etant lui-m\^eme une NAND dont les deux entr\'ees sont reli\'ees ($\overline{A\cdot A} = \overline{A}$) :
+  \[ \overline{S} = \text{NAND}(S,S) \qquad P\cdot S = \overline{\text{NAND}(P,S)} \qquad\text{etc.} \]
+
+  \begin{center}
+  \begin{circuitikz}[scale=0.8, transform shape, font=\small]
+    % ---- bus d'entree : 4 lignes verticales a gauche, degagees des portes ----
+    % chaque entree a sa propre abscisse, de 0.4 a 1.6
+    \node[font=\small] at (0.0,3.9)  {$P$};
+    \node[font=\small] at (0.7,3.9)  {$S$};
+    \node[font=\small] at (1.4,3.9)  {$N$};
+    \node[font=\small] at (2.1,3.9)  {$T$};
+    \draw (0.0,3.6) -- (0.0,-2.6);
+    \draw (0.7,3.6) -- (0.7,-0.6);
+    \draw (1.4,3.6) -- (1.4,1.8);
+    \draw (2.1,3.6) -- (2.1,-3.6);
+
+    % ================= BRANCHE 1 : NAND(P,S) -> inverseur -> NAND(.,N) =========
+    \node[nand port, number inputs=2] (a1) at (3.2,2.6) {};
+    \node[nand port, number inputs=2] (a2) at (5.6,2.6) {};   % inverseur
+    \node[nand port, number inputs=2] (a3) at (8.0,2.2) {};
+
+    \draw (0.0,3.0) -- (a1.in 1);  \fill (0.0,3.0) circle (1.6pt);
+    \draw (0.7,2.2) -- (a1.in 2);  \fill (0.7,2.2) circle (1.6pt);
+    % NAND-inverseur : les deux entrees sont reliees a la sortie de a1
+    \draw (a1.out) -- (4.30,2.6);
+    \draw (4.30,2.9) -- (4.30,2.3);
+    \fill (4.30,2.6) circle (1.6pt);
+    \draw (4.30,2.9) -- (a2.in 1);
+    \draw (4.30,2.3) -- (a2.in 2);
+    \draw (a2.out) -- (a3.in 1);
+    \draw (1.4,1.8) -- (a3.in 2);
+    \node[font=\scriptsize, above] at (8.0,3.05) {$\overline{P\cdot S\cdot N}$};
+
+    % ================= INVERSEUR DE S =========================================
+    \node[nand port, number inputs=2] (iS) at (3.2,-0.6) {};
+    % les deux entrees de la NAND sont reliees ensemble a S : NAND(S,S) = Sbar
+    \draw (0.7,-0.6) -- (2.2,-0.6);
+    \draw (2.2,-0.2) -- (2.2,-1.0);
+    \fill (2.2,-0.6) circle (1.6pt);
+    \draw (2.2,-0.2) -- (iS.in 1);
+    \draw (2.2,-1.0) -- (iS.in 2);
+    \node[font=\scriptsize, above] at (4.5,-0.65) {$\overline{S}$};
+
+    % ================= BRANCHE 2 : NAND(P,Sbar) -> inverseur -> NAND(.,T) =====
+    \node[nand port, number inputs=2] (b1) at (5.6,-2.2) {};
+    \node[nand port, number inputs=2] (b2) at (8.0,-2.2) {};  % inverseur
+    \node[nand port, number inputs=2] (b3) at (10.4,-2.6) {};
+
+    \draw (0.0,-2.6) -- (4.55,-2.6) -- (b1.in 2);
+    \draw (iS.out) -- (4.3,-0.6) -- (4.3,-1.8) -- (b1.in 1);
+    % NAND-inverseur : les deux entrees sont reliees a la sortie de b1
+    \draw (b1.out) -- (6.70,-2.2);
+    \draw (6.70,-1.9) -- (6.70,-2.5);
+    \fill (6.70,-2.2) circle (1.6pt);
+    \draw (6.70,-1.9) -- (b2.in 1);
+    \draw (6.70,-2.5) -- (b2.in 2);
+    \draw (b2.out) -- (b3.in 1);
+    \draw (2.1,-3.6) -- (9.35,-3.6) -- (b3.in 2);
+    \node[font=\scriptsize, below] at (10.4,-3.45) {$\overline{P\cdot\overline{S}\cdot T}$};
+
+    % ================= NAND FINALE (realise le OU) ============================
+    \node[nand port, number inputs=2] (nf) at (12.8,0.0) {};
+    \draw (a3.out) -- (11.6,2.2) -- (11.6,0.4) -- (nf.in 1);
+    \draw (b3.out) -- (11.9,-2.6) -- (11.9,-0.4) -- (nf.in 2);
+    \draw (nf.out) -- ++(1.1,0) node[right, font=\small] {$Y$};
+  \end{circuitikz}
+  \end{center}
+
+  Le montage mobilise \textbf{7 portes NAND \`a deux entr\'ees} (1 inverseur pour $\overline{S}$, 2 par branche pour former le produit de trois variables, plus 2 pour l'inversion interm\'ediaire, et 1 NAND finale). Sans la simplification de la question 2, il aurait fallu c\^abler les 4 mintermes complets, soit 4 produits de 4 variables et un OU \`a 4 entr\'ees : \textbf{plus du double de bo\^itiers}.
+
+  \item \textbf{Analyse de la proposition du technicien.} La proposition consiste \`a poser $T = 1$ en permanence, ce qui r\'eduirait l'\'equation \`a :
+  \[ Y' = P\cdot S\cdot N + P\cdot\overline{S} = P\cdot\left(S\cdot N + \overline{S}\right) = P\cdot\left(N + \overline{S}\right) \]
+  \emph{(en appliquant l'absorption $\overline{S} + S\cdot N = \overline{S} + N$).}
+
+  Comparons $Y'$ et $Y$ sur la ligne critique $P = 1$, $T = 0$, $N = 0$, $S = 0$ -- pression suffisante, mode manuel, \textbf{eau trop chaude} :
+  \[ Y = 1\cdot 0\cdot 0 + 1\cdot 1\cdot 0 = 0 \qquad\text{mais}\qquad Y' = 1\cdot(0 + 1) = \boldsymbol{1} \]
+  La vanne s'ouvrirait donc, alors que le thermostat de s\'ecurit\'e l'interdit.
+
+  \smallskip
+  \textbf{Conclusion.} La proposition doit \^etre \textbf{rejet\'ee}. Le technicien a raison sur un point : $T$ n'intervient effectivement pas dans la \emph{branche automatique} -- c'est d'ailleurs pr\'ecis\'ement ce que traduit le terme $P\cdot S\cdot N$, o\`u $T$ n'appara\^it pas. Mais il en tire une conclusion fausse : $T$ reste la \textbf{seule condition de s\'ecurit\'e de la branche manuelle}, celle o\`u un op\'erateur commande l'ouverture sans surveillance de niveau. La supprimer autoriserait l'\'evacuation d'eau \`a plus de \SI{30}{\degreeCelsius} vers l'\'egout en mode manuel : c'est exactement le sc\'enario contre lequel le thermostat est install\'e, et le \textbf{risque de br\^ulure de l'intervenant} comme le rejet non conforme au r\'eseau d'assainissement en d\'ecoulent directement. L'\'economie r\'ealis\'ee serait au mieux d'une porte NAND -- \`a mettre en regard d'une fonction de s\'ecurit\'e. \textbf{Une variable absente d'un terme n'est jamais une variable inutile} : elle est indispensable dans le terme o\`u elle figure, et c'est la table de v\'erit\'e compl\`ete -- et non l'\'equation simplifi\'ee lue de travers -- qui permet de le v\'erifier.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

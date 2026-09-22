@@ -1,0 +1,377 @@
+﻿\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colElec}{T24}} - Systemes embarques - Microcontreleurs, API, FPGA}
+\fancyhead[R]{\small\textit{CAPET SII IE - Session 2026}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TeTE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colElec,
+  colframe=colElec,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T24 \quad Systemes embarques - Microcontreleurs, API, FPGA}\\[2pt]
+  {\color{colElec!30!white}\small
+    \textbf{Domaine :} electronique - Commande numerique et systemes programmables \quad
+    \textbf{Presence :} \textbf{8/13} sujets (2013-2026) - theme \emph{tres frequent}
+  }\\[1pt]
+  {\color{colElec!20!white}\footnotesize
+    Sous-themes : microcontreleur (Arduino, PIC) - registre ADCON0 - API S7-1500 - PWM - bus CAN/OneWire/LoRa - DSP - FPGA/VHDL (programme) - mise - l'echelle automate
+  }
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Architecture systemes embarques -------------------------------
+\textbf{1.1 Architecture des systemes embarques}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{llll}
+\toprule
+\textbf{Composant} & \textbf{Rele} & \textbf{Exemples CAPET} & \textbf{Prog.} \\
+\midrule
+Microcontreleur & CPU + peripheriques integres & Arduino, PIC 18F8723 & C/Python \\
+DSP & Traitement signal haute vitesse & DSP 40 MHz (2024) & C optimise \\
+API/PLC & Contrele industriel robuste & Siemens S7-1500 (2024) & Ladder/Grafcet \\
+FPGA & Circuit reconfigurable parallele & (Programme SII) & VHDL \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 Microcontreleur - CAN interne --------------------------------
+\textbf{1.2 Microcontreleur - CAN interne (PIC 18F8723)}
+
+\begin{itemize}
+  \item 1 CAN partage entre 16 entrees analogiques AN0eAN15 via multiplexeur
+  \item Selection de la voie : registre ADCON0, champs CHS3:CHS0
+  \item Resolution 10 bits ; Quantum $q = V_{ref}/2^{10} = V_{ref}/1024$
+  \item Demarrage conversion : bit GO/DONE = 1
+\end{itemize}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 PWM ----------------------------------------------------------
+\textbf{1.3 PWM - Modulation de Largeur d'Impulsion}
+
+Signal creneau - frequence fixe (50 Hz pour servomoteur), rapport cyclique $\alpha = t_{on}/T$.
+
+\[
+  t_{on} = \frac{\theta - \theta_{min}}{\theta_{max} - \theta_{min}}\,(t_{on,max} - t_{on,min}) + t_{on,min}
+\]
+
+Frequence d'echantillonnage pour resolution angulaire $\delta\theta$ :
+\[
+  f_{ech} = \frac{\theta_{max} - \theta_{min}}{\delta\theta \cdot T} = \frac{N_{positions}}{T}
+  \quad \Rightarrow \quad
+  f_{ech} = N_{pos} \times f_{PWM}
+\]
+Exemple (2025) : $\delta\theta = 0{,}1^\circ$, plage $180^\circ$ - $N = 1800$ - $f_{ech} = 1{,}8\,\mathrm{MHz}$ (PWM - 50 Hz).
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 API Siemens S7-1500 ------------------------------------------
+\textbf{1.4 Automate S7-1500 - Mise - l'echelle}
+
+\[
+  T = T_{min} + \frac{PIW8 - 0}{27\,648 - 0}\,(T_{max} - T_{min})
+\]
+\begin{itemize}
+  \item Module AI : PIW8 $\in [0\,;\,27\,648]$ pour $I_s \in [4\,;\,20]\,\mathrm{mA}$
+  \item Programme cyclique : lecture entrees - traitement - ecriture sorties
+  \item Capteur OneWire DS1820 : commande 0x44 (conversion) ; 0xBE (lecture scratchpad)
+\end{itemize}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.5 DSP ----------------------------------------------------------
+\textbf{1.5 DSP - Calcul de frequence maximale}
+
+\[
+  f_{max} = \frac{P \cdot n}{60}
+  \quad P : \text{points/tour codeur}, \quad n : \text{vitesse (tr/min)}
+\]
+Condition : $f_{DSP} \geq f_{max}$. Exemple (2024) : $f_{max} = 1326\,\mathrm{Hz}$, $f_{DSP} = 40\,\mathrm{MHz}$ - .
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.6 Bus CAN Controller Area Network -------------------------------
+\textbf{1.6 Bus CAN (Controller Area Network)}
+
+Bus serie differentiel multi-maetres, debit jusqu'a 1 Mbit/s.\\
+Structure de trame : SOF (1) + ID (11) + RTR (1) + IDE+r0 (2) + DLC (4) + Data (0-64) + CRC (15) + ACK (2) + EOF (7) = 111 bits max.
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHeTIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthetique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{5cm}l@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} \\
+\midrule
+\multicolumn{2}{@{}l}{\footnotesize\textit{PWM}} \\
+$\alpha = t_{on}/T$ & Rapport cyclique \\
+$f_{ech} = N_{pos} \times f_{PWM}$ & Resolution angulaire \\
+$N_{pos} = (\theta_{max}-\theta_{min})/\delta\theta$ & Nb positions \\
+\midrule
+\multicolumn{2}{@{}l}{\footnotesize\textit{DSP}} \\
+$f_{max} = P \cdot n / 60$ & Frequence codeur \\
+Condition : $f_{DSP} \geq f_{max}$ & Choix DSP \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{5cm}l@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} \\
+\midrule
+\multicolumn{2}{@{}l}{\footnotesize\textit{API S7-1500}} \\
+$T = T_{min} + PIW8/27648 \cdot \Delta T$ & Mise - l'echelle \\
+PIW8 $\in [0\,;\,27\,648]$ & Plage module AI \\
+\midrule
+\multicolumn{2}{@{}l}{\footnotesize\textit{Bus CAN}} \\
+Debit max : 1\,Mbit/s & CAN 2.0 \\
+Trame max : 111\,bits (8 octets data) & Structure \\
+$D_b = 1/T_b$ & Debit depuis chrono. \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets reels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+% Mini-procedure de resolution type copie concours
+\begin{tcolorbox}[questiontype,title={Procedure type copie concours (5 etapes)}]
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Qualifier le modele} : hypotheses, domaine de validite, grandeurs d'entree/sortie.
+  \item \textbf{Ecrire les lois} : equations de base avec symboles et unites SI.
+  \item \textbf{Isoler l'inconnue} : expression litterale, puis application numerique tracee.
+  \item \textbf{Controler l'ordre de grandeur} : coherence physique et unite finale.
+  \item \textbf{Conclure concours} : phrase courte orientee decision technique.
+\end{enumerate}
+\end{tcolorbox}
+
+% Visuel de methode : chemin de resolution CAPET
+\begin{center}
+\begin{tikzpicture}[font=\small, node distance=7mm and 6mm, >=Stealth]
+  \node[draw, rounded corners, fill=colElec!8, inner sep=4pt] (n1) {Notions};
+  \node[draw, rounded corners, fill=colElec!8, right=of n1, inner sep=4pt] (n2) {Methode};
+  \node[draw, rounded corners, fill=colElec!8, right=of n2, inner sep=4pt] (n3) {Application annale};
+  \node[draw, rounded corners, fill=colElec!8, right=of n3, inner sep=4pt] (n4) {Verification jury};
+  \draw[->, thick, colElec] (n1) -- (n2);
+  \draw[->, thick, colElec] (n2) -- (n3);
+  \draw[->, thick, colElec] (n3) -- (n4);
+\end{tikzpicture}
+\end{center}
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Registre ADCON0 du PIC - configuration CAN \hfill\normalfont\footnotesize E1/E2 2022 (PIC 18F8723)}
+]
+\textbf{enonce.}
+Pour selectionner l'entree AN2 du PIC 18F8723 et lancer la conversion, remplir le registre ADCON0 champ par champ. Donner la valeur hexadecimale.
+
+\tcbline
+
+\textbf{Corrige.}
+
+Structure ADCON0 : [ADON | GO/DONE | CHS3 | CHS2 | CHS1 | CHS0 | - | ]
+\begin{itemize}
+  \item ADON = 1 (CAN active)
+  \item GO/DONE = 1 (lancer la conversion)
+  \item CHS3:CHS0 = 0010 (voie AN2)
+\end{itemize}
+Registre : $1\,1\,0010\,00_2$ (si les 2 LSB non utilises = 0) = $\mathrm{C8_{16}}$ (verifier le datasheet exact).
+
+Attention : valeur exacte - lire dans la documentation technique fournie avec le sujet.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - PWM servomoteur - frequence d'echantillonnage \hfill\normalfont\footnotesize E2 Commune 2025 (Q18-Q19)}
+]
+\textbf{enonce.}
+Signal PWM - 50 Hz pour un servomoteur ($-90^\circ$ - $+90^\circ$). Precision angulaire requise : $\delta\theta = 0{,}1^\circ$. - quelle frequence le recepteur doit-il echantillonner le signal PWM - Le microcontreleur Arduino (84 MHz) est-il compatible - 
+\tcbline
+
+\textbf{Corrige.}
+
+Nombre de positions : $N = \dfrac{180^\circ}{0{,}1^\circ} = 1800$.
+
+Frequence d'echantillonnage necessaire :
+\[
+  f_{ech} = N \times f_{PWM} = 1800 \times 50 = \mathbf{90\,000\,\mathrm{Hz}} = 90\,\mathrm{kHz}
+\]
+
+Condition Arduino : $f_{horloge} = 84\,\mathrm{MHz} \gg 90\,\mathrm{kHz}$ -  compatible (si le code de mesure est suffisamment optimise).
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Mise - l'echelle automate - programme de conversion \hfill\normalfont\footnotesize E1 2024 (S7-1500)}
+]
+\textbf{enonce.}
+Le module AI du S7-1500 reeoit un signal 4-20\,mA d'un thermocouple type J ($T \in [-20\,;\,+200e]\,\mathrm{C}$). PIW8 $\in [0\,;\,27\,648]$. ecrire la relation de mise - l'echelle.
+
+\tcbline
+
+\textbf{Corrige.}
+
+\[
+  T = T_{min} + \frac{PIW8 - 0}{27\,648 - 0}\,(T_{max} - T_{min})
+  = -20 + \frac{PIW8}{27\,648} \times 220
+\]
+
+En Ladder/Blocs fonctionnels S7-1500 : instruction SCALE ou calcul avec blocs ADD, MUL, DIV avec les coefficients $a = 220/27648$ et $b = -20$.
+
+Verification : $PIW8 = 0$ - $T = -20^\circ$C - ; $PIW8 = 27\,648$ - $T = 200^\circ$C .
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs recurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Configurer un registre bit par bit.} Justifier chaque bit de ADCON0 (ou tout autre registre de microcontroleur) - ecrire la valeur hex sans justification est insuffisant.
+
+  \item \textbf{Ceblage d'une entree/sortie automate.} Jury 2021 : "Un candidat au CAPET doit etre capable de cebler une entree TOR/analogique d'un API industriel."
+
+  \item \textbf{Confusion API vs microcontroleur.} L'API est robuste, programme en Ladder/Grafcet pour l'industrie. Le microcontroleur est compact, programme en C/Python pour les fonctions embarquees legeres. Ne pas interchanger.
+
+  \item \textbf{Mise - l'echelle API.} Ne pas oublier le decalage (offset) quand la plage ne commence pas - zero (ex. $PIW8 = 0$ - $T = -20^\circ$C). Verifier les deux bornes.
+
+  \item \textbf{Bus CAN vs CAN (convertisseur).} Dans les sujets, les deux coexistent (2026 E1). Distinguer par le contexte : bus de terrain - convertisseur analogique-numerique.
+
+  \item \textbf{FPGA/VHDL.} Absent des sujets reels 2013-2026 mais au programme. Si la question apparaet : entite + architecture, signal, process concurrent vs sequentiel.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2023 : "Notions d'algorithmes, variables informatiques, boucles, systemes embarques sont des connaissances de base attendues des candidats."\\
+Rapport jury 2021 : "Un candidat au CAPET doit etre capable de cebler une entree ou une sortie TOR/analogique d'un API industriel programmable."
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PReSENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colGrayLight,
+  colframe=colSeparator,
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+  before skip=4pt, after skip=0pt,
+  fonttitle=\small\bfseries,
+  title={Presence dans les sujets analyses (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Annee} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & $\checkmark$ & - & - & - & - & - & - & $\checkmark$ & $\checkmark$ & - & $\checkmark$ & - \\
+E2 discipl. IE & - & - & - & - & - & - & $\checkmark$ & - & - & - & - & $\checkmark$ & $\checkmark$ \\
+E2 appl. comm. & - & - & - & - & - & - & - & - & - & - & - & $\checkmark$ & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-themes frequents :}
+registre CAN microcontreleur (PIC ADCON0) - OneWire DS1820 - mise - l'echelle API S7-1500 - PWM servomoteur - DSP frequence - bus CAN trame - LoRaWAN IoT
+
+\medskip
+\textbf{Ordres de grandeur (reperes rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Reseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, frequence \SI{50}{\hertz}.
+  \item Courants d'etude frequents en sujet : de quelques \si{\ampere} a quelques dizaines de \si{\ampere}.
+  \item En conversion d'energie, un rendement attendu reste generalement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthese express (a refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypotheses du modele et les conventions de signe.
+  \item Ecrire 2 a 4 relations cles avec unites.
+  \item Realiser un calcul numerique complet et verifier l'ordre de grandeur.
+  \item Justifier le resultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE
+
+
+
+
+
+
+
+
+

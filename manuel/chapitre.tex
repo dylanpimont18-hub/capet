@@ -1,0 +1,64 @@
+% =====================================================================
+%  chapitre.tex — gabarit de compilation d'UNE notion en PDF autonome
+%
+%  Produit un fascicule : fiche de cours + exercices + corriges de cette
+%  seule notion, chacun repaginé à partir de 1 et avec sa propre annexe.
+%
+%  Usage (depuis manuel/) — \CAPETCHAP = code, \CAPETFICHE = nom du .tex
+%  de la fiche, \CAPETTITRE = titre affiche :
+%
+%    pdflatex -jobname=T05 "\def\CAPETCHAP{T05}
+%                           \def\CAPETFICHE{T05_Phenomenes_Thermiques}
+%                           \def\CAPETTITRE{Phenomenes thermiques}
+%                           \input{chapitre.tex}"
+%
+%  Contrairement a un decoupage du PDF du manuel, chaque chapitre a ici sa
+%  propre annexe : aucune page ne porte la fin des corriges d'une autre
+%  notion (dans le manuel complet, 25 sections sur 30 commencent en milieu
+%  de page, l'annexe etant un flux continu).
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+
+\def\CAPETMANUEL{1}
+\newcommand{\CAPETINCLUDEMODE}{1}
+
+\usepackage{import}
+\input{../fiches/preamble}
+
+\usepackage[hidelinks, bookmarks=true]{hyperref}
+\usepackage{bookmark}
+
+\newcommand{\CAPETBANDEAUEXOS}[2]{%
+  \par\medskip
+  \begin{tcolorbox}[enhanced, breakable, colback=colExo, colframe=colExo,
+    left=6pt, right=6pt, top=4pt, bottom=4pt, arc=1.5mm,
+    before skip=8pt, after skip=6pt]
+    {\color{white}\bfseries\large Exercices --- #1\quad #2}
+  \end{tcolorbox}
+}
+
+\begin{document}
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\CAPETNOTION{\CAPETCHAP}{\CAPETTITRE}
+
+% --- Cours ------------------------------------------------------------
+\subimport{../fiches/}{\CAPETFICHE}
+
+% --- Exercices --------------------------------------------------------
+\CAPETBANDEAUEXOS{\CAPETCHAP}{\CAPETTITRE}
+\subimport{../exercices/}{\CAPETEXOS}
+
+% --- Corriges de cette notion uniquement ------------------------------
+\clearpage
+\begin{tcolorbox}[enhanced, breakable, colback=colExo, colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt, arc=1.5mm,
+  before skip=0pt, after skip=8pt]
+  {\color{white}\bfseries\large Corrig\'es --- \CAPETCHAP\quad \CAPETTITRE}
+\end{tcolorbox}
+
+\ficheHeaders{\CAPETCHAP}{Corrig\'es des exercices}{colExo}
+\CAPETANNEXE
+
+\end{document}

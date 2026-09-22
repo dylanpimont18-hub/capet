@@ -1,0 +1,403 @@
+﻿\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colAuto}{T27}} - Systemes boucles, correcteurs, stabilite}
+\fancyhead[R]{\small\textit{CAPET SII IE - Session 2026}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TeTE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colAuto,
+  colframe=colAuto,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T27 \quad Systemes boucles, correcteurs, stabilite}\\[2pt]
+  {\color{colAuto!30!white}\small
+    \textbf{Domaine :} Automatique - Asservissement et regulation \quad
+    \textbf{Presence :} \textbf{11/13} sujets (2013-2026) - theme \emph{incontournable}
+  }\\[1pt]
+  {\color{colAuto!20!white}\footnotesize
+    Sous-themes : FTBO / FTBF - marges de phase et de gain - critere de Bode - correcteurs P, PI, PID - reglage graphique - correcteur numerique (recurrence)
+  }
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colAuto,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Structure d'un asservissement -------------------------------
+\textbf{1.1 Structure d'un asservissement - retour unitaire}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{ll}
+\toprule
+\textbf{Grandeur} & \textbf{Expression} \\
+\midrule
+FTBO & $H_{BO}(p) = C(p)\,H_{proc}(p)\,H_{capt}(p)$ \\
+FTBF (retour unitaire) & $H_{BF}(p) = \dfrac{H_{BO}(p)}{1 + H_{BO}(p)}$ \\
+Erreur en boucle fermee & $\varepsilon(p) = \dfrac{E(p)}{1 + H_{BO}(p)}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 Performances ------------------------------------------------
+\textbf{1.2 Performances en regime permanent}
+
+\begin{itemize}
+  \item \textbf{Erreur statique (echelon)} : $\varepsilon_s = \lim_{p\to 0} p\,\varepsilon(p) = \dfrac{E_0}{1 + H_{BO}(0)}$
+  \item Si la FTBO contient au moins un integrateur - $H_{BO}(0) \to \infty$ - $\varepsilon_s = 0$
+  \item \textbf{Depassement} : $D\% = 100\,\exp\!\left(\dfrac{-m\pi}{\sqrt{1-m^2}}\right)$ \quad ($m < 1$)
+  \item \textbf{Temps de reponse - 5\,\%} : $t_{R5\%} \approx 3\tau$ (1\textsuperscript{er} ordre)
+\end{itemize}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 Stabilite - marges (Bode) -----------------------------------
+\textbf{1.3 Stabilite - critere des marges (diagramme de Bode de la BO)}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lll}
+\toprule
+\textbf{Marge} & \textbf{Definition} & \textbf{Lecture graphique} \\
+\midrule
+Marge de phase $M_\varphi$ & $M_\varphi = 180^{\circ} + \arg(H_{BO}(j\omega_c))$ & Phase - $\omega_c$ (gain = 0 dB) \\
+Marge de gain $M_G$ & $M_G = -|H_{BO}(j\omega_{-180^{\circ}})|_{dB}$ & Gain - $\omega_{-180^{\circ}}$ (phase = $-180^{\circ}$) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Cahiers des charges rencontres :} $M_\varphi \geq 45^{\circ}$ (2023, 2026) ; $M_\varphi \geq 90^{\circ}$ (2024) ; $M_G \geq 10$ dB (2026).
+
+\textbf{Condition de stabilite :} $M_\varphi > 0^{\circ}$ \textit{et} $M_G > 0$ dB - systeme stable en boucle fermee.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 Correcteurs -------------------------------------------------
+\textbf{1.4 Correcteurs courants}
+
+\medskip
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{llp{6cm}}
+\toprule
+\textbf{Type} & \textbf{Transmittance} & \textbf{Effet} \\
+\midrule
+P & $C(p) = K_C$ & Gain pur : ameliore la precision, reduit $M_\varphi$ \\
+PI & $K_P\!\left(1 + \dfrac{1}{T_i p}\right)$ & Annule $\varepsilon_s$ (integrateur) ; ajoute $-90^{\circ}$ de phase \\
+PID & $K_P\!\left(1 + \dfrac{1}{T_i p} + T_d p\right)$ & P (rapidite) + I (precision) + D (stabilite) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.5 Reglage du correcteur par Bode ------------------------------
+\textbf{1.5 Reglage du correcteur P par la methode de Bode}
+
+\textbf{Procedure :}
+\begin{enumerate}
+  \item Tracer le Bode de $H_{BO}(j\omega)$ pour $K_C = 1$.
+  \item Identifier $\omega_B$ tel que $\arg(H_{BO}(j\omega_B)) = -180^{\circ} + M_{\varphi\,\text{cible}}$.
+  \item Le gain - $\omega_B$ vaut $-G_{dB}$ - pour obtenir 0 dB - $\omega_B$ :
+  \[
+    K_{C\,\lim} = 10^{G_{dB}/20}
+  \]
+\end{enumerate}
+
+\textit{Exemple (corrige 2023) :} $M_\varphi = 45^{\circ}$, $\omega_B = 7\,000$ rad$\cdot$s$^{-1}$, gain $= -59{,}4$ dB - $K_{PV} = 10^{59{,}4/20} = 933$.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.6 Correcteur numerique -----------------------------------------
+\textbf{1.6 Correcteur PI numerique - relation de recurrence}
+
+Pour $C(p) = K_{co}\dfrac{1 + T_{co}\,p}{T_{co}\,p}$, avec periode d'echantillonnage $T_e$ :
+\[
+  u_k = u_{k-1} + a_0\,\varepsilon_k + a_1\,\varepsilon_{k-1}
+\]
+\[
+  a_0 = K_{co}\!\left(1 + \frac{T_{co}}{T_e}\right) \qquad a_1 = -K_{co}\frac{T_{co}}{T_e}
+\]
+
+\textit{Source : E2 Sujet 2026 Q.B19 - asservissement de temperature d'une pile - combustible.}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHeTIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colAuto,
+  title={2. Formulaire synthetique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.8cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Boucle fermee}} \\
+$H_{BF} = H_{BO}/(1+H_{BO})$ & FTBF & - \\
+$\varepsilon_s = E_0/(1+H_{BO}(0))$ & Erreur statique & - \\
+$D\% = 100\,e^{-m\pi/\sqrt{1-m^2}}$ & Depassement & \% \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Marges (Bode)}} \\
+$M_\varphi = 180^{\circ} + \arg H_{BO}(j\omega_c)$ & Phase & $^{\circ}$ \\
+$M_G = -|H_{BO}(j\omega_{-180^{\circ}})|_{dB}$ & Gain & dB \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.8cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Correcteurs}} \\
+$C_P(p) = K_C$ & Gain pur & - \\
+$C_{PI}(p) = K_P(1+1/(T_i p))$ & PI & - \\
+$K_{C\,\lim} = 10^{G_{dB}/20}$ & Reglage P & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Numerique}} \\
+$u_k = u_{k-1} + a_0\varepsilon_k + a_1\varepsilon_{k-1}$ & Recurrence PI & - \\
+$a_0 = K_{co}(1+T_{co}/T_e)$ & Coeff. & - \\
+$a_1 = -K_{co}\,T_{co}/T_e$ & Coeff. & - \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colAuto,
+  title={3. Questions types - extraites des sujets reels},
+]
+  
+% Mini-procedure de resolution type copie concours
+\begin{tcolorbox}[questiontype,title={Procedure type copie concours (5 etapes)}]
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Qualifier le modele} : hypotheses, domaine de validite, grandeurs d'entree/sortie.
+  \item \textbf{ecrire les lois} : equations de base avec symboles et unites SI.
+  \item \textbf{Isoler l'inconnue} : expression litterale, puis application numerique tracee.
+  \item \textbf{Contreler l'ordre de grandeur} : coherence physique et unite finale.
+  \item \textbf{Conclure concours} : phrase courte orientee decision technique.
+\end{enumerate}
+\end{tcolorbox}
+
+% Visuel de methode : chemin de resolution CAPET
+\begin{center}
+\begin{tikzpicture}[font=\small, node distance=7mm and 6mm, >=Stealth]
+  \node[draw, rounded corners, fill=colElec!8, inner sep=4pt] (n1) {Notions};
+  \node[draw, rounded corners, fill=colElec!8, right=of n1, inner sep=4pt] (n2) {Methode};
+  \node[draw, rounded corners, fill=colElec!8, right=of n2, inner sep=4pt] (n3) {Application annale};
+  \node[draw, rounded corners, fill=colElec!8, right=of n3, inner sep=4pt] (n4) {Verification jury};
+  \draw[->, thick, colElec] (n1) -- (n2);
+  \draw[->, thick, colElec] (n2) -- (n3);
+  \draw[->, thick, colElec] (n3) -- (n4);
+\end{tikzpicture}
+\end{center}% -- QT1 -------------------------------------------------------------
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Lecture graphique des marges \hfill\normalfont\footnotesize E1 2026 (C5)}
+]
+\textbf{enonce.} - partir du diagramme de Bode de la FTBO fourni en document reponse, determiner graphiquement la marge de phase et la marge de gain. Conclure sur le respect du cahier des charges ($M_\varphi > 45^{\circ}$, $M_G > 10$ dB).
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{Marge de phase :}
+\begin{enumerate}
+  \item Trouver $\omega_c$ tel que $|H_{BO}(j\omega_c)|_{dB} = 0$ dB sur la courbe de gain.
+  \item Lire la phase - $\omega_c$ : soit $\varphi(\omega_c)$.
+  \item $M_\varphi = 180^{\circ} + \varphi(\omega_c)$ \quad [attention au signe : la phase est negative]
+\end{enumerate}
+
+\textbf{Marge de gain :}
+\begin{enumerate}
+  \item Trouver $\omega_{-180^{\circ}}$ tel que $\varphi(\omega_{-180^{\circ}}) = -180^{\circ}$.
+  \item Lire le gain - $\omega_{-180^{\circ}}$ : soit $G_{dB}$.
+  \item $M_G = -G_{dB}$ (en dB, $G_{dB}$ est negatif pour un systeme stable)
+\end{enumerate}
+
+\textbf{Conclusion :} comparer aux valeurs du CDC. Si $M_\varphi > 45^{\circ}$ \textbf{et} $M_G > 10$ dB : cahier des charges respecte.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Determination graphique de $K_{C\,\lim}$ \hfill\normalfont\footnotesize E1 2026 (C6)}
+]
+\textbf{enonce.}
+Sur le diagramme de Bode de la FTBO avec $K_C = 1$, determiner $K_{C\,\lim}$ pour se placer - la limite du critere de marge de phase ($M_\varphi = 45^{\circ}$).
+
+\tcbline
+
+\textbf{Corrige.}
+
+\begin{enumerate}
+  \item Identifier $\omega_B$ tel que $\varphi(\omega_B) = -180^{\circ} + 45^{\circ} = -135^{\circ}$.
+  \item Lire le gain - $\omega_B$ : $|H_{BO}(j\omega_B)|_{dB} = -G_{dB}$ (valeur negative).
+  \item Pour que le gain soit exactement 0 dB - $\omega_B$, il faut decaler la courbe de $+G_{dB}$ :
+  \[
+    K_{C\,\lim} = 10^{G_{dB}/20}
+  \]
+\end{enumerate}
+
+\textit{Rappel :} multiplier $K_C$ decale la courbe de gain de $20\log_{10} K_C$ sans modifier la courbe de phase.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Relation de recurrence du correcteur numerique \hfill\normalfont\footnotesize E2 2026 (B18-B19)}
+]
+\textbf{enonce.}
+Un correcteur PI de temperature d'une pile - combustible a pour transmittance $C(p) = K_{co}\dfrac{1 + T_{co}\,p}{T_{co}\,p}$. La periode d'echantillonnage est $T_e$. etablir l'equation differentielle liant $u(t)$ et $\varepsilon(t)$, puis la relation de recurrence.
+
+\tcbline
+
+\textbf{Corrige.}
+
+\textbf{equation differentielle :} - partir de $U(p) = K_{co}\dfrac{1+T_{co}\,p}{T_{co}\,p}\,\mathcal{E}(p)$ :
+\[
+  T_{co}\,\frac{du}{dt} = K_{co}\,T_{co}\,\frac{d\varepsilon}{dt} + K_{co}\,\varepsilon(t)
+\]
+
+\textbf{Discretisation} (approximation d'Euler arriere : $\dot{f}(kT_e) \approx (f_k - f_{k-1})/T_e$) :
+\[
+  u_k = u_{k-1} + a_0\,\varepsilon_k + a_1\,\varepsilon_{k-1}
+  \qquad
+  a_0 = K_{co}\!\left(1 + \frac{T_{co}}{T_e}\right) \quad a_1 = -K_{co}\frac{T_{co}}{T_e}
+\]
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs recurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Lire les marges sur le bon diagramme.} La marge de phase se lit - la pulsation de coupure du \emph{gain} (0 dB), \textbf{pas} - la pulsation de dephasage. La confusion est frequente.
+
+  \item \textbf{Conclure vis--vis du cahier des charges.} Donner une valeur numerique sans la comparer - la valeur cible est insuffisant : ecrire - $M_\varphi = 52^{\circ} > 45^{\circ}$ : CDC respecte .
+
+  \item \textbf{Effet du correcteur P sur la phase.} Augmenter $K_C$ decale la courbe de gain vers le haut ($+20\log K_C$) \textbf{sans toucher la phase} - $\omega_c$ se deplace, $M_\varphi$ change.
+
+  \item \textbf{Correcteur PI : l'integrateur ajoute $-90^{\circ}$.} L'action integrale garantit $\varepsilon_s = 0$ pour un echelon mais degrade la marge de phase. Toujours verifier la stabilite apres introduction du PI.
+
+  \item \textbf{Relation de recurrence : signe des coefficients.} $a_1$ est negatif. Erreur frequente : utiliser $\dot{g}(kT_e) \approx (g_{k+1}-g_k)/T_e$ (Euler avant) au lieu de $(g_k-g_{k-1})/T_e$ (Euler arriere).
+
+  \item \textbf{Theme systematiquement present depuis 2022.} Ne pas l'impasse : les parties asservissement sont fortement ponderees et tres penalisees si absentes.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2023 : "Trop peu de candidats l'ont traitee de maniere satisfaisante. Le jury invite les candidats - revoir les concepts de base de ce domaine comme les notions de boucle ouverte, de correcteur ou encore de marge de phase."\\
+Rapport jury 2024 : "Les candidats doivent etre capables de lire une marge de phase et de gain sur un diagramme de Bode fourni. La lecture graphique est une competence de base."
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PReSENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colGrayLight,
+  colframe=colSeparator,
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+  before skip=4pt, after skip=0pt,
+  fonttitle=\small\bfseries,
+  title={Presence dans les sujets analyses (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Annee} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & - & $\checkmark$ & $\checkmark$ & - & $\checkmark$ & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+E2 discipl. IE & - & - & - & - & - & - & - & - & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+E2 appl. comm. & - & - & - & - & - & - & - & - & - & - & - & $\checkmark$ & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-themes frequents :}
+lecture graphique marges de Bode - reglage correcteur P ($K_{C\,\lim}$) - correcteur PI (annulation $\varepsilon_s$) - correcteur numerique (relation de recurrence) - analyse stabilite / CDC
+
+\medskip
+\textbf{Ordres de grandeur (reperes rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Reseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, frequence \SI{50}{\hertz}.
+  \item Courants d'etude frequents en sujet : de quelques \si{\ampere} a quelques dizaines de \si{\ampere}.
+  \item En conversion d'energie, un rendement attendu reste generalement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthese express (a refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypotheses du modele et les conventions de signe.
+  \item Ecrire 2 a 4 relations cles avec unites.
+  \item Realiser un calcul numerique complet et verifier l'ordre de grandeur.
+  \item Justifier le resultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE
+
+
+
+
+
+
+
+

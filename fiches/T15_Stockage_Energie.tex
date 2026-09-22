@@ -1,0 +1,386 @@
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ficheHeaders{T15}{Stockage d'énergie}{colElec}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TETE
+% -----------------------------------------------------------------------
+
+\ficheEntete{T15}{Stockage d'énergie électrique}{colElec}%
+  {électrotechnique - Systèmes énergétiques}%
+  {\textbf{Présence :} \textbf{5/13} sujets (2013-2026) - thème \emph{régulier}}%
+  {capacité batterie (A\,h) - association série/parallèle de cellules - taux de décharge (DoD) - autonomie - STEP micro-hydraulique - technologies Li-Ion / NMC / LFP - BMS et SOC}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Capacite et energie d'une batterie ---------------------------
+\textbf{1.1 Capacité et énergie d'une batterie}
+
+\smallskip
+\[
+  E = U_{nom} \times C_b
+  \qquad;\qquad
+  C_b = \frac{E_{necessaire}}{U_{nom}}
+  \qquad;\qquad
+  E_{utile} = E_{totale} \times (1 - DoD_{min})
+\]
+$C_b$ en A\,h, $E$ en W\,h, $U_{nom}$ en V. Le taux de décharge minimum $DoD_{min}$ protège les cellules (ex : $DoD_{min} = 20\,\%$ - énergie utile = 80\,\% de l'énergie totale).
+
+\smallskip
+\textbf{Attention aux deux conventions rencontrées dans les sujets} : « ne pas excéder 70\,\% de décharge » (rapport 2020) $\Rightarrow$ énergie utile $= 70\,\%$ de $E_{totale}$ ($E_{necessaire} = E_{consommee}/0{,}7$) ; « exploitée jusqu'à 20\,\% de décharge » (niveau critique, sujet 2026) $\Rightarrow$ énergie utile $= 80\,\%$. Lire précisément l'énoncé -- le corrigé 2020 avertit : «~Attention à ne pas confondre \% de décharge et profondeur de décharge\ldots~»
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 Association de cellules ---------------------------------------
+\textbf{1.2 Association série / parallèle de cellules}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{llll}
+\toprule
+\textbf{Association} & \textbf{Tension résultante} & \textbf{Capacité résultante} & \textbf{Formule} \\
+\midrule
+Série & $N_s \times U_{cell}$ & $C_{cell}$ inchangée & $N_s = U_{bat}/U_{cell}$ \\
+Parallèle & $U_{cell}$ inchangée & $N_p \times C_{cell}$ & $N_p = C_{bat}/C_{cell}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+$N_{total} = N_s \times N_p$.
+
+\smallskip
+\begin{center}
+\begin{tikzpicture}[scale=0.9, font=\footnotesize]
+  \draw (0,0) rectangle (0.9,0.5); \draw (0,0.6) rectangle (0.9,1.1); \draw (0,1.2) rectangle (0.9,1.7);
+  \draw (1.2,0) rectangle (2.1,0.5); \draw (1.2,0.6) rectangle (2.1,1.1); \draw (1.2,1.2) rectangle (2.1,1.7);
+  \draw (2.4,0) rectangle (3.3,0.5); \draw (2.4,0.6) rectangle (3.3,1.1); \draw (2.4,1.2) rectangle (3.3,1.7);
+  \node[left] at (-0.15,0.85) {$N_s$};
+  \node[below] at (1.65,-0.2) {$N_p$ branches};
+\end{tikzpicture}
+\end{center}
+Chaque colonne empile $N_s$ cellules en série (tensions cumulées) ; les $N_p$ colonnes sont mises en parallèle (capacités cumulées).
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 Autonomie -----------------------------------------------------
+\textbf{1.3 Autonomie et calcul de capacité}
+
+\smallskip
+\[
+  t_{autonomie} = \frac{E_{utile}}{P_{consommee}}
+  \quad\text{(h)}
+  \qquad;\qquad
+  d_{autonomie} = t_{autonomie} \times v
+  \quad\text{(km)}
+\]
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 STEP - stockage hydraulique ----------------------------------
+\textbf{1.4 STEP micro-hydraulique (Station de Transfert d'Énergie par Pompage)}
+
+\smallskip
+\[
+  E_p = m\,g\,h = \rho_{eau}\,V_{utile}\,g\,h
+  \qquad;\qquad
+  E_{elec} = E_p \times \eta_{turbinage}
+  \qquad;\qquad
+  \eta_{st} = \frac{E_{elec\,turbinage}}{E_{elec\,pompage}}
+\]
+$\rho_{eau} = 1000\,\mathrm{kg\!\cdot\!m^{-3}}$, $g = 9{,}81\,\mathrm{m\!\cdot\!s^{-2}}$.
+Durée de remplissage : $T_{remplissage} = V_{utile}/Q_{pompe}$.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.5 Technologies de cellules -------------------------------------
+\textbf{1.5 Technologies de cellules}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{llll}
+\toprule
+\textbf{Technologie} & \textbf{$U_{nom}$} & \textbf{Énergie massique} & \textbf{Application typique} \\
+\midrule
+Li-Ion / NMC & 3{,}5-3{,}7\,V & 150-250 W\,h\,kg$^{-1}$ & Bus, VE, robot \\
+Li-FePO4 (LFP) & 3{,}2\,V & 100-160 W\,h\,kg$^{-1}$ & Stockage stationnaire \\
+Plomb-acide & 2{,}0\,V & 30-50 W\,h\,kg$^{-1}$ & Démarrage, bateau \\
+Supercondensateur & 2{,}5-3{,}0\,V & 5-20 W\,h\,kg$^{-1}$ & Tampon puissance \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHETIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthétique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Batterie}} \\
+$E = U_{nom} \cdot C_b$ & Énergie & W\,h \\
+$C_b = E/U_{nom}$ & Capacité & A\,h \\
+$E_{utile} = E(1-DoD_{min})$ & Utile & W\,h \\
+$t = E_{utile}/P$ & Autonomie & h \\
+$N_s = U_{bat}/U_{cell}$ & Série & - \\
+$N_p = C_{bat}/C_{cell}$ & Parallèle & - \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{STEP}} \\
+$E_p = \rho V g h$ & Énergie pot. & J \\
+$E_{elec} = E_p \cdot \eta_{turb}$ & Turbinage & W\,h \\
+$\eta_{st} = E_{turb}/E_{pomp}$ & Rendement & - \\
+$T = V_{utile}/Q$ & Remplissage & h \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Données typiques}} \\
+$U_{NMC} = 3{,}5\,\mathrm{V}$ & Urbanloop & - \\
+$\eta_{STEP} \approx 58\,\%$ & Micro-STEP & - \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets réels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Association série/parallèle et autonomie - bus Hycity \hfill\normalfont\footnotesize E2 appl. 2026 (Q A3-A5)}
+]
+\textbf{Énoncé.}
+Batterie bus Hycity : $U_{bat} = 600\,\mathrm{V}$, $E_{bat} = 128{,}4\,\mathrm{kW\!\cdot\!h}$, cellules NMC HpCO ($U_{cell} = 3{,}5\,\mathrm{V}$, $C_{cell} = 53{,}5\,\mathrm{A\!\cdot\!h}$), décharge min 20\,\%. Calculer $N_s$ (cellules série par module), $C_{totale}$, puis l'autonomie à $v = 40\,\mathrm{km\!\cdot\!h^{-1}}$ pour $P_{moy} = 22\,\mathrm{kW}$.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Nombre de cellules en série.}
+\[
+  N_s = \frac{600/2}{3{,}5} = \frac{300}{3{,}5} \approx 86\,\text{cellules/module} \quad (2\,\text{modules en série} \times 2\,\text{branches})
+\]
+
+\textbf{Étape 2 — Capacité totale.}
+\[
+  C_{totale} = \frac{E_{bat}}{U_{bat}} = \frac{128{,}4 \times 10^3\,\mathrm{W\!\cdot\!h}}{600\,\mathrm{V}} = 214\,\mathrm{A\!\cdot\!h}
+\]
+
+\textbf{Étape 3 — Autonomie.}
+\[
+  E_{utile} = 128{,}4 \times (1 - 0{,}20) = 102{,}72\,\mathrm{kW\!\cdot\!h}
+  \quad;\quad
+  t = \frac{102{,}72}{22} = 4{,}67\,\mathrm{h}
+  \quad;\quad
+  d = 4{,}67 \times 40 = \mathbf{186{,}8\,\mathrm{km}}
+\]
+
+\textbf{Conclusion.} Avec 186,8\,km d'autonomie, le bus peut rentrer au dépôt depuis n'importe quel point du trajet type.\checkmark
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Dimensionnement batterie - taux de décharge et nombre de cellules \hfill\normalfont\footnotesize Rapport jury 2020 (Q20-Q22)}
+]
+\textbf{Énoncé.}
+Un robot effectue 160 trajets types (énergie consommée par trajet type $E_{trajet} \approx \SI{4.06}{\watt\hour}$ -- ne pas confondre avec l'énergie récupérée en descente, $\SI{0.6}{\watt\hour}$, Q16). Taux de décharge max : 70\,\%. Tension nominale batterie : \SI{48}{\volt}. Cellules Li-Ion : $U_{cell} = \SI{3.7}{\volt}$, $C_{cell} = \SI{5.2}{\ampere\hour}$, masse \SI{92}{\gram}. Calculer $E_{necessaire}$ puis $C_b$, la structure série/parallèle, et vérifier la masse (limite \SI{5}{\kilo\gram}).
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Énergie nécessaire et capacité.}
+\[
+  E_{necessaire} = \frac{160 \times 4{,}06}{0{,}7} \approx 928\,\si{\watt\hour}
+  \qquad;\qquad
+  C_b = \frac{928}{48} = 19{,}33\,\si{\ampere\hour}
+\]
+$C_b = \SI{19.33}{\ampere\hour}$ est la valeur du corrigé officiel (rapport jury 2020, Q21-Q22) ; $E_{trajet} \approx \SI{4.06}{\watt\hour}$ est [corrigé reconstitué] par calcul inverse, la valeur exacte de Q19 n'étant pas lisible dans la source.
+
+\textbf{Étape 2 — Structure série/parallèle.}
+\[
+  N_s = \frac{48}{3{,}7} = 12{,}97 \to 13\,\text{cellules en série}
+  \quad;\quad
+  N_p = \frac{19{,}33}{5{,}2} = 3{,}72 \to 4\,\text{branches en parallèle}
+\]
+
+\textbf{Étape 3 — Vérification masse.}
+$N_{total} = 13 \times 4 = 52\,\text{cellules}$. Masse = $52 \times 0{,}092 = 4{,}784\,\si{\kilo\gram}$.
+
+\textbf{Conclusion.} $\SI{4.784}{\kilo\gram} < \SI{5}{\kilo\gram}$ : l'exigence « masse de la batterie $< \SI{5}{\kilo\gram}$ » du cahier des charges est respectée, avec une marge d'environ 4\,\% qu'il convient de signaler.\checkmark
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Énergie potentielle et rendement STEP \hfill\normalfont\footnotesize E2 disc. 2021 (Q5-Q10), Rapport jury 2021}
+]
+\textbf{Énoncé.}
+Réservoir : volume total 1000\,m$^3$, volume utile 90\,\%. Hauteur de chute $h = 130\,\mathrm{m}$. Rendement turbinage : 78\,\%. Puissance pompe : 76\,kW, durée remplissage : 5,625\,h. Calculer $E_p$, $E_{elec\,turbinage}$ et le rendement global $\eta_{st}$.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Énergie potentielle.}
+\[
+  V_{utile} = 0{,}90 \times 1000 = 900\,\mathrm{m^3}
+  \quad;\quad
+  m = 1000 \times 900 = 9 \times 10^5\,\mathrm{kg}
+\]
+\[
+  E_p = m\,g\,h = 9 \times 10^5 \times 9{,}81 \times 130 = 1{,}147 \times 10^9\,\mathrm{J} = \frac{1{,}147 \times 10^9}{3{,}6 \times 10^6} = \mathbf{318{,}8\,\mathrm{kW\!\cdot\!h}}
+\]
+
+\textbf{Étape 2 — Énergie électrique turbinée.}
+\[
+  E_{elec\,turbinage} = 318{,}8 \times 0{,}78 = \mathbf{248{,}7\,\mathrm{kW\!\cdot\!h}}
+\]
+
+\textbf{Étape 3 — Rendement du cycle complet.}
+\[
+  E_{pompage} = 76 \times 5{,}625 = 427{,}5\,\mathrm{kW\!\cdot\!h}
+  \quad;\quad
+  \eta_{st} = \frac{248{,}7}{427{,}5} = \mathbf{58{,}2\,\%}
+\]
+
+\textbf{Conclusion.} Un rendement de 58,2\,\% est faible comparé à une batterie électrochimique, mais la technologie reste écologique et complémentaire aux panneaux PV (production stockée pendant les heures creuses pour restitution la nuit).
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs récurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Confusion W\,h et A\,h.}
+  La capacité s'exprime en A\,h, l'énergie en W\,h. La conversion est $E = U_{nom} \times C_b$. Ne pas additionner des A\,h et des W\,h.
+
+  \item \textbf{Oubli du taux de décharge.}
+  Si le constructeur impose $DoD_{max} = 70\,\%$, l'énergie utile n'est que 70\,\% de l'énergie totale. Rapport jury 2020 : «~Une critique à la fois qualitative et quantitative était attendue afin de vérifier que l'installation permette de ne pas excéder 70~\% de décharge de la batterie.~»
+
+  \item \textbf{Erreur sur l'association série/parallèle.}
+  En \emph{série} : les tensions s'additionnent, la capacité reste celle d'une cellule. En \emph{parallèle} : les capacités s'additionnent, la tension reste celle d'une cellule. Ne jamais multiplier les deux simultanément.
+
+  \item \textbf{Densité de l'eau dans la formule STEP.}
+  Utiliser $E_p = \rho V g h$ avec $\rho_{eau} = 1000\,\mathrm{kg\!\cdot\!m^{-3}}$. Oublier la densité donne un résultat 1000 fois trop faible.
+
+  \item \textbf{Rendement STEP = cycle complet.}
+  Calculer $\eta_{st} = E_{turbinage}/E_{pompage}$ sur le cycle complet, pas uniquement sur la phase de turbinage (qui donnerait 100\,\%). Citer la valeur numérique ($\approx$58\,\%) ET la conclusion contextuelle (écologique, peu performant).
+
+  \item \textbf{Réponses qualitatives sans chiffres.}
+  Rapport jury 2020 : «~Le jury déplore des réponses trop évasives sans aucun lien avec les documents techniques et/ou un manque de valeurs numériques pour assoir les justifications.~» Toujours appuyer la conclusion (autonomie suffisante) par un calcul comparant $E_{disponible}$ et $E_{necessaire}$.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2020 : «~Le jury note ici les progrès des candidats quant aux conversions d'unités mais déplore que des problématiques simples, comme le dimensionnement d'une batterie, ne soient pas maîtrisées.~»\\
+Rapport jury 2021 (corrigé officiel, Q10) : «~Le procédé de stockage par pompage n'est pas très performant (rendement de 58\,\%). [\ldots] Mais ce procédé est plus respectueux de l'environnement que le stockage par batterie.~»
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PRESENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colPresence,
+  title={Présence dans les sujets analysés (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Année} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & - & - & - & - & - & - & - & - & - & - & - & - \\
+E2 discipl. IE & - & - & - & - & - & - & - & $\checkmark$ & $\checkmark$ & - & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+E2 appl. comm. & - & - & - & - & - & - & - & - & - & - & - & - & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Note :} la session 2026 inclut un sujet BAC3 (bus électrique Hycity) qui traite le stockage Li-Ion 600\,V / 128{,}4\,kW\,h en détail (Q A3-A5).\\
+\textbf{Sous-thèmes fréquents :}
+capacité batterie en A\,h (5/13) - association série/parallèle (4/13) - taux de décharge DoD (4/13) - énergie potentielle STEP (2/13) - rendement cycle complet (2/13)
+
+\medskip
+\textbf{Ordres de grandeur (repères rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Réseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, fréquence \SI{50}{\hertz}.
+  \item Courants d'étude fréquents en sujet : de quelques \si{\ampere} à quelques dizaines de \si{\ampere}.
+  \item En conversion d'énergie, un rendement attendu reste généralement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthèse express (à refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypothèses du modèle et les conventions de signe.
+  \item Écrire 2 à 4 relations clés avec unités.
+  \item Réaliser un calcul numérique complet et vérifier l'ordre de grandeur.
+  \item Justifier le résultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE

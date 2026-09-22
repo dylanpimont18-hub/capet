@@ -1,0 +1,418 @@
+% ---------------------------------------------------------------------------
+% T04 -- Harmoniques reseau, THD, puissance deformante -- banque d'exercices
+%
+% COMPLEMENTARITE AVEC LA FICHE fiches/T04_Harmoniques_THD.tex (revision 2026-09-02)
+%   La fiche traite 3 Questions Types : QT1 = 2024 B9-B13 (THD pleine onde vs MLI
+%   6 kHz), QT2 = 2018 questions 7-9 (puissance deformante D, S, FP), QT3 = 2025
+%   CV3-2 (THD = 0,48 d'un onduleur pleine onde monophase). Ces trois travaux sont
+%   DELIBEREMENT absents de la presente banque : les exercices portent sur d'autres
+%   questions des memes sujets, ou sur d'autres annees.
+%   Coordination inter-notions : les spectres 2024 (170/95/27/27/20 A et 37/22 A)
+%   sont deja exploites par T09 (ex. 5) et T14 (ex. 3) ; ils ne sont pas repris ici.
+%   Le CV3-2 2025 (Q21-Q23) est deja exploite par T09 (ex. 3) ; non repris ici.
+%
+% SOURCES VERIFIEES (corpus Markdown docs/CAPET_Markdown-20260629T134311Z-3-001/)
+%   - ex. 2 (docTech) : 2018/E2_Sujet_2018/E2_Sujet_2018.md, l. 181-201 (enonce des
+%     questions 6 a 9, presentation des documents ressources DRS 3 et DRS 4) et
+%     2018/Rapport_Jury_2018/Rapport_Jury_2018.md, l. 2129-2150 (elements de
+%     correction des questions 7 et 8 : tableau complet des grandeurs relevees sur
+%     DRS 3 / DRS 4, puis tableau Q1 / D).
+%     * Vient du sujet/rapport : la TOTALITE des valeurs de l'encadre docTech
+%       (tension, courant, P, S, THD, FP, cos(phi) pour LUBIO et COMPACTO II en
+%       nominal 220 V et economique 190 V), ainsi que les resultats Q1 et D.
+%     * Reconstitue : uniquement la MISE EN FORME de l'encadre. Les documents DRS 3
+%       et DRS 4 du sujet sont des photographies d'ecrans d'analyseur de reseau,
+%       omises par la conversion Markdown ; les valeurs qu'elles portent sont
+%       restituees telles quelles par le rapport de jury (question 7).
+%   - ex. 4 et 5 : 2026/E2_Sujet_2026_BAC3/E2_Sujet_2026_BAC3.md, l. 289-313
+%     (questions A16 a A20 : onduleur triphase en commande simplifiee, U0 = 490 V,
+%     f0 = 700 Hz, harmoniques de rang n < 10, puis comparaison avec une MLI de
+%     porteuse fP = 10 kHz).
+%     * Vient du sujet : U0 = 490 V, f0 = 700 Hz, n < 10, fP = 10 kHz, la structure
+%       de l'onduleur triphase et le sens des questions A19/A20.
+%     * Reconstitue : l'expression |An| = 2*racine(3)*U0/(n*pi) pour n = 6k+-1. Le
+%       sujet la donne dans son "equation 5", qui est une image omise par la
+%       conversion Markdown ; l'expression retenue est la decomposition de Fourier
+%       classique de la tension composee d'un onduleur triphase 6 creneaux
+%       (conduction 120 degres), redemontrable et coherente avec l'enonce (seuls
+%       les rangs 6k+-1 subsistent, ce qui laisse bien 5 et 7 pour n < 10).
+%       Aucun rapport de jury n'existe pour la session 2026.
+%     * L'inductance de fuite Lf = 1,2 mH de l'exercice 5 est une donnee ajoutee
+%       (ordre de grandeur usuel pour une MAS de traction), signalee dans l'enonce.
+%   - ex. 6 : exercice inedit, contexte reel 2018 (Dampmart). Les seules donnees
+%     issues du sujet sont : 46 luminaires repartis de maniere equilibree sur 3
+%     regulateurs monophases COMPACTO II de 4 kVA (Rapport_Jury_2018 l. 2204 et
+%     2224), courant absorbe 17 A par phase (l. 2248 et 2272), THD de courant
+%     28,8 % (LUBIO) et 28,5 % (COMPACTO, mode economique) (l. 2136). Le scenario
+%     de surcharge du neutre par l'harmonique de rang 3 est un ajout pedagogique,
+%     signale comme tel a la fin du corrige.
+% ---------------------------------------------------------------------------
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ifdefined\var\else\DeclareSIUnit{\var}{var}\fi
+\ifdefined\vad\else\DeclareSIUnit{\vad}{VAD}\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T04}} - Exercices - Harmoniques r\'eseau, THD}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T04 \quad Harmoniques r\'eseau, THD, puissance d\'eformante}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+% ===========================================================================
+% Exercice 1 -- inedit -- definition normalisee du THD (niveau 1)
+% ===========================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Un analyseur de r\'eseau mesure le spectre du courant $i(t)$ absorb\'e par une charge non lin\'eaire, aliment\'ee par un r\'eseau sinuso\"idal de fr\'equence $\SI{50}{\hertz}$. Les valeurs efficaces obtenues pour le fondamental et les harmoniques de rang 3, 5 et 7 sont donn\'ees ci-dessous.
+
+\begin{center}
+\begin{tikzpicture}[scale=0.85]
+  \draw[-latex] (0,-0.3) -- (0,4.6) node[above]{$I_n$ (A)};
+  \draw[-latex] (-0.5,0) -- (9.5,0) node[right]{rang $n$};
+  \foreach \i/\h/\lab/\val in {1/4.0/1/20, 2/0.8/3/4, 3/0.48/5/2{,}4, 4/0.24/7/1{,}2}{
+    \draw[fill=colExo!35] (\i*2-0.6,0) rectangle (\i*2+0.6,\h);
+    \node[below] at (\i*2,0) {\lab};
+    \node[above] at (\i*2,\h) {\small\val};
+  }
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Calculer le THD du courant $i(t)$, selon la d\'efinition normalis\'ee IEC (rapport \`a $I_1$).
+  \item En d\'eduire la valeur efficace totale $I_{eff}$ du courant.
+  \item Ce courant est-il conforme \`a la norme IEC/EN 61000-2-2 (THD de courant $< 25\,\%$) ?
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \[ THD = \dfrac{\sqrt{I_3^2 + I_5^2 + I_7^2}}{I_1} = \dfrac{\sqrt{4^2 + 2{,}4^2 + 1{,}2^2}}{20} = \dfrac{\sqrt{23{,}2}}{20} = \dfrac{4{,}82}{20} \approx 0{,}241 \quad (24{,}1\,\%) \]
+  \item \[ I_{eff} = I_1\sqrt{1 + THD^2} = 20 \times \sqrt{1 + 0{,}241^2} = 20 \times 1{,}029 \approx \SI{20,6}{\ampere} \]
+  \item $THD = 24{,}1\,\% < 25\,\%$ : le courant est conforme \`a la norme, mais tr\`es proche de la limite -- toute d\'egradation suppl\'ementaire du spectre (ajout d'une autre charge non lin\'eaire sur le m\^eme d\'epart) ferait basculer l'installation en non-conformit\'e.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% ===========================================================================
+% Exercice 2 -- docTech -- 2018 E2, questions 6 a 9 (releves DRS 3 / DRS 4)
+% ===========================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{2} \hfill\normalfont\footnotesize 2018, \'epreuve d'admissibilit\'e \guillemotleft\ Analyse et exploitation p\'edagogique d'un syst\`eme pluritechnique \guillemotright\ (ville de Dampmart), questions 6 \`a 9}
+]
+\CAPETSHOW{
+La ville de Dampmart remplace, dans les postes des rues Br\'evard et Leduc, ses anciens r\'egulateurs abaisseurs de tension de type LUBIO\textsuperscript{\textregistered} par des r\'egulateurs COMPACTO II\textregistered. Les documents ressources DRS 3 et DRS 4 pr\'esentent, \emph{pour une m\^eme charge de luminaires}, les grandeurs appel\'ees au r\'eseau relev\'ees \`a l'analyseur, sous tension nominale des luminaires ($\SI{220}{\volt}$) puis sous tension d'\'economie ($\SI{190}{\volt}$).
+
+\begin{tcolorbox}[docTech, title={Documents ressources DRS 3 et DRS 4 -- rel\'ev\'es \`a l'analyseur de r\'eseau}]
+\centering\small
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Grandeur absorb\'ee} & \multicolumn{2}{c}{\textbf{LUBIO\textsuperscript{\textregistered} (DRS 3)}} & \multicolumn{2}{c}{\textbf{COMPACTO II\textregistered\ (DRS 4)}} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+\textbf{au r\'eseau} & Nom. \SI{220}{\volt} & \'Eco. \SI{190}{\volt} & Nom. \SI{220}{\volt} & \'Eco. \SI{190}{\volt} \\
+\midrule
+Tension (\si{\volt})    & 235      & 236{,}9 & 233{,}1 & 235{,}2 \\
+Courant (\si{\ampere})  & 11{,}69  & 9{,}71  & 8{,}48  & 6{,}5 \\
+$P$ (\si{\watt})        & 1\,930   & 1\,460  & 1\,900  & 1\,430 \\
+$S$ (\si{\volt\ampere}) & 2\,720   & 2\,290  & 1\,980  & 1\,530 \\
+$THD$ (\%)              & 28{,}8   & 28{,}9  & 29{,}6  & 28{,}5 \\
+$FP$                    & 0{,}71   & 0{,}64  & 0{,}96  & 0{,}94 \\
+$\cos\varphi_1$         & 0{,}75   & 0{,}67  & 1       & 0{,}98 \\
+\bottomrule
+\end{tabular}
+\end{tcolorbox}
+
+\noindent On rappelle que $\varphi_1$ d\'esigne le d\'ephasage entre la tension du r\'eseau (suppos\'ee sinuso\"idale) et le \emph{fondamental} du courant absorb\'e, et que :
+\[ Q_1 = P\tan\varphi_1 \qquad\text{et}\qquad S = \sqrt{P^2 + Q_1^2 + D^2} \]
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever} dans le document ressource, pour les quatre points de fonctionnement, le courant absorb\'e et le facteur de puissance $FP$. \textbf{Identifier} le point de fonctionnement qui appelle le courant le plus faible, et celui dont le facteur de puissance est le meilleur.
+  \item Le THD relev\'e est sensiblement le m\^eme pour les deux r\'egulateurs (environ $29\,\%$). Expliquer pourquoi les facteurs de puissance sont pourtant tr\`es diff\'erents ($0{,}71$ contre $0{,}96$ en nominal). Quelle grandeur, autre que le THD, en est responsable ?
+  \item Calculer, pour le LUBIO\textsuperscript{\textregistered} en nominal puis pour le COMPACTO II\textregistered\ en nominal, la puissance r\'eactive $Q_1$ li\'ee au fondamental de courant, puis la puissance d\'eformante $D$ attribu\'ee aux harmoniques de courant.
+  \item Recommencer le calcul de $Q_1$ et de $D$ pour les deux r\'egulateurs en mode \'economique.
+  \item \`A THD quasi identique, la puissance d\'eformante du COMPACTO II\textregistered\ est n\'eanmoins plus faible que celle du LUBIO\textsuperscript{\textregistered}. \textbf{Justifier} ce r\'esultat, puis conclure sur l'int\'er\^et du remplacement pour la qualit\'e de l'\'energie appel\'ee au r\'eseau.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Lecture directe du document ressource :
+
+  \begin{center}\small
+  \begin{tabular}{lcccc}
+  \toprule
+   & LUBIO nom. & LUBIO \'eco. & COMPACTO nom. & COMPACTO \'eco. \\
+  \midrule
+  $I$ (\si{\ampere}) & 11{,}69 & 9{,}71 & 8{,}48 & \textbf{6{,}5} \\
+  $FP$ & 0{,}71 & 0{,}64 & \textbf{0{,}96} & 0{,}94 \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+
+  Le courant le plus faible est appel\'e par le COMPACTO II\textregistered\ en mode \'economique ($\SI{6,5}{\ampere}$) ; le meilleur facteur de puissance est celui du COMPACTO II\textregistered\ en mode nominal ($FP = 0{,}96$).
+
+  \item Le facteur de puissance se d\'ecompose en $FP = \dfrac{\cos\varphi_1}{\sqrt{1+THD^2}}$ : il r\'esulte du produit d'un terme de \emph{d\'eplacement} ($\cos\varphi_1$) et d'un terme de \emph{distorsion} ($1/\sqrt{1+THD^2}$). Le THD \'etant quasi identique pour les deux mat\'eriels, le terme de distorsion vaut $1/\sqrt{1+0{,}29^2} \approx 0{,}96$ dans les deux cas : il ne peut pas expliquer l'\'ecart. C'est le facteur de \emph{d\'eplacement} $\cos\varphi_1$ qui fait la diff\'erence : $0{,}75$ pour le LUBIO\textsuperscript{\textregistered} (hacheur de tension, fondamental de courant fortement d\'ephas\'e) contre $1$ pour le COMPACTO II\textregistered\ (injection d'une tension sinuso\"idale en opposition de phase, courant en phase avec la tension).
+
+  \item \textbf{LUBIO\textsuperscript{\textregistered} nominal} ($\cos\varphi_1 = 0{,}75 \Rightarrow \varphi_1 \approx 41{,}4^\circ$, $\tan\varphi_1 \approx 0{,}882$) :
+  \[ Q_1 = P\tan\varphi_1 = 1\,930 \times 0{,}882 \approx \SI[group-minimum-digits=4]{1702}{\var} \]
+  \[ D = \sqrt{S^2 - P^2 - Q_1^2} = \sqrt{2\,720^2 - 1\,930^2 - 1\,702^2} = \sqrt{(7{,}398 - 3{,}725 - 2{,}897)\times10^6} \approx \SI{881}{\vad} \]
+
+  \textbf{COMPACTO II\textregistered\ nominal} ($\cos\varphi_1 = 1 \Rightarrow \varphi_1 = 0$, $\tan\varphi_1 = 0$) :
+  \[ Q_1 = 1\,900 \times 0 = \SI{0}{\var} \]
+  \[ D = \sqrt{1\,980^2 - 1\,900^2 - 0} = \sqrt{(3{,}920 - 3{,}610)\times10^6} = \sqrt{0{,}310\times10^6} \approx \SI{557}{\vad} \]
+
+  \item \textbf{LUBIO\textsuperscript{\textregistered} \'economique} ($\cos\varphi_1 = 0{,}67$, $\tan\varphi_1 \approx 1{,}108$) :
+  \[ Q_1 = 1\,460 \times 1{,}108 \approx \SI[group-minimum-digits=4]{1618}{\var} \qquad D = \sqrt{2\,290^2 - 1\,460^2 - 1\,618^2} \approx \SI{703}{\vad} \]
+
+  \textbf{COMPACTO II\textregistered\ \'economique} ($\cos\varphi_1 = 0{,}98$, $\tan\varphi_1 \approx 0{,}203$) :
+  \[ Q_1 = 1\,430 \times 0{,}203 \approx \SI{290}{\var} \qquad D = \sqrt{1\,530^2 - 1\,430^2 - 290^2} \approx \SI{460}{\vad} \]
+
+  \item Le THD est un rapport \emph{relatif} : il compare la valeur efficace des harmoniques \`a celle du fondamental, et ne dit rien de leur amplitude absolue. La puissance d\'eformante, elle, est proportionnelle \`a la valeur efficace r\'eelle des courants harmoniques, $D \approx V\sqrt{\sum_{n\geq2} I_n^2}$. Le COMPACTO II\textregistered\ appelant un courant nettement plus faible pour la m\^eme puissance active ($\SI{8,48}{\ampere}$ contre $\SI{11,69}{\ampere}$, soit $-27\,\%$), ses courants harmoniques sont plus faibles en amp\`eres m\^eme \`a THD identique : $D$ passe de $\SI{881}{\vad}$ \`a $\SI{557}{\vad}$, soit $-37\,\%$.
+
+  \textbf{Conclusion.} Le remplacement fait passer la puissance non active $\sqrt{Q_1^2+D^2}$ de $\SI[group-minimum-digits=4]{1916}{\volt\ampere}$ \`a $\SI{557}{\volt\ampere}$ en nominal et le facteur de puissance de $0{,}71$ \`a $0{,}96$ : \`a puissance active inchang\'ee, le courant de ligne diminue de plus d'un quart et les pertes Joule dans le r\'eseau d'\'eclairage public sont r\'eduites d'environ moiti\'e, ce qui satisfait l'exigence de qualit\'e de l'\'energie recherch\'ee par la ville.
+\end{enumerate}
+
+\smallskip
+\textit{Pi\`ege de lecture \`a \'eviter : un THD identique ne signifie pas une pollution harmonique identique. Le THD qualifie la \emph{forme} du courant, jamais son amplitude ; c'est $D$ -- ou directement les amp\`eres harmoniques -- qui dimensionne le conducteur de neutre et les pertes en ligne.}
+}
+\end{tcolorbox}
+
+% ===========================================================================
+% Exercice 3 -- inedit -- dimensionnement d'un filtre LC (niveau 2)
+% ===========================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Un variateur de vitesse command\'e par MLI \`a la fr\'equence de porteuse $f_p = \SI{6000}{\hertz}$ rejette l'essentiel de sa distorsion vers les rangs voisins de $f_p$. On souhaite dimensionner un filtre LC passe-bas en sortie du variateur afin d'att\'enuer ces harmoniques r\'esiduels.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+\draw (0,0) -- (5,0);
+\draw (0,0) to[sV, l=$v_{ond}(t)$] (0,3);
+\draw (0,3) to[cute inductor, l=$L$] (3,3) node[circ]{};
+\draw (3,3) to[C, l=$C$] (3,0) node[circ]{};
+\draw (3,3) -- (5,3) to[R, l=$R_{ch}$, *-*] (5,0);
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Rappeler l'expression de la fr\'equence de coupure $f_c$ de ce filtre du second ordre en fonction de $L$ et $C$.
+  \item On souhaite $f_c \leqslant f_p/10$ pour assurer une att\'enuation suffisante \`a $f_p$. Calculer la valeur de $f_c$ vis\'ee.
+  \item Pour une capacit\'e normalis\'ee $C = \SI{10}{\micro\farad}$, calculer l'inductance $L$ n\'ecessaire pour obtenir cette $f_c$.
+  \item V\'erifier que ce choix laisse passer le fondamental ($\SI{50}{\hertz}$) sans att\'enuation notable, tout en filtrant les harmoniques group\'es autour de $f_p$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \[ f_c = \dfrac{1}{2\pi\sqrt{LC}} \]
+  \item \[ f_c = \dfrac{f_p}{10} = \dfrac{6\,000}{10} = \SI{600}{\hertz} \]
+  \item \[ L = \dfrac{1}{(2\pi f_c)^2\, C} = \dfrac{1}{(2\pi \times 600)^2 \times 10\times10^{-6}} = \dfrac{1}{142{,}1} \approx \SI{7,04}{\milli\henry} \]
+  \item Le fondamental \`a $\SI{50}{\hertz}$ est tr\`es inf\'erieur \`a $f_c = \SI{600}{\hertz}$ (rapport $12$) : il traverse le filtre quasiment sans att\'enuation. Les harmoniques group\'es autour de $f_p = \SI{6000}{\hertz}$ sont \`a une d\'ecade au-dessus de $f_c$ : pour un filtre du second ordre (pente $\SI{-40}{\decibel}$ par d\'ecade), ils sont att\'enu\'es d'environ $\SI{40}{\decibel}$, soit un facteur $100$ en amplitude.
+
+  \textbf{Conclusion.} Un filtre $L = \SI{7,04}{\milli\henry}$ / $C = \SI{10}{\micro\farad}$ suffit \`a ramener les raies de commutation \`a $1\,\%$ de leur amplitude initiale : c'est bien la solution de filtrage passe-bas attendue en sortie d'un onduleur MLI. Elle ne serait en revanche pas transposable \`a une commande pleine onde, dont les harmoniques de rang 5 et 7 sont trop proches du fondamental pour \^etre s\'epar\'es par un filtre de cet ordre.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% ===========================================================================
+% Exercice 4 -- 2026 E2, questions A16 a A19 -- spectre onduleur 6 creneaux
+% ===========================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize 2026, admissibilit\'e -- \'epreuve 2 (essieu \'electrifi\'e), questions A16 \`a A19}
+]
+\CAPETSHOW{
+Une machine asynchrone triphas\'ee d'essieu \'electrifi\'e est aliment\'ee par un onduleur de tension triphas\'e pilot\'e en \emph{commande simplifi\'ee} (six cr\'eneaux). Les interrupteurs sont id\'eaux, la tension d'entr\'ee $U_0 = \SI{490}{\volt}$ est continue, et la commande est p\'eriodique de fr\'equence $f_0 = \SI{700}{\hertz}$.
+
+En optimisant l'origine des temps, la tension compos\'ee $u_{12}(t)$ se d\'ecompose en s\'erie de Fourier : seuls subsistent les harmoniques de rang $n = 6k \pm 1$ ($k$ entier), d'amplitude
+\[ |A_n| = \dfrac{2\sqrt{3}\,U_0}{n\pi} \]
+
+\begin{center}
+\begin{tikzpicture}[scale=0.8, >=Stealth]
+  \draw[-latex] (0,0) -- (8.8,0) node[right]{$t$};
+  \draw[-latex] (0,-2.0) -- (0,2.3) node[above]{$u_{12}(t)$};
+  \draw[dashed, gray] (0,1.5) -- (8,1.5); \node[left, font=\small] at (0,1.5) {$+U_0$};
+  \draw[dashed, gray] (0,-1.5) -- (8,-1.5); \node[left, font=\small] at (0,-1.5) {$-U_0$};
+  \draw[thick, colExo]
+    (0,1.5) -- (2.667,1.5) -- (2.667,0) -- (4,0) -- (4,-1.5)
+    -- (6.667,-1.5) -- (6.667,0) -- (8,0);
+  \draw[dotted] (2.667,1.5) -- (2.667,-1.8) node[below, font=\small]{$T_0/3$};
+  \draw[dotted] (4,0) -- (4,-1.8) node[below, font=\small]{$T_0/2$};
+  \draw[dotted] (8,0) -- (8,-1.8) node[below, font=\small]{$T_0$};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Justifier, \`a partir de l'allure de $u_{12}(t)$ ci-dessus et de la structure triphas\'ee de l'onduleur, l'absence des harmoniques de rang pair et de rang multiple de 3.
+  \item Calculer les amplitudes $|A_n|$ des harmoniques de $u_{12}(t)$ pour $n < 10$, et pr\'eciser la fr\'equence de chacun.
+  \item En d\'eduire la valeur efficace du fondamental $U_{12,1}$ de la tension compos\'ee.
+  \item Calculer le THD de $u_{12}(t)$ en se limitant aux rangs $n < 10$, puis indiquer dans quel sens ce r\'esultat est modifi\'e si l'on prend en compte tous les rangs jusqu'\`a l'infini.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \emph{Rangs pairs} : sur le trac\'e, l'alternance n\'egative est l'exacte oppos\'ee de l'alternance positive d\'ecal\'ee d'une demi-p\'eriode, soit $u_{12}(t + T_0/2) = -u_{12}(t)$. Cette sym\'etrie de glissement annule tous les harmoniques de rang pair.
+
+  \emph{Rangs multiples de 3} : les trois tensions simples de l'onduleur forment un syst\`eme triphas\'e ; leurs harmoniques de rang $3k$ sont en phase entre eux (syst\`eme homopolaire) et se soustraient donc exactement dans la diff\'erence $u_{12} = v_1 - v_2$. Il ne reste que les rangs $6k \pm 1$, soit $1, 5, 7, 11, 13,\ldots$
+
+  \item Pour $n < 10$, les seuls rangs pr\'esents sont $n = 1$, $n = 5$ et $n = 7$ :
+  \[ |A_1| = \dfrac{2\sqrt{3}\times 490}{\pi} = \dfrac{1\,697{,}4}{\pi} \approx \SI{540,3}{\volt} \quad\text{\`a}\quad f_0 = \SI{700}{\hertz} \]
+  \[ |A_5| = \dfrac{|A_1|}{5} = \dfrac{540{,}3}{5} \approx \SI{108,1}{\volt} \quad\text{\`a}\quad 5f_0 = \SI{3500}{\hertz} \]
+  \[ |A_7| = \dfrac{|A_1|}{7} = \dfrac{540{,}3}{7} \approx \SI{77,2}{\volt} \quad\text{\`a}\quad 7f_0 = \SI{4900}{\hertz} \]
+  Les rangs 2, 3, 4, 6, 8 et 9 sont d'amplitude nulle.
+
+  \item \[ U_{12,1} = \dfrac{|A_1|}{\sqrt{2}} = \dfrac{540{,}3}{\sqrt{2}} \approx \SI{382,1}{\volt} \]
+
+  \item Les valeurs efficaces \'etant toutes proportionnelles aux amplitudes (m\^eme facteur $1/\sqrt{2}$), le THD se calcule directement sur les $|A_n|$ :
+  \[ THD_{n<10} = \dfrac{\sqrt{|A_5|^2 + |A_7|^2}}{|A_1|} = \dfrac{\sqrt{108{,}1^2 + 77{,}2^2}}{540{,}3} = \dfrac{\sqrt{11\,686 + 5\,960}}{540{,}3} = \dfrac{132{,}8}{540{,}3} \approx 0{,}246 \]
+  soit $24{,}6\,\%$. En sommant tous les rangs $6k\pm1$, on ajoute les termes en $1/11^2$, $1/13^2$, \ldots\ : le THD ne peut donc que \emph{cro\^itre}, et tend vers
+  \[ THD_\infty = \sqrt{\sum_{n\,=\,6k\pm1,\ n\geq5}\dfrac{1}{n^2}} \approx 0{,}311 \quad (31{,}1\,\%) \]
+
+  \textbf{Conclusion.} La troncature au rang 9 sous-estime la distorsion de plus d'un cinqui\`eme ($24{,}6\,\%$ au lieu de $31{,}1\,\%$) et ferait conclure \`a tort \`a la conformit\'e vis-\`a-vis d'un seuil fix\'e \`a $25\,\%$ : dans une commande six cr\'eneaux, dont les amplitudes ne d\'ecroissent qu'en $1/n$, le rang de troncature doit toujours \^etre justifi\'e avant toute comparaison \`a une exigence normative.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% ===========================================================================
+% Exercice 5 -- 2026 E2, question A20 -- comparaison 6 creneaux / MLI 10 kHz
+% ===========================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize 2026, admissibilit\'e -- \'epreuve 2 (essieu \'electrifi\'e), question A20 -- prolong\'ee}
+]
+\CAPETSHOW{
+On reprend l'onduleur de l'exercice pr\'ec\'edent ($U_0 = \SI{490}{\volt}$, $f_0 = \SI{700}{\hertz}$). Le constructeur envisage une seconde strat\'egie de commande : une \textbf{MLI} obtenue en comparant une modulante \`a $f_0 = \SI{700}{\hertz}$ \`a une porteuse \`a $f_P = \SI{10}{\kilo\hertz}$. Dans une telle commande, les raies harmoniques significatives se regroupent autour des multiples de l'indice de modulation $m_f = f_P/f_0$.
+
+On admet en outre, pour cette \'etude prolong\'ee, que la machine asynchrone se comporte pour les harmoniques comme une inductance de fuite $L_f = \SI{1,2}{\milli\henry}$ par phase, son imp\'edance harmonique \'etant domin\'ee par $L_f\,n\omega_0$ d\`es les rangs \'elev\'es (avec $\omega_0 = 2\pi f_0$).
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Calculer l'indice de modulation $m_f$ et en d\'eduire le rang du premier groupe de raies significatives de la commande MLI, ainsi que les fr\'equences des raies lat\'erales situ\'ees \`a $f_P \pm 2f_0$.
+  \item Sur la plage $\SI{0}{\hertz}$--$\SI{7}{\kilo\hertz}$, comparer les deux strat\'egies : quels rangs harmoniques chacune y place-t-elle ? En d\'eduire, en justifiant, quelle strat\'egie est la plus favorable sur cette plage.
+  \item Calculer l'imp\'edance $Z_n = L_f\,n\omega_0$ offerte par la machine au rang 5 de la commande six cr\'eneaux, puis au premier rang significatif de la MLI. En d\'eduire, dans chaque cas, l'amplitude du courant harmonique correspondant. On prendra $\SI{160}{\volt}$ pour l'amplitude de la raie dominante de la MLI.
+  \item Conclure sur le choix de la commande MLI pour cette motorisation, en distinguant ce qui est gagn\'e sur les ondulations de couple et ce qui reste \`a traiter.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \[ m_f = \dfrac{f_P}{f_0} = \dfrac{10\,000}{700} \approx 14{,}3 \]
+  Le premier groupe de raies significatives se situe donc autour du rang $n \approx 14$, c'est-\`a-dire \`a la fr\'equence $f_P = \SI{10}{\kilo\hertz}$. Les raies lat\'erales \`a $f_P \pm 2f_0$ sont \`a
+  \[ 10\,000 - 2\times700 = \SI{8600}{\hertz} \qquad\text{et}\qquad 10\,000 + 2\times700 = \SI{11400}{\hertz} \]
+
+  \item \emph{Commande six cr\'eneaux} : sur $[0\ ;\ \SI{7}{\kilo\hertz}]$ on trouve le fondamental ($\SI{700}{\hertz}$) et deux harmoniques de forte amplitude, les rangs 5 ($\SI{3,5}{\kilo\hertz}$, $\SI{108}{\volt}$) et 7 ($\SI{4,9}{\kilo\hertz}$, $\SI{77}{\volt}$).
+
+  \emph{Commande MLI} : sur la m\^eme plage, on ne trouve que le fondamental. La raie la plus basse du premier groupe \'etant \`a $\SI{8,6}{\kilo\hertz}$, la bande $[0\ ;\ \SI{7}{\kilo\hertz}]$ est \emph{spectralement vide} en dehors de $f_0$.
+
+  La MLI est donc nettement plus favorable sur cette plage : elle repousse toute l'\'energie de distorsion au-del\`a de $\SI{8}{\kilo\hertz}$, l\`a o\`u elle est bien plus facile \`a att\'enuer.
+
+  \item $\omega_0 = 2\pi \times 700 \approx \SI{4398}{\radian\per\second}$, soit $L_f\omega_0 = 1{,}2\times10^{-3} \times 4\,398 \approx \SI{5,28}{\ohm}$.
+
+  \emph{Six cr\'eneaux, rang 5} :
+  \[ Z_5 = 5 \times 5{,}28 \approx \SI{26,4}{\ohm} \qquad \hat{I}_5 = \dfrac{|A_5|}{Z_5} = \dfrac{108{,}1}{26{,}4} \approx \SI{4,10}{\ampere} \]
+
+  \emph{MLI, premier rang significatif ($n \approx 14$)} :
+  \[ Z_{14} = 14 \times 5{,}28 \approx \SI{73,9}{\ohm} \qquad \hat{I}_{14} = \dfrac{160}{73{,}9} \approx \SI{2,17}{\ampere} \]
+
+  Bien que la raie MLI soit plus \'elev\'ee en tension ($\SI{160}{\volt}$ contre $\SI{108}{\volt}$), le courant harmonique qu'elle produit est presque deux fois plus faible : l'imp\'edance de la machine croissant proportionnellement au rang, la machine joue elle-m\^eme le r\^ole d'un filtre passe-bas.
+
+  \item La MLI apporte deux b\'en\'efices distincts.
+
+  \emph{Sur le couple} : les harmoniques de rang 5 et 7 de la commande six cr\'eneaux cr\'eent, par interaction avec le champ tournant fondamental, une ondulation de couple au rang 6 (soit $6f_0 = \SI{4,2}{\kilo\hertz}$) qui sollicite m\'ecaniquement l'essieu. En les supprimant, la MLI \'elimine cette source d'ondulation, et le courant harmonique r\'esiduel est de surcro\^it r\'eduit de pr\`es de moiti\'e ($\SI{2,17}{\ampere}$ contre $\SI{4,10}{\ampere}$).
+
+  \emph{Ce qui reste \`a traiter} : les raies \`a $\SI{10}{\kilo\hertz}$ ne disparaissent pas, elles sont d\'eplac\'ees. Elles n'agissent plus sur le couple, mais deviennent une source de perturbations conduites et rayonn\'ees (CEM) et de pertes fer suppl\'ementaires, et la fr\'equence de d\'ecoupage \'elev\'ee augmente les pertes par commutation dans l'onduleur.
+
+  \textbf{Conclusion.} Le choix de la commande MLI est justifi\'e pour cette motorisation d'essieu : il d\'eplace la distorsion vers une zone o\`u l'inductance de fuite de la machine l'att\'enue \`a elle seule, ce qui satisfait l'exigence de r\'egularit\'e du couple sans mat\'eriel de filtrage additionnel -- au prix d'un traitement CEM \`a pr\'evoir en amont du variateur et d'un rendement de conversion l\'eg\`erement d\'egrad\'e.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% ===========================================================================
+% Exercice 6 -- inedit, contexte reel 2018 -- harmonique 3 et neutre (niveau 3)
+% ===========================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize exercice in\'edit, contexte 2018 (\'eclairage public de Dampmart)}
+]
+\CAPETSHOW{
+L'installation d'\'eclairage public de la rue des F\^etes comporte $46$ luminaires r\'epartis de mani\`ere \'equilibr\'ee sur trois r\'egulateurs monophas\'es assurant l'alimentation triphas\'ee des cand\'elabres. Le courant absorb\'e est de $\SI{17}{\ampere}$ par phase.
+
+Avec les anciens r\'egulateurs, le THD du courant appel\'e vaut $28{,}8\,\%$. On admet, pour cette \'etude, que la distorsion est enti\`erement due \`a l'harmonique de rang 3 (hypoth\`ese majorante, usuelle pour ce type de charge \`a ballast ferromagn\'etique).
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.82]
+  \draw (0,3.6) node[left]{Ph1} to[short, o-] (1.2,3.6) to[generic, l=$Z$] (3.9,3.6) -- (5.6,3.6);
+  \draw (0,2.4) node[left]{Ph2} to[short, o-] (1.2,2.4) to[generic, l=$Z$] (3.9,2.4) -- (5.6,2.4);
+  \draw (0,1.2) node[left]{Ph3} to[short, o-] (1.2,1.2) to[generic, l=$Z$] (3.9,1.2) -- (5.6,1.2);
+  \draw (5.6,3.6) -- (5.6,1.2);
+  \draw (5.6,2.4) -- (7.4,2.4) node[circ]{};
+  \draw (7.4,2.4) -- (7.4,0.4) node[below]{$N$};
+  \draw[-latex, colExo, very thick] (6.6,2.4) -- (6.6,1.1);
+  \node[colExo, font=\small] at (6.95,1.7) {$i_N$};
+  \node[align=center, font=\small] at (2.5,0.2) {46 luminaires SHP \SI{150}{\watt}\\r\'epartis \'equitablement sur les 3 phases};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Sous l'hypoth\`ese ci-dessus, calculer la valeur efficace $I_1$ du fondamental et $I_3$ de l'harmonique de rang 3 dans une phase, sachant que $I_{eff} = \SI{17}{\ampere}$.
+  \item Montrer que les harmoniques de rang 3 des trois phases sont en phase entre eux, alors que les fondamentaux forment un syst\`eme \'equilibr\'e. En d\'eduire l'expression de la valeur efficace $I_N$ du courant dans le conducteur de neutre.
+  \item Calculer $I_N$ et comparer au courant de phase. Conclure sur le dimensionnement du conducteur de neutre de cette installation.
+  \item Les r\'egulateurs COMPACTO II\textregistered\ ram\`enent le courant absorb\'e \`a $\SI{12,3}{\ampere}$ par phase, pour un THD pratiquement inchang\'e de $28{,}5\,\%$. Recalculer $I_N$ et quantifier le gain sur les pertes Joule dans le conducteur de neutre.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Avec $I_{eff} = I_1\sqrt{1+THD^2}$ :
+  \[ I_1 = \dfrac{I_{eff}}{\sqrt{1+THD^2}} = \dfrac{17}{\sqrt{1+0{,}288^2}} = \dfrac{17}{\sqrt{1{,}0829}} = \dfrac{17}{1{,}0406} \approx \SI{16,34}{\ampere} \]
+  \[ I_3 = THD \times I_1 = 0{,}288 \times 16{,}34 \approx \SI{4,71}{\ampere} \]
+
+  \item Les fondamentaux des trois phases sont d\'ephas\'es de $\SI{120}{\degree}$ : la phase $k$ porte le d\'ephasage $-(k-1)\,\frac{2\pi}{3}$ pour $k = 1, 2, 3$. Pour l'harmonique de rang 3, ce d\'ephasage est multipli\'e par 3 :
+  \[ 3 \times \left(-(k-1)\dfrac{2\pi}{3}\right) = -(k-1)\,2\pi \equiv 0 \pmod{2\pi} \]
+  Les trois harmoniques de rang 3 sont donc \emph{en phase} : ils forment un syst\`eme homopolaire. Au n\oe ud du neutre, les fondamentaux (syst\`eme \'equilibr\'e) se compensent \`a z\'ero, tandis que les harmoniques de rang 3 s'\emph{ajoutent arithm\'etiquement} :
+  \[ I_N = 3\,I_3 \]
+
+  \item \[ I_N = 3 \times 4{,}71 \approx \SI{14,1}{\ampere} \]
+  Soit $I_N/I_{eff} = 14{,}1/17 \approx 0{,}83$ : le conducteur de neutre v\'ehicule $83\,\%$ du courant de phase alors m\^eme que la charge est parfaitement \'equilibr\'ee. Un neutre dimensionn\'e \`a la moiti\'e de la section des phases -- pratique admise pour les charges lin\'eaires \'equilibr\'ees -- serait ici en surcharge permanente : le neutre doit \^etre de \emph{m\^eme section que les phases}, conform\'ement \`a ce qu'impose la NF C 15-100 en pr\'esence de charges non lin\'eaires \`a fort taux d'harmonique 3.
+
+  \item Nouveau point de fonctionnement :
+  \[ I_1' = \dfrac{12{,}3}{\sqrt{1+0{,}285^2}} = \dfrac{12{,}3}{1{,}0398} \approx \SI{11,83}{\ampere} \qquad I_3' = 0{,}285 \times 11{,}83 \approx \SI{3,37}{\ampere} \]
+  \[ I_N' = 3 \times 3{,}37 \approx \SI{10,1}{\ampere} \]
+  Les pertes Joule dans le neutre \'evoluant en $I_N^2$ :
+  \[ \dfrac{P_{J,N}'}{P_{J,N}} = \left(\dfrac{10{,}1}{14{,}1}\right)^2 \approx 0{,}513 \]
+  soit une r\'eduction de pr\`es de $\SI{49}{\percent}$ des pertes Joule dans le conducteur de neutre.
+
+  \textbf{Conclusion.} Le remplacement des r\'egulateurs divise par deux les pertes dans le neutre \emph{sans que le THD ait \'et\'e modifi\'e} : c'est la baisse du courant absorb\'e, et non l'am\'elioration de la forme d'onde, qui produit le gain. Le neutre reste n\'eanmoins parcouru par $\SI{10,1}{\ampere}$ pour une charge \'equilibr\'ee, ce qui interdit toujours de le sous-dimensionner.
+\end{enumerate}
+
+\smallskip
+\textit{Cadrage de l'exercice : le contexte (46 luminaires r\'epartis \'equitablement sur 3 r\'egulateurs monophas\'es, \SI{17}{\ampere} par phase, THD de $28{,}8\,\%$ puis $28{,}5\,\%$) est issu du sujet 2018 et de ses \'el\'ements de correction. L'\'etude du courant de neutre, elle, n'y figure pas : c'est un prolongement propos\'e ici, l'hypoth\`ese \guillemotleft\ toute la distorsion est port\'ee par le rang 3 \guillemotright\ \'etant volontairement majorante.}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

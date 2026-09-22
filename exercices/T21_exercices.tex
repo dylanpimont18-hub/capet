@@ -1,0 +1,825 @@
+% T21 -- Fonctions de transfert, diagramme de Bode -- banque d'exercices
+%
+% COMPLEMENTARITE AVEC LA FICHE fiches/T21_Fonctions_Transfert_Bode.tex
+% Les trois Questions Types du Bloc 3 de la fiche sont :
+%   QT1 = identification graphique de H_M(p) sur le Bode (K_M, omega_a, omega_b)
+%         -> 2023, EDE ENE 1, question D4 ;
+%   QT2 = marge de phase et reglage de K_PV -> 2023, EDE ENE 1, questions D7-D8 ;
+%   QT3 = FTBF du 2e ordre / depassement nul -> 2026, LDE ENE 1, questions C7-C8.
+% AUCUN des six exercices ci-dessous ne refait ce travail : les questions D4, D7, D8
+% du sujet 2023 et C7, C8 du sujet 2026 sont DELIBEREMENT ECARTEES. L'exercice 3
+% exploite le MEME sujet 2023 mais par ses questions D5 et D6 (expression de K_GT et
+% de la FTBO), qui sont en amont de D7-D8 ; les exercices 1 et 4 exploitent le MEME
+% sujet 2026 mais par sa partie B (filtrage), independante de la partie C.
+%
+% SOURCES (toutes relues dans les .md de conversion Marker, chemins relatifs a
+% docs/CAPET_Markdown-20260629T134311Z-3-001/CAPET_Markdown/docs/CAPET_SII_IE/06_PDFs_Originaux/) :
+%
+%   - Ex. 1 : 2026/E1_Sujet_2026/E1_Sujet_2026.md. Nom d'epreuve lu l.1-20 :
+%     "LDE ENE 1", "CAPET CONCOURS EXTERNE ET CAFEP CORRESPONDANT (BAC + 3)",
+%     "ADMISSIBILITE : EPREUVE 1", duree 4 heures, session 2026.
+%     Question B3 lue l.299 : "Montrer que la fonction de transfert complexe du premier
+%     filtre peut s'ecrire H_F1(jw) = 1/(1 + j w/w0). Exprimer w0 en fonction de R et C."
+%     Question B4 lue l.301 (trace du Bode asymptotique puis du trace reel).
+%     Contexte du filtre passif R/C, resistance d'entree de l'etage suivant consideree
+%     infinie : l.285-295. Cahier des charges (facteur d'attenuation du perturbateur
+%     > 100 ; temps de reponse a 5 % < 50 ms) : tableau l.279-283.
+%     ATTENTION : les valeurs numeriques de R et C du sujet sont dans une image omise
+%     par Marker (l.297, "picture [192 x 15] intentionally omitted"). Elles ne sont donc
+%     PAS connues. Le couple R = 10 kOhm / C = 1 uF utilise dans les exercices 1 et 4
+%     est un choix PROPRE a cette banque, explicitement signale comme tel dans l'enonce
+%     ("Pour la suite, on retient...") -- aucune valeur n'est attribuee au sujet.
+%
+%   - Ex. 2 : 2014/E1_Corrige_2014_commun_SII/E1_Corrige_2014_commun_SII.md, question 25
+%     (l.239-249). Le document est le corrige officiel ; il porte en pied de page la
+%     mention "Capet 2013 / epreuve de tronc commun" (l.323-325) alors que le fichier
+%     est archive sous 2014 -- l'exercice cite donc l'epreuve telle qu'elle se nomme
+%     dans le fichier : "epreuve de tronc commun". Valeurs du corrige officiel :
+%     T0 = 2,4 s (l.243), gain statique k = 1 (l.245), D1% = 73 % d'ou xi = 0,1 (l.249).
+%     Recalcul independant : 100 e^{-0,1.pi/sqrt(1-0,01)} = 72,9 % -> coherent.
+%     Le corrige officiel pose T0 = 2.pi/w0 (l.243) : on obtient w0 = 2,62 rad/s ;
+%     le calcul exact par la pseudo-periode donne 2,63 rad/s (ecart negligeable,
+%     signale dans le corrige de l'exercice).
+%
+%   - Ex. 3 : 2023/E2_Disciplinaire_IE_2023/E2_Disciplinaire_IE_2023.md. Nom d'epreuve
+%     lu l.1-13 : "EDE ENE 1", session 2023, "Section : SCIENCES INDUSTRIELLES DE
+%     L'INGENIEUR", "Option : INGENIERIE ELECTRIQUE", "EPREUVE ECRITE DSICIPLINAIRE"
+%     (la coquille "DSICIPLINAIRE" est dans le sujet ; on cite ici l'intitule corrige).
+%     Questions D5 (l.407) et D6 (l.411-413). Donnees : generatrice tachymetrique
+%     5,0 V pour 1 000 tr/min (l.405) ; C_V(p) = K_PV (l.409) ; schema bloc figure 12.
+%     K_M = 20,9 et omega_a = 10 rad/s, omega_b = 7 000 rad/s : corrige officiel
+%     Rapport_Jury_2023.md l.359-363 (fournis ici en donnees d'entree, ce n'est donc
+%     pas le travail demande -- c'est precisement la QT1 de la fiche, ecartee).
+%     Corrige officiel D5 : Rapport_Jury_2023.md l.365 -> K_GT = 0,048 V/(rad/s).
+%     Corrige officiel D6 : Rapport_Jury_2023.md l.369.
+%     Recalcul independant : 5/(1000*2*pi/60) = 0,0477 -> 0,048 confirme ;
+%     K_M.K_GT = 20,9 x 0,0477 = 0,998 (le jury ecrit K_M.K_GT = 1, l.371) confirme.
+%     Citation jury : verbatim exact de Rapport_Jury_2023.md l.459.
+%
+%   - Ex. 4 (docTech) : 2026/E1_Sujet_2026/E1_Sujet_2026.md, questions B5 (l.307) et
+%     B6 (l.309). Signal d'entree v2(t) = v21(t) + v22(t) = 2 + 0,5.sin(2.pi.900.t) :
+%     verbatim du sujet l.305. Exigences "facteur d'attenuation du signal perturbateur
+%     > 100" et "temps de reponse a 5 % < 50 ms" : tableau du cahier des charges l.279-283.
+%     Le diagramme de Bode du document reponse DRB2 n'est pas extractible du .md
+%     (image omise) : le docTech de cet exercice le RECONSTRUIT en TikZ a partir de la
+%     fonction de transfert H_F1 etablie en B3 et des valeurs R/C retenues ci-dessus.
+%     C'est un trace calcule, pas une reproduction du document du sujet.
+%     Valeurs recalculees deux fois : w0 = 1/RC = 100 rad/s ; w22 = 2.pi.900 = 5 655 rad/s ;
+%     w22/w0 = 56,5 ; H22 = 1/sqrt(1+56,5^2) = 1,77e-2 soit G = -35,0 dB ;
+%     phase = -arctan(56,5) = -89,0 deg ; attenuation 1/H22 = 56,6 < 100 -> CdC NON tenu ;
+%     tr5% = 3.tau = 30 ms < 50 ms -> CdC tenu. La conclusion de non-conformite rejoint
+%     celle du sujet, qui enchaine en B7-B9 sur un second filtre d'ordre 2 (l.320-340).
+%
+%   - Ex. 5 : 2024/E2_Disciplinaire_IE_2024/E2_Disciplinaire_IE_2024.md, questions C5
+%     (l.353), C6 (l.355) et C8 (l.371). Donnees d'enonce (l.357-369) : m = 1 ;
+%     Tr = 1 s ; omega_0 = 5/Tr ; K_meca = 250 ; tau_meca = 8,5 s ; H_m(p) =
+%     K_meca/(1+tau_meca.p) ; correcteur PI K_p(1 + K_i/p).
+%     Corrige officiel : Rapport_Jury_2024.md l.266 (mise en equation de la FTBF) et
+%     l.277 (K_p = (2.m.tau_meca.omega_0 - 1)/K_meca = 0.35 ;
+%     K_i = tau_meca.omega_0^2/(K_p.K_meca) = 2.5).
+%     Recalcul independant : omega_0 = 5 rad/s ; K_i.K_p.K_meca = tau_meca.omega_0^2
+%     = 212,5 ; (1 + 250.K_p)/212,5 = 2m/omega_0 = 0,4 -> K_p = 84/250 = 0,336 (arrondi
+%     a 0,35 par le rapport) ; K_i = 212,5/84 = 2,53 (arrondi a 2,5 par le rapport).
+%     Les deux arrondis du rapport sont donc confirmes.
+%     Citation jury : verbatim exact de Rapport_Jury_2024.md l.515.
+%
+%   - Ex. 6 : EXERCICE INEDIT (aucune reference de sujet). Construit sur
+%     FTBO(p) = K_C.K/(p(1+p/omega_1)) avec K = 100 s^-1 et omega_1 = 10 rad/s, choisis
+%     pour que les lectures tombent sur des valeurs exactes : a omega = omega_1 la phase
+%     vaut exactement -135 deg (M_phi = 45 deg) et le gain exact vaut
+%     20log(K/(omega_1.sqrt(2))) = 20log(7,071) = +17,0 dB (l'asymptote y passe a +20 dB,
+%     l'ecart de 3 dB a la cassure etant precisement le point du cours). D'ou
+%     K_C = 10^{-17/20} = 0,141. Verifications numeriques independantes :
+%     |FTBO(j10)| pour K_C = 1 vaut 7,071 ; avec K_C = 0,141 le module vaut 1,000 et la
+%     phase -135,0 deg. Pulsation de coupure a 0 dB pour K_C = 1 : 30,8 rad/s (exacte),
+%     31,6 rad/s (asymptotique = sqrt(K.omega_1)), marge de phase alors de 18,0 deg.
+%     Le critere M_phi >= 45 deg est celui du cahier des charges 2023
+%     (E2_Disciplinaire_IE_2023.md l.349) et 2026 (E1_Sujet_2026.md l.390) ; le critere
+%     M_G >= 10 dB est celui du cahier des charges 2026 (meme tableau l.390). Ces deux
+%     criteres sont presentes comme usuels, sans etre attribues a une question precise.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T21}} - Exercices - Fonctions de transfert}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T21 \quad Fonctions de transfert, diagramme de Bode}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 1 -- 2026, LDE ENE 1, questions B3 et B4
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2026, LDE ENE 1, admissibilit\'e \'epreuve 1, questions B3 et B4}
+]
+\CAPETSHOW{
+La cha\^ine d'acquisition de la position angulaire de la porte d'un bus d\'elivre un signal $v_2(t)$ entach\'e d'un signal perturbateur haute fr\'equence produit par les actionneurs \'electriques voisins du capteur. Un \textbf{filtre passif} est ins\'er\'e entre l'amplificateur et le convertisseur analogique-num\'erique ; sa fonction de transfert est $\underline{H}_{F1}(j\omega) = \underline{V}_3(j\omega)/\underline{V}_2(j\omega)$.
+
+La r\'esistance d'entr\'ee de l'\'etage qui suit le filtre est \textbf{consid\'er\'ee infinie} : le filtre n'est donc pas charg\'e.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.9, every node/.style={scale=0.9}]
+  \draw (0,2.2) to[R, l=$R$, o-] (3.4,2.2);
+  \draw (0,0) to[short, o-] (3.4,0);
+  \draw (3.4,2.2) to[C, l=$C$] (3.4,0);
+  \draw (3.4,2.2) -- (4.9,2.2);
+  \draw (3.4,0) -- (4.9,0);
+  \draw (4.9,2.2) to[open, v^=$\underline{V}_3$] (4.9,0);
+  \draw (0,2.2) to[open, v^=$\underline{V}_2$] (0,0);
+  \node[circ] at (3.4,2.2) {};
+  \node[circ] at (3.4,0) {};
+  \node[font=\scriptsize, right, align=left] at (5.8,1.1) {r\'esistance d'entr\'ee\\de l'\'etage suivant :\\$R_e \to \infty$};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Montrer} que la fonction de transfert complexe de ce filtre peut s'\'ecrire
+  \[ \underline{H}_{F1}(j\omega) = \frac{1}{1 + j\,\dfrac{\omega}{\omega_0}} \]
+  et \textbf{exprimer} $\omega_0$ en fonction de $R$ et $C$. Pr\'eciser la nature du filtre.
+  \item Pour la suite, on retient $R = \SI{10}{\kilo\ohm}$ et $C = \SI{1}{\micro\farad}$. \textbf{Calculer} $\omega_0$ ainsi que la fr\'equence de coupure $f_0$ correspondante.
+  \item \textbf{Tracer} le diagramme de Bode \textbf{asymptotique} (gain et phase), puis \textbf{esquisser} le trac\'e r\'eel. On pr\'ecisera la pente de l'asymptote haute fr\'equence et l'\'ecart entre le trac\'e r\'eel et le trac\'e asymptotique \`a la pulsation de coupure.
+  \item Le cahier des charges impose un \textbf{temps de r\'eponse \`a \SI{5}{\percent} inf\'erieur \`a \SI{50}{\milli\second}}. \textbf{V\'erifier} ce crit\`ere et conclure.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item L'\'etage suivant \'etant d'imp\'edance d'entr\'ee infinie, \textbf{aucun courant n'est d\'eriv\'e en sortie} : le m\^eme courant traverse $R$ puis $C$, et le montage se ram\`ene \`a un simple \textbf{diviseur de tension} entre $R$ et l'imp\'edance $\underline{Z}_C = 1/(jC\omega)$ :
+  \[ \underline{H}_{F1}(j\omega) = \frac{\underline{Z}_C}{R + \underline{Z}_C} = \frac{\dfrac{1}{jC\omega}}{R + \dfrac{1}{jC\omega}} \]
+  En multipliant num\'erateur et d\'enominateur par $jC\omega$ :
+  \[ \underline{H}_{F1}(j\omega) = \frac{1}{1 + jRC\omega} = \frac{1}{1 + j\,\dfrac{\omega}{\omega_0}} \qquad\text{avec}\qquad \boxed{\;\omega_0 = \frac{1}{RC}\;} \]
+  C'est un \textbf{filtre passe-bas du premier ordre} de gain statique unitaire : \`a basse fr\'equence le condensateur se comporte comme un circuit ouvert et $\underline{V}_3 = \underline{V}_2$ ; \`a haute fr\'equence il court-circuite la sortie et $\underline{V}_3 \to 0$. C'est bien le comportement recherch\'e vis-\`a-vis d'un perturbateur haute fr\'equence.
+
+  \emph{Remarque :} l'hypoth\`ese $R_e \to \infty$ est essentielle. Si l'\'etage suivant chargeait le filtre, $\underline{Z}_C$ serait en parall\`ele avec $R_e$ et le gain statique ne vaudrait plus 1.
+  \item \[ \omega_0 = \frac{1}{RC} = \frac{1}{10\times 10^{3}\times 1\times 10^{-6}} = \frac{1}{10^{-2}} = \SI{100}{\radian\per\second} \]
+  \[ f_0 = \frac{\omega_0}{2\pi} = \frac{100}{2\pi} \approx \SI{15,9}{\hertz} \]
+  La constante de temps associ\'ee vaut $\tau = RC = \SI{10}{\milli\second}$.
+  \item \textbf{Gain.} $G_{dB}(\omega) = 20\log|\underline{H}_{F1}| = -20\log\sqrt{1 + (\omega/\omega_0)^2}$.
+  \begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+    \item $\omega \ll \omega_0$ : $G_{dB} \to 20\log 1 = \SI{0}{\decibel}$ -- asymptote horizontale ;
+    \item $\omega \gg \omega_0$ : $G_{dB} \to -20\log(\omega/\omega_0)$ -- asymptote de pente $\boldsymbol{-20\,\text{dB/d\'ecade}}$, passant par \SI{0}{\decibel} en $\omega_0$.
+  \end{itemize}
+  \`A la cassure, $|\underline{H}_{F1}(j\omega_0)| = 1/\sqrt{2}$, soit $G_{dB}(\omega_0) = -20\log\sqrt{2} = \SI{-3,0}{\decibel}$ : le trac\'e r\'eel passe \textbf{\SI{3}{\decibel} en dessous} du point de cassure des asymptotes.
+
+  \textbf{Phase.} $\varphi(\omega) = -\arctan(\omega/\omega_0)$ : $0^\circ$ en basse fr\'equence, $\boldsymbol{-45^\circ}$ exactement en $\omega_0$, $-90^\circ$ en haute fr\'equence.
+
+\begin{center}
+\begin{tikzpicture}[scale=1, font=\footnotesize]
+  % Repere : x = log10(omega) ; 1 unite = 1 decade. omega0 = 100 -> x = 2.
+  % Gain  : 0.035 cm/dB, cadre de +10 a -60 dB.
+  % Phase : 0.022 cm/deg, cadre de +10 a -100 deg.
+  % ---------------- GAIN ----------------
+  \begin{scope}
+    % cadre + grille
+    \draw[colRule] (-0.5,0.35) rectangle (5.2,-2.1);
+    \foreach \x in {0,1,2,3,4,5} { \draw[colRule] (\x,0.35) -- (\x,-2.1); }
+    \foreach \y in {0.35,0,-0.7,-1.4,-2.1} { \draw[colRule] (-0.5,\y) -- (5.2,\y); }
+    % graduations fines (2..9 de chaque decade)
+    \foreach \xx in {0.301,0.477,0.602,0.699,0.778,0.845,0.903,0.954,%
+      1.301,1.477,1.602,1.699,1.778,1.845,1.903,1.954,%
+      2.301,2.477,2.602,2.699,2.778,2.845,2.903,2.954,%
+      3.301,3.477,3.602,3.699,3.778,3.845,3.903,3.954,%
+      4.301,4.477,4.602,4.699,4.778,4.845,4.903,4.954}
+      { \draw[colRule] (\xx,-2.1) -- (\xx,-2.02); }
+    % etiquettes
+    \foreach \x/\lab in {0/{10^0},1/{10^1},2/{10^2},3/{10^3},4/{10^4},5/{10^5}}
+      { \node[below, font=\tiny] at (\x,-2.14) {$\lab$}; }
+    \foreach \y/\lab in {0.35/{+10},0/{0},-0.7/{-20},-1.4/{-40},-2.1/{-60}}
+      { \node[left, font=\tiny] at (-0.55,\y) {\lab}; }
+    \node[left, font=\tiny, rotate=90, anchor=south] at (-1.25,-0.9) {$G$ (dB)};
+    \node[below, font=\tiny] at (2.35,-2.72) {$\omega$ (rad$\cdot$s$^{-1}$)};
+    \node[font=\bfseries\footnotesize] at (2.35,0.7) {Gain};
+    \begin{scope}
+      \clip (-0.5,0.35) rectangle (5.2,-2.1);
+      % asymptotes : 0 dB puis -20 dB/decade = -0,7 cm/decade
+      \draw[very thick, colExo] (-0.5,0) -- (2,0);
+      \draw[very thick, colExo] (2,0) -- (5.2,-2.24);
+      % trace reel : exact jusqu'a une decade au-dela de w0, puis asymptote translatee
+      \draw[thick, colMeca, dashed] plot[smooth, domain=-0.5:3, samples=60]
+        (\x, {-0.035*10*log10(1 + pow(10,2*(\x-2)))});
+      \draw[thick, colMeca, dashed] (3,-0.7015) -- (5.2,-2.2415);
+      \draw[dotted, thick] (2,0.35) -- (2,-2.1);
+      \draw[dotted, thick] (-0.5,-0.105) -- (2,-0.105);
+    \end{scope}
+    \node[below, font=\tiny] at (2,-2.38) {\textcolor{colExo}{$\omega_0$}};
+    \node[right, font=\tiny, colMeca] at (2.1,-0.32) {$-3$\,dB en $\omega_0$};
+    \node[colExo, font=\tiny, anchor=west] at (3.35,-0.95) {\rotatebox{-35}{$-20\ \text{dB/d\'ec.}$}};
+  \end{scope}
+  % ---------------- PHASE ----------------
+  \begin{scope}[xshift=8.3cm]
+    \draw[colRule] (-0.5,0.22) rectangle (5.2,-2.2);
+    \foreach \x in {0,1,2,3,4,5} { \draw[colRule] (\x,0.22) -- (\x,-2.2); }
+    \foreach \y in {0.22,0,-0.99,-1.98} { \draw[colRule] (-0.5,\y) -- (5.2,\y); }
+    \foreach \xx in {0.301,0.477,0.602,0.699,0.778,0.845,0.903,0.954,%
+      1.301,1.477,1.602,1.699,1.778,1.845,1.903,1.954,%
+      2.301,2.477,2.602,2.699,2.778,2.845,2.903,2.954,%
+      3.301,3.477,3.602,3.699,3.778,3.845,3.903,3.954,%
+      4.301,4.477,4.602,4.699,4.778,4.845,4.903,4.954}
+      { \draw[colRule] (\xx,-2.2) -- (\xx,-2.12); }
+    \foreach \x/\lab in {0/{10^0},1/{10^1},2/{10^2},3/{10^3},4/{10^4},5/{10^5}}
+      { \node[below, font=\tiny] at (\x,-2.24) {$\lab$}; }
+    \foreach \y/\lab in {0/{0^\circ},-0.99/{-45^\circ},-1.98/{-90^\circ}}
+      { \node[left, font=\tiny] at (-0.55,\y) {$\lab$}; }
+    \node[left, font=\tiny, rotate=90, anchor=south] at (-1.4,-0.99) {$\varphi$};
+    \node[below, font=\tiny] at (2.35,-2.82) {$\omega$ (rad$\cdot$s$^{-1}$)};
+    \node[font=\bfseries\footnotesize] at (2.35,0.7) {Phase};
+    \begin{scope}
+      \clip (-0.5,0.22) rectangle (5.2,-2.2);
+      % asymptotique : 0 deg jusqu'a 0,1 w0 (x=1) puis -90 deg a partir de 10 w0 (x=3)
+      \draw[very thick, colExo] (-0.5,0) -- (1,0);
+      \draw[very thick, colExo] (1,0) -- (3,-1.98);
+      \draw[very thick, colExo] (3,-1.98) -- (5.2,-1.98);
+      % trace reel (0,022 cm/degre)
+      \draw[thick, colMeca, dashed] plot[smooth, domain=-0.5:2, samples=55]
+        (\x, {-0.022*atan(pow(10,\x-2))});
+      \draw[thick, colMeca, dashed] plot[smooth, domain=2:5.2, samples=65]
+        (\x, {-0.022*(90 - atan(pow(10,2-\x)))});
+      \draw[dotted, thick] (2,0.22) -- (2,-2.2);
+      \draw[dotted, thick] (-0.5,-0.99) -- (2,-0.99);
+    \end{scope}
+    \node[below, font=\tiny] at (2,-2.48) {\textcolor{colExo}{$\omega_0$}};
+    \node[right, font=\tiny, colMeca] at (2.1,-0.78) {$-45^\circ$ en $\omega_0$};
+  \end{scope}
+  \node[font=\tiny, colExo] at (1.0,1.15) {trait plein : asymptotique};
+  \node[font=\tiny, colMeca] at (9.3,1.15) {tiret\'e : trac\'e r\'eel};
+\end{tikzpicture}
+\end{center}
+
+  \item Pour un syst\`eme du premier ordre, le temps de r\'eponse \`a \SI{5}{\percent} vaut $t_{r5\%} \approx 3\tau$ :
+  \[ t_{r5\%} \approx 3\,RC = 3\times \SI{10}{\milli\second} = \SI{30}{\milli\second} \]
+
+  \smallskip
+  \textbf{Conclusion.} Avec $\SI{30}{\milli\second} < \SI{50}{\milli\second}$, le filtre \textbf{satisfait l'exigence de rapidit\'e} du cahier des charges, avec une marge d'environ \SI{40}{\percent}. Attention cependant : rapidit\'e et s\'electivit\'e sont ici \textbf{antagonistes} -- augmenter $\omega_0$ pour gagner en rapidit\'e revient \`a moins att\'enuer le perturbateur, et inversement. C'est pr\'ecis\'ement ce compromis que l'exercice 4 va mettre en \'echec sur le second crit\`ere du cahier des charges (att\'enuation du perturbateur sup\'erieure \`a 100).
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 2 -- 2014, epreuve de tronc commun, question 25
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{1} \hfill\normalfont\footnotesize 2014, \'epreuve de tronc commun, question 25}
+]
+\CAPETSHOW{
+La trav\'ee mobile d'un pont levant est command\'ee en \'el\'evation. On s'int\'eresse \`a la fonction de transfert $T_s(p)$ qui lie la \textbf{hauteur r\'eelle} $h_s(t)$ de la trav\'ee \`a la \textbf{hauteur indiqu\'ee par les capteurs} $h(t)$, c'est-\`a-dire au comportement dynamique propre de la structure (souplesse des c\^ables et des guidages).
+
+Un essai indiciel, r\'ealis\'e en appliquant un \'echelon sur $h$, donne la r\'eponse ci-dessous : la r\'eponse est \textbf{oscillatoire amortie}, avec un premier d\'epassement tr\`es marqu\'e.
+
+\begin{center}
+\begin{tikzpicture}[scale=1, font=\footnotesize]
+  \draw[->] (-0.2,0) -- (8.6,0) node[right] {$t$ (s)};
+  \draw[->] (0,-0.3) -- (0,4.0) node[above] {$h_s(t)$};
+  \draw[colRule, dashed] (0,2) -- (8.4,2);
+  \node[left, font=\tiny] at (-0.05,2) {$h_\infty$};
+  % echelon d'entree
+  \draw[thick, colSlate] (0,0) -- (0,2) -- (8.4,2);
+  \node[right, font=\tiny, colSlate] at (5.9,2.22) {\'echelon d'entr\'ee $h(t)$};
+  % reponse 2e ordre : xi = 0.1, w0 = 2.618 rad/s ; 1 cm = 1 s
+  \draw[very thick, colExo] plot[smooth, domain=0:8.4, samples=340]
+    (\x, {2*(1 - exp(-0.2618*\x)/0.99499*cos(2.6180*0.99499*\x r))});
+  % 1er max a t = pi/(w0 sqrt(1-xi^2)) = 1.206 s
+  \draw[dotted, thick] (1.21,0) -- (1.21,3.46);
+  \draw[dotted, thick] (0,3.46) -- (1.21,3.46);
+  \node[left, font=\tiny] at (-0.05,3.46) {$h_{max}$};
+  \node[below, font=\tiny] at (1.21,-0.06) {$1{,}2$};
+  % 2e max a t = 1.206 + 2.4 = 3.61 s
+  \draw[dotted, thick] (3.61,0) -- (3.61,2.62);
+  \node[below, font=\tiny] at (3.61,-0.06) {$3{,}6$};
+  \draw[<->, thick, colMeca] (1.21,3.78) -- (3.61,3.78) node[midway, above, font=\tiny] {$T_0 = \SI{2,4}{\second}$};
+  \foreach \x in {2,4,6,8} { \draw[colRule] (\x,0.06) -- (\x,-0.06); \node[below, font=\tiny] at (\x,-0.06) {\x}; }
+  \node[right, font=\tiny, colExo] at (5.3,1.62) {$h_s(t)$};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Identifier}, \`a l'aide du relev\'e, l'\textbf{ordre} de la fonction de transfert $T_s(p)$ et \textbf{\'ecrire} sa forme canonique en pr\'ecisant la signification de chaque param\`etre.
+  \item \textbf{D\'eterminer} la valeur num\'erique du \textbf{gain statique} $k$ et de la \textbf{p\'eriode} $T_0$.
+  \item Le relev\'e donne un premier d\'epassement $D_{1\%} = \SI{73}{\percent}$. \textbf{En d\'eduire} le facteur d'amortissement $\xi$, puis la pulsation propre $\omega_0$.
+  \item \textbf{Conclure} sur le comportement dynamique de la structure et sur les cons\'equences pour la commande en position de la trav\'ee.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item La r\'eponse \`a un \'echelon est \textbf{oscillatoire amortie} : elle ne peut pas \^etre produite par un syst\`eme du premier ordre, dont la r\'eponse indicielle est une exponentielle strictement croissante, sans aucun d\'epassement. La r\'eponse peut \^etre assimil\'ee \`a celle d'un syst\`eme r\'egi par une \'equation diff\'erentielle du \textbf{second ordre} \`a coefficients constants, en r\'egime \textbf{pseudo-p\'eriodique} ($\xi < 1$) :
+  \[ T_s(p) = \frac{k}{1 + \dfrac{2\xi}{\omega_0}\,p + \dfrac{p^2}{\omega_0^{\,2}}} \]
+  avec $k$ le \textbf{gain statique} (rapport des valeurs finales), $\xi$ le \textbf{facteur d'amortissement} (sans dimension, il fixe l'ampleur des oscillations) et $\omega_0$ la \textbf{pulsation propre non amortie} (en \si{\radian\per\second}, elle fixe la rapidit\'e).
+  \item \textbf{Gain statique.} La valeur finale de la sortie $h_s$ est \'egale \`a l'amplitude de l'\'echelon appliqu\'e sur $h$ : la hauteur r\'eelle rejoint, en r\'egime \'etabli, la hauteur indiqu\'ee par les capteurs. Donc
+  \[ \boldsymbol{k = 1} \]
+  Ce r\'esultat est physiquement n\'ecessaire : un gain statique diff\'erent de 1 signifierait que les capteurs mesurent faux en r\'egime permanent.
+
+  \textbf{P\'eriode.} On mesure l'\'ecart entre deux maximums successifs de l'oscillation :
+  \[ T_0 = 3{,}6 - 1{,}2 = \boldsymbol{\SI{2,4}{\second}} \]
+  \item Pour un second ordre pseudo-p\'eriodique, le premier d\'epassement relatif vaut
+  \[ D_{1\%} = 100\,e^{-\xi\pi/\sqrt{1-\xi^2}} \]
+  On inverse cette relation pour $D_{1\%} = \SI{73}{\percent}$ :
+  \[ \ln(0{,}73) = \frac{-\xi\pi}{\sqrt{1-\xi^2}} \;\Longrightarrow\; \frac{\xi}{\sqrt{1-\xi^2}} = \frac{-\ln 0{,}73}{\pi} = \frac{0{,}3147}{\pi} \approx 0{,}1002 \;\Longrightarrow\; \boldsymbol{\xi \approx 0{,}1} \]
+  \emph{V\'erification (indispensable) :} $100\,e^{-0{,}1\pi/\sqrt{1-0{,}01}} = 100\,e^{-0{,}3157} \approx \SI{72,9}{\percent}$ -- coh\'erent avec le relev\'e.
+
+  \textbf{Pulsation propre.} L'amortissement \'etant tr\`es faible ($\sqrt{1-\xi^2} = 0{,}995 \approx 1$), la pseudo-p\'eriode se confond pratiquement avec la p\'eriode propre, et l'on peut \'ecrire $T_0 \approx 2\pi/\omega_0$ :
+  \[ \omega_0 \approx \frac{2\pi}{T_0} = \frac{2\pi}{2{,}4} \approx \SI{2,6}{\radian\per\second} \]
+  Le calcul exact $\omega_0 = 2\pi/\bigl(T_0\sqrt{1-\xi^2}\bigr) = \SI{2,63}{\radian\per\second}$ ne modifie pas le r\'esultat \`a deux chiffres significatifs : c'est ce qui justifie l'approximation.
+  \item \textbf{Conclusion.} Avec $\xi \approx 0{,}1$, la structure est \textbf{tr\`es faiblement amortie} : un \'echelon de consigne provoque un d\'epassement de \SI{73}{\percent} de la hauteur vis\'ee, et l'oscillation met environ
+  \[ t_{r5\%} \approx \frac{3}{\xi\,\omega_0} = \frac{3}{0{,}1\times 2{,}6} \approx \SI{11}{\second} \]
+  \`a s'\'eteindre. Sur une trav\'ee de pont de plusieurs dizaines de tonnes, un tel d\'epassement est \textbf{inacceptable} : il sollicite m\'ecaniquement les c\^ables et les guidages et interdit tout accostage pr\'ecis.
+
+  Cons\'equence pour la commande : la loi de pilotage ne peut pas \^etre un \'echelon de consigne. Il faut imposer un \textbf{profil de d\'eplacement lisse} (rampes d'acc\'el\'eration et de d\'ec\'el\'eration limit\'ees) afin de ne jamais exciter le mode propre \`a \SI{2,6}{\radian\per\second}. Le crit\`ere de dimensionnement n'est donc pas ici la rapidit\'e brute, mais la \textbf{non-excitation du mode r\'esonnant} de la structure.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 3 -- 2023, EDE ENE 1, questions D5 et D6
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize 2023, EDE ENE 1, \'epreuve \'ecrite disciplinaire (option IE), questions D5 et D6}
+]
+\CAPETSHOW{
+La perche porte-outils d'un enjambeur viticole autonome est positionn\'ee par un actionneur lin\'eaire \'electrique. La boucle interne de \textbf{vitesse} de cet actionneur est mod\'elis\'ee par le sch\'ema-bloc ci-dessous.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=1, every node/.style={font=\footnotesize}]
+  \node (e) at (-0.2,0) {$U_{cons}(p)$};
+  \node[draw, circle, minimum size=0.55cm, inner sep=0pt] (c) at (1.6,0) {};
+  \draw (c.north west) -- (c.south east);
+  \node[font=\tiny] at (1.32,0.36) {$+$};
+  \node[font=\tiny] at (1.88,-0.30) {$-$};
+  \node[draw, minimum width=1.6cm, minimum height=0.8cm, align=center] (cv) at (3.7,0) {$C_V(p)$\\$= K_{PV}$};
+  \node[draw, minimum width=1.6cm, minimum height=0.8cm] (hm) at (6.4,0) {$H_M(p)$};
+  \node (s) at (8.8,0) {$\Omega_m(p)$};
+  \node[draw, minimum width=1.6cm, minimum height=0.7cm] (kgt) at (5.1,-1.7) {$K_{GT}$};
+  \draw[->] (e) -- (c);
+  \draw[->] (c) -- node[above, font=\tiny] {$\varepsilon_V(p)$} (cv);
+  \draw[->] (cv) -- node[above, font=\tiny] {$U_{mod}(p)$} (hm);
+  \draw[->] (hm) -- (s);
+  \draw (7.8,0) node[circ]{} -- (7.8,-1.7) -- (kgt.east);
+  \draw[->] (kgt.west) -- node[below, font=\tiny] {$U_{GT}(p)$} (1.6,-1.7) -- (c.south);
+\end{tikzpicture}
+\end{center}
+
+Avec : $\Omega_m$ la vitesse de rotation de l'arbre moteur (en \si{\radian\per\second}) ; $u_{GT}$ la tension image de cette vitesse ; $u_{cons}$ la tension image de la consigne de vitesse ; $C_V(p) = K_{PV}$ la fonction de transfert du \textbf{correcteur proportionnel} ; $H_M(p)$ celle du \textbf{moteur associ\'e \`a son modulateur d'\'energie} ; $K_{GT}$ celle de la \textbf{g\'en\'eratrice tachym\'etrique}.
+
+L'\'etude fr\'equentielle du moteur associ\'e \`a son modulateur a d\'ej\`a permis d'identifier, sur le diagramme de Bode fourni au concours :
+\[ K_M = 20{,}9 \qquad \omega_a = \SI{10}{\radian\per\second} \qquad \omega_b = \SI{7000}{\radian\per\second} \]
+$H_M(p)$ \'etant du second ordre \`a deux p\^oles r\'eels distincts.
+
+La g\'en\'eratrice tachym\'etrique fournit une tension proportionnelle \`a la vitesse de rotation : elle d\'elivre \SI{5,0}{\volt} en sortie pour \num{1000} tours par minute en entr\'ee.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{D\'eterminer} l'expression de la fonction de transfert $K_{GT}$ de la g\'en\'eratrice tachym\'etrique. \textbf{Pr\'eciser} son unit\'e et justifier qu'elle ne d\'epende pas de $p$.
+  \item \`A partir des trois param\`etres identifi\'es, \textbf{\'ecrire} l'expression de $H_M(p)$ sous forme canonique.
+  \item \textbf{D\'eterminer} l'expression de la fonction de transfert en boucle ouverte $FTBO_V(p) = U_{GT}(p)/\varepsilon_V(p)$ en fonction de $K_{PV}$, $K_M$, $K_{GT}$, $\omega_a$ et $\omega_b$. \textbf{Pr\'eciser} la classe de cette boucle ouverte.
+  \item \textbf{Calculer} le gain statique de cette $FTBO_V$ pour $K_{PV} = 1$, ainsi que sa valeur en \si{\decibel}. \textbf{Commenter} le r\'esultat, et \textbf{conclure} sur ce que devient le diagramme de Bode de $H_M(p)$ lorsqu'on passe \`a celui de $FTBO_V(p)$ avec $K_{PV} = 1$.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item La g\'en\'eratrice tachym\'etrique fournit une tension \textbf{proportionnelle} \`a la vitesse : la relation entre $u_{GT}$ et $\Omega_m$ est purement statique, sans d\'eriv\'ee ni int\'egrale. Sa fonction de transfert est donc une \textbf{constante} (syst\`eme d'ordre 0) et ne d\'epend pas de $p$.
+
+  Il faut convertir les \num{1000} tr/min en \si{\radian\per\second} :
+  \[ \Omega_m = 1\,000 \times \frac{2\pi}{60} = 1\,000\times\frac{\pi}{30} \approx \SI{104,7}{\radian\per\second} \]
+  \[ K_{GT} = \frac{u_{GT}}{\Omega_m} = \frac{5{,}0}{1\,000\times\dfrac{\pi}{30}} = \frac{5{,}0}{104{,}7} \approx \boldsymbol{0{,}048} \;\si{\volt}\text{ par }\si{\radian\per\second} \]
+
+  \emph{Pi\`ege classique :} oublier la conversion tr/min $\to$ \si{\radian\per\second} conduit \`a $K_{GT} = 5/1\,000 = \num{5e-3}$, soit un facteur $10{,}5$ d'erreur qui se propage ensuite dans tout le r\'eglage du correcteur.
+  \item $H_M(p)$ pr\'esentant deux p\^oles r\'eels en $\omega_a$ et $\omega_b$ et un gain statique $K_M$ :
+  \[ H_M(p) = \frac{K_M}{\left(1 + \dfrac{p}{\omega_a}\right)\left(1 + \dfrac{p}{\omega_b}\right)} \]
+  \item La boucle ouverte est le produit de tous les blocs travers\'es depuis l'\'ecart $\varepsilon_V$ jusqu'au retour $U_{GT}$, c'est-\`a-dire $C_V(p)\times H_M(p)\times K_{GT}$ :
+  \[ \boxed{\;FTBO_V(p) = \frac{K_{PV}\,K_M\,K_{GT}}{\left(1 + \dfrac{p}{\omega_a}\right)\left(1 + \dfrac{p}{\omega_b}\right)}\;} \]
+  Cette $FTBO_V$ ne comporte \textbf{aucun int\'egrateur} : c'est un syst\`eme de \textbf{classe 0}. Cela annonce d\`es maintenant une \textbf{erreur statique non nulle} sur la boucle de vitesse prise seule -- ce sera \`a la boucle de position englobante, qui contient l'int\'egration naturelle vitesse $\to$ position, d'assurer l'erreur statique nulle exig\'ee par le cahier des charges.
+  \item Pour $K_{PV} = 1$, le gain statique vaut :
+  \[ K_M\,K_{GT} = 20{,}9\times 0{,}048 \approx \boldsymbol{1{,}00} \]
+  \[ 20\log(K_M K_{GT}) = 20\log(1{,}00) \approx \SI{0}{\decibel} \]
+
+  \smallskip
+  \textbf{Conclusion.} Le produit $K_M K_{GT}$ vaut pratiquement \textbf{1}, soit \SI{0}{\decibel} : ce n'est pas un hasard mais une \textbf{cons\'equence du dimensionnement de la cha\^ine de retour}. La g\'en\'eratrice tachym\'etrique a \'et\'e choisie pour que la tension de retour $u_{GT}$ soit directement comparable, en amplitude, \`a la tension de consigne $u_{cons}$ : le comparateur travaille alors sur des grandeurs homog\`enes et du m\^eme ordre de grandeur, ce qui est une exigence de conception et non un r\'esultat fortuit.
+
+  Cons\'equence pratique pour le trac\'e : le diagramme de Bode de $FTBO_V(p)$ pour $K_{PV} = 1$ est \textbf{exactement celui de $H_M(p)$, translat\'e verticalement} de $20\log(K_M K_{GT}) - 20\log K_M = -\SI{26,4}{\decibel}$, de fa\c{c}on \`a ramener le plateau basse fr\'equence de $+\SI{26,4}{\decibel}$ \`a \SI{0}{\decibel}. La \textbf{courbe de phase est inchang\'ee}, puisqu'un gain r\'eel positif n'introduit aucun d\'ephasage. C'est ce trac\'e translat\'e qui servira ensuite \`a lire la marge de phase et \`a r\'egler $K_{PV}$.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2023, commentaire de la partie D) : \guillemotleft\ La quatri\`eme partie portait sur l'asservissement, trop peu de candidats l'ont trait\'ee de mani\`ere satisfaisante. C'est un champ disciplinaire important des sciences industrielles auquel les candidats au CAPET de SII ne peuvent se soustraire. Le jury invite les candidats \`a revoir les concepts de base de ce domaine comme les notions de boucle ouverte, de correcteur ou encore de marge de phase. \guillemotright}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 4 -- docTech -- 2026, LDE ENE 1, questions B5 et B6
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize 2026, LDE ENE 1, admissibilit\'e \'epreuve 1, questions B5 et B6}
+]
+\CAPETSHOW{
+On reprend le filtre passe-bas du premier ordre de l'exercice 1 ($\omega_0 = \SI{100}{\radian\per\second}$, $\tau = RC = \SI{10}{\milli\second}$), plac\'e dans la cha\^ine d'acquisition de la position angulaire de la porte du bus.
+
+Le signal appliqu\'e \`a son entr\'ee a pour expression :
+\[ v_2(t) = v_{21}(t) + v_{22}(t) = 2 + 0{,}5\,\sin(2\pi\cdot 900\cdot t) \qquad (\text{en volts}) \]
+o\`u $v_{21}$ est la \textbf{composante informative} (image de la position angulaire, quasi continue) et $v_{22}$ le \textbf{signal perturbateur} inject\'e par les actionneurs \'electriques voisins.
+
+Le cahier des charges du filtre impose :
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Facteur d'att\'enuation du signal perturbateur & $> 100$ \\
+Temps de r\'eponse \`a \SI{5}{\percent} & $< \SI{50}{\milli\second}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{tcolorbox}[docTech, title={Document technique -- diagramme de Bode du filtre $\underline{H}_{F1}$ (gain et phase)}]
+\footnotesize
+\begin{center}
+\begin{tikzpicture}[scale=1, font=\scriptsize]
+  % x = log10(omega) ; 1 unite = 1 decade. omega0 = 100 -> x = 2.
+  % Gain  : 0.035 cm/dB (cadre +10 a -60 dB) ; Phase : 0.022 cm/deg (0 a -90 deg).
+  % ---------------- GAIN ----------------
+  \begin{scope}
+    \draw[colRule] (-0.5,0.35) rectangle (5.2,-2.1);
+    \foreach \x in {0,1,2,3,4,5} { \draw[colRule] (\x,0.35) -- (\x,-2.1); }
+    \foreach \y in {0.35,0,-0.35,-0.7,-1.05,-1.4,-1.75,-2.1} { \draw[colRule] (-0.5,\y) -- (5.2,\y); }
+    \foreach \xx in {0.301,0.477,0.602,0.699,0.778,0.845,0.903,0.954,%
+      1.301,1.477,1.602,1.699,1.778,1.845,1.903,1.954,%
+      2.301,2.477,2.602,2.699,2.778,2.845,2.903,2.954,%
+      3.301,3.477,3.602,3.699,3.778,3.845,3.903,3.954,%
+      4.301,4.477,4.602,4.699,4.778,4.845,4.903,4.954}
+      { \draw[colRule] (\xx,-2.1) -- (\xx,-2.02); }
+    \foreach \x/\lab in {0/{10^0},1/{10^1},2/{10^2},3/{10^3},4/{10^4},5/{10^5}}
+      { \node[below, font=\tiny] at (\x,-2.14) {$\lab$}; }
+    \foreach \y/\lab in {0.35/{+10},0/{0},-0.35/{-10},-0.7/{-20},-1.05/{-30},-1.4/{-40},-1.75/{-50},-2.1/{-60}}
+      { \node[left, font=\tiny] at (-0.55,\y) {\lab}; }
+    \node[font=\tiny, rotate=90] at (-1.25,-0.9) {$G$ (dB)};
+    \node[below, font=\tiny] at (2.35,-2.46) {$\omega$ (rad$\cdot$s$^{-1}$)};
+    \node[font=\bfseries\scriptsize] at (2.35,0.66) {Gain};
+    \begin{scope}
+      \clip (-0.5,0.35) rectangle (5.2,-2.1);
+      % asymptotes : 0 dB puis -20 dB/decade = -0,7 cm/decade
+      \draw[thin, colSlate, dashed] (-0.5,0) -- (2,0);
+      \draw[thin, colSlate, dashed] (2,0) -- (5.2,-2.24);
+      % courbe reelle
+      \draw[very thick, colExo] plot[smooth, domain=-0.5:3, samples=65]
+        (\x, {-0.035*10*log10(1 + pow(10,2*(\x-2)))});
+      \draw[very thick, colExo] (3,-0.7015) -- (5.2,-2.2415);
+      % pulsation du perturbateur : w22 = 2.pi.900 = 5655 -> log10 = 3,7524
+      \draw[dotted, very thick, colMeca] (3.7524,0.35) -- (3.7524,-2.1);
+    \end{scope}
+    \node[above, font=\tiny, colMeca] at (3.7524,0.37) {$\omega_{22}$};
+  \end{scope}
+  % ---------------- PHASE ----------------
+  \begin{scope}[xshift=7.6cm]
+    \draw[colRule] (-0.5,0.22) rectangle (5.2,-2.2);
+    \foreach \x in {0,1,2,3,4,5} { \draw[colRule] (\x,0.22) -- (\x,-2.2); }
+    \foreach \y in {0.22,0,-0.495,-0.99,-1.485,-1.98} { \draw[colRule] (-0.5,\y) -- (5.2,\y); }
+    \foreach \xx in {0.301,0.477,0.602,0.699,0.778,0.845,0.903,0.954,%
+      1.301,1.477,1.602,1.699,1.778,1.845,1.903,1.954,%
+      2.301,2.477,2.602,2.699,2.778,2.845,2.903,2.954,%
+      3.301,3.477,3.602,3.699,3.778,3.845,3.903,3.954,%
+      4.301,4.477,4.602,4.699,4.778,4.845,4.903,4.954}
+      { \draw[colRule] (\xx,-2.2) -- (\xx,-2.12); }
+    \foreach \x/\lab in {0/{10^0},1/{10^1},2/{10^2},3/{10^3},4/{10^4},5/{10^5}}
+      { \node[below, font=\tiny] at (\x,-2.24) {$\lab$}; }
+    \foreach \y/\lab in {0/{0^\circ},-0.495/{-22{,}5^\circ},-0.99/{-45^\circ},-1.485/{-67{,}5^\circ},-1.98/{-90^\circ}}
+      { \node[left, font=\tiny] at (-0.55,\y) {$\lab$}; }
+    \node[font=\tiny, rotate=90] at (-1.55,-0.99) {$\varphi$};
+    \node[below, font=\tiny] at (2.35,-2.56) {$\omega$ (rad$\cdot$s$^{-1}$)};
+    \node[font=\bfseries\scriptsize] at (2.35,0.66) {Phase};
+    \begin{scope}
+      \clip (-0.5,0.22) rectangle (5.2,-2.2);
+      \draw[very thick, colExo] plot[smooth, domain=-0.5:2, samples=55]
+        (\x, {-0.022*atan(pow(10,\x-2))});
+      \draw[very thick, colExo] plot[smooth, domain=2:5.2, samples=65]
+        (\x, {-0.022*(90 - atan(pow(10,2-\x)))});
+      \draw[dotted, very thick, colMeca] (3.7524,0.22) -- (3.7524,-2.2);
+    \end{scope}
+    \node[above, font=\tiny, colMeca] at (3.7524,0.24) {$\omega_{22}$};
+  \end{scope}
+\end{tikzpicture}
+\end{center}
+\emph{Trac\'e r\'eel en trait plein \'epais, asymptotes en tiret\'e fin. Abscisse logarithmique : graduations fines interm\'ediaires ($2$ \`a $9$) dans chaque d\'ecade.}
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever} sur le document technique, pour chacune des deux composantes $v_{21}$ et $v_{22}$ du signal d'entr\'ee, la \textbf{pulsation}, le \textbf{gain $G$ en \si{\decibel}}, le \textbf{module $H$} et la \textbf{phase $\varphi$}. On commencera par calculer la pulsation de chaque composante avant de la placer en abscisse. Pr\'esenter les r\'esultats dans un tableau.
+  \item \textbf{D\'eterminer} l'expression du signal $v_3(t)$ en sortie du filtre.
+  \item \textbf{V\'erifier} le premier crit\`ere du cahier des charges (facteur d'att\'enuation du perturbateur sup\'erieur \`a 100).
+  \item Le second crit\`ere ($t_{r5\%} < \SI{50}{\milli\second}$) ayant \'et\'e valid\'e \`a l'exercice 1, \textbf{conclure} sur la capacit\'e de ce filtre \`a satisfaire le cahier des charges, et \textbf{proposer} une \'evolution de la structure.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\textbf{\'Etape 1 -- Extraction des donn\'ees du document technique.}
+
+Il faut d'abord \textbf{convertir} les caract\'eristiques temporelles du signal en pulsations, seules grandeurs port\'ees en abscisse du diagramme :
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item $v_{21}(t) = \SI{2}{\volt}$ : composante \textbf{continue}, donc $f_{21} = \SI{0}{\hertz}$ et $\omega_{21} = \SI{0}{\radian\per\second}$. Elle se lit \`a l'extr\^eme gauche du diagramme, sur le \textbf{plateau basse fr\'equence} ;
+  \item $v_{22}(t) = 0{,}5\sin(2\pi\cdot 900\cdot t)$ : sinuso\"ide de fr\'equence $f_{22} = \SI{900}{\hertz}$, donc
+  \[ \omega_{22} = 2\pi f_{22} = 2\pi\times 900 \approx \boldsymbol{\SI{5655}{\radian\per\second}} \]
+\end{itemize}
+
+\emph{C'est ici l'erreur classique : lire directement l'abscisse \guillemotleft~900~\guillemotright\ sur un axe gradu\'e en \si{\radian\per\second} conduit \`a un facteur $2\pi$ d'erreur sur le point de lecture, donc \`a une att\'enuation sous-estim\'ee d'environ \SI{16}{\decibel}.}
+
+\smallskip
+Lecture sur le diagramme aux deux abscisses, confirm\'ee par le calcul $|\underline{H}_{F1}| = 1/\sqrt{1+(\omega/\omega_0)^2}$ et $\varphi = -\arctan(\omega/\omega_0)$ avec $\omega_0 = \SI{100}{\radian\per\second}$ :
+
+\begin{center}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Composante & $\omega$ (\si{\radian\per\second}) & $G$ (\si{\decibel}) & $H$ & $\varphi$ \\
+\midrule
+$v_{21}$ (informative) & $0$ & $0$ & $1$ & $0^\circ$ \\
+$v_{22}$ (perturbatrice) & $5\,655$ & $-35{,}0$ & $1{,}77\times 10^{-2}$ & $-89{,}0^\circ$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+D\'etail du calcul de contr\^ole pour $v_{22}$ : $\omega_{22}/\omega_0 = 5\,655/100 = 56{,}5$, d'o\`u
+\[ H_{22} = \frac{1}{\sqrt{1 + 56{,}5^2}} = \frac{1}{56{,}56} \approx 1{,}77\times 10^{-2} \qquad G_{22} = 20\log\bigl(1{,}77\times 10^{-2}\bigr) \approx \SI{-35,0}{\decibel} \]
+\[ \varphi_{22} = -\arctan(56{,}5) \approx -89{,}0^\circ \]
+Le perturbateur \'etant situ\'e pr\`es de deux d\'ecades au-del\`a de $\omega_0$, on retrouve bien le d\'ephasage asymptotique de $-90^\circ$ et une att\'enuation proche de $-20\log(56{,}5) = \SI{-35}{\decibel}$.
+
+\smallskip
+\textbf{\'Etape 2 -- Expression de $v_3(t)$.}
+
+Le filtre \'etant \textbf{lin\'eaire}, on applique le th\'eor\`eme de superposition et l'on traite s\'epar\'ement chaque composante, chacune \'etant multipli\'ee par le module et d\'ephas\'ee de la phase lue \`a \emph{sa} pulsation :
+\[ v_3(t) = \underbrace{1 \times 2}_{v_{21}} + \underbrace{1{,}77\times 10^{-2}\times 0{,}5}_{\text{amplitude de } v_{22}}\,\sin\!\left(2\pi\cdot 900\cdot t - 89{,}0^\circ\right) \]
+\[ \boldsymbol{v_3(t) \approx 2 + 8{,}8\times 10^{-3}\,\sin\bigl(2\pi\cdot 900\cdot t - 89{,}0^\circ\bigr)} \quad \text{(en volts)} \]
+La composante utile traverse le filtre \textbf{sans att\'enuation ni d\'ephasage} ; le perturbateur voit son amplitude ramen\'ee de \SI{500}{\milli\volt} \`a environ \SI{8,8}{\milli\volt}.
+
+\smallskip
+\textbf{\'Etape 3 -- V\'erification du crit\`ere d'att\'enuation.}
+
+Le facteur d'att\'enuation du perturbateur est l'inverse du module du filtre \`a $\omega_{22}$ :
+\[ A = \frac{1}{H_{22}} = \sqrt{1 + 56{,}5^2} \approx \boldsymbol{56{,}6} \]
+Or le cahier des charges exige $A > 100$ :
+\[ 56{,}6 < 100 \quad\Longrightarrow\quad \textbf{crit\`ere NON satisfait} \]
+\'Equivalent en d\'ecibels : il aurait fallu $G_{22} < -20\log 100 = \SI{-40}{\decibel}$, or on ne dispose que de \SI{-35,0}{\decibel} ; il manque donc \SI{5}{\decibel}.
+
+\smallskip
+\textbf{Conclusion.} Le filtre passe-bas du \textbf{premier ordre} satisfait le crit\`ere de rapidit\'e ($t_{r5\%} = \SI{30}{\milli\second} < \SI{50}{\milli\second}$, exercice 1) mais \textbf{\'echoue sur le crit\`ere d'att\'enuation} ($56{,}6 < 100$) : il ne valide donc \textbf{pas} le cahier des charges.
+
+Les deux exigences sont \textbf{structurellement antagonistes pour un premier ordre}. Atteindre $A > 100$ imposerait
+\[ \frac{\omega_{22}}{\omega_0} > 100 \;\Longrightarrow\; \omega_0 < \SI{56,5}{\radian\per\second} \;\Longrightarrow\; \tau > \SI{17,7}{\milli\second} \;\Longrightarrow\; t_{r5\%} = 3\tau > \SI{53}{\milli\second} \]
+soit au-del\`a de la limite de \SI{50}{\milli\second}. \textbf{Aucun couple $(R,C)$ ne permet donc de tenir les deux crit\`eres simultan\'ement} : le probl\`eme n'est pas un mauvais r\'eglage, mais l'ordre du filtre.
+
+La seule \'evolution possible est d'\textbf{augmenter l'ordre du filtre}. Un filtre du \textbf{second ordre} (deux cellules en cascade) pr\'esente une asymptote \`a $-\SI{40}{\decibel}$ par d\'ecade : il atteint l'att\'enuation requise avec une pulsation de coupure bien plus \'elev\'ee, donc sans sacrifier la rapidit\'e. Il faudra alors v\'erifier que l'amortissement retenu n'introduit pas de d\'epassement sur la r\'eponse indicielle -- c'est pr\'ecis\'ement la suite de l'\'etude propos\'ee par le sujet.
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 5 -- 2024, epreuve ecrite disciplinaire, questions C5, C6 et C8
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize 2024, \'epreuve \'ecrite disciplinaire (option IE), questions C5, C6 et C8}
+]
+\CAPETSHOW{
+L'extraction d'air d'un atelier est assur\'ee par une machine asynchrone pilot\'ee en \textbf{commande scalaire}. La boucle d'asservissement de vitesse est mod\'elis\'ee par le sch\'ema-bloc ci-dessous. L'ensemble \{variateur + machine + m\'ecanique\} est assimil\'e \`a un premier ordre :
+\[ H_m(p) = \frac{K_{m\acute{e}ca}}{1 + \tau_{m\acute{e}ca}\,p} \]
+et le correcteur est un \textbf{correcteur proportionnel-int\'egral} de fonction de transfert $C(p) = K_P\left(1 + \dfrac{K_i}{p}\right)$.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=1, every node/.style={font=\footnotesize}]
+  \node (e) at (-0.4,0) {$\Omega_{r\acute{e}f}(p)$};
+  \node[draw, circle, minimum size=0.55cm, inner sep=0pt] (c) at (1.5,0) {};
+  \draw (c.north west) -- (c.south east);
+  \node[font=\tiny] at (1.22,0.36) {$+$};
+  \node[font=\tiny] at (1.78,-0.30) {$-$};
+  \node[draw, minimum width=2.1cm, minimum height=0.95cm] (cor) at (3.9,0) {$K_P\left(1 + \dfrac{K_i}{p}\right)$};
+  \node[draw, minimum width=2.0cm, minimum height=0.95cm] (hm) at (7.1,0) {$\dfrac{K_{m\acute{e}ca}}{1+\tau_{m\acute{e}ca}\,p}$};
+  \node (s) at (9.4,0) {$\Omega(p)$};
+  \draw[->] (e) -- (c);
+  \draw[->] (c) -- node[above, font=\tiny] {$\varepsilon(p)$} (cor);
+  \draw[->] (cor) -- node[above, font=\tiny] {$\omega_{sr\acute{e}f}$} (hm);
+  \draw[->] (hm) -- (s);
+  \draw (8.7,0) node[circ]{} -- (8.7,-1.4) -- (1.5,-1.4) -- (c.south);
+  \node[below, font=\tiny] at (5.1,-1.4) {retour unitaire (capteur de vitesse)};
+\end{tikzpicture}
+\end{center}
+
+Donn\'ees num\'eriques impos\'ees par la suite de l'\'etude : amortissement $m = 1$ ; temps de r\'eponse $T_r = \SI{1}{\second}$ ; pulsation propre $\omega_0 = 5/T_r$ ; $K_{m\acute{e}ca} = 250$ et $\tau_{m\acute{e}ca} = \SI{8,5}{\second}$.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{D\'eterminer} la fonction de transfert en boucle ferm\'ee $H_{bf}(p) = \Omega(p)/\Omega_{r\acute{e}f}(p)$ en fonction de $K_P$, $K_i$, $K_{m\acute{e}ca}$ et $\tau_{m\acute{e}ca}$, puis \textbf{mettre} l'expression obtenue sous la forme canonique
+  \[ H_{bf}(p) = \frac{1}{1 + \dfrac{2m}{\omega_0}\,p + \dfrac{1}{\omega_0^{\,2}}\,p^2} \]
+  \item \textbf{D\'eterminer} l'expression de $m$ et de $\omega_0$ en fonction de $K_P$, $K_i$, $K_{m\acute{e}ca}$ et $\tau_{m\acute{e}ca}$.
+  \item \textbf{Exprimer} les gains $K_P$ et $K_i$ en fonction de $m$, $K_{m\acute{e}ca}$, $\tau_{m\acute{e}ca}$ et $\omega_0$, puis \textbf{d\'eterminer} leurs valeurs num\'eriques.
+  \item Le cahier des charges impose notamment une \textbf{erreur statique nulle} sur la boucle de vitesse et un \textbf{d\'epassement $D\% \leq \SI{5}{\percent}$}. \textbf{V\'erifier} ces deux crit\`eres et \textbf{conclure} sur le r\'eglage obtenu.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le retour \'etant unitaire, la relation de bouclage s'\'ecrit, avec $\varepsilon(p) = \Omega_{r\acute{e}f}(p) - \Omega(p)$ :
+  \[ \bigl[\Omega_{r\acute{e}f}(p) - \Omega(p)\bigr]\times K_P\left(1 + \frac{K_i}{p}\right)\times \frac{K_{m\acute{e}ca}}{1 + \tau_{m\acute{e}ca}\,p} = \Omega(p) \]
+  On regroupe le correcteur sur un d\'enominateur commun, $K_P\left(1 + \dfrac{K_i}{p}\right) = \dfrac{K_P\,(p + K_i)}{p}$, d'o\`u :
+  \[ \bigl[\Omega_{r\acute{e}f} - \Omega\bigr]\,\frac{K_P\,K_{m\acute{e}ca}\,(p + K_i)}{p\,(1 + \tau_{m\acute{e}ca}\,p)} = \Omega \]
+  \[ \Omega_{r\acute{e}f}\,K_P K_{m\acute{e}ca}(p + K_i) = \Omega\,\Bigl[p\,(1 + \tau_{m\acute{e}ca}\,p) + K_P K_{m\acute{e}ca}(p + K_i)\Bigr] \]
+  \[ H_{bf}(p) = \frac{K_P K_{m\acute{e}ca}\,p + K_i K_P K_{m\acute{e}ca}}{\tau_{m\acute{e}ca}\,p^2 + \bigl(1 + K_P K_{m\acute{e}ca}\bigr)p + K_i K_P K_{m\acute{e}ca}} \]
+  L'\'enonc\'e impose une forme canonique dont le \textbf{num\'erateur est r\'eduit \`a 1} : on n\'eglige donc le z\'ero du num\'erateur (hypoth\`ese de l'\'enonc\'e), et l'on divise num\'erateur et d\'enominateur par le terme constant $K_i K_P K_{m\acute{e}ca}$ :
+  \[ \boxed{\;H_{bf}(p) = \cfrac{1}{1 + \cfrac{1 + K_P K_{m\acute{e}ca}}{K_i K_P K_{m\acute{e}ca}}\,p + \cfrac{\tau_{m\acute{e}ca}}{K_i K_P K_{m\acute{e}ca}}\,p^2}\;} \]
+  \item L'identification terme \`a terme avec la forme canonique donne :
+  \[ \frac{1}{\omega_0^{\,2}} = \frac{\tau_{m\acute{e}ca}}{K_i K_P K_{m\acute{e}ca}} \qquad\Longrightarrow\qquad \boldsymbol{\omega_0 = \sqrt{\frac{K_i K_P K_{m\acute{e}ca}}{\tau_{m\acute{e}ca}}}} \]
+  \[ \frac{2m}{\omega_0} = \frac{1 + K_P K_{m\acute{e}ca}}{K_i K_P K_{m\acute{e}ca}} \qquad\Longrightarrow\qquad \boldsymbol{m = \frac{\omega_0\,\bigl(1 + K_P K_{m\acute{e}ca}\bigr)}{2\,K_i K_P K_{m\acute{e}ca}}} \]
+  En rempla\c{c}ant $K_i K_P K_{m\acute{e}ca} = \tau_{m\acute{e}ca}\,\omega_0^{\,2}$ dans la seconde relation, on obtient la forme la plus commode pour la suite :
+  \[ m = \frac{1 + K_P K_{m\acute{e}ca}}{2\,\tau_{m\acute{e}ca}\,\omega_0} \]
+  \item On \textbf{inverse} les deux relations pr\'ec\'edentes. De l'expression de $m$ :
+  \[ 1 + K_P K_{m\acute{e}ca} = 2\,m\,\tau_{m\acute{e}ca}\,\omega_0 \qquad\Longrightarrow\qquad \boxed{\;K_P = \frac{2\,m\,\tau_{m\acute{e}ca}\,\omega_0 - 1}{K_{m\acute{e}ca}}\;} \]
+  et de celle de $\omega_0$ :
+  \[ \boxed{\;K_i = \frac{\tau_{m\acute{e}ca}\,\omega_0^{\,2}}{K_P\,K_{m\acute{e}ca}}\;} \]
+
+  \textbf{Application num\'erique.} D'abord la pulsation propre :
+  \[ \omega_0 = \frac{5}{T_r} = \frac{5}{1} = \SI{5}{\radian\per\second} \]
+  \[ K_P = \frac{2\times 1\times 8{,}5\times 5 - 1}{250} = \frac{85 - 1}{250} = \frac{84}{250} = \boldsymbol{0{,}336} \approx 0{,}35 \]
+  \[ K_i = \frac{8{,}5\times 5^2}{0{,}336\times 250} = \frac{212{,}5}{84} \approx \boldsymbol{2{,}53} \approx 2{,}5 \]
+
+  \emph{V\'erification (\`a faire syst\'ematiquement).} Avec ces valeurs :
+  \[ K_i K_P K_{m\acute{e}ca} = 2{,}53\times 0{,}336\times 250 = 212{,}5 \;\Longrightarrow\; \omega_0 = \sqrt{\frac{212{,}5}{8{,}5}} = \sqrt{25} = \SI{5}{\radian\per\second} \quad\checkmark \]
+  \[ m = \frac{1 + 84}{2\times 8{,}5\times 5} = \frac{85}{85} = 1 \quad\checkmark \]
+  Les deux sp\'ecifications impos\'ees sont bien retrouv\'ees.
+  \item \textbf{Erreur statique.} Le correcteur comporte un terme en $K_i/p$, c'est-\`a-dire un \textbf{int\'egrateur} : la boucle ouverte est de \textbf{classe 1}. Le th\'eor\`eme de la valeur finale appliqu\'e \`a un \'echelon de vitesse d'amplitude $\Omega_0$ donne, puisque $H_{bf}(0) = 1$ :
+  \[ \varepsilon(\infty) = \lim_{p\to 0}\, p\,\bigl[1 - H_{bf}(p)\bigr]\frac{\Omega_0}{p} = \Omega_0\,\bigl[1 - H_{bf}(0)\bigr] = \Omega_0\,(1 - 1) = \boldsymbol{0} \]
+  L'erreur statique est donc \textbf{nulle} : le crit\`ere est satisfait, et il l'est \textbf{structurellement} (par la seule pr\'esence de l'int\'egrateur), ind\'ependamment des valeurs num\'eriques de $K_P$ et $K_i$.
+
+  \textbf{D\'epassement.} Le r\'eglage impose $m = 1$, c'est-\`a-dire le r\'egime \textbf{ap\'eriodique critique} : les deux p\^oles sont r\'eels confondus, la r\'eponse indicielle est monotone croissante et ne pr\'esente \textbf{aucun d\'epassement} :
+  \[ D\% = 0 \leq \SI{5}{\percent} \quad \checkmark \]
+
+  \smallskip
+  \textbf{Conclusion.} Le r\'eglage $K_P \approx 0{,}35$ et $K_i \approx 2{,}5$ satisfait \textbf{simultan\'ement} les deux exigences du cahier des charges : erreur statique nulle (apport\'ee par l'action int\'egrale) et d\'epassement nul (apport\'e par le choix $m = 1$), pour un temps de r\'eponse d'une seconde. Le choix $m = 1$ est le r\'eglage \textbf{le plus rapide sans d\'epassement} : toute valeur $m > 1$ garantirait encore l'absence de d\'epassement mais d\'egraderait la rapidit\'e, tandis que $m < 1$ ferait appara\^itre un d\'epassement qui d\'epasserait rapidement \SI{5}{\percent}. Le r\'eglage est donc plac\'e exactement \`a la fronti\`ere admissible du cahier des charges.
+
+  \emph{Remarque de m\'ethode :} le z\'ero en $(p + K_i)$ n\'eglig\'e au num\'erateur introduit en r\'ealit\'e un l\'eger d\'epassement sur la r\'eponse r\'eelle. Un candidat qui le signale explicitement -- plut\^ot que de l'ignorer silencieusement -- valorise sa copie.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2024, analyse globale des r\'esultats) : \guillemotleft\ Le jury attend des r\'eponses d\'etaill\'ees et argument\'ees. Des r\'esultats donn\'es directement, sans calcul et sans justification ne r\'epondent pas aux attendus de l'\'epreuve. \guillemotright}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 6 -- exercice inedit
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Un axe de positionnement lin\'eaire est asservi en vitesse. Sa fonction de transfert en boucle ouverte, retour compris, s'\'ecrit :
+\[ FTBO(p) = C(p)\times \frac{K}{p\left(1 + \dfrac{p}{\omega_1}\right)} \qquad\text{avec}\qquad K = \SI{100}{\per\second} \quad\text{et}\quad \omega_1 = \SI{10}{\radian\per\second} \]
+Le correcteur est d'abord un \textbf{correcteur proportionnel} $C(p) = K_C$, r\'egl\'e \`a $K_C = 1$.
+
+Le cahier des charges impose, comme dans les sujets r\'ecents : \textbf{marge de phase $M_\varphi \geq 45^\circ$} et \textbf{marge de gain $M_G \geq \SI{10}{\decibel}$}.
+
+Le diagramme de Bode de $FTBO(p)$ pour $K_C = 1$ est trac\'e ci-dessous.
+
+\begin{center}
+\begin{tikzpicture}[scale=1, font=\scriptsize]
+  % x = log10(omega) ; 1 unite = 1 decade. omega_1 = 10 -> x = 1.
+  % Gain : 0,026 cm/dB (cadre +60 a -40 dB) ; Phase : 0,013 cm/deg (0 a -180 deg).
+  % ---------------- GAIN ----------------
+  \begin{scope}
+    \draw[colRule] (-1.3,1.56) rectangle (3.2,-1.04);
+    \foreach \x in {-1,0,1,2,3} { \draw[colRule] (\x,1.56) -- (\x,-1.04); }
+    \foreach \y in {1.56,1.04,0.52,0,-0.52,-1.04} { \draw[colRule] (-1.3,\y) -- (3.2,\y); }
+    \foreach \x/\lab in {-1/{0{,}1},0/{1},1/{10},2/{100},3/{10^3}}
+      { \node[below, font=\tiny] at (\x,-1.08) {$\lab$}; }
+    \foreach \y/\lab in {1.56/{+60},1.04/{+40},0.52/{+20},0/{0},-0.52/{-20},-1.04/{-40}}
+      { \node[left, font=\tiny] at (-1.35,\y) {\lab}; }
+    \node[font=\tiny, rotate=90] at (-1.95,0.26) {$G$ (dB)};
+    \node[below, font=\tiny] at (0.95,-1.62) {$\omega$ (rad$\cdot$s$^{-1}$)};
+    \node[font=\bfseries\scriptsize] at (0.95,1.9) {Gain -- $K_C = 1$};
+    \begin{scope}
+      \clip (-1.3,1.56) rectangle (3.2,-1.04);
+      % asymptote 1 : -20 dB/dec = -0,52 cm/dec ; a x=-1 -> 60 dB (y=1,56) ; a x=1 -> 20 dB (y=0,52)
+      \draw[very thick, colExo] (-1.3,1.716) -- (1,0.52);
+      % asymptote 2 : -40 dB/dec = -1,04 cm/dec ; a x=2,5 -> -40 dB (y=-1,04)
+      \draw[very thick, colExo] (1,0.52) -- (2.6,-1.144);
+      % trace reel : 20log(100) - 20log(w) - 10log(1+(w/10)^2)
+      \draw[thick, colMeca, dashed] plot[smooth, domain=-1.3:2, samples=70]
+        (\x, {0.026*(40 - 20*\x - 10*log10(1 + pow(10,2*(\x-1))))});
+      \draw[thick, colMeca, dashed] (2,-0.5211) -- (2.55,-1.093);
+      % reperes
+      \draw[dotted, thick] (1,1.56) -- (1,-1.04);
+      \draw[dotted, thick] (-1.3,0.52) -- (1,0.52);
+      \draw[dotted, thick] (-1.3,0.442) -- (1,0.442);
+      % pulsation de coupure a 0 dB pour Kc = 1 : w_u = 30,8 -> x = 1,489
+      \draw[dotted, thick, colSlate] (1.489,0) -- (1.489,-1.04);
+    \end{scope}
+    \node[below, font=\tiny, colExo] at (1,-1.32) {$\omega_1$};
+    \node[below, font=\tiny, colSlate] at (1.62,-1.32) {$\omega_u$};
+    \node[right, font=\tiny, colExo] at (1.06,0.62) {$+20$\,dB (asympt.)};
+    \node[right, font=\tiny, colMeca] at (1.06,0.36) {$+17$\,dB (r\'eel)};
+    \node[colExo, font=\tiny] at (-0.55,1.32) {\rotatebox{-27}{$-20$\,dB/d\'ec.}};
+    \node[colExo, font=\tiny] at (2.05,-0.28) {\rotatebox{-46}{$-40$\,dB/d\'ec.}};
+  \end{scope}
+  % ---------------- PHASE ----------------
+  \begin{scope}[xshift=6.6cm, yshift=1.3cm]
+    \draw[colRule] (-1.3,0.26) rectangle (3.2,-2.34);
+    \foreach \x in {-1,0,1,2,3} { \draw[colRule] (\x,0.26) -- (\x,-2.34); }
+    \foreach \y in {0.26,0,-0.585,-1.17,-1.755,-2.34} { \draw[colRule] (-1.3,\y) -- (3.2,\y); }
+    \foreach \x/\lab in {-1/{0{,}1},0/{1},1/{10},2/{100},3/{10^3}}
+      { \node[below, font=\tiny] at (\x,-2.38) {$\lab$}; }
+    \foreach \y/\lab in {0/{0^\circ},-0.585/{-45^\circ},-1.17/{-90^\circ},-1.755/{-135^\circ},-2.34/{-180^\circ}}
+      { \node[left, font=\tiny] at (-1.35,\y) {$\lab$}; }
+    \node[font=\tiny, rotate=90] at (-2.15,-1.17) {$\varphi$};
+    \node[below, font=\tiny] at (0.95,-2.92) {$\omega$ (rad$\cdot$s$^{-1}$)};
+    \node[font=\bfseries\scriptsize] at (0.95,0.6) {Phase -- $K_C = 1$};
+    \begin{scope}
+      \clip (-1.3,0.26) rectangle (3.2,-2.34);
+      % asymptotique : -90 deg jusqu'a 0,1.w1 (x=0) puis -180 deg a partir de 10.w1 (x=2)
+      \draw[very thick, colExo] (-1.3,-1.17) -- (0,-1.17);
+      \draw[very thick, colExo] (0,-1.17) -- (2,-2.34);
+      \draw[very thick, colExo] (2,-2.34) -- (3.2,-2.34);
+      % trace reel : -90 - arctan(w/10), a 0,013 cm/degre
+      \draw[thick, colMeca, dashed] plot[smooth, domain=-1.3:1, samples=60]
+        (\x, {-0.013*(90 + atan(pow(10,\x-1)))});
+      \draw[thick, colMeca, dashed] plot[smooth, domain=1:3.2, samples=60]
+        (\x, {-0.013*(180 - atan(pow(10,1-\x)))});
+      \draw[dotted, thick] (1,0.26) -- (1,-2.34);
+      \draw[dotted, thick] (-1.3,-1.755) -- (1,-1.755);
+      \draw[dotted, thick, colSlate] (1.489,0.26) -- (1.489,-2.34);
+      \draw[dotted, thick, colSlate] (-1.3,-2.107) -- (1.489,-2.107);
+    \end{scope}
+    \node[below, font=\tiny, colExo] at (1,-2.62) {$\omega_1$};
+    \node[below, font=\tiny, colSlate] at (1.62,-2.62) {$\omega_u$};
+    \node[right, font=\tiny, colMeca] at (1.06,-1.64) {$-135^\circ$};
+    \node[right, font=\tiny, colSlate] at (1.55,-1.99) {$-162^\circ$};
+  \end{scope}
+  \node[font=\tiny, colExo] at (0.2,2.35) {trait plein : asymptotique};
+  \node[font=\tiny, colMeca] at (6.9,2.35) {tiret\'e : trac\'e r\'eel};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Justifier} la forme du diagramme asymptotique : pente et position de l'asymptote basse fr\'equence, pulsation de cassure, pentes successives, asymptotes de phase.
+  \item \textbf{Montrer} que la marge de gain $M_G$ de ce syst\`eme est infinie, et \textbf{expliquer} ce que cela traduit physiquement.
+  \item Pour $K_C = 1$, la pulsation de coupure \`a \SI{0}{\decibel} vaut $\omega_u \approx \SI{31}{\radian\per\second}$. \textbf{Calculer} la marge de phase correspondante et \textbf{conclure} vis-\`a-vis du cahier des charges.
+  \item \textbf{D\'eterminer} la valeur de $K_C$ permettant d'obtenir exactement $M_\varphi = 45^\circ$. On justifiera d'abord la pulsation $\omega_u^{\star}$ \`a laquelle le croisement \SI{0}{\decibel} doit \^etre ramen\'e. \textbf{Conclure} sur le compromis obtenu.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item $FTBO(p)$ comporte, pour $K_C = 1$, un \textbf{int\'egrateur} $1/p$ et un \textbf{p\^ole du premier ordre} en $\omega_1$.
+  \begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+    \item \textbf{Basse fr\'equence} ($\omega \ll \omega_1$) : $FTBO \approx K/(j\omega)$, soit $G_{dB} = 20\log K - 20\log\omega$. L'asymptote a une pente de $\boldsymbol{-20\,\text{dB/d\'ecade}}$ et couperait \SI{0}{\decibel} en $\omega = K = \SI{100}{\radian\per\second}$ si elle \'etait prolong\'ee. En $\omega = \SI{0,1}{\radian\per\second}$ elle vaut $20\log(100/0{,}1) = \SI{60}{\decibel}$ ; en $\omega = \omega_1 = \SI{10}{\radian\per\second}$ elle vaut $20\log(100/10) = \SI{20}{\decibel}$.
+    \item \textbf{Cassure} en $\omega_1 = \SI{10}{\radian\per\second}$ : le p\^ole ajoute $-20\,\text{dB/d\'ecade}$, la pente devient $\boldsymbol{-40\,\text{dB/d\'ecade}}$.
+    \item \textbf{Phase} : l'int\'egrateur apporte $-90^\circ$ \textbf{constants sur tout le spectre} ; le p\^ole ajoute une transition de $0^\circ$ \`a $-90^\circ$ centr\'ee sur $\omega_1$, dont les asymptotes se raccordent de $0{,}1\,\omega_1 = \SI{1}{\radian\per\second}$ \`a $10\,\omega_1 = \SI{100}{\radian\per\second}$. La phase part donc de $-90^\circ$ et tend vers $-180^\circ$ :
+    \[ \varphi(\omega) = -90^\circ - \arctan\!\left(\frac{\omega}{\omega_1}\right) \]
+  \end{itemize}
+  \item La marge de gain se lit \`a la pulsation $\omega_\pi$ pour laquelle $\varphi(\omega_\pi) = -180^\circ$. Or ici :
+  \[ \varphi(\omega) = -90^\circ - \arctan(\omega/\omega_1) \;>\; -180^\circ \qquad \text{pour tout } \omega \text{ fini} \]
+  puisque $\arctan(\omega/\omega_1) < 90^\circ$ strictement. La phase n'atteint $-180^\circ$ qu'\`a la limite $\omega \to \infty$, o\`u le gain vaut $-\infty$ \si{\decibel}. Il n'existe donc aucune pulsation $\omega_\pi$ finie :
+  \[ \boldsymbol{M_G = +\infty} \]
+  Physiquement : ce syst\`eme, d'ordre 2 en boucle ouverte avec un seul int\'egrateur, est \textbf{inconditionnellement stable en boucle ferm\'ee vis-\`a-vis du gain}. Quelle que soit la valeur de $K_C > 0$, augmenter le gain \textbf{translate la courbe de gain vers le haut sans modifier la phase}, qui reste toujours strictement au-dessus de $-180^\circ$. Le crit\`ere $M_G \geq \SI{10}{\decibel}$ est donc \textbf{satisfait par construction}, et seule la marge de phase limitera le r\'eglage.
+
+  \emph{Attention :} cette propri\'et\'e dispara\^itrait d\`es l'ajout d'un troisi\`eme p\^ole ou d'un retard pur -- c'est le cas de la plupart des syst\`emes r\'eels, o\`u la marge de gain redevient un crit\`ere dimensionnant.
+  \item Marge de phase \`a $\omega_u \approx \SI{31}{\radian\per\second}$ :
+  \[ \varphi(\omega_u) = -90^\circ - \arctan\!\left(\frac{31}{10}\right) = -90^\circ - 72{,}1^\circ = -162{,}1^\circ \]
+  \[ M_\varphi = 180^\circ + \varphi(\omega_u) = 180^\circ - 162{,}1^\circ \approx \boldsymbol{18^\circ} \]
+
+  \smallskip
+  Avec $M_\varphi \approx 18^\circ < 45^\circ$, le \textbf{cahier des charges n'est pas respect\'e}. Le syst\`eme reste th\'eoriquement stable ($M_\varphi > 0$), mais si faiblement amorti que la r\'eponse indicielle en boucle ferm\'ee pr\'esentera un fort d\'epassement et de longues oscillations : le gain $K_C = 1$ est trop \'elev\'e.
+
+  \emph{Contr\^ole de coh\'erence :} l'asymptote \`a $-40\,\text{dB/d\'ecade}$ coupe \SI{0}{\decibel} en $\omega = \sqrt{K\,\omega_1} = \sqrt{1\,000} \approx \SI{31,6}{\radian\per\second}$, ce qui confirme la valeur de $\omega_u$ fournie.
+  \item \textbf{Choix de la pulsation cible.} $K_C$ ne modifiant \textbf{pas la phase}, la marge de phase souhait\'ee fixe \`a elle seule la pulsation de croisement. On cherche $\omega_u^{\star}$ telle que $\varphi(\omega_u^{\star}) = -180^\circ + 45^\circ = -135^\circ$ :
+  \[ -90^\circ - \arctan\!\left(\frac{\omega_u^{\star}}{\omega_1}\right) = -135^\circ \;\Longrightarrow\; \arctan\!\left(\frac{\omega_u^{\star}}{\omega_1}\right) = 45^\circ \;\Longrightarrow\; \boldsymbol{\omega_u^{\star} = \omega_1 = \SI{10}{\radian\per\second}} \]
+  La cible est donc exactement la pulsation de cassure -- r\'esultat remarquable, cons\'equence directe de la pr\'esence d'un seul p\^ole en plus de l'int\'egrateur.
+
+  \textbf{Lecture du gain \`a cette pulsation.} Sur le trac\'e \textbf{r\'eel}, et non sur l'asymptote :
+  \[ G_0 = 20\log\left|\frac{K}{j\omega_1\left(1 + j\dfrac{\omega_1}{\omega_1}\right)}\right| = 20\log\frac{100}{10\times\sqrt{2}} = 20\log(7{,}07) \approx \SI{+17,0}{\decibel} \]
+  L'asymptote annonce $+\SI{20}{\decibel}$ : l'\'ecart de \SI{3}{\decibel} \`a la pulsation de cassure est pr\'ecis\'ement la correction \`a ne pas oublier. La n\'egliger conduirait \`a une erreur de \SI{3}{\decibel} sur $K_C$, soit environ \SI{40}{\percent}.
+
+  \textbf{Calcul de $K_C$.} Il faut abaisser le gain de $G_0$ pour ramener le croisement \SI{0}{\decibel} en $\omega_u^{\star}$, soit $20\log K_C = -G_0$ :
+  \[ K_C = 10^{-G_0/20} = 10^{-17{,}0/20} = 10^{-0{,}85} \approx \boldsymbol{0{,}141} \]
+
+  \emph{V\'erification :} avec $K_C = 0{,}141$, $|FTBO(j10)| = 0{,}141\times 7{,}07 = 1{,}00$ (soit \SI{0}{\decibel}) \checkmark\ et $\varphi(10) = -90^\circ - 45^\circ = -135^\circ$, donc $M_\varphi = 180^\circ - 135^\circ = 45^\circ$ \checkmark.
+
+  \smallskip
+  \textbf{Conclusion.} Le r\'eglage $K_C \approx 0{,}14$ porte la marge de phase de $18^\circ$ \`a exactement $45^\circ$ et satisfait donc le cahier des charges, la marge de gain restant infinie. Mais ce gain de stabilit\'e a un \textbf{co\^ut} : la pulsation de coupure passe de \SI{31}{\radian\per\second} \`a \SI{10}{\radian\per\second}, soit une \textbf{bande passante divis\'ee par trois} et un syst\`eme environ trois fois plus lent. La pr\'ecision se d\'egrade dans le m\^eme mouvement, puisque l'erreur de tra\^inage est gouvern\'ee par le gain de boucle $K_C\,K = \SI{14,1}{\per\second}$ au lieu de \SI{100}{\per\second}, soit une erreur de poursuite multipli\'ee par sept.
+
+  C'est le compromis fondamental du correcteur proportionnel seul : \textbf{stabilit\'e, rapidit\'e et pr\'ecision s'\'echangent} et ne peuvent pas \^etre am\'elior\'ees ensemble avec un unique param\`etre. Si le cahier des charges exigeait \textbf{simultan\'ement} $M_\varphi \geq 45^\circ$ et la bande passante initiale, un correcteur proportionnel ne suffirait plus : il faudrait un correcteur \`a \textbf{avance de phase}, qui remonte la phase au voisinage de $\omega_u$ sans sacrifier le gain, ou un correcteur PI si seule la pr\'ecision statique \'etait en cause.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

@@ -1,0 +1,388 @@
+% Audit de veracite des citations de rapport de jury - 2026-09-20
+% Bloc 4 : encadre de citations jury supprime en entier.
+% Citation << jury 2022 / LoRa >> introuvable dans le corpus (la seule occurrence
+% de LoRaWAN, RJ2022 l.347, appartient au corrige, pas au commentaire du jury).
+% Citation << jury 2026 / trame CAN >> : rapport 2026 inexistant, texte fabrique.
+% Aucun verbatim de remplacement pertinent : encadre retire plutot que fausse.
+%
+% Correction de deux erreurs de calcul - 2026-09-20
+%
+% 1. QT2 (LoRa) REECRITE. L'ancienne version se reclamait de la question 29 du
+%    sujet E2 disciplinaire IE 2022 mais inventait un enonce a SF = 7, resolu par
+%    "debit de table x CR" -> 4 376 bit/s. La question 29 reelle
+%    (E2_Disciplinaire_IE_2022.md l.507) impose SF = 12, explicitement rappele deux
+%    fois dans le sujet (l.500 et l.505), et le corrige officiel
+%    (Rapport_Jury_2022.md l.349) donne Rb = SF*BW*CR/2^SF = 293 bit/s.
+%    Recalcul independant : 12*125000*0,8/4096 = 292,97 -> 293 bit/s ; Ts = 32,768 ms.
+%    La QT suit desormais l'enonce reel et la formule du corrige officiel.
+%
+% 2. TRAME CAN : 108 -> 111 bits (5 emplacements : Bloc 1 intro, Bloc 1 champs,
+%    Bloc 1 methode, Bloc 2 formulaire, QT3 calcul et conclusion).
+%    Le decompte des champs (1+11+1+2+4+64+16+2+7 = 108) est exact mais omet les
+%    3 bits d'INTERMISSION. Le sujet 2026 (E1_Sujet_2026.md l.517, question D5)
+%    ecrit explicitement "constituee de 111 bits". La fiche explicite desormais la
+%    decomposition 108 + 3 au lieu de trancher silencieusement, et signale que le
+%    bit-stuffing n'est jamais compte forfaitairement (il depend des donnees).
+%    QT3 : t_trame = 111 us, marge 44,5 % (et non 108 us / 46 %).
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ficheHeaders{T25}{Transmission numérique}{colElec}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TETE
+% -----------------------------------------------------------------------
+
+\ficheEntete{T25}{Transmission numérique - Modulations et protocoles}{colElec}%
+  {électronique - Communications numériques}%
+  {\textbf{Présence :} \textbf{4/13} sujets (2013-2026) - thème \emph{occasionnel}}%
+  {débit binaire - modulation FSK/FM - LoRa/LoRaWAN - bus CAN (trame) - MLI/PWM transmission - Shannon capacité - UART vs PWM}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Debit binaire -------------------------------------------------
+\textbf{1.1 Notions fondamentales}
+
+\[
+  D_b = \frac{1}{T_b} \quad [\mathrm{bit/s}]
+  \qquad
+  D_b = \log_2(M) \cdot D_s \quad (M \text{ états})
+  \qquad
+  C = B \cdot \log_2(1 + SNR) \quad \text{(Shannon)}
+\]
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 Modulation FM et FSK ------------------------------------------
+\textbf{1.2 Modulation FM et FSK (2015 E1)}
+
+\[
+  f_{inst}(t) = f_0 + k_f\,v_m(t)
+  \qquad
+  m = \frac{\Delta f}{f_m} = \frac{k_f\,V_m}{f_m} \quad \text{(indice de modulation)}
+\]
+
+\textbf{FSK} ($v_m = \pm 1$) :
+\begin{itemize}
+  \item Bit « 0 » : fréquence $f_0 = f_n - \Delta f$
+  \item Bit « 1 » : fréquence $f_1 = f_n + \Delta f$
+  \item Excursion : $\Delta f = f_1 - f_n = f_n - f_0$
+\end{itemize}
+Exemple (2015) : $f_n = 433\,\mathrm{MHz}$, $\Delta f = 300\,\mathrm{kHz}$.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 LoRa / LoRaWAN ------------------------------------------------
+\textbf{1.3 LoRa / LoRaWAN (2022 E1/E2)}
+
+Modulation CSS (Chirp Spread Spectrum), bandes ISM 868 MHz (Europe), 915 MHz (USA).
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{DR} & \textbf{Mod.} & \textbf{SF} & \textbf{BP (kHz)} & \textbf{Débit physique (bit/s)} \\
+\midrule
+0 & LoRa & 12 & 125 & 250 \\
+3 & LoRa & 9  & 125 & 1\,760 \\
+5 & LoRa & 7  & 125 & 5\,470 \\
+7 & FSK  & -  & -   & 50\,000 \\
+\bottomrule
+\end{tabular}
+\end{center}
+Débit utile calculé depuis les paramètres radio : $R_b = SF \times BP \times CR / 2^{SF}$ (à privilégier en épreuve). Si l'énoncé fournit un débit physique de table, il intègre déjà l'étalement : $D_{utile} = D_{phys} \times CR$.\\
+Portée : $\sim 5\,\mathrm{km}$ urbain, $\sim 15\,\mathrm{km}$ rural (SF12).
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 Bus CAN -------------------------------------------------------
+\textbf{1.4 Bus CAN - transmission série de terrain}
+
+Bus série différentiel ($U_D = U_{CAN\_H} - U_{CAN\_L}$), multi-maîtres, 1 Mbit/s max.
+
+Structure de trame (données = 8 octets) : 108 bits de trame, 111 bits en comptant l'intermission.
+
+\smallskip
+\begin{center}
+\begin{tikzpicture}[font=\tiny, node distance=1mm, align=center]
+  \node[draw, minimum height=6.5mm, minimum width=6mm] (sof) {SOF\\1};
+  \node[draw, minimum height=6.5mm, minimum width=11mm, right=of sof] (id) {ID\\11};
+  \node[draw, minimum height=6.5mm, minimum width=6mm, right=of id] (rtr) {RTR\\1};
+  \node[draw, minimum height=6.5mm, minimum width=10mm, right=of rtr] (ide) {IDE+r0\\2};
+  \node[draw, minimum height=6.5mm, minimum width=8mm, right=of ide] (dlc) {DLC\\4};
+  \node[draw, minimum height=6.5mm, minimum width=15mm, right=of dlc] (data) {Data\\0-64};
+  \node[draw, minimum height=6.5mm, minimum width=11mm, right=of data] (crc) {CRC\\15+1};
+  \node[draw, minimum height=6.5mm, minimum width=7mm, right=of crc] (ack) {ACK\\2};
+  \node[draw, minimum height=6.5mm, minimum width=7mm, right=of ack] (eof) {EOF\\7};
+\end{tikzpicture}
+\end{center}
+Champs successifs (nombre de bits indiqué sous chaque nom) - $1+11+1+2+4+64+16+2+7 = 108$ bits pour une trame à 8 octets de données.
+
+\textbf{\textcolor{colElec}{Attention au périmètre du comptage.}} Les 3 bits d'\emph{intermission} qui séparent deux trames consécutives portent le total à $108+3 = \mathbf{111}$ bits. Un sujet qui interroge la durée de transmission compte en général ces 111 bits (c'est le cas du sujet 2026, question D5). Toujours lire l'énoncé : le bit-stuffing, lui, n'est jamais compté forfaitairement car il dépend des données transmises.
+
+\textbf{Débit depuis chronogramme :} mesurer $T_b$ sur le chrono - $D_b = 1/T_b$ ; durée trame $= 111 \times T_b$ (intermission comprise).
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.5 MLI/PWM en transmission ---------------------------------------
+\textbf{1.5 MLI/PWM - contexte transmission de consigne}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lll}
+\toprule
+\textbf{Critère} & \textbf{UART} & \textbf{PWM} \\
+\midrule
+Synchronisation & Asynchrone (baud rate) & Synchrone (fréquence fixe) \\
+Complexité & Élevée (protocole complet) & Simple (mesure $t_{on}$) \\
+Immunité bruit & Faible & Élevée (signal TOR) \\
+Débit & Élevé & Faible (1 valeur/période) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHETIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthétique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Débit}} \\
+$D_b = 1/T_b$ & Bit/s & bit/s \\
+$D_b = \log_2(M) \cdot D_s$ & $M$ états & bit/s \\
+$C = B\log_2(1+SNR)$ & Shannon & bit/s \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{FM / FSK}} \\
+$f_{inst} = f_0 + k_f v_m$ & Inst. & Hz \\
+$m = \Delta f / f_m$ & Indice & - \\
+$f_1 = f_n + \Delta f$ ; $f_0 = f_n - \Delta f$ & FSK & Hz \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{5cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{LoRa}} \\
+$R_b = SF{\cdot}BP{\cdot}CR/2^{SF}$ & LoRa & bit/s \\
+SF$\uparrow$ - débit$\downarrow$, portée$\uparrow$ & Compromis & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Bus CAN}} \\
+Débit max : 1\,Mbit/s & CAN 2.0 & bit/s \\
+Trame : 108 bits (+3 interm. = 111) & - & bits \\
+$t_{trame} = 111 \times T_b$ & Durée & s \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Données types}} \\
+LoRa SF7/125 kHz : 5\,470 bit/s & DR5 & - \\
+FSK LoRa : 50\,000 bit/s & DR7 & - \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets réels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Modulation FSK - deux fréquences et indice \hfill\normalfont\footnotesize E1 2015 (Shelter déployable)}
+]
+\textbf{Énoncé.}
+Système de transmission FSK : porteuse $f_n = 433\,\mathrm{MHz}$, excursion $\Delta f = 300\,\mathrm{kHz}$, fréquence modulante $f_m = 1\,\mathrm{kHz}$. (a) Donner les deux fréquences FSK. (b) Calculer l'indice de modulation $m$. (c) Exprimer la phase instantanée $\Phi(t)$.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 (a) — Fréquences FSK.}
+\[
+  f_1 = f_n + \Delta f = 433 + 0{,}3 = 433{,}3\,\mathrm{MHz} \quad (\text{bit «1»})
+\]
+\[
+  f_0 = f_n - \Delta f = 433 - 0{,}3 = 432{,}7\,\mathrm{MHz} \quad (\text{bit «0»})
+\]
+
+\textbf{Étape 2 (b) — Indice de modulation.}
+\[
+  m = \frac{\Delta f}{f_m} = \frac{300 \times 10^3}{1000} = \mathbf{300}
+\]
+
+\textbf{Étape 3 (c) — Phase instantanée} pour $v_m(t) = V_m \sin(2\pi f_m t)$ :
+\[
+  \Phi(t) = 2\pi f_n t + m \sin(2\pi f_m t) = 2\pi f_n t + 300\sin(2\pi \times 10^3 t)
+\]
+
+\textbf{Conclusion.} Un indice $m = 300$ est très élevé : la déviation en fréquence domine largement la fréquence modulante, ce qui est cohérent avec un usage FSK où l'on cherche une séparation nette entre les deux fréquences porteuses des bits «0» et «1».
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - LoRa - débit binaire utile \hfill\normalfont\footnotesize E2 disciplinaire IE 2022 (Q29)}
+]
+\textbf{Énoncé.}
+Liaison LoRaWAN d'un capteur : la tension du module Peltier est codée sur 12 bits, avec un facteur d'étalement $SF = 12$ et une bande passante $BP = \SI{125}{\kilo\hertz}$. Calculer le débit binaire utile si l'on ajoute 1 bit redondant pour chaque symbole ($CR = 4/5$). Discuter la valeur obtenue.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Durée et débit d'un symbole.} Un symbole LoRa étale $SF$ bits sur $2^{SF}$ échantillons de bande $BP$ :
+\[
+  T_s = \frac{2^{SF}}{BP} = \frac{4\,096}{125\,000} = \SI{32,768}{\milli\second}
+  \qquad
+  D_{sym} = \frac{1}{T_s} = 30{,}5\ \mathrm{symboles/s}
+\]
+
+\textbf{Étape 2 — Débit binaire utile.} Chaque symbole porte $SF$ bits, dont la fraction utile vaut $CR$ :
+\[
+  R_b = \frac{SF \times BP \times CR}{2^{SF}}
+      = \frac{12 \times 125\,000 \times 4/5}{4\,096}
+      = \mathbf{293\ \mathrm{bit/s}}
+\]
+
+\textbf{Étape 3 — Discussion.} Sans codage ($CR = 1$) le débit brut vaudrait $\SI{366}{bit/s}$ : la redondance coûte 20 \% de débit, prix de la robustesse. Le débit reste très faible, mais 12 bits de mesure ne demandent qu'une seule trame courte.
+
+\textbf{Conclusion.} $\SI{293}{bit/s}$ est un débit volontairement bas : c'est le $SF$ maximal qui l'impose, en échange de la portée et de l'immunité au bruit recherchées en IoT. Le débit n'est pas le critère de dimensionnement ici — l'envoi ponctuel d'une mesure sur 12 bits s'en accommode largement, et la faible consommation qui en découle est l'exigence réellement dimensionnante pour un capteur autonome.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Bus CAN - débit depuis chronogramme \hfill\normalfont\footnotesize E1 2026 (D5)}
+]
+\textbf{Énoncé.}
+Sur un chronogramme du bus CAN, la durée d'un bit est $T_b = \SI{1}{\micro\second}$. Calculer le débit binaire. En déduire la durée d'une trame complète (8 octets de données). Vérifier le cahier des charges (trame $< \SI{200}{\micro\second}$).
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Débit binaire.}
+\[
+  D_b = \frac{1}{T_b} = \frac{1}{10^{-6}} = \mathbf{1\,\mathrm{Mbit/s}}
+\]
+
+\textbf{Étape 2 — Durée de la trame.} Trame à 8 octets de données : 108 bits de trame auxquels s'ajoutent les 3 bits d'intermission, soit 111 bits (valeur retenue par le sujet 2026) :
+\[
+  t_{trame} = 111 \times T_b = 111 \times \SI{1}{\micro\second} = \mathbf{\SI{111}{\micro\second}}
+\]
+
+\textbf{Conclusion.} $\SI{111}{\micro\second} < \SI{200}{\micro\second}$ : le cahier des charges est respecté avec une marge de \SI{44,5}{\percent}, suffisante pour absorber d'éventuelles retransmissions en cas d'erreur. Noter que le bit-stuffing, non comptabilisé ici, peut allonger la trame de quelques bits selon les données : la marge réelle est donc légèrement inférieure, sans remettre en cause la conformité.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs récurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Confondre bus CAN et CAN (convertisseur).} Même sigle, deux significations distinctes. Dans les sujets 2026, les deux coexistent : se fier au contexte (bus de terrain vs périphérique microcontrôleur).
+
+  \item \textbf{FSK est un cas particulier de FM.} Modulant binaire $v_m = \pm 1$ - deux fréquences fixes. Relier la formule générale $f_{inst} = f_0 + k_f v_m$ au cas FSK.
+
+  \item \textbf{Taux de codage LoRa.} CR = 4/5 signifie 4 bits utiles + 1 bit redondant = 5 bits transmis. Le débit utile se calcule par $R_b = SF \times BP \times CR / 2^{SF}$ (formule du corrigé officiel 2022), et non en appliquant CR à un débit lu dans une table constructeur : la valeur dépend du couple $(SF, BP)$ de l'énoncé. Ne pas confondre CR et efficacité spectrale.
+
+  \item \textbf{Chronogramme CAN.} Mesurer $T_b$ en comptant les transitions, pas les niveaux. Une erreur de lecture sur $T_b$ se propage au débit et à la durée de trame.
+
+  \item \textbf{Shannon (capacité) vs Shannon (échantillonnage).} $C = B\log_2(1+SNR)$ est la capacité maximale d'un canal bruité. $f_e \geq 2f_{max}$ est le théorème d'échantillonnage - deux résultats distincts du même auteur.
+
+  \item \textbf{MLI onduleur vs PWM servomoteur.} La MLI de commande d'onduleur (T09) compare une modulante sinusoïdale à une porteuse triangulaire. La PWM de consigne servo (50 Hz, $t_{on}$ proportionnel à l'angle) est un protocole de transmission - ne pas confondre.
+
+\end{enumerate}
+
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PRESENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colPresence,
+  title={Présence dans les sujets analysés (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Année} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & - & $\checkmark$ & - & - & - & $\checkmark$ & - & - & $\checkmark$ & - & - & - \\
+E2 discipl. IE & - & - & - & - & - & - & $\checkmark$ & - & - & - & - & - & $\checkmark$ \\
+E2 appl. comm. & - & - & - & - & - & - & - & - & - & - & - & - & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-thèmes fréquents :}
+modulation FSK (2015) - LoRa SF/BP/CR débit (2022) - bus CAN trame + chronogramme (2019, 2026) - PWM vs UART (2025) - débit binaire depuis chronogramme
+
+\medskip
+\textbf{Ordres de grandeur (repères rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Réseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, fréquence \SI{50}{\hertz}.
+  \item Courants d'étude fréquents en sujet : de quelques \si{\ampere} à quelques dizaines de \si{\ampere}.
+  \item En conversion d'énergie, un rendement attendu reste généralement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthèse express (à refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypothèses du modèle et les conventions de signe.
+  \item Écrire 2 à 4 relations clés avec unités.
+  \item Réaliser un calcul numérique complet et vérifier l'ordre de grandeur.
+  \item Justifier le résultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE

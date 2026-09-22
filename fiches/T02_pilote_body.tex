@@ -1,0 +1,483 @@
+﻿\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\newcommand{\totalPages}{5}  % mis - jour apres premiere compile
+
+\ficheHeaders{T02}{Puissance en régime AC}{colElec}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TETE (integre - la premiere page, sans saut de page)
+% -----------------------------------------------------------------------
+
+\ficheEntete{T02}{Puissance en régime alternatif sinusoïdal (AC)}{colElec}%
+  {électrotechnique}%
+  {\textbf{Présence : 13/13} sujets (2013--2026) --- thème \emph{systématiquement} présent}%
+  {triangle des puissances \(\cdot\) facteur de puissance \(\cdot\) triphasé équilibré \(\cdot\) compensation réactive \(\cdot\) bilan de puissance}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Monophase --------------------------------------------------
+\textbf{1.1 Régime sinusoïdal monophasé}
+
+\smallskip
+Récepteur d'impédance $\underline{Z} = R + jX$, alimenté par $u(t) = U\sqrt{2}\cos(\omega t)$.
+Courant : $i(t) = I\sqrt{2}\cos(\omega t - \varphi)$, avec $\varphi = \arg(\underline{Z})$.
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{llll}
+\toprule
+\textbf{Grandeur} & \textbf{Symb.} & \textbf{Expression} & \textbf{Unité} \\
+\midrule
+Puissance active    & $P$   & $P = UI\cos\varphi = RI^2 = \dfrac{U^2\cos\varphi}{Z}$ & W \\[5pt]
+Puissance réactive  & $Q$   & $Q = UI\sin\varphi = XI^2 = \dfrac{U^2\sin\varphi}{Z}$ & VAR \\[5pt]
+Puissance apparente & $S$   & $S = UI = \sqrt{P^2+Q^2}$ & VA \\[4pt]
+Facteur de puissance & $\cos\varphi$ & $\cos\varphi = \dfrac{P}{S} = \dfrac{R}{Z}$ & - $\in[0;1]$ \\[5pt]
+Puissance complexe  & $\underline{S}$ & $\underline{S} = \underline{U}\,\overline{\underline{I}} = P + jQ$ & VA \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\textbf{Triangle des puissances :}
+
+\begin{center}
+\begin{minipage}[c]{0.32\textwidth}
+% Schema TikZ
+\begin{tikzpicture}[scale=1.05, font=\small]
+  \draw[thick, colElec, ->] (0,0) -- (3.2,0) node[right] {$P$};
+  \draw[thick, colElec!60!black, ->] (3.2,0) -- (3.2,1.8) node[right] {$Q$};
+  \draw[thick, colElec!40!black, ->] (0,0) -- (3.2,1.8) node[above left=-2pt] {$S$};
+  % angle phi
+  \draw[colElec!70!black] (0.7,0) arc[start angle=0, end angle=29.3, radius=0.7];
+  \node at (1.05, 0.2) {\footnotesize$\varphi$};
+  % labels
+  \node[below] at (1.6,0) {$P = S\cos\varphi$};
+  \node[right] at (3.25,0.9) {$Q = S\sin\varphi$};
+\end{tikzpicture}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{0.30\textwidth}
+\[S^2 = P^2 + Q^2\]
+\[\tan\varphi = \frac{Q}{P}\]
+\end{minipage}
+\hfill
+\begin{minipage}[c]{0.30\textwidth}
+\footnotesize
+$Q > 0$ : inductif (moteur)\\
+$Q < 0$ : capacitif (condo)\\
+$Q = 0$ : resistif, $\cos\varphi=1$
+\end{minipage}
+\end{center}
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.2 Triphase --------------------------------------------------
+\textbf{1.2 Régime triphasé équilibré}
+
+$V$ = tension simple (phase-neutre), $U$ = tension composée (entre phases) :
+$\displaystyle U = \sqrt{3}\,V$
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{lll}
+\toprule
+\textbf{Grandeur} & \textbf{Expression} & \textbf{Remarque} \\
+\midrule
+Puissance active    & $P = 3VI\cos\varphi = \sqrt{3}\,UI\cos\varphi$ & $I$ = courant de ligne \\[4pt]
+Puissance réactive  & $Q = 3VI\sin\varphi = \sqrt{3}\,UI\sin\varphi$ & \\[4pt]
+Puissance apparente & $S = 3VI = \sqrt{3}\,UI = \sqrt{P^2+Q^2}$ & \\[4pt]
+Facteur de puissance & $\cos\varphi = P/S$ & identique au monophasé \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\textbf{Couplage étoile (Y) / triangle ($\Delta$) :}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{lcc}
+\toprule
+ & \textbf{étoile (Y)} & \textbf{Triangle ($\Delta$)} \\
+\midrule
+Tension aux bornes du recepteur & $V = U/\sqrt{3}$ & $U$ \\
+Courant dans le recepteur & $I_\text{ligne}$ & $I_\text{ligne}/\sqrt{3}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.3 Compensation ----------------------------------------------
+\textbf{1.3 Compensation de l'énergie réactive}
+
+Objectif : rôlever $\cos\varphi_1$ - $\cos\varphi_2 > \cos\varphi_1$ en ajoutant des condensateurs en parallèle.
+
+\[
+  Q_C = P\,\bigl(\tan\varphi_1 - \tan\varphi_2\bigr)
+  \qquad \text{[puissance réactive - fournir par les condensateurs]}
+\]
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lll}
+\toprule
+\textbf{Couplage} & \textbf{Tension sur le condo} & \textbf{Capacite par phase} \\
+\midrule
+étoile (Y) & $V = U/\sqrt{3}$ & $\displaystyle C = \dfrac{Q_C}{3\,\omega\,V^2}$ \\[6pt]
+Triangle ($\Delta$) & $U$ & $\displaystyle C = \dfrac{Q_C}{3\,\omega\,U^2}$ \\[4pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\vspace{2pt}
+{\footnotesize Sur réseau 400\,V/230\,V : $V=230$\,V, $\omega = 2\pi\times50 \approx 314$\,rad/s. Un condensateur $\Delta$ vaut 3 fois moins qu'un equivalent Y.}
+
+\medskip
+\hrule\vspace{4pt}
+
+% -- 1.4 Bilan installation ----------------------------------------
+\textbf{1.4 Bilan de puissance d'une installation complexe}
+
+Plusieurs recepteurs en parallèle - \textbf{sommer $P$ et $Q$ séparément, jamais $S$} :
+\[
+  P_\text{tot} = \textstyle\sum P_k \qquad Q_\text{tot} = \textstyle\sum Q_k \qquad S_\text{tot} = \sqrt{P_\text{tot}^2 + Q_\text{tot}^2}
+\]
+Pour un moteur asynchrone ($P_u$ = puissance utile mecanique, $\eta$ = rendement) :
+\[
+  P_a = \frac{P_u}{\eta} \qquad
+  Q = P_a\tan\varphi \qquad
+  S = \frac{P_a}{\cos\varphi}
+\]
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHeTIQUE (2 colonnes)
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthétique},
+]
+
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{3.8cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Monophase}} \\
+$P = UI\cos\varphi$ & P active & W \\
+$Q = UI\sin\varphi$ & P réactive & VAR \\
+$S = \sqrt{P^2+Q^2}$ & P apparente & VA \\
+$\cos\varphi = P/S = R/Z$ & Facteur puis. & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Triphase équilibré}} \\
+$P = \sqrt{3}\,UI\cos\varphi$ & P active & W \\
+$Q = \sqrt{3}\,UI\sin\varphi$ & P réactive & VAR \\
+$S = \sqrt{3}\,UI$ & P apparente & VA \\
+$U = \sqrt{3}\,V$ & Tension & V \\
+$I = P/(\sqrt{3}\,U\cos\varphi)$ & Courant ligne & A \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{3.8cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Compensation réactive}} \\
+$Q_C = P(\tan\varphi_1 - \tan\varphi_2)$ & - compenser & VAR \\[2pt]
+$C = Q_C/(3\omega V^2)$ & Condo étoile & F \\[2pt]
+$C = Q_C/(3\omega U^2)$ & Condo triangle & F \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Moteur asynchrone}} \\
+$P_a = P_u / \eta$ & P absorbée & W \\
+$Q = P_a \tan\varphi$ & P réactive & VAR \\
+$S = P_a / \cos\varphi$ & P apparente & VA \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Trigonometrie}} \\
+$\sin\varphi = \sqrt{1-\cos^2\!\varphi}$ & & - \\
+$\tan\varphi = \sin\varphi/\cos\varphi$ & & - \\
+\bottomrule
+\end{tabular}
+
+\end{multicols}
+\normalsize
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets réels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Bilan de puissance d'une installation triphasée \hfill\normalfont\footnotesize E2 disciplinaire 2024}
+]
+
+\textbf{énoncé.}
+Un atelier triphasé $U=\SI{400}{\volt}$, $f=\SI{50}{\hertz}$ comporte :
+un moto-extracteur ($I_n=\SI{229}{\ampere}$ relevé sur la plaque signalétique, $\cos\varphi_\text{mot}=0{,}85$) ;
+des ordinateurs ($P_0=\SI{1}{\kilo\watt}$, $\cos\varphi_0=1$) ;
+eclairage et équipements ($P_e=\SI{43}{\kilo\watt}$, $Q_e=\SI{25{,}5}{\kilo VAR}$).
+\textbf{Calculer} $P_\text{ch}$, $Q_\text{ch}$, $S_\text{ch}$, $I_\text{abs}$ et $F_p$.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{étape 1 - puissances du moteur} (à partir des données de plaque $I_n$, $\cos\varphi_\text{mot}$).
+\[
+  P_\text{mot} = \sqrt{3}\,U I_n \cos\varphi_\text{mot} = \sqrt{3}\times 400\times 229\times 0{,}85 \approx \SI{134{,}9}{\kilo\watt}
+\]
+\[
+  \sin\varphi_\text{mot} = \sqrt{1-0{,}85^2} = 0{,}527
+  \qquad
+  Q_\text{mot} = \sqrt{3}\,U I_n \sin\varphi_\text{mot} \approx \SI{83{,}6}{\kilo VAR}
+\]
+
+\textbf{étape 2 - bilan global} (sommer $P$ et $Q$ séparément, jamais $S$).
+\[
+  P_\text{ch} = 134{,}9 + 1 + 43 = \SI{178{,}9}{\kilo\watt}
+  \qquad
+  Q_\text{ch} = 83{,}6 + 0 + 25{,}5 = \SI{109{,}1}{\kilo VAR}
+\]
+Le corrigé officiel impose pour la suite $P_\text{ch}=\SI{178{,}3}{\kilo\watt}$ et
+$Q_\text{ch}=\SI{108{,}7}{\kilo VAR}$ (écart d'arrondi sur les données de plaque) --- valeurs
+retenues ci-après.
+\[
+  S_\text{ch} = \sqrt{P_\text{ch}^2+Q_\text{ch}^2} = \sqrt{178{,}3^2+108{,}7^2} \approx \SI{208{,}8}{\kilo VA}
+\]
+
+\textbf{étape 3 - courant et facteur de puissance.}
+\[
+  I_\text{abs} = \frac{S_\text{ch}}{\sqrt{3}\,U} = \frac{208\,800}{\sqrt{3}\times 400} \approx \SI{301}{\ampere}
+  \qquad
+  F_p = \frac{P_\text{ch}}{S_\text{ch}} = \frac{178{,}3}{208{,}8} \approx \mathbf{0{,}854}
+\]
+
+\textbf{Conclusion.} $F_p \approx 0{,}85 < 0{,}92$ : l'installation ne respecte pas l'exigence du
+gestionnaire d'énergie ($F_p \in [0{,}92\,;\,1]$) --- une compensation de l'énergie réactive est
+nécessaire (cf.\ QT2).
+
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Compensation de l'énergie réactive par condensateurs \hfill\normalfont\footnotesize E2 disciplinaire 2024}
+]
+
+\textbf{énoncé.}
+(Données jury, identiques au bilan de QT1 : $P=\SI{178{,}3}{\kilo\watt}$, $Q=\SI{108{,}7}{\kilo VAR}$.)
+Un gestionnaire impose $F_p=1$ via une batterie de condensateurs étoile ($C$ par phase).
+\textbf{B3.} Montrer que $C = Q_\text{abs}/(3\omega V_n^2)$.
+\textbf{B4.} Calculer $C$.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{B3.}
+Pour $F_p'=1$ : $Q_\text{total} = Q_\text{abs} + Q_C = 0$, donc $Q_C = -Q_\text{abs}$.
+Un condensateur étoile sous tension simple $V_n$ fournit $Q_C = 3C\omega V_n^2$, d'où :
+\[
+  \boxed{C = \frac{Q_\text{abs}}{3\,\omega\,V_n^2}}
+\]
+
+\textbf{B4.}
+$V_n = \SI{230}{\volt}$, $\omega = 2\pi\times 50 \approx \SI{314}{\radian\per\second}$ :
+\[
+  C = \frac{108\,700}{3 \times 314 \times 230^2} = \frac{108\,700}{49\,831\,800} \approx \SI{2{,}18}{\milli\farad}
+\]
+
+\textbf{Conclusion.} Avec $C \approx \SI{2{,}2}{\milli\farad}$ par phase en étoile, la puissance
+réactive absorbée est intégralement compensée : $F_p = 1$, conforme à l'exigence du gestionnaire
+d'énergie ($F_p \in [0{,}92\,;\,1]$).
+
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Relevement du facteur de puissance vers une valeur cible \hfill\normalfont\footnotesize E2 2017-2020}
+]
+
+\textbf{énoncé.}
+Installation triphasée : $P=\SI{120}{\kilo\watt}$, $\cos\varphi_1=0{,}75$.
+On souhaite $\cos\varphi_2=0{,}93$.
+Calculer $Q_C$ et $C$ (couplage étoile, $V=\SI{230}{\volt}$).
+
+\tcbline
+
+\textbf{Corrigé.}
+\[
+  \tan\varphi_1 = \frac{\sqrt{1-0{,}75^2}}{0{,}75} = 0{,}882
+  \qquad
+  \tan\varphi_2 = \frac{\sqrt{1-0{,}93^2}}{0{,}93} = 0{,}396
+\]
+\[
+  Q_C = P(\tan\varphi_1-\tan\varphi_2) = 120\times(0{,}882-0{,}396) = \SI{58{,}3}{\kilo VAR}
+\]
+\[
+  C = \frac{58\,300}{3\times 314\times 230^2} \approx \SI{1{,}17}{\milli\farad}
+\]
+\textit{Vérif. :}
+\[
+  \cos\varphi_2 = \frac{120}{\sqrt{120^2+(105{,}8-58{,}3)^2}} = \frac{120}{129{,}0} \approx 0{,}930 \;\checkmark
+\]
+
+\textbf{Conclusion.} Une batterie étoile de $C \approx \SI{1{,}17}{\milli\farad}$ par phase fournit
+les \SI{58{,}3}{\kilo VAR} requis : la vérification redonne bien $\cos\varphi_2 \approx 0{,}93$,
+l'objectif de relèvement du facteur de puissance fixé par le cahier des charges est atteint.
+
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs récurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Ne jamais sommer les puissances apparentes $S_k$.}
+  $S_\text{tot} \neq S_1+S_2+\cdots$ \textit{(erreur eliminatoire)}.
+  Méthode : sommer $P_k$, sommer $Q_k$, puis $S=\sqrt{P^2+Q^2}$.
+
+  \item \textbf{Confondre tension simple et composée.}
+  $V = U/\sqrt{3}$ - réseau 400\,V/230\,V : $U=400$\,V entre phases, $V=230$\,V phase-neutre.
+  Les formules $P=\sqrt{3}\,UI\cos\varphi$ utilisent $U$ composée et $I$ de ligne.
+
+  \item \textbf{Oublier le rendement du moteur.}
+  $P_\text{absorbée} = P_\text{utile}/\eta$. C'est $P_a$ qui sert - calculer $Q$ et $S$, pas $P_u$.
+
+  \item \textbf{Erreurs d'unités et d'ordre de grandeur.}
+  Le jury signale chaque année des erreurs de facteur $10^3$.
+  Convertir systématiquement en SI avant toute application numerique.
+
+  \item \textbf{Confondre couplage étoile et triangle pour $C$.}
+  étoile : $C = Q_C/(3\omega V^2)$ avec $V$ simple.
+  Triangle : $C = Q_C/(3\omega U^2)$ avec $U$ composée.
+  Un condensateur $\Delta$ vaut 3 fois moins qu'un condensateur Y equivalent.
+
+  \item \textbf{Signe de la puissance réactive.}
+  Inductances ($Q>0$), condensateurs ($Q<0$).
+  La compensation annule la somme algebrique des $Q_k$.
+
+  \item \textbf{Rédiger la demonstration, pas seulement le resultat.}
+  Exemple attendu : \textit{"Pour $F_p=1$, $Q_\text{tot}=Q_\text{abs}+Q_C=0$, donc $Q_C=-Q_\text{abs}$.
+  Un condensateur étoile donne $Q_C=3C\omega V_n^2$, d'où $C=Q_\text{abs}/(3\omega V_n^2)$."}
+
+  \item \textbf{Verifier le resultat.}
+  Contrôler que $P\leq S$, $\cos\varphi\in[0;1]$, valeur de $C$ realiste (mF - eF selon les puissances).
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapports jury 2019-2025 : "La manipulation des unités et des puissances de 10 est tres souvent hasardeuse, entraînant des resultats dont l'ordre de grandeur meme est faux."
+"Un nombre significatif de candidats ne parvient pas - caracteriser des constituants electriques ou - identifier leur rôle dans une chaîne de puissance."
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PRESENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colPresence,
+  title={5. Présence dans les sujets analysés (2013--2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Annee} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)    & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+E2 discipl. IE  & - & - & - & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-thèmes frequents :}
+$P/Q/S$ triphasé (13/13) - facteur de puissance (13/13) - bilan installation (11/13) - compensation condensateurs (9/13) - chute de tension ligne (6/13)
+
+\medskip
+\textbf{Ordres de grandeur (repères rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Reseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, fréquence \SI{50}{\hertz}.
+  \item Courants d'etude frequents en sujet : de quelques \si{\ampere} a quelques dizaines de \si{\ampere}.
+  \item En conversion d'énergie, un rendement attendu reste generalement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthese express (à refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypotheses du modele et les conventions de signe.
+  \item Ecrire 2 a 4 relations clés avec unités.
+  \item Réaliser un calcul numerique complet et verifier l'ordre de grandeur.
+  \item Justifier le resultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE
+
+
+
+
+
+
+
+
+
+

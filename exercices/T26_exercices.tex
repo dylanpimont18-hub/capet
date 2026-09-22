@@ -1,0 +1,757 @@
+% T26 -- Mod\'elisation des syst\`emes lin\'eaires (automatique) -- banque d'exercices
+%
+% COMPL\'EMENTARIT\'E AVEC LA FICHE fiches/T26_Modelisation_Systemes.tex
+% Les trois Questions Types de la fiche sont toutes tir\'ees du sujet E1 2026 :
+%   QT1 = MCC, \'equation \'electrique de l'induit + identification de R et Ke
+%         (E1 2026, questions A1 \`a A4) ;
+%   QT2 = identification graphique d'un 1er ordre sur l'essai indiciel
+%         (E1 2026, question C4) ;
+%   QT3 = mise sous forme canonique de la FTBF du 2e ordre et condition D% = 0
+%         (E1 2026, questions C7-C8).
+% AUCUN des six exercices ci-dessous ne reprend ces trois travaux : le sujet 2026
+% n'est PAS utilis\'e ici, et l'identification graphique du 1er ordre (ex. 3) porte
+% sur un relev\'e exp\'erimental DIFF\'ERENT (couple/tension, 2021) avec un corrig\'e
+% officiel chiffr\'e, l\`a o\`u la QT2 de la fiche reste purement m\'ethodologique.
+%
+% FRONTI\`ERE AVEC T27 (syst\`emes boucl\'es / correcteurs) : T26 s'arr\^ete \`a la
+% mod\'elisation, la mise en \'equation, la r\'eduction de sch\'ema-bloc et
+% l'identification. Sont donc volontairement EXCLUS ici : le trac\'e de Bode de la
+% FTBO et le calcul de marge de phase (2023 D7-D8 ; 2026 C5-C6), le choix compar\'e
+% de r\'eglages de correcteur (2021 Q33), et l'analyse d'erreur statique/d\'epassement
+% sur relev\'es (2024 C9-C12). L'exercice 5 s'arr\^ete apr\`es le calcul des gains
+% d'un PI par identification \`a la forme canonique (2024 C8) : c'est un calcul de
+% mod\'elisation, pas une synth\`ese de correcteur.
+%
+% SOURCES (toutes relues dans les .md de conversion Marker, lignes indiqu\'ees) :
+%   - Ex. 1 : E2_Disciplinaire_IE_2024 ("EDE ENE 1", \'EPREUVE \'ECRITE DISCIPLINAIRE,
+%     option Ing\'enierie \'electrique), question C3.
+%     \'Enonc\'e : E2_Disciplinaire_IE_2024.md l.333-337 (forme \`a d\'emontrer
+%     Omega(p) = Kmeca/(1+tau_meca p) x [Cem(p) - Cr(p)]).
+%     Donn\'ees DT1 : f = 4e-3 N.m.s.rad^-1 et J = 0,035 kg.m^2, l.869-871.
+%     Corrig\'e officiel : Rapport_Jury_2024.md l.253
+%     ("Cem(p) - Cr(p) = J p Omega(p) + f Omega(p)", conditions initiales nulles).
+%     AN recalcul\'ees : Kmeca = 1/f = 250 rad.s^-1/(N.m) ; tau_meca = J/f = 8,75 s.
+%     \`A NOTER : le sujet imprime "Kmeca = 250 et tau_meca = 8,5 s" (l.369) alors que
+%     J/f = 8,75 s. Le rapport de jury, lui, utilise bien 8,75 s : ses r\'esultats
+%     Kp = 0,35 et Ki = 2,5 (l.~300) ne se retrouvent qu'avec tau_meca = 8,75
+%     (8,5 donnerait Kp = 0,336). Le 8,5 du sujet est donc une coquille / un artefact
+%     de conversion. On retient 8,75 s, l'\'ecart est signal\'e dans le corrig\'e.
+%   - Ex. 2 : E1_Sujet_2023 ("EDE ENE 1", \'EPREUVE \'ECRITE DISCIPLINAIRE, option
+%     Ing\'enierie \'electrique -- le fichier E2_Disciplinaire_IE_2023.md est le M\^EME
+%     document), questions D5 et D6.
+%     \'Enonc\'e : E1_Sujet_2023.md l.379-413 (figure 12, sch\'ema bloc de la boucle
+%     de vitesse ; g\'en\'eratrice tachym\'etrique 5,0 V pour 1 000 tr/min ; CV(p) = KPV).
+%     Corrig\'e officiel : Rapport_Jury_2023.md l.365 (KGT = 5/1000 x 30/pi
+%     = 0,048 V/(rad.s^-1)) et l.369 (FTBO = KPV.KM.KGT/[(1+p/wA)(1+p/wB)]).
+%     Valeurs de KM, wA, wB : Rapport_Jury_2023.md l.359 (wA = 10 rad.s^-1),
+%     l.379 (wB = 7 000 rad.s^-1) et E1_Sujet_2023.md l.783 (gain BF = +26,4 dB).
+%     KGT recalcul\'e : 5/(1000 x 2pi/60) = 0,04775 V/(rad.s^-1). Conforme.
+%   - Ex. 3 (docTech) : E1_Sujet_2021 ("EDE STI 1", ANALYSE ET EXPLOITATION
+%     P\'EDAGOGIQUE D'UN SYST\`EME PLURITECHNIQUE), questions 31 et 32.
+%     \'Enonc\'e et donn\'ees de la figure 18 : E1_Sujet_2021.md l.534-572 (\'echelon de
+%     Ucom de 10 V, de 30 V \`a 40 V, \`a t = 100 min ; axes 0-1400 kN.m / 0-600 min).
+%     Corrig\'e officiel : Rapport_Jury_2021.md l.319 (justification de l'ordre 1),
+%     l.321 (K = 600/10 = 60 kN.m.V^-1) et l.323 (Cbras passe de 600 \`a
+%     600 + 0,63 x 600 = 978 kN.m en 70 min environ, donc tau = 70 min).
+%     Les valeurs du relev\'e reproduites dans le docTech (600 kN.m avant l'\'echelon,
+%     1 200 kN.m en r\'egime final, 978 kN.m \`a 63 %) sont celles du corrig\'e officiel.
+%     Citation jury : verbatim exact de Rapport_Jury_2021.md l.455.
+%   - Ex. 4 : E1_Sujet_2014_commun_SII ("EDE STI 1", ANALYSE D'UN SYST\`EME
+%     PLURITECHNIQUE), question 25.
+%     \'Enonc\'e : E1_Sujet_2014_commun_SII.md l.231-235 (\'echelon d'amplitude
+%     Delta h = 20 mm appliqu\'e \`a la structure, r\'eponse figure 5-1).
+%     Corrig\'e officiel : E1_Corrige_2014_commun_SII.md l.243-251 (T0 = 2,4 s mesur\'ee
+%     sur la courbe ; gain statique k = 1 ; premier d\'epassement D1% = 73 % d'o\`u
+%     xi = 0,1). AN recontr\^ol\'ees : xi = ln(1/0,73)/sqrt(pi^2 + ln(1/0,73)^2)
+%     = 0,0997 ; w_p = 2pi/2,4 = 2,618 rad/s ; w0 = w_p/sqrt(1-xi^2) = 2,63 rad/s.
+%     (Le corrig\'e officiel du pont Chaban-Delmas porte l'en-t\^ete "Correction Capet
+%     2014" mais ses pieds de page indiquent "Capet 2013" -- incoh\'erence du document
+%     source, sans effet sur les valeurs.)
+%   - Ex. 5 : E2_Disciplinaire_IE_2024, questions C5, C6 et C8.
+%     \'Enonc\'e : E2_Disciplinaire_IE_2024.md l.347-373 (figure 9, boucle de vitesse
+%     avec correcteur PI Kp(1 + Ki/p) ; Hm(p) = Kmeca/(1+tau_meca p) ; forme canonique
+%     impos\'ee ; m = 1, Tr = 1 s, w0 = 5/Tr).
+%     Corrig\'e officiel : Rapport_Jury_2024.md l.266 (d\'eveloppement complet de la
+%     FTBF jusqu'\`a Omega/Omega_ref = KiKpKmeca/(tau p^2 + p + KpKmeca p + KiKpKmeca))
+%     et l.~300 (Kp = (2 m tau_meca w0 - 1)/Kmeca = 0,35 ;
+%     Ki = tau_meca w0^2/(Kp Kmeca) = 2,5).
+%     AN recalcul\'ees avec tau_meca = 8,75 s : Kp = (2x1x8,75x5 - 1)/250 = 0,346 ;
+%     Ki = 8,75 x 25/(0,346 x 250) = 2,53. Conforme au rapport.
+%     V\'erification crois\'ee de la forme canonique : w0 = sqrt(KiKpKmeca/tau_meca)
+%     = 5,00 rad/s et 2m/w0 = (1+KpKmeca)/(KiKpKmeca) = 0,400 = 2x1/5. Coh\'erent.
+%   - Ex. 6 : EXERCICE IN\'EDIT (aucune r\'ef\'erence de sujet). Circuit RLC s\'erie
+%     L = 0,1 H, C = 10 uF, R = 100 Ohm. AN recalcul\'ees deux fois :
+%     w0 = 1/sqrt(LC) = 1 000 rad/s (f0 = 159,2 Hz) ; m = (R/2) sqrt(C/L) = 0,500 ;
+%     D1% = 100 exp(-m pi/sqrt(1-m^2)) = 16,3 % ; w_p = w0 sqrt(1-m^2) = 866 rad/s ;
+%     Tp = 2pi/w_p = 7,26 ms ; tr5% ~ 3/(m w0) = 6,0 ms ;
+%     R critique (m = 1) = 2 sqrt(L/C) = 200 Ohm ; R pour m = 0,7 : 140 Ohm.
+%
+% AUCUNE citation de rapport de jury n'est reproduite ici sans avoir \'et\'e retrouv\'ee
+% mot pour mot par grep dans le .md correspondant (lignes cit\'ees ci-dessus).
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\fancyhead[L]{\textbf{\textcolor{colExo}{T26}} - Exercices - Modelisation des systemes}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T26 \quad Mod\'elisation des syst\`emes lin\'eaires (automatique)}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 1 -- 2024, question C3
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2024, \'epreuve \'ecrite disciplinaire (option IE), question C3}
+]
+\CAPETSHOW{
+Le moto-ventilateur d'extraction d'air d'un atelier est entra\^in\'e par une \textbf{machine asynchrone triphas\'ee} pilot\'ee en commande scalaire. Pour mod\'eliser la partie m\'ecanique de l'entra\^inement, on applique le \textbf{principe fondamental de la dynamique en rotation} \`a l'arbre moteur :
+\[
+  C_{em}(t) - C_r(t) = J\,\frac{d\Omega(t)}{dt} + f\,\Omega(t)
+\]
+o\`u $C_{em}$ est le couple \'electromagn\'etique, $C_r$ le couple r\'esistant de la charge, et $\Omega$ la vitesse angulaire de l'arbre. Le document technique du sujet donne :
+
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item $f = 4\times 10^{-3}\ \mathrm{N\!\cdot\!m\!\cdot\!s\!\cdot\!rad^{-1}}$ : coefficient de frottement visqueux ;
+  \item $J = 0{,}035\ \mathrm{kg\!\cdot\!m^2}$ : moment d'inertie ramen\'e \`a l'arbre du moteur.
+\end{itemize}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \'Enoncer l'hypoth\`ese indispensable avant d'appliquer la transformation de Laplace \`a cette \'equation, puis \'ecrire l'\'equation obtenue dans le domaine de Laplace.
+  \item \textbf{Montrer} que cette \'equation peut se mettre sous la forme :
+  \[
+    \Omega(p) = \frac{K_{m\acute{e}ca}}{1 + \tau_{m\acute{e}ca}\,p}\,\bigl[\,C_{em}(p) - C_r(p)\,\bigr]
+  \]
+  et \textbf{exprimer} $K_{m\acute{e}ca}$ et $\tau_{m\acute{e}ca}$ en fonction de $J$ et $f$.
+  \item \textbf{D\'eterminer} les valeurs num\'eriques de $K_{m\acute{e}ca}$ et $\tau_{m\acute{e}ca}$, en pr\'ecisant leurs unit\'es.
+  \item Repr\'esenter la partie m\'ecanique sous forme d'un \textbf{sch\'ema-bloc} \`a deux entr\'ees ($C_{em}$ et $C_r$) et une sortie ($\Omega$). Conclure sur l'ordre du mod\`ele obtenu et sur la rapidit\'e naturelle de l'entra\^inement.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item L'hypoth\`ese indispensable est celle des \textbf{conditions initiales nulles} (conditions de Heaviside) : $\Omega(0^-) = 0$. Sans elle, $\mathcal{L}\{d\Omega/dt\} = p\,\Omega(p) - \Omega(0^-)$ ferait appara\^itre un terme suppl\'ementaire et il n'existerait plus de fonction de transfert. Sous cette hypoth\`ese :
+  \[
+    C_{em}(p) - C_r(p) = J\,p\,\Omega(p) + f\,\Omega(p)
+  \]
+  \item On factorise $\Omega(p)$ au second membre :
+  \[
+    C_{em}(p) - C_r(p) = \bigl(J\,p + f\bigr)\,\Omega(p)
+    \qquad\Longrightarrow\qquad
+    \Omega(p) = \frac{1}{f + J\,p}\,\bigl[C_{em}(p) - C_r(p)\bigr]
+  \]
+  La forme canonique du 1\textsuperscript{er} ordre impose un \textbf{« 1 » au d\'enominateur} : on met donc $f$ en facteur.
+  \[
+    \Omega(p) = \frac{1}{f\left(1 + \dfrac{J}{f}\,p\right)}\,\bigl[C_{em}(p) - C_r(p)\bigr]
+  \]
+  Par identification terme \`a terme avec la forme demand\'ee :
+  \[
+    \boxed{\;K_{m\acute{e}ca} = \frac{1}{f}\;}
+    \qquad\qquad
+    \boxed{\;\tau_{m\acute{e}ca} = \frac{J}{f}\;}
+  \]
+  \item Applications num\'eriques :
+  \[
+    K_{m\acute{e}ca} = \frac{1}{4\times 10^{-3}} = \boldsymbol{250}\ \mathrm{rad\!\cdot\!s^{-1}\!\cdot\!(N\!\cdot\!m)^{-1}}
+  \]
+  \[
+    \tau_{m\acute{e}ca} = \frac{0{,}035}{4\times 10^{-3}} = \boldsymbol{8{,}75}\ \si{\second}
+  \]
+  \emph{Contr\^ole d'homog\'en\'eit\'e} (exigence syst\'ematique du jury) : $[J]/[f] = \mathrm{kg\!\cdot\!m^2}/(\mathrm{N\!\cdot\!m\!\cdot\!s\!\cdot\!rad^{-1}})$. Or $\mathrm{N\!\cdot\!m} = \mathrm{kg\!\cdot\!m^2\!\cdot\!s^{-2}}$, donc $[f] = \mathrm{kg\!\cdot\!m^2\!\cdot\!s^{-1}}$ et le rapport vaut bien des \textbf{secondes}. De m\^eme $1/f$ s'exprime en $\mathrm{rad\!\cdot\!s^{-1}}$ par $\mathrm{N\!\cdot\!m}$ : c'est une vitesse par unit\'e de couple, ce qui est bien la nature du gain statique cherch\'e.
+
+  \emph{Remarque sur l'\'enonc\'e du sujet.} Le sujet retient pour la suite « $K_{m\acute{e}ca} = 250$ et $\tau_{m\acute{e}ca} = \SI{8,5}{\second}$ ». La valeur exacte issue des donn\'ees $J$ et $f$ est pourtant $J/f = \SI{8,75}{\second}$, et c'est bien \SI{8,75}{\second} qui permet de retrouver les gains du correcteur publi\'es dans le rapport de jury (exercice 5). On conserve donc \SI{8,75}{\second}.
+  \item Sch\'ema-bloc de la partie m\'ecanique : le couple r\'esistant $C_r$ est une \textbf{perturbation} qui se soustrait au couple moteur avant le bloc dynamique.
+
+  \begin{center}
+  \begin{tikzpicture}[>=Stealth, scale=1, font=\footnotesize]
+    % sommateur
+    \draw[->] (0,0) -- (1.5,0) node[midway,above]{$C_{em}(p)$};
+    \draw (1.8,0) circle (0.3);
+    \draw (1.8,0.3) -- (1.8,-0.3); \draw (1.5,0) -- (2.1,0);
+    \node[above left=-2pt] at (1.55,0.05) {$+$};
+    \node[below right=-2pt] at (1.78,-0.28) {$-$};
+    \draw[->] (1.8,-1.1) -- (1.8,-0.3) node[midway,right]{$C_r(p)$};
+    % bloc
+    \draw[->] (2.1,0) -- (3.3,0);
+    \draw (3.3,-0.55) rectangle (6.0,0.55);
+    \node at (4.65,0) {$\dfrac{K_{m\acute{e}ca}}{1 + \tau_{m\acute{e}ca}\,p}$};
+    \draw[->] (6.0,0) -- (7.6,0) node[midway,above]{$\Omega(p)$};
+  \end{tikzpicture}
+  \end{center}
+
+  \smallskip
+  \textbf{Conclusion.} La partie m\'ecanique de l'entra\^inement se mod\'elise par un \textbf{syst\`eme du 1\textsuperscript{er} ordre} de constante de temps $\tau_{m\acute{e}ca} = \SI{8,75}{\second}$ : son temps de r\'eponse naturel \`a \SI{5}{\percent} vaut $t_{r5\%} \approx 3\,\tau_{m\acute{e}ca} \approx \SI{26}{\second}$. C'est \textbf{tr\`es lent} au regard de l'exigence de rapidit\'e impos\'ee ensuite au syst\`eme asservi ($T_r = \SI{1}{\second}$, exercice 5) : la mod\'elisation \'etablie ici \textbf{justifie \`a elle seule} la n\'ecessit\'e d'un asservissement de vitesse avec correcteur, puisque la dynamique naturelle du groupe moto-ventilateur est plus de vingt fois trop lente.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 2 -- 2023, questions D5 et D6
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{1} \hfill\normalfont\footnotesize 2023, \'epreuve \'ecrite disciplinaire (option IE), questions D5 et D6}
+]
+\CAPETSHOW{
+La hauteur de la perche porte-outils d'un enjambeur viticole autonome est asservie par un v\'erin \'electrique. On \'etudie ici la \textbf{boucle de vitesse} de l'actionneur, dont le sch\'ema-bloc simplifi\'e est le suivant :
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\footnotesize, scale=0.82, transform shape,
+                   blk/.style={draw, minimum width=1.6cm, minimum height=0.95cm, fill=white}]
+  % chaine directe
+  \node (cmp) at (2.6,0) [draw, circle, minimum size=0.6cm, inner sep=0pt] {};
+  \draw (cmp.north) -- (cmp.south); \draw (cmp.west) -- (cmp.east);
+  \node[blk] (cv) at (5.1,0) {$C_V(p)$};
+  \node[blk] (hm) at (8.1,0) {$H_M(p)$};
+  \draw[->] (0.3,0) -- (cmp.west) node[midway,above=1pt]{$u_{cons}(p)$};
+  \draw[->] (cmp.east) -- (cv.west) node[midway,above=1pt]{$\varepsilon_V(p)$};
+  \draw[->] (cv.east) -- (hm.west) node[midway,above=1pt]{$u_{mod}(p)$};
+  \draw[->] (hm.east) -- (11.4,0) node[midway,above=1pt]{$\Omega_m(p)$};
+  % signes du comparateur
+  \node[font=\scriptsize] at (2.22,0.30) {$+$};
+  \node[font=\scriptsize] at (2.96,-0.30) {$-$};
+  % retour : prise de signal apres Hm, traversee de KGT de droite a gauche
+  \node[blk] (kgt) at (6.4,-2.0) {$K_{GT}(p)$};
+  \draw (10.4,0) node[circ]{} -- (10.4,-2.0) -- (kgt.east);
+  \draw[->] (kgt.west) -- (2.6,-2.0) -- (cmp.south);
+  \node[below=1pt] at (4.4,-2.0) {$u_{GT}(p)$};
+\end{tikzpicture}
+\end{center}
+
+Avec : $\Omega_m$ vitesse de rotation de l'arbre moteur (en \si{\radian\per\second}) ; $u_{GT}$ tension image de cette vitesse (en \si{\volt}) ; $u_{cons}$ tension image de la consigne de vitesse (en \si{\volt}) ; $u_{mod}$ tension de commande du modulateur d'\'energie (en \si{\volt}) ; $C_V(p)$ correcteur proportionnel de vitesse ; $H_M(p)$ fonction de transfert du moteur associ\'e \`a son modulateur d'\'energie ; $K_{GT}(p)$ fonction de transfert de la g\'en\'eratrice tachym\'etrique.
+
+\smallskip
+La g\'en\'eratrice tachym\'etrique fournit une tension proportionnelle \`a la vitesse de rotation : elle donne une tension de sortie de $\SI{5,0}{\volt}$ pour $1\,000\ \mathrm{tr\!\cdot\!min^{-1}}$ en entr\'ee. Le correcteur proportionnel a pour fonction de transfert $C_V(p) = K_{PV}$, constante.
+
+\smallskip
+L'\'etude fr\'equentielle du moteur associ\'e \`a son modulateur a conduit au mod\`ele :
+\[
+  H_M(p) = \frac{\Omega_m(p)}{U_{mod}(p)} = \frac{K_M}{\left(1 + \dfrac{p}{\omega_A}\right)\left(1 + \dfrac{p}{\omega_B}\right)}
+  \quad\text{avec}\quad
+  \omega_A = \SI{10}{\radian\per\second},\ \ \omega_B = 7\,000\ \mathrm{rad\!\cdot\!s^{-1}}
+\]
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{D\'eterminer} l'expression puis la valeur num\'erique de $K_{GT}(p)$, en pr\'ecisant son unit\'e. Justifier qu'il s'agit bien d'un \textbf{gain pur} et non d'une fonction de $p$.
+  \item Le gain statique de $H_M$ est relev\'e sur le diagramme de Bode fourni au sujet : $20\log K_M = \SI{26,4}{\deci\bel}$. \textbf{Calculer} $K_M$ et pr\'eciser son unit\'e.
+  \item \`A l'aide du sch\'ema-bloc, \textbf{d\'eterminer} l'expression de la fonction de transfert en boucle ouverte $FTBO_V(p) = \dfrac{U_{GT}(p)}{\varepsilon_V(p)}$.
+  \item \textbf{Calculer} le gain statique de $FTBO_V$ pour $K_{PV} = 1$, en d\'ecibels, et conclure sur ce que cela implique pour la pr\'ecision de la boucle non corrig\'ee.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item La g\'en\'eratrice tachym\'etrique d\'elivre une tension \textbf{proportionnelle} \`a la vitesse : $u_{GT}(t) = K_{GT}\,\Omega_m(t)$. Il faut d'abord convertir la vitesse donn\'ee en $\mathrm{tr\!\cdot\!min^{-1}}$ en $\mathrm{rad\!\cdot\!s^{-1}}$ :
+  \[
+    \Omega_m = 1\,000\ \mathrm{tr\!\cdot\!min^{-1}} = 1\,000\times\frac{2\pi}{60} = \frac{1\,000\,\pi}{30} \approx \SI{104,7}{\radian\per\second}
+  \]
+  \[
+    K_{GT} = \frac{u_{GT}}{\Omega_m} = \frac{5{,}0}{1\,000}\times\frac{30}{\pi} \approx \boldsymbol{0{,}048}\ \mathrm{V\!\cdot\!(rad\!\cdot\!s^{-1})^{-1}}
+  \]
+  Il s'agit d'un \textbf{gain pur} (ind\'ependant de $p$) car la relation entre la tension d\'elivr\'ee et la vitesse est instantan\'ee : la g\'en\'eratrice tachym\'etrique est ici mod\'elis\'ee sans dynamique propre. On \'ecrit donc $K_{GT}(p) = K_{GT} = \SI{0,048}{}$, constante r\'eelle.
+
+  \emph{Pi\`ege classique} : oublier la conversion $\mathrm{tr\!\cdot\!min^{-1}} \to \mathrm{rad\!\cdot\!s^{-1}}$ conduirait \`a $K_{GT} = 5\times 10^{-3}$, soit une erreur d'un facteur $\approx 10$ qui se propage ensuite dans tout le calcul de gain de boucle.
+  \item Le gain statique en d\'ecibels vaut $G_{dB} = 20\log K_M$, donc :
+  \[
+    K_M = 10^{26{,}4/20} = 10^{1{,}32} \approx \boldsymbol{20{,}9}\ \mathrm{rad\!\cdot\!s^{-1}\!\cdot\!V^{-1}}
+  \]
+  L'unit\'e d\'ecoule de la d\'efinition $H_M = \Omega_m/U_{mod}$ : une vitesse divis\'ee par une tension.
+  \item La FTBO est le produit de \textbf{tous} les blocs rencontr\'es en parcourant la boucle depuis le point de comparaison, \textbf{cha\^ine de retour comprise}. En partant de $\varepsilon_V$ : on traverse $C_V(p) = K_{PV}$, puis $H_M(p)$, puis $K_{GT}$ pour arriver \`a $u_{GT}$ :
+  \[
+    \boxed{\;FTBO_V(p) = \frac{U_{GT}(p)}{\varepsilon_V(p)} = C_V(p)\,H_M(p)\,K_{GT}
+    = \frac{K_{PV}\,K_M\,K_{GT}}{\left(1 + \dfrac{p}{\omega_A}\right)\left(1 + \dfrac{p}{\omega_B}\right)}\;}
+  \]
+  Trois remarques de m\'ethode :
+  \begin{itemize}[leftmargin=1.4em, itemsep=1pt]
+    \item la FTBO est un \textbf{produit} et \emph{jamais} un quotient du type $H_D/(1+H_DH_R)$ -- cette derni\`ere expression est la FTBF ;
+    \item le bloc de retour $K_{GT}$ \textbf{fait partie} de la FTBO : l'oublier est l'erreur la plus fr\'equente ;
+    \item la FTBO ne d\'epend pas du signe du comparateur ; c'est la FTBF qui en d\'epend ($1 + FTBO$ pour un retour n\'egatif).
+  \end{itemize}
+  \item Le gain statique de la boucle ouverte est le produit des trois gains :
+  \[
+    K_{BO} = K_{PV}\,K_M\,K_{GT} = 1\times 20{,}9\times 0{,}048 \approx 1{,}00
+    \qquad\text{soit}\qquad 20\log(1{,}00) \approx \SI{0}{\deci\bel}
+  \]
+
+  \smallskip
+  \textbf{Conclusion.} Pour $K_{PV} = 1$, la cha\^ine moteur + tachym\'etrie constitue \`a elle seule un gain de boucle unitaire ($\SI{0}{\deci\bel}$) : le diagramme de Bode de $FTBO_V$ se d\'eduit donc de celui de $H_M$ par une simple \textbf{translation verticale de $\SI{-26,4}{\deci\bel}$}, la phase restant inchang\'ee. Cons\'equence directe sur la pr\'ecision : le syst\`eme \'etant de \textbf{classe 0} (aucun int\'egrateur en boucle ouverte), l'erreur statique relative vaut $1/(1+K_{BO}) = 1/2 = \SI{50}{\percent}$. La boucle non corrig\'ee est donc \textbf{inexploitable en l'\'etat} : seule l'augmentation de $K_{PV}$ -- ou l'ajout d'une action int\'egrale -- permettra de satisfaire l'exigence de pr\'ecision, au prix d'une v\'erification de la stabilit\'e.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 3 -- docTech -- 2021, questions 31 et 32
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize 2021, Analyse et exploitation p\'edagogique d'un syst\`eme pluritechnique, questions 31 et 32}
+]
+\CAPETSHOW{
+Dans une usine de traitement de minerai, la pulpe est clarifi\'ee dans des \textbf{cuves de d\'ecantation} de \SI{70}{\meter} de diam\`etre. Un \textbf{bras rotatif} racle la boue en fond de cuve ; le couple $C_{bras}$ qu'il subit est l'image directe du pourcentage de solides dans la boue. Pour ajuster \emph{en continu} le dosage du floculant (qui acc\'el\`ere la s\'edimentation), on souhaite asservir $C_{bras}$ \`a une consigne en agissant sur la tension de commande $U_{com}$ des pompes doseuses.
+
+\smallskip
+Le mod\`ele de connaissance reliant le d\'ebit de floculant au pourcentage de solides est beaucoup trop complexe pour \^etre \'etabli analytiquement. On proc\`ede donc par \textbf{identification}, \`a partir d'un \textbf{mod\`ele de comportement} : un essai indiciel est r\'ealis\'e sur le proc\'ed\'e r\'eel.
+
+\begin{tcolorbox}[docTech, title={Document technique -- relev\'e de l'essai indiciel sur la cuve de d\'ecantation}]
+\footnotesize
+\textbf{Protocole.} La tension de commande $U_{com}$ des pompes de dosage est maintenue \`a \SI{30}{\volt} jusqu'\`a $t = \SI{100}{\minute}$, puis port\'ee brutalement \`a \SI{40}{\volt} (\'echelon de \SI{10}{\volt}). Pendant toute la dur\'ee de l'exp\'erience, les variations de masse volumique $\rho_{pulpe}$ de la pulpe en entr\'ee sont suppos\'ees n\'egligeables.
+
+\smallskip
+\textbf{Relev\'e du couple sur le bras rotatif :}
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\scriptsize]
+  % axes
+  \draw[->] (0,0) -- (9.6,0) node[right]{$t$ [min]};
+  \draw[->] (0,0) -- (0,4.6) node[above]{$C_{bras}$ [\si{\kilo\newton\meter}]};
+  % graduations x : 0..600 min sur 9 cm => 1.5 cm par 100 min
+  \foreach \i/\lab in {0/0,1/100,2/200,3/300,4/400,5/500,6/600} {
+    \draw (1.5*\i,0.08) -- (1.5*\i,-0.08) node[below]{\lab};
+  }
+  % graduations y : 0..1400 sur 4.2 cm => 0.3 cm par 100 kN.m
+  \foreach \j/\lab in {0/0,2/200,4/400,6/600,8/800,10/1000,12/1200,14/1400} {
+    \draw (0.08,0.3*\j) -- (-0.08,0.3*\j) node[left]{\lab};
+    \draw[gray!25] (0,0.3*\j) -- (9.2,0.3*\j);
+  }
+  \foreach \i in {1,...,6} { \draw[gray!25] (1.5*\i,0) -- (1.5*\i,4.3); }
+  % palier initial 600 kN.m de 0 a 100 min
+  \draw[very thick, colExo] (0,1.8) -- (1.5,1.8);
+  % reponse exponentielle : de 600 a 1200, tau = 70 min = 1.05 cm
+  \draw[very thick, colExo, domain=0:7.7, samples=120, smooth]
+    plot ({1.5+\x}, {1.8 + 1.8*(1-exp(-\x/1.05))});
+\end{tikzpicture}
+\end{center}
+
+\emph{Relev\'e du couple mesur\'e sur le bras en fonction du temps, pour un \'echelon de $U_{com}$ de \SI{10}{\volt} appliqu\'e \`a $t = \SI{100}{\minute}$.}
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever} sur le document technique : la valeur du couple $C_{bras}$ avant l'\'echelon, sa valeur en r\'egime permanent final, l'amplitude $\Delta U_0$ de l'\'echelon appliqu\'e et l'instant de son application.
+  \item \textbf{Justifier}, au vu de l'allure du relev\'e, que l'on peut mod\'eliser le syst\`eme en boucle ouverte non corrig\'ee par un syst\`eme du \textbf{premier ordre} de fonction de transfert $H(p) = \dfrac{K}{1 + \tau\,p}$. Citer les \textbf{deux} caract\'eristiques graphiques qui excluent respectivement l'ordre 2 et l'ordre 0.
+  \item \textbf{D\'eterminer} la valeur du gain $K$, en $\mathrm{kN\!\cdot\!m\!\cdot\!V^{-1}}$.
+  \item \textbf{D\'eterminer} la valeur de la constante de temps $\tau$, en minutes. Pr\'eciser la construction graphique utilis\'ee.
+  \item Le cahier des charges de l'asservissement impose un \textbf{temps de r\'eponse \`a \SI{5}{\percent} inf\'erieur \`a \SI{500}{\minute}}. Conclure sur la capacit\'e du proc\'ed\'e \`a respecter cette exigence \emph{sans} asservissement.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\textbf{\'Etape 1 -- Extraction des donn\'ees du relev\'e.}
+
+\begin{itemize}[leftmargin=1.5em, itemsep=1pt]
+  \item couple avant l'\'echelon (r\'egime permanent initial) : $C_{bras,0} = \SI[group-minimum-digits=4]{600}{\kilo\newton\meter}$ ;
+  \item couple en r\'egime permanent final : $C_{bras,\infty} \approx \SI[group-minimum-digits=4]{1200}{\kilo\newton\meter}$ ;
+  \item amplitude de l'\'echelon de commande : $\Delta U_0 = 40 - 30 = \SI{10}{\volt}$ ;
+  \item instant d'application : $t_0 = \SI{100}{\minute}$.
+\end{itemize}
+On en d\'eduit imm\'ediatement la \textbf{variation} de la sortie : $\Delta C_{bras} = 1\,200 - 600 = \SI[group-minimum-digits=4]{600}{\kilo\newton\meter}$.
+
+\smallskip
+\emph{Point de m\'ethode.} Le syst\`eme n'est pas au repos avant l'essai : il faut raisonner en \textbf{variations autour du point de fonctionnement}, jamais sur les valeurs absolues. Prendre $K = 1\,200/40 = 30$ serait une erreur grossi\`ere.
+
+\begin{enumerate}[leftmargin=1.5em, start=2]
+  \item Deux observations graphiques concordantes :
+  \begin{itemize}[leftmargin=1.4em, itemsep=1pt]
+    \item la r\'eponse est une \textbf{exponentielle amortie croissante, sans aucun d\'epassement} de la valeur finale ni oscillation : cela exclut un 2\textsuperscript{e} ordre sous-amorti ;
+    \item la \textbf{tangente \`a l'origine de l'\'echelon est non nulle} (la sortie d\'emarre imm\'ediatement avec une pente finie, sans palier horizontal ni point d'inflexion) : cela exclut un 2\textsuperscript{e} ordre ap\'eriodique ou un retard pur. Par ailleurs la sortie \'evolue dans le temps, ce qui exclut un simple gain (ordre 0).
+  \end{itemize}
+  Le mod\`ele du \textbf{1\textsuperscript{er} ordre} $H(p) = K/(1+\tau p)$ est donc pertinent.
+  \item En r\'egime permanent ($p \to 0$), la variation de sortie vaut $\Delta C_{bras} = K \times \Delta U_0$, d'o\`u :
+  \[
+    K = \frac{\Delta C_{bras}}{\Delta U_0} = \frac{600}{10} = \boldsymbol{60}\ \mathrm{kN\!\cdot\!m\!\cdot\!V^{-1}}
+  \]
+  \item La constante de temps est l'abscisse (compt\'ee \textbf{depuis l'instant de l'\'echelon}) du point o\`u la sortie a effectu\'e $\SI{63,2}{\percent}$ de sa variation totale :
+  \[
+    C_{bras}(t_0 + \tau) = C_{bras,0} + 0{,}63\times\Delta C_{bras} = 600 + 0{,}63\times 600 = \SI{978}{\kilo\newton\meter}
+  \]
+  La lecture graphique de l'abscisse correspondant \`a $\SI{978}{\kilo\newton\meter}$ donne $t \approx \SI{170}{\minute}$, soit, en retranchant l'instant de l'\'echelon :
+  \[
+    \tau \approx 170 - 100 = \boldsymbol{\SI{70}{\minute}}
+  \]
+  \emph{Construction \'equivalente} : la tangente \`a la courbe \`a l'instant $t_0$ coupe l'asymptote horizontale $C_{bras} = \SI{1200}{\kilo\newton\meter}$ \`a l'abscisse $t_0 + \tau$. Les deux constructions doivent \^etre trac\'ees sur le document r\'eponse -- une valeur donn\'ee sans trac\'e n'est pas accept\'ee.
+
+  \emph{Erreur \`a \'eviter} : lire $\tau$ \`a $\SI{50}{\percent}$ (on trouverait $\approx \SI{48}{\minute}$) ou \`a $\SI{90}{\percent}$ ($\approx \SI{161}{\minute}$). Seul le rep\`ere \`a $\SI{63,2}{\percent}$ est correct.
+  \item Le mod\`ele identifi\'e est donc :
+  \[
+    H(p) = \frac{60}{1 + 70\,p}
+    \qquad (\,K \text{ en } \mathrm{kN\!\cdot\!m\!\cdot\!V^{-1}},\ \tau \text{ en minutes}\,)
+  \]
+  Le temps de r\'eponse \`a \SI{5}{\percent} d'un 1\textsuperscript{er} ordre vaut :
+  \[
+    t_{r5\%} \approx 3\,\tau = 3\times 70 = \SI{210}{\minute}
+  \]
+
+  \smallskip
+  \textbf{Conclusion.} Le proc\'ed\'e non asservi atteint son r\'egime permanent en environ \SI{210}{\minute}, ce qui satisfait \emph{en apparence} l'exigence $t_{r5\%} < \SI{500}{\minute}$. Mais cette exigence porte sur le syst\`eme \textbf{asservi soumis \`a des perturbations} : en boucle ouverte, toute variation de $\rho_{pulpe}$ (discontinuit\'e du pourcentage de solides en entr\'ee) d\'eplace durablement le couple sans qu'aucune correction n'intervienne, et l'erreur statique reste enti\`ere. L'identification men\'ee ici ne valide donc pas le proc\'ed\'e : elle \textbf{fournit le mod\`ele de comportement} indispensable au dimensionnement du correcteur, seul \`a m\^eme d'assurer simultan\'ement la pr\'ecision (erreur statique nulle) et le rejet des perturbations.
+\end{enumerate}
+
+\smallskip
+\textit{Point de vigilance jury (rapport de jury CAPET 2021, commentaire de la partie 5) : \guillemotleft\ Cette partie a \'et\'e moins trait\'ee que les autres. [\dots] La sous-partie correspondant \`a l'\'etude d'un asservissement est tr\`es peu trait\'ee, et la qualit\'e des r\'eponses est faible. La lecture graphique d'une courbe est la question la moins bien trait\'ee du sujet. \guillemotright}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 4 -- 2014, question 25
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize 2014, Analyse d'un syst\`eme pluritechnique, question 25}
+]
+\CAPETSHOW{
+La trav\'ee levante centrale du pont Chaban-Delmas (\SI{117}{\meter} de long, \SI{2600}{\tonne}) est suspendue par des c\^ables \`a quatre pyl\^ones. La \textbf{souplesse des c\^ables et de la structure} rend le comportement dynamique de la trav\'ee oscillant : la commande doit \^etre con\c{c}ue pour ne pas exciter ces vibrations.
+
+\smallskip
+Un essai est r\'ealis\'e sur la structure en appliquant un \textbf{\'echelon de hauteur d'amplitude $\Delta h = \SI{20}{\milli\meter}$}. On rel\`eve la hauteur r\'eelle $h_s(t)$ de la trav\'ee, dont la r\'eponse est repr\'esent\'ee ci-dessous. On cherche \`a identifier la fonction de transfert $T_s(p)$ liant la hauteur r\'eelle $h_s$ \`a la hauteur de consigne.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\scriptsize]
+  \draw[->] (0,0) -- (9.4,0) node[right]{$t$ [s]};
+  \draw[->] (0,0) -- (0,4.4) node[above]{$h_s(t)$ [\si{\milli\meter}]};
+  % x : 0..12 s sur 9 cm => 0.75 cm / s
+  \foreach \i in {0,2,4,6,8,10,12} {
+    \draw (0.75*\i,0.08) -- (0.75*\i,-0.08) node[below]{\i};
+  }
+  % y : 0..40 mm sur 4 cm => 0.1 cm / mm
+  \foreach \j in {0,10,20,30,40} {
+    \draw (0.08,0.1*\j) -- (-0.08,0.1*\j) node[left]{\j};
+    \draw[gray!25] (0,0.1*\j) -- (9.0,0.1*\j);
+  }
+  % asymptote a 20 mm (valeur finale)
+  \draw[dashed, colSlate] (0,2.0) -- (9.0,2.0);
+  \node[above left, font=\tiny, colSlate] at (9.0,2.0) {valeur finale};
+  % reponse 2e ordre : m = 0.1, wp = 2pi/2.4 = 2.618 rad/s
+  % h(t) = 20*(1 - exp(-m w0 t)*cos(wp t))  approx (terme sin neglige, m petit)
+  \draw[very thick, colExo, domain=0:12, samples=400, smooth]
+    plot ({0.75*\x}, {0.1*20*(1 - exp(-0.2631*\x)*cos(2.618*\x r))});
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Justifier}, au vu de l'allure de la r\'eponse, l'ordre \`a retenir pour $T_s(p)$ et le r\'egime dans lequel se trouve le syst\`eme.
+  \item \textbf{D\'eterminer} le \textbf{gain statique} $k$ de $T_s(p)$. Commenter sa valeur.
+  \item \textbf{Relever} la \textbf{pseudo-p\'eriode} $T_0$ des oscillations, puis en d\'eduire la pseudo-pulsation $\omega_p$.
+  \item \textbf{Relever} le \textbf{premier d\'epassement relatif} $D_1\%$, puis en d\'eduire le facteur d'amortissement $\xi$. On rappelle :
+  \[
+    D_1\% = 100\,e^{-\xi\pi/\sqrt{1-\xi^2}}
+  \]
+  \item \textbf{En d\'eduire} la pulsation propre non amortie $\omega_0$, puis \'ecrire $T_s(p)$ sous forme canonique. Conclure sur les cons\'equences de cet amortissement pour la commande de la trav\'ee.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item La r\'eponse pr\'esente des \textbf{oscillations amorties} autour de sa valeur finale, avec une \textbf{tangente nulle \`a l'origine} (d\'emarrage \`a pente nulle). Ces deux caract\'eristiques signent un syst\`eme du \textbf{2\textsuperscript{e} ordre} en \textbf{r\'egime sous-amorti} ($\xi < 1$), c'est-\`a-dire la solution d'une \'equation diff\'erentielle du second ordre \`a coefficients constants soumise \`a un \'echelon.
+  \item Le gain statique est le rapport de la valeur finale de la sortie \`a l'amplitude de l'entr\'ee :
+  \[
+    k = \frac{h_s(\infty)}{\Delta h} = \frac{20}{20} = \boldsymbol{1}
+  \]
+  Ce gain unitaire (et \textbf{sans dimension}, puisque entr\'ee et sortie sont toutes deux des hauteurs en \si{\milli\meter}) est attendu : en r\'egime \'etabli, la trav\'ee atteint bien la hauteur demand\'ee. La structure n'introduit \textbf{aucune erreur statique}, seulement un \textbf{transitoire oscillant}.
+  \item La pseudo-p\'eriode se lit entre deux maxima successifs (ou deux passages successifs dans le m\^eme sens par la valeur finale) :
+  \[
+    \boldsymbol{T_0 \approx \SI{2,4}{\second}}
+    \qquad\Longrightarrow\qquad
+    \omega_p = \frac{2\pi}{T_0} = \frac{2\pi}{2{,}4} \approx \SI{2,62}{\radian\per\second}
+  \]
+  \item Le premier maximum de la r\'eponse atteint environ \SI{34,6}{\milli\meter} pour une valeur finale de \SI{20}{\milli\meter}, soit un d\'epassement relatif :
+  \[
+    D_1\% = \frac{h_{max} - h_s(\infty)}{h_s(\infty)}\times 100 \approx \frac{34{,}6 - 20}{20}\times 100 \approx \SI{73}{\percent}
+  \]
+  On inverse la relation du d\'epassement. En posant $x = \ln\!\left(\dfrac{100}{D_1\%}\right) = \ln\!\left(\dfrac{1}{0{,}73}\right) \approx 0{,}3147$ :
+  \[
+    x = \frac{\xi\,\pi}{\sqrt{1-\xi^2}}
+    \qquad\Longrightarrow\qquad
+    \xi = \frac{x}{\sqrt{\pi^2 + x^2}} = \frac{0{,}3147}{\sqrt{9{,}870 + 0{,}099}} \approx 0{,}0997
+  \]
+  \[
+    \boxed{\;\xi \approx 0{,}1\;}
+  \]
+  \emph{V\'erification} (syst\'ematique apr\`es toute inversion de formule) : $100\,e^{-0{,}1\pi/\sqrt{1-0{,}01}} = \SI{72,9}{\percent} \approx \SI{73}{\percent}$. Coh\'erent.
+  \item La pseudo-pulsation et la pulsation propre sont li\'ees par $\omega_p = \omega_0\sqrt{1-\xi^2}$ :
+  \[
+    \omega_0 = \frac{\omega_p}{\sqrt{1-\xi^2}} = \frac{2{,}62}{\sqrt{1 - 0{,}01}} \approx \SI{2,63}{\radian\per\second}
+  \]
+  L'amortissement \'etant tr\`es faible, $\omega_0$ et $\omega_p$ sont quasiment confondues. D'o\`u la forme canonique :
+  \[
+    \boxed{\;T_s(p) = \frac{1}{1 + \dfrac{2\xi}{\omega_0}\,p + \dfrac{p^2}{\omega_0^2}}
+    = \frac{1}{1 + 0{,}076\,p + 0{,}145\,p^2}\;}
+  \]
+  (avec $2\xi/\omega_0 = 2\times 0{,}0997/2{,}63 = 0{,}0758$ et $1/\omega_0^2 = 1/2{,}63^2 = 0{,}145$).
+
+  \smallskip
+  \textbf{Conclusion.} Le facteur d'amortissement $\xi \approx 0{,}1$ est \textbf{tr\`es faible} : la structure est quasiment un r\'esonateur. Le temps de stabilisation \`a \SI{5}{\percent} vaut $t_{r5\%} \approx 3/(\xi\,\omega_0) \approx \SI{11}{\second}$, soit pr\`es de \textbf{cinq pseudo-p\'eriodes d'oscillation} de la trav\'ee. Toute sollicitation brutale de la commande (\'echelon de consigne, d\'emarrage ou arr\^et franc) excitera donc des vibrations de grande amplitude -- ici \SI{73}{\percent} de d\'epassement -- inacceptables sur un ouvrage de \SI{2600}{\tonne} circul\'e par un tramway. C'est pr\'ecis\'ement ce qui \textbf{justifie l'exigence du cahier des charges} imposant des profils de commande \`a acc\'el\'eration limit\'ee, dont la dur\'ee des phases d'acc\'el\'eration et de freinage est choisie \'egale \`a un multiple de $T_0$ : la strat\'egie de commande est ici dict\'ee, non par l'actionneur, mais par le \textbf{mod\`ele dynamique de la structure men\'ee} -- c'est la charge, et non le moteur, qui impose le profil de mouvement.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 5 -- 2024, questions C5, C6 et C8
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize 2024, \'epreuve \'ecrite disciplinaire (option IE), questions C5, C6 et C8}
+]
+\CAPETSHOW{
+On reprend le moto-ventilateur de l'exercice 1, dont la partie m\'ecanique a \'et\'e mod\'elis\'ee par $H_m(p) = \dfrac{K_{m\acute{e}ca}}{1 + \tau_{m\acute{e}ca}\,p}$. On l'ins\`ere maintenant dans la boucle d'asservissement de vitesse suivante, o\`u le correcteur est de type \textbf{proportionnel-int\'egral} de gain proportionnel $K_p$ et de gain d'action int\'egrale $K_i$ :
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\footnotesize, scale=0.76, transform shape,
+                   blk/.style={draw, minimum width=1.25cm, minimum height=0.9cm, fill=white}]
+  % comparateur
+  \node (cmp) at (2.5,0) [draw, circle, minimum size=0.6cm, inner sep=0pt] {};
+  \draw (cmp.north) -- (cmp.south); \draw (cmp.west) -- (cmp.east);
+  \node[font=\scriptsize] at (2.12,0.30) {$+$};
+  \node[font=\scriptsize] at (2.86,-0.30) {$-$};
+  \draw[->] (0.2,0) -- (cmp.west) node[midway,above=1pt]{$\Omega_{r\acute{e}f}(p)$};
+  % encadre pointille : le correcteur PI (trace en premier, sous les blocs)
+  \draw[dashed, colSlate] (3.45,-0.75) rectangle (7.35,2.35);
+  \node[colSlate, font=\scriptsize, anchor=north] at (5.4,-0.8) {correcteur PI};
+  % Kp
+  \node[blk] (kp) at (4.5,0) {$K_p$};
+  \draw[->] (cmp.east) -- (kp.west) node[midway,above=1pt]{$\varepsilon(p)$};
+  % sommateur du PI
+  \node (som) at (6.9,0) [draw, circle, minimum size=0.6cm, inner sep=0pt] {};
+  \draw (som.north) -- (som.south); \draw (som.west) -- (som.east);
+  \node[font=\scriptsize] at (6.52,0.30) {$+$};
+  \node[font=\scriptsize] at (7.26,0.30) {$+$};
+  % branche proportionnelle directe
+  \draw[->] (kp.east) -- (som.west);
+  % branche integrale (au-dessus) : prise de signal a gauche du bloc K_i/p
+  \node[blk] (ki) at (6.0,1.6) {$\dfrac{K_i}{p}$};
+  \draw (5.25,0) node[circ]{} -- (5.25,1.6) -- (ki.west);
+  \draw[->] (ki.east) -- (6.9,1.6) -- (som.north);
+  % Hm
+  \node[draw, minimum width=2.5cm, minimum height=1.15cm, fill=white] (hm) at (9.3,0)
+       {$\dfrac{K_{m\acute{e}ca}}{1+\tau_{m\acute{e}ca}\,p}$};
+  \draw[->] (som.east) -- (hm.west);
+  \draw[->] (hm.east) -- (12.4,0) node[midway,above=1pt]{$\Omega(p)$};
+  % retour unitaire
+  \draw (11.6,0) node[circ]{} -- (11.6,-1.7);
+  \draw[->] (11.6,-1.7) -- (2.5,-1.7) -- (cmp.south);
+  \node[below=1pt] at (7.4,-1.7) {retour unitaire};
+\end{tikzpicture}
+\end{center}
+
+\noindent Le correcteur r\'ealise donc $\varepsilon(p) \mapsto K_p\left(1 + \dfrac{K_i}{p}\right)\varepsilon(p)$, o\`u $\varepsilon(p) = \Omega_{r\acute{e}f}(p) - \Omega(p)$.
+
+\smallskip
+Donn\'ees : $K_{m\acute{e}ca} = 250$ et $\tau_{m\acute{e}ca} = \SI{8,75}{\second}$ (exercice 1). Le cahier des charges impose $m = 1$ et un temps de r\'eponse $T_r = \SI{1}{\second}$, avec la relation $\omega_0 = 5/T_r$.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{D\'eterminer} la fonction de transfert en boucle ferm\'ee $H_{bf}(p) = \dfrac{\Omega(p)}{\Omega_{r\acute{e}f}(p)}$ en fonction de $K_p$, $K_i$, $K_{m\acute{e}ca}$ et $\tau_{m\acute{e}ca}$.
+  \item \textbf{Mettre} l'expression obtenue sous la forme canonique
+  $H_{bf}(p) = \dfrac{1}{1 + \dfrac{2m}{\omega_0}\,p + \dfrac{1}{\omega_0^2}\,p^2}$,
+  puis \textbf{exprimer} $m$ et $\omega_0$ en fonction de $K_p$, $K_i$, $K_{m\acute{e}ca}$ et $\tau_{m\acute{e}ca}$.
+  \item \textbf{Inverser} ces relations pour exprimer $K_p$ et $K_i$ en fonction de $m$, $K_{m\acute{e}ca}$, $\tau_{m\acute{e}ca}$ et $\omega_0$, puis \textbf{d\'eterminer} leurs valeurs num\'eriques.
+  \item V\'erifier la coh\'erence du r\'esultat en recalculant $\omega_0$ et $m$ \`a partir des gains trouv\'es. Conclure sur l'apport du mod\`ele \'etabli.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Lecture du sch\'ema-bloc.} Le retour \'etant unitaire, l'\'ecart vaut $\varepsilon(p) = \Omega_{r\acute{e}f}(p) - \Omega(p)$. En parcourant la cha\^ine directe depuis le comparateur (correcteur puis $H_m$) :
+  \[
+    \bigl[\Omega_{r\acute{e}f}(p) - \Omega(p)\bigr]\times K_p\,\frac{p + K_i}{p}\times \frac{K_{m\acute{e}ca}}{1+\tau_{m\acute{e}ca}\,p} = \Omega(p)
+  \]
+  On multiplie les deux membres par $p\,(1+\tau_{m\acute{e}ca}p)$ et on regroupe les termes en $\Omega(p)$ :
+  \[
+    \Omega_{r\acute{e}f}(p)\,K_p\,(p+K_i)\,K_{m\acute{e}ca}
+    = \Omega(p)\,\bigl[\,p\,(1+\tau_{m\acute{e}ca}p) + K_p\,(p+K_i)\,K_{m\acute{e}ca}\,\bigr]
+  \]
+  \[
+    H_{bf}(p) = \frac{K_p\,K_{m\acute{e}ca}\,(p + K_i)}
+    {\tau_{m\acute{e}ca}\,p^2 + p + K_p\,K_{m\acute{e}ca}\,p + K_i\,K_p\,K_{m\acute{e}ca}}
+  \]
+  Le d\'enominateur est exactement celui du corrig\'e officiel. Le sujet imposant une forme canonique \`a \textbf{num\'erateur constant}, on n\'eglige le z\'ero $(p+K_i)$ devant $K_i$ dans la bande utile -- hypoth\`ese explicite du sujet -- soit $K_p K_{m\acute{e}ca}(p+K_i) \simeq K_i K_p K_{m\acute{e}ca}$ :
+  \[
+    \boxed{\;H_{bf}(p) = \frac{K_i\,K_p\,K_{m\acute{e}ca}}{\tau_{m\acute{e}ca}\,p^2 + p + K_p\,K_{m\acute{e}ca}\,p + K_i\,K_p\,K_{m\acute{e}ca}}\;}
+  \]
+  On v\'erifie d\'ej\`a que $H_{bf}(0) = 1$ : le gain statique est unitaire, ce qui traduit l'\textbf{erreur statique nulle} apport\'ee par l'action int\'egrale.
+  \item \textbf{Mise sous forme canonique.} La forme canonique impose un \textbf{« 1 » comme terme constant du d\'enominateur} : on divise donc num\'erateur \emph{et} d\'enominateur par $K_iK_pK_{m\acute{e}ca}$.
+  \[
+    H_{bf}(p) = \frac{1}{1 + \dfrac{1 + K_pK_{m\acute{e}ca}}{K_iK_pK_{m\acute{e}ca}}\,p + \dfrac{\tau_{m\acute{e}ca}}{K_iK_pK_{m\acute{e}ca}}\,p^2}
+  \]
+  Identification terme \`a terme avec $1 + \dfrac{2m}{\omega_0}p + \dfrac{1}{\omega_0^2}p^2$ :
+  \[
+    \frac{1}{\omega_0^2} = \frac{\tau_{m\acute{e}ca}}{K_iK_pK_{m\acute{e}ca}}
+    \qquad\Longrightarrow\qquad
+    \boxed{\;\omega_0 = \sqrt{\frac{K_i\,K_p\,K_{m\acute{e}ca}}{\tau_{m\acute{e}ca}}}\;}
+  \]
+  \[
+    \frac{2m}{\omega_0} = \frac{1 + K_pK_{m\acute{e}ca}}{K_iK_pK_{m\acute{e}ca}}
+    \qquad\Longrightarrow\qquad
+    \boxed{\;m = \frac{\omega_0}{2}\cdot\frac{1 + K_p\,K_{m\acute{e}ca}}{K_i\,K_p\,K_{m\acute{e}ca}}\;}
+  \]
+  \item \textbf{Inversion.} On part des deux relations pr\'ec\'edentes. La premi\`ere donne directement :
+  \[
+    K_i\,K_p\,K_{m\acute{e}ca} = \tau_{m\acute{e}ca}\,\omega_0^2 \qquad (\star)
+  \]
+  En reportant $(\star)$ dans la relation sur $m$ :
+  \[
+    \frac{2m}{\omega_0} = \frac{1 + K_pK_{m\acute{e}ca}}{\tau_{m\acute{e}ca}\,\omega_0^2}
+    \quad\Longrightarrow\quad
+    1 + K_pK_{m\acute{e}ca} = 2\,m\,\tau_{m\acute{e}ca}\,\omega_0
+  \]
+  \[
+    \boxed{\;K_p = \frac{2\,m\,\tau_{m\acute{e}ca}\,\omega_0 - 1}{K_{m\acute{e}ca}}\;}
+    \qquad\text{puis, avec }(\star):\qquad
+    \boxed{\;K_i = \frac{\tau_{m\acute{e}ca}\,\omega_0^2}{K_p\,K_{m\acute{e}ca}}\;}
+  \]
+  \textbf{Applications num\'eriques} avec $m = 1$, $\omega_0 = 5/T_r = \SI{5}{\radian\per\second}$, $K_{m\acute{e}ca} = 250$ et $\tau_{m\acute{e}ca} = \SI{8,75}{\second}$ :
+  \[
+    K_p = \frac{2\times 1\times 8{,}75\times 5 - 1}{250} = \frac{87{,}5 - 1}{250} = \frac{86{,}5}{250} = \boldsymbol{0{,}346} \approx 0{,}35
+  \]
+  \[
+    K_i = \frac{8{,}75\times 5^2}{0{,}346\times 250} = \frac{218{,}75}{86{,}5} = \boldsymbol{2{,}53} \approx 2{,}5
+  \]
+  \emph{Remarque.} Avec la valeur $\tau_{m\acute{e}ca} = \SI{8,5}{\second}$ imprim\'ee dans l'\'enonc\'e du sujet, on obtiendrait $K_p = 0{,}336$ ; les r\'esultats publi\'es ($0{,}35$ et $2{,}5$) ne se retrouvent qu'avec $\tau_{m\acute{e}ca} = J/f = \SI{8,75}{\second}$, ce qui confirme que la valeur \`a retenir est bien \SI{8,75}{\second}.
+  \item \textbf{V\'erification crois\'ee} -- on recalcule les param\`etres canoniques \`a partir des gains obtenus :
+  \[
+    \omega_0 = \sqrt{\frac{2{,}53\times 0{,}346\times 250}{8{,}75}} = \sqrt{\frac{218{,}8}{8{,}75}} = \sqrt{25{,}0} = \SI{5,00}{\radian\per\second}\quad\checkmark
+  \]
+  \[
+    \frac{2m}{\omega_0} = \frac{1 + 0{,}346\times 250}{218{,}8} = \frac{87{,}5}{218{,}8} = 0{,}400
+    \quad\Longrightarrow\quad m = \frac{0{,}400\times 5}{2} = 1{,}00\quad\checkmark
+  \]
+
+  \smallskip
+  \textbf{Conclusion.} Le r\'eglage $K_p = 0{,}35$ et $K_i = 2{,}5$ place la boucle ferm\'ee en \textbf{r\'egime critique} ($m = 1$) : c'est le retour \emph{le plus rapide possible sans aucun d\'epassement}, exactement ce qu'exige le cahier des charges ($D\% \leq \SI{5}{\percent}$). Le temps de r\'eponse passe ainsi de $3\,\tau_{m\acute{e}ca} \approx \SI{26}{\second}$ en boucle ouverte \`a $T_r = \SI{1}{\second}$ en boucle ferm\'ee, soit une acc\'el\'eration d'un facteur \textbf{26}, tandis que l'action int\'egrale annule l'erreur statique. C'est toute la valeur de la d\'emarche de mod\'elisation men\'ee depuis l'exercice 1 : c'est la \textbf{forme canonique} -- et elle seule -- qui permet de traduire directement des exigences de cahier des charges ($T_r$, $D\%$) en valeurs num\'eriques de r\'eglage.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2023, commentaire de la partie 4) : \guillemotleft\ C'est un champ disciplinaire important des sciences industrielles auquel les candidats au CAPET de SII ne peuvent se soustraire. Le jury invite les candidats \`a revoir les concepts de base de ce domaine comme les notions de boucle ouverte, de correcteur ou encore de marge de phase. \guillemotright}
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 6 -- exercice inedit
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize exercice in\'edit}
+]
+\CAPETSHOW{
+Le filtre de sortie d'un hacheur s\'erie est un \textbf{circuit RLC s\'erie} : l'inductance de lissage $L$ et la r\'esistance $R$ de l'enroulement sont en s\'erie avec le condensateur de sortie $C$, aux bornes duquel est pr\'elev\'ee la tension de sortie $v_s(t)$. La tension d\'ecoup\'ee moyenne appliqu\'ee en entr\'ee est not\'ee $v_e(t)$. La charge est suppos\'ee de tr\`es forte imp\'edance (fonctionnement \`a vide).
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.95, every node/.style={scale=0.95}]
+  \draw (0,0) to[V, l=$v_e(t)$, invert] (0,3);
+  \draw (0,3) to[R, l=$R$, i>^=$i(t)$] (3,3);
+  \draw (3,3) to[cute inductor, l=$L$] (5.4,3);
+  \draw (5.4,3) to[C, l_=$C$] (5.4,0);
+  \draw (5.4,0) -- (0,0);
+  \draw (5.4,3) -- (7.2,3) node[circ]{};
+  \draw (5.4,0) -- (7.2,0) node[circ]{};
+  \draw[-Stealth] (7.5,0.2) -- (7.5,2.8) node[midway, right]{$v_s(t)$};
+  \node[circ] at (5.4,3) {}; \node[circ] at (5.4,0) {};
+\end{circuitikz}
+\end{center}
+
+Donn\'ees : $L = \SI{0,1}{\henry}$ ; $C = \SI{10}{\micro\farad}$ ; $R = \SI{100}{\ohm}$.
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{\'Etablir} l'\'equation diff\'erentielle liant $v_s(t)$ \`a $v_e(t)$. On pr\'ecisera les lois utilis\'ees.
+  \item En pr\'ecisant l'hypoth\`ese n\'ecessaire, \textbf{d\'eterminer} la fonction de transfert $H(p) = \dfrac{V_s(p)}{V_e(p)}$ et la \textbf{mettre sous forme canonique}. \textbf{Identifier} le gain statique $K$, la pulsation propre $\omega_0$ et le facteur d'amortissement $m$ en fonction de $R$, $L$ et $C$.
+  \item \textbf{Calculer} les valeurs num\'eriques de $K$, $\omega_0$ et $m$. V\'erifier l'homog\'en\'eit\'e des expressions obtenues.
+  \item \textbf{Pr\'evoir} la r\'eponse du filtre \`a un \'echelon de tension de \SI{50}{\volt} : d\'epassement relatif $D_1\%$, pseudo-p\'eriode $T_p$ et temps de r\'eponse \`a \SI{5}{\percent}.
+  \item Le cahier des charges impose une tension de sortie \textbf{sans aucun d\'epassement} lors d'un \'echelon de consigne. \textbf{D\'eterminer} la valeur minimale de $R$ permettant de satisfaire cette exigence, puis conclure sur la pertinence de cette solution pour un filtre de sortie de hacheur.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Loi des mailles} sur l'unique maille du circuit :
+  \[
+    v_e(t) = R\,i(t) + L\,\frac{di(t)}{dt} + v_s(t)
+  \]
+  \textbf{Relation de d\'efinition du condensateur} (le m\^eme courant $i$ traverse toute la maille, le circuit \'etant \`a vide) :
+  \[
+    i(t) = C\,\frac{dv_s(t)}{dt}
+    \qquad\Longrightarrow\qquad
+    \frac{di(t)}{dt} = C\,\frac{d^2v_s(t)}{dt^2}
+  \]
+  En substituant :
+  \[
+    \boxed{\;L\,C\,\frac{d^2v_s(t)}{dt^2} + R\,C\,\frac{dv_s(t)}{dt} + v_s(t) = v_e(t)\;}
+  \]
+  Il s'agit bien d'une \'equation diff\'erentielle \textbf{lin\'eaire du 2\textsuperscript{e} ordre \`a coefficients constants}.
+  \item L'hypoth\`ese n\'ecessaire est celle des \textbf{conditions initiales nulles} (conditions de Heaviside) : $v_s(0^-) = 0$ et $i(0^-) = 0$, c'est-\`a-dire un condensateur initialement d\'echarg\'e et une inductance initialement non parcourue. Sous cette hypoth\`ese $\mathcal{L}\{dv_s/dt\} = p\,V_s(p)$ et $\mathcal{L}\{d^2v_s/dt^2\} = p^2\,V_s(p)$ :
+  \[
+    \bigl(L\,C\,p^2 + R\,C\,p + 1\bigr)\,V_s(p) = V_e(p)
+    \qquad\Longrightarrow\qquad
+    H(p) = \frac{1}{1 + R\,C\,p + L\,C\,p^2}
+  \]
+  L'expression est \textbf{d\'ej\`a} sous forme canonique (terme constant \'egal \`a 1 au d\'enominateur). Par identification avec $\dfrac{K}{1 + \dfrac{2m}{\omega_0}p + \dfrac{1}{\omega_0^2}p^2}$ :
+  \[
+    \boxed{\;K = 1\;}
+    \qquad
+    \frac{1}{\omega_0^2} = L\,C \Longrightarrow \boxed{\;\omega_0 = \frac{1}{\sqrt{L\,C}}\;}
+  \]
+  \[
+    \frac{2m}{\omega_0} = R\,C
+    \Longrightarrow
+    m = \frac{R\,C\,\omega_0}{2} = \frac{R\,C}{2\sqrt{L\,C}}
+    \qquad\Longrightarrow\qquad
+    \boxed{\;m = \frac{R}{2}\sqrt{\frac{C}{L}}\;}
+  \]
+  \item Applications num\'eriques :
+  \[
+    \omega_0 = \frac{1}{\sqrt{0{,}1\times 10\times 10^{-6}}} = \frac{1}{\sqrt{10^{-6}}} = \frac{1}{10^{-3}} = \SI[group-minimum-digits=4]{1000}{\radian\per\second}
+  \]
+  soit $f_0 = \omega_0/2\pi \approx \SI{159}{\hertz}$.
+  \[
+    m = \frac{100}{2}\sqrt{\frac{10\times 10^{-6}}{0{,}1}} = 50\times\sqrt{10^{-4}} = 50\times 10^{-2} = \boldsymbol{0{,}500}
+  \]
+  Le gain statique $K = 1$ est sans dimension (tension sur tension) : en r\'egime continu \'etabli, le condensateur est un circuit ouvert et l'inductance un court-circuit, donc $v_s = v_e$ -- coh\'erent.
+
+  \emph{Contr\^ole d'homog\'en\'eit\'e.} $[L\,C] = \mathrm{H\!\cdot\!F}$. Or $\mathrm{H} = \Omega\!\cdot\!\mathrm{s}$ et $\mathrm{F} = \mathrm{s}/\Omega$, donc $[LC] = \mathrm{s^2}$ et $\omega_0 = 1/\sqrt{LC}$ est bien en $\mathrm{s^{-1}}$. De m\^eme $[R\sqrt{C/L}] = \Omega\times\sqrt{(\mathrm{s}/\Omega)/(\Omega\!\cdot\!\mathrm{s})} = \Omega\times 1/\Omega = 1$ : $m$ est bien sans dimension.
+  \item Avec $m = 0{,}5 < 1$, le r\'egime est \textbf{sous-amorti} : il y aura d\'epassement et oscillations.
+  \[
+    D_1\% = 100\,e^{-m\pi/\sqrt{1-m^2}} = 100\,e^{-0{,}5\pi/\sqrt{0{,}75}}
+    = 100\,e^{-1{,}814} \approx \boldsymbol{\SI{16,3}{\percent}}
+  \]
+  Pour un \'echelon de \SI{50}{\volt} (et $K = 1$), la tension de sortie culminera \`a :
+  \[
+    v_{s,max} = 50\times(1 + 0{,}163) \approx \SI{58,2}{\volt}
+  \]
+  Pseudo-pulsation et pseudo-p\'eriode :
+  \[
+    \omega_p = \omega_0\sqrt{1-m^2} = 1\,000\times\sqrt{0{,}75} \approx \SI{866}{\radian\per\second}
+    \qquad
+    T_p = \frac{2\pi}{\omega_p} \approx \SI{7,26}{\milli\second}
+  \]
+  Temps de r\'eponse \`a \SI{5}{\percent} (enveloppe exponentielle en $e^{-m\omega_0 t}$) :
+  \[
+    t_{r5\%} \approx \frac{3}{m\,\omega_0} = \frac{3}{0{,}5\times 1\,000} = \SI{6}{\milli\second}
+  \]
+  \item Le d\'epassement est nul si et seulement si $m \geq 1$ (r\'egime critique ou ap\'eriodique) :
+  \[
+    m = \frac{R}{2}\sqrt{\frac{C}{L}} \geq 1
+    \qquad\Longleftrightarrow\qquad
+    R \geq 2\sqrt{\frac{L}{C}} = 2\sqrt{\frac{0{,}1}{10\times 10^{-6}}} = 2\times\sqrt{10^4} = \boldsymbol{\SI{200}{\ohm}}
+  \]
+  Il faudrait donc \textbf{doubler} la r\'esistance s\'erie du circuit pour annuler le d\'epassement.
+
+  \smallskip
+  \textbf{Conclusion.} L'exigence « aucun d\'epassement » est math\'ematiquement satisfaite pour $R \geq \SI{200}{\ohm}$, mais cette solution est \textbf{technologiquement inacceptable} pour un filtre de sortie de hacheur : la r\'esistance est ici la r\'esistance parasite de l'enroulement, qui dissipe $R\,I^2$ en pure perte. La porter \`a \SI{200}{\ohm} doublerait les pertes Joule, effondrerait le rendement du convertisseur et provoquerait une chute de tension en charge incompatible avec la r\'egulation. La mod\'elisation montre donc que le param\`etre d'action pertinent n'est \textbf{pas} $R$ mais le rapport $\sqrt{L/C}$ : \`a $\omega_0$ impos\'ee (donc \`a produit $LC$ constant), \textbf{diminuer $L$ et augmenter $C$} dans le m\^eme rapport augmente $m$ sans aucune perte suppl\'ementaire. \`A $L = \SI{50}{\milli\henry}$ et $C = \SI{20}{\micro\farad}$, le produit $LC$ est inchang\'e (donc $\omega_0 = \SI{1000}{\radian\per\second}$) et l'on obtient exactement $m = \frac{100}{2}\sqrt{20\times 10^{-6}/0{,}05} = 1$ : c'est la \textbf{r\'eponse de conception} que la seule lecture du mod\`ele canonique permet de formuler, sans toucher au rendement.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

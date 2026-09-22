@@ -1,0 +1,345 @@
+% Audit de veracite des citations de rapport de jury - 2026-09-20
+% Bloc 4 : citation jury 2025 remplacee par le verbatim exact du
+% Rapport_Jury_2025 (l.1024). Les mentions << 85 % des candidats >> et
+% << gain de l'amplificateur differentiel >> sont introuvables dans le corpus.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ficheHeaders{T23}{Capteurs et conditionnement}{colElec}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TETE
+% -----------------------------------------------------------------------
+
+\ficheEntete{T23}{Capteurs et Conditionnement du signal}{colElec}%
+  {électronique - Instrumentation industrielle}%
+  {\textbf{Présence :} \textbf{9/13} sujets (2013-2026) - thème \emph{très fréquent}}%
+  {PT100 - thermocouple - capteur inductif - jauge de contrainte - pont de Wheatstone - signal 4-20\,mA - montages AOP de conditionnement - mise à l'échelle CAN}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Taxonomie capteurs ---------------------------------------------
+\textbf{1.1 Classification des capteurs}
+
+\smallskip
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{lll}
+\toprule
+\textbf{Critère} & \textbf{Actif} & \textbf{Passif} \\
+\midrule
+Principe & Génère une FEM & Varie une impédance \\
+Exemples & Thermocouple, piézoélectrique & PT100, jauge, potentiomètre \\
+Alimentation & Non (source autonome) & Oui (pont, courant) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 PT100 ---------------------------------------------------------
+\textbf{1.2 Capteur PT100 (thermorésistance)}
+
+\[
+  R_T = R_0(1 + \alpha\,T)
+  \qquad R_0 = 100\,\Omega \text{ à } 0^\circ\mathrm{C}
+  \qquad \alpha = 3{,}85 \times 10^{-3}\,^\circ\mathrm{C}^{-1}
+\]
+\[
+  \frac{\Delta R_T}{\Delta T} = R_0\,\alpha = 0{,}385\,\Omega/^\circ\mathrm{C}
+\]
+Capteur \textbf{passif} ; plage $-200^\circ$C à $+850^\circ$C. Nécessite un pont d'alimentation.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 Thermocouple --------------------------------------------------
+\textbf{1.3 Thermocouple (effet Seebeck)}
+
+Capteur \textbf{actif} : génère une FEM $e_{AB}$ de quelques mV entre deux métaux différents.
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lll}
+\toprule
+\textbf{Type} & \textbf{Plage} & \textbf{Tolérance} \\
+\midrule
+J (Fe/Constantan) & $-210^\circ$C à $+1200^\circ$C & $\pm 2{,}5^\circ$C \\
+K (Chromel/Alumel) & $-10^\circ$C à $+1100^\circ$C  & $\pm 2{,}5^\circ$C \\
+\bottomrule
+\end{tabular}
+\end{center}
+Nécessite un transmetteur mV → 4-20\,mA ou un ampli d'instrumentation.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 Pont de Wheatstone --------------------------------------------
+\textbf{1.4 Pont de Wheatstone - jauge de contrainte}
+
+\[
+  V_{out} \approx \frac{V_{cc}}{4} \cdot \frac{\Delta R}{R_0} \quad (\Delta R \ll R_0)
+\]
+
+\smallskip
+\begin{center}
+\begin{circuitikz}[european, scale=0.85]
+  \draw (0,2) node[above]{$+V_{cc}$} to[R, l=$R_1$] (2,1)
+        to[R, l=$R_2$] (0,0) node[below]{0 V};
+  \draw (0,2) to[R, l_=$R_4$] (-2,1)
+        to[R, l_=$R_3{+}\Delta R$] (0,0);
+  \draw (2,1) -- (2.8,1) node[right]{$V_+$};
+  \draw (-2,1) -- (-2.8,1) node[left]{$V_-$};
+\end{circuitikz}
+\end{center}
+
+Avantage : compense les dérives thermiques (4 jauges identiques). L'ampli différentiel amplifie $V_{out} = V_+ - V_-$ jusqu'à la plage du CAN.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.5 Signal 4-20 mA ------------------------------------------------
+\textbf{1.5 Signal normalisé industriel 4-20\,mA}
+
+\[
+  x = x_{min} + \frac{I_s - 4}{16}\,(x_{max} - x_{min})
+\]
+\begin{itemize}
+  \item $I_s = 4\,\mathrm{mA}$ - grandeur minimale (pas zéro !)
+  \item $I_s = 20\,\mathrm{mA}$ - grandeur maximale
+  \item Immunité aux perturbations CEM sur grande longueur de câble (2 fils)
+\end{itemize}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.6 Conditionnement AOP -------------------------------------------
+\textbf{1.6 Montages AOP courants en conditionnement}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lll}
+\toprule
+\textbf{Montage} & \textbf{Gain} & \textbf{Usage} \\
+\midrule
+Inverseur & $-R_f/R_e$ & Amplification + inversion \\
+Non-inverseur & $1 + R_f/R_e$ & Amplification sans inversion \\
+Soustracteur (diff.) & $(R_2/R_1)(V^+ - V^-)$ & Pont de Wheatstone, PT100 \\
+Suiveur & $1$ & Adaptation d'impédance \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHETIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthétique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.8cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{PT100}} \\
+$R_T = R_0(1 + \alpha T)$ & Résistance & $\Omega$ \\
+$\Delta R_T/\Delta T = R_0\alpha = 0{,}385$ & Sensibilité & $\Omega/^\circ$C \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Pont Wheatstone}} \\
+$V_{out} \approx (V_{cc}/4) \cdot (\Delta R/R_0)$ & Déséquilibre & V \\
+$V_{CAN} = K_a \cdot V_{out}$ & Après ampli & V \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Signal 4-20\,mA}} \\
+$x = x_{min} + (I_s-4)/16 \cdot (x_{max}-x_{min})$ & Mise à l'éch. & - \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.8cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Conditionnement}} \\
+$V_s = -(R_f/R_e) V_e$ & Inverseur & V \\
+$V_s = (1+R_f/R_e) V_e$ & Non-inv. & V \\
+$V_s = (R_2/R_1)(V^+-V^-)$ & Soustr. & V \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Capteur inductif}} \\
+$f = N \cdot Z \cdot n / 60$ & Fréquence signal & Hz \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Données PT100}} \\
+$R_0 = 100\,\Omega$ ; $\alpha = 3{,}85\times10^{-3}\,^\circ$C$^{-1}$ & - & - \\
+Plage : $-200^\circ$C à $+850^\circ$C & - & - \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets réels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Identification du capteur et justification du conditionnement \hfill\normalfont\footnotesize E2 BAC3 2026 (Q1-Q2)}
+]
+\textbf{Énoncé.}
+Capteur Jumo (référence 370) placé dans une conduite. Identifier le type, le principe de mesure, sa nature active/passive. Justifier le besoin d'un conditionneur pour $T \in [-5\,;\,90^\circ\mathrm{C}]$, $V_{CAN} \in [0\,;\,3] \,\mathrm{V}$. Montrer que $c = 0{,}0316\,\mathrm{V/^\circ C}$.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Identification.} Type : PT100 (thermorésistance) - transducteur résistif, capteur \textbf{passif}.
+
+\textbf{Étape 2 — Justification du conditionneur.} Plage capteur : variation de résistance correspondant à $95^\circ$C. Tension de sortie directe du capteur : trop faible et décalée - le conditionneur adapte la plage.
+
+\textbf{Étape 3 — Calcul du coefficient.}
+\[
+  c = \dfrac{V_{max} - V_{min}}{T_{max} - T_{min}} = \dfrac{3 - 0}{90 - (-5)} = \dfrac{3}{95} \approx \mathbf{0{,}0316\,\mathrm{V/^\circ C}}
+\]
+
+\textbf{Conclusion.} Ce coefficient $c$ garantit que toute la plage utile de température ($-5$ à $90^\circ$C) est traduite sur l'intégralité de la plage d'entrée du CAN ($0$ à $3$\,V), maximisant ainsi la résolution effective de la mesure.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Pont de Wheatstone - expression de la tension de déséquilibre \hfill\normalfont\footnotesize E2 Commune 2025}
+]
+\textbf{Énoncé.}
+Un pont de Wheatstone alimente 4 jauges de contrainte ($R_0 = 120\,\Omega$, $V_{cc} = 1\,\mathrm{V}$). Une jauge subit $\Delta R = 0{,}0153\,\Omega$. (a) Expliquer l'intérêt du pont par rapport à une mesure directe. (b) Calculer $V_{out}$.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 (a) — Intérêt du pont.} Le pont compense les dérives thermiques : si toutes les jauges varient de la même façon avec la température, la variation s'annule. Seule la déformation mécanique appliquée à une jauge crée un déséquilibre.
+
+\textbf{Étape 2 (b) — Calcul.} Approximation petits déséquilibres ($\Delta R \ll R_0$) :
+\[
+  V_{out} \approx \frac{V_{cc}}{4} \cdot \frac{\Delta R}{R_0} = \frac{1}{4} \cdot \frac{0{,}0153}{120} \approx \mathbf{31{,}9\,\mu\mathrm{V}}
+\]
+Gain ampli nécessaire pour 5\,V en CAN : $K_a = 5 / (31{,}9 \times 10^{-6}) \approx 1{,}56 \times 10^5$.
+
+\textbf{Conclusion.} Un gain de l'ordre de $1{,}56 \times 10^5$ est très élevé pour un AOP classique : il impose l'usage d'un amplificateur d'instrumentation dédié (offre de dérive et de bruit maîtrisés), pas d'un simple montage soustracteur à AOP standard.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Capteur inductif - calcul de fréquence et choix \hfill\normalfont\footnotesize E1 2020}
+]
+\textbf{Énoncé.}
+Capteur inductif détectant les dents d'un disque. Vitesse $n = 240\,\mathrm{tr/min}$, nombre de dents $Z = 24$. Calculer la fréquence maximale du signal. Choisir le capteur adapté parmi la liste.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Calcul de fréquence.}
+\[
+  f = \frac{N \cdot Z \cdot n}{60} = \frac{1 \times 24 \times 240}{60} = \mathbf{96\,\mathrm{Hz}}
+\]
+
+\textbf{Étape 2 — Choix du capteur.} Le capteur choisi doit avoir une fréquence de commutation maximale $f_{max} \geq 96\,\mathrm{Hz}$.
+
+\textbf{Conclusion.} Comparer $f_{max}$ du catalogue avec 96\,Hz et sélectionner le premier modèle qui satisfait cette condition, sans surdimensionner inutilement le choix (coût, encombrement).
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs récurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Identifier le capteur depuis la référence.} Lire le datasheet fourni ; ne pas deviner. La confusion PT100 (passif, résistance) / thermocouple (actif, FEM de l'ordre du mV) est fréquente.
+
+  \item \textbf{Justifier le choix chiffré.} Jury 2020 : "Le choix du capteur est rarement justifié." Toujours comparer avec les critères numériques (plage, tolérance, fréquence).
+
+  \item \textbf{Pont de Wheatstone.} Jury 2025 : moins de 20\,\% des candidats traitent correctement. Mémoriser $V_{out} \approx (V_{cc}/4) \cdot (\Delta R/R_0)$ et vérifier $\Delta R \ll R_0$.
+
+  \item \textbf{Signal 4-20\,mA.} $4\,\mathrm{mA}$ correspond à la valeur minimale, pas à zéro. La mise à l'échelle part de $I_s - 4$ et non de $I_s$.
+
+  \item \textbf{Gain du conditionneur.} Calculer analytiquement : $G = (V_{max,CAN} - V_{min,CAN}) / (V_{max,capteur} - V_{min,capteur})$. Ne pas oublier l'offset si la plage capteur est décalée.
+
+  \item \textbf{Relier capteur et CAN.} La tension de sortie du conditionneur doit \textbf{couvrir exactement} $[0\,;\,V_{ref}]$ - utiliser tout le codage du CAN pour maximiser la résolution effective.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2025 : «~L'intérêt d'un pont de Wheatstone et l'expression simplifiée de la tension de sortie ont été traités par moins de vingt pour cent des candidats.~»
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PRESENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colPresence,
+  title={Présence dans les sujets analysés (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Année} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+E1 (commune)   & - & $\checkmark$ & - & - & $\checkmark$ & - & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & - & - & $\checkmark$ \\
+E2 discipl. IE & - & - & - & - & - & - & $\checkmark$ & - & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+E2 appl. comm. & - & - & - & - & - & - & - & - & - & - & - & - & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-thèmes fréquents :}
+PT100 ($R_T$, $\alpha$) - thermocouple (type J/K, FEM) - pont de Wheatstone - signal 4-20\,mA - montage AOP soustracteur - capteur inductif (fréquence) - mise à l'échelle CAN
+
+\end{tcolorbox}
+
+\CAPETENDFILE

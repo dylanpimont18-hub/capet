@@ -1,0 +1,732 @@
+% T20 -- R\'egime sinuso\"idal, filtres du 1er et du 2e ordre (\'electronique) -- banque d'exercices
+%
+% COMPL\'EMENTARIT\'E AVEC LA FICHE fiches/T20_Filtres_RC_RL.tex
+% Les trois Questions Types de la fiche sont TOUTES tir\'ees de la partie B du sujet E1 2026 :
+%   QT1 = questions B3-B4 (\'etablir H_F1 = 1/(1+jw/w0) par diviseur de tension, puis Bode
+%         asymptotique du 1er ordre) ;
+%   QT2 = questions B5-B6 (lecture du Bode aux deux pulsations de v2, expression de v3(t),
+%         estimation de t_r5%) ;
+%   QT3 = question B9 (proposer R et C satisfaisant le gabarit, justifier l'absence
+%         d'oscillations de la r\'eponse indicielle).
+% AUCUN des six exercices ci-dessous ne refait ce travail. La partie B 2026 comporte dix
+% questions (B1 \`a B10) : les exercices 1, 3 et 4 exploitent les questions B1, B2 et B7-B8,
+% qui restent enti\`erement libres. L'exercice 2 quitte la partie B pour la partie A du m\^eme
+% sujet (identification RL d'ordre 1, questions A2-A3), l'exercice 5 change de sujet (E2 2026),
+% l'exercice 6 change de sujet et d'ann\'ee (2023 / 2024).
+% N'ONT PAS \'ET\'E REPRIS non plus, pour la m\^eme raison : le trac\'e du Bode asymptotique du 1er
+% ordre (QT1), le calcul de |H| \`a 900 Hz sur le filtre du 1er ordre (QT2), le dimensionnement
+% num\'erique R/C du filtre du 2e ordre (QT3).
+%
+% SOURCES DE CHAQUE EXERCICE (toutes relues ligne \`a ligne dans les .md de conversion Marker,
+% r\'epertoire docs/CAPET_Markdown-20260629T134311Z-3-001/CAPET_Markdown/docs/CAPET_SII_IE/
+% 06_PDFs_Originaux/) :
+%
+%   - Ex. 1 : 2026/E1_Sujet_2026/E1_Sujet_2026.md, question B1 (l.271).
+%     Nom d'\'epreuve LU dans le fichier (l.1-20) : en-t\^ete « LDE ENE 1 » (OCR ; le sujet 2023
+%     homologue imprime « EDE ENE 1 »), « SESSION 2026 », « CAPET CONCOURS EXTERNE ET CAFEP
+%     CORRESPONDANT (BAC + 3) », « Section : SCIENCES INDUSTRIELLES DE L'ING\'ENIEUR », « Option :
+%     ING\'ENIERIE \'ELECTRIQUE », « ADMISSIBILIT\'E : \'EPREUVE 1 », dur\'ee 4 heures. La r\'ef\'erence
+%     affich\'ee reprend cette d\'enomination officielle sans la compl\'eter.
+%     Donn\'ees d'\'enonc\'e : figure B2 « Spectre du signal v2(t) » (l.263-269), dont le texte
+%     d'image donne explicitement les deux raies « 2V » et « 0,5V » et l'axe des fr\'equences
+%     gradu\'e de 0 \`a 2000 Hz ; expression v2(t) = V0 + A.sin(w2.t) (l.261) ; et l.305 du m\^eme
+%     fichier (question B5) qui confirme v2(t) = 2 + 0,5.sin(2.pi.900.t).
+%     La chaine d'acquisition (capteur potentiom\'etrique + conditionneur + amplificateur +
+%     filtre + CAN) et l'origine du perturbateur (« pr\'esence des actionneurs \'electriques pr\`es
+%     du capteur ») : l.245 et l.259.
+%     AN recalcul\'ee : w2 = 2.pi.900 = 5654,9 rad/s (deux voies : 2.pi.f et 900/0,15915).
+%
+%   - Ex. 2 : m\^eme fichier, questions A2 et A3 (l.186-190).
+%     Donn\'ees d'\'enonc\'e : essai \`a rotor bloqu\'e sous U = 3,3 V, figure A2 dont le texte d'image
+%     (l.180) donne u(t) = 3,3 V, i(t) -> 0,5 A, et l'axe des temps gradu\'e « 0  5  15  30 » ms ;
+%     plaque : Un = 200 V, In = 0,5 A, Nn = 1800 tr/min (l.168-172) ; valeurs retenues pour la
+%     suite R = 6,6 Ohm et L = 100 mH (l.193, VALEUR TEXTUELLE, pas une image).
+%     Coh\'erence v\'erifi\'ee : 3,3/6,6 = 0,50 A exactement (plateau de la figure A2) ;
+%     tau = L/R = 0,1/6,6 = 15,15 ms (la graduation 15 ms de la figure A2) ; 3.tau = 45,5 ms
+%     (fin de l'\'echelle 30 ms d\'epass\'ee, r\'egime quasi \'etabli). Aucune de ces trois v\'erifications
+%     n'est donn\'ee par le sujet : elles sont recalcul\'ees ici.
+%     200/6,6 = 30,3 A = 60,6 x In : justification de l'essai sous tension r\'eduite.
+%
+%   - Ex. 3 : m\^eme fichier, question B2 (l.282) et cahier des charges du tableau l.275-280
+%     (facteur d'att\'enuation du signal perturbateur > 100 ; temps de r\'eponse \`a 5 % < 50 ms).
+%     Le gabarit DRB1 (l.699-703) porte les rep\`eres w2, 10.w2 et -3 dB : textes d'image relus.
+%     AN recalcul\'ees : G = 20.log(1/100) = -40 dB ;
+%     ordre 1 -> w0 <= w2/sqrt(100^2-1) = 56,6 rad/s -> t_r5% = 3/w0 = 53,0 ms > 50 ms (REFUS) ;
+%     ordre 2 (m=1) -> w0 <= w2/sqrt(100-1) = 568,3 rad/s -> t_r5% = 4,74/w0 = 8,3 ms (OK).
+%     Le 4,74 est la racine de 1-(1+x)e^{-x} = 0,95, recalcul\'ee num\'eriquement (brentq).
+%
+%   - Ex. 4 : m\^eme fichier, questions B7 et B8 (texte d'image l.322, figure B4 « Sch\'ema
+%     \'electrique du second filtre retenu », structure R/C puis 10R/(C/10) lisible sur l'OCR
+%     « R 10R / V2 C Va V3 / 10 »). L'\'enonc\'e B8 demande explicitement la forme canonique
+%     H_F2 = H0/(1 + 2m(jw/w0) + (jw/w0)^2) et l'expression de w02 et de m en fonction de R et C.
+%     R\'esolution nodale refaite ici sous sympy (deux noeuds Va et V3) :
+%     H = 1/(1 + 2,1.jRCw + (jRCw)^2)  =>  w02 = 1/(RC)  et  m = 1,05.
+%     V\'erification ind\'ependante par les p\^oles : racines de x^2+2,1x+1 = -1,370 et -0,730,
+%     R\'EELLES et distinctes => r\'egime ap\'eriodique, pas d'oscillations (coh\'erent avec B9).
+%     ATTENTION : m = 1,05 et NON m = 1. Une cascade de deux \'etages RC IDENTIQUES non isol\'es
+%     donnerait 1 + 3jRCw + (jRCw)^2, soit m = 1,5 ; deux \'etages parfaitement isol\'es donneraient
+%     m = 1 exactement. Le rapport 10 introduit par le sujet (10R et C/10) est pr\'ecis\'ement ce qui
+%     rapproche m de 1 sans amplificateur s\'eparateur. Ce point est d\'evelopp\'e dans le corrig\'e.
+%
+%   - Ex. 5 (docTech) : 2026/E2_Sujet_2026_BAC3/E2_Sujet_2026_BAC3.md, questions B13, B16 et B17
+%     (l.462, l.472, l.478). Nom d'\'epreuve LU dans le fichier (l.1-22) : « LDE ENE 2 »,
+%     « SESSION 2026 », « CAPET CONCOURS EXTERNE ET CAFEP CORRESPONDANT (BAC + 3) »,
+%     « Option : ING\'ENIERIE \'ELECTRIQUE », « ADMISSIBILIT\'E : \'EPREUVE 2 ».
+%     Donn\'ees d'\'enonc\'e TEXTUELLES : syst\`eme de refroidissement du 1er ordre, tau = 0,9 s,
+%     K = 4 degC/V (l.452-456) ; capteur Kc = 0,0316 V/degC (l.456) ; « le constructeur d\'esire
+%     obtenir au moins 10 \'echantillons au cours du r\'egime transitoire » (l.460) ; p\'eriode
+%     retenue T2 = 0,25 s (l.466) ; CAN ADS7029-Q1 (l.417) ; sensibilit\'e de chaine 2,684/degC
+%     et consigne Tc = 55 degC (l.427) ; plage de tension de 3 V en sortie du conditionneur et
+%     c = 0,0316 V/degC (l.398-402) ; plage de fonctionnement 50-60 degC (l.432).
+%     ATTENTION -- LIMITE ASSUM\'EE : le document technique DTB4 (la datasheet du CAN) est une
+%     IMAGE omise par la conversion Marker (l.624, « ==> picture intentionally omitted <== »).
+%     Le docTech de cet exercice n'est donc PAS une reproduction du DTB4 : c'est un extrait
+%     reconstitu\'e de la datasheet constructeur du composant r\'eellement nomm\'e par le sujet,
+%     v\'erifi\'e par WebSearch le 2026-09-20 sur ti.com / mouser.com :
+%     ADS7029-Q1 = « Small-Size, Low-Power, 8-Bit, 2-MSPS, SAR ADC », SAR \`a \'echantillonneur-
+%     bloqueur int\'egr\'e, AVDD 2,35 \`a 3,6 V, DVDD 1,65 \`a 3,6 V, 1,11 mW max \`a 2 MSPS sous 3 V,
+%     < 1 uW \`a 1 kSPS, qualifi\'e AEC-Q100. Le fait que ce soit une reconstitution est signal\'e
+%     dans l'encadr\'e lui-m\^eme (mention « d'apr\`es la documentation constructeur »).
+%     AN recalcul\'ees : t_R5% = 3.tau = 2,7 s ; Te <= 2,7/10 = 0,27 s ; f_min = 3,70 Hz ;
+%     avec T2 = 0,25 s -> fe = 4 Hz -> fc <= 2 Hz ; Tconv = 1/2e6 = 0,5 us << 0,25 s.
+%     q = 3/255 = 11,76 mV -> S = 0,0316/q = 2,686/degC, qui reproduit le 2,684 du sujet \`a
+%     l'arrondi de c pr\`es (la convention q = PE/2^n donnerait 11,72 mV et S = 2,697 ;
+%     les deux conventions sont donn\'ees dans le corrig\'e, comme l'impose la r\`egle de ne pas
+%     trancher arbitrairement). Erreur de quantification q/2 -> 0,19 degC dans les deux cas.
+%     N(55 degC) = 148 = 1001 0100(2) = 0x94, identique sous les deux conventions (v\'erifi\'e).
+%
+%   - Ex. 6 : 2023/E2_Appliquee_Commune_2023/E2_Appliquee_Commune_2023.md, question 17 (l.291).
+%     Nom d'\'epreuve LU dans le fichier (l.1-12) : « EDE STI 2 », « SESSION 2023 »,
+%     « CAPET CONCOURS EXTERNE ET CAFEP CORRESPONDANT », « Section : SCIENCES INDUSTRIELLES DE
+%     L'ING\'ENIEUR / Option : ING\'ENIERIE DES CONSTRUCTIONS / Option : ING\'ENIERIE \'ELECTRIQUE /
+%     Option : ING\'ENIERIE INFORMATIQUE / Option : ING\'ENIERIE M\'ECANIQUE »,
+%     « \'EPREUVE \'ECRITE DISCIPLINAIRE APPLIQU\'EE », dur\'ee 5 heures.
+%     Contexte de l'\'enonc\'e (l.277) : ventilateurs entra\^in\'es par MAS 3~, modulateur = pont
+%     redresseur PD3 + filtre (L,C) + onduleur MLI, r\'eseau 3 x 400 V - 50 Hz.
+%     CORRIG\'E OFFICIEL, VERBATIM EXACT, Rapport_Jury_2023.md l.714 (v\'erifi\'e par grep) :
+%     « Cette technique permet d'\'eliminer les premiers harmoniques des tensions statoriques.
+%     Les enroulements du moteur se comportant comme des filtres passe-bas, les courants
+%     statoriques appel\'es sont quasiment sinuso\"idaux (ce qui assure une rotation r\'eguli\`ere et
+%     sans \`a-coups et limite les \'echauffements). »
+%     SECOND VERBATIM EXACT, Rapport_Jury_2024.md l.237 (corrig\'e officiel de la question B12 de
+%     2024/E2_Disciplinaire_IE_2024, « EDE ENE 1 », l.305) : « On remarque que la mise en place
+%     de la MLI g\'en\`ere des harmoniques dans les hautes fr\'equences. La solution pour les
+%     \'eliminer est d'introduire un filtre passe bas (circuit R,L par exemple). »
+%     Ces deux verbatims sont les SEULES citations de rapport de jury du fichier.
+%     Donn\'ees num\'eriques de l'exercice : fp = 6000 Hz est la fr\'equence de porteuse MLI
+%     explicitement donn\'ee par 2024/E2_Disciplinaire_IE_2024.md l.287 ; f = 50 Hz est la
+%     fr\'equence r\'eseau (2023 l.277). R et L du mod\`ele d'enroulement ne sont donn\'es par aucun
+%     des deux sujets : ils sont pos\'es ici en donn\'ees d'exercice (mention explicite dans
+%     l'\'enonc\'e), et l'exercice est donc rattach\'e aux questions r\'eelles pour la d\'emarche,
+%     pas pour ces deux valeurs.
+%
+% AUCUN RAPPORT DE JURY 2026 N'EXISTE dans le corpus (2026/ ne contient que E1_Sujet_2026 et
+% E2_Sujet_2026_BAC3 ; les Rapport_Jury_*.md s'arr\^etent \`a 2025, v\'erifi\'e par ls). Aucune
+% citation n'est donc attribu\'ee \`a un rapport de jury 2026 dans ce fichier.
+%
+% VALEURS D\'ELIB\'ER\'EMENT NON UTILIS\'EES : le sujet E1 2026 annonce l.191 « pour la suite de
+% l'\'etude les valeurs num\'eriques suivantes seront retenues » pour le filtre de la partie B,
+% mais ces valeurs sont dans une IMAGE omise (l.297). R = 1 kOhm et C = 100 nF ne sont donc
+% PAS attribuables au sujet : ils n'apparaissent nulle part dans ce fichier. Les exercices 3
+% et 4 raisonnent en litt\'eral (w0, RC) pr\'ecis\'ement pour cette raison.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{../fiches/preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+% En-t\^ete raccourci : la r\`egle projet impose < 35 caract\`eres apr\`es le code.
+% « Exercices - R\'egime sinuso\"idal et filtres » en faisait 40 ; la variante ci-dessous en fait 32.
+\fancyhead[L]{\textbf{\textcolor{colExo}{T20}} - Exercices - Filtres 1\textsuperscript{er}/2\textsuperscript{e} ordre}
+\fancyhead[R]{\small\textit{Banque d'exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}}
+\fancyfoot[C]{\small\thepage\,/\,\pageref{LastPage}}
+
+\CAPETBEGINFILE
+
+\begin{tcolorbox}[
+  enhanced, breakable,
+  colback=colExo,
+  colframe=colExo,
+  left=6pt, right=6pt, top=5pt, bottom=5pt,
+  before skip=0pt, after skip=4pt
+]
+  {\color{white}\bfseries\large T20 \quad R\'egime sinuso\"idal, filtres du 1\textsuperscript{er} et du 2\textsuperscript{e} ordre}\\[2pt]
+  {\color{white}\small Banque d'exercices -- 6 exercices \CAPETSHOW{(\'enonc\'es)}{(corrig\'es)}}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 1 -- 2026 E1, question B1 (lecture de spectre)
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 1 -- \difficulte{1} \hfill\normalfont\footnotesize 2026, admissibilit\'e \'epreuve 1 (option IE), question B1}
+]
+\CAPETSHOW{
+La position angulaire de la porte d'un bus est acquise par une cha\^ine de mesure compos\'ee d'un capteur potentiom\'etrique, d'un conditionneur, d'un amplificateur, d'un filtre, puis d'un convertisseur analogique/num\'erique. La mesure du signal $v_2(t)$ fourni par l'ensemble \{capteur + conditionneur + amplificateur\} met en \'evidence la pr\'esence d'un \textbf{signal perturbateur non d\'esir\'e}, attribu\'e \`a la pr\'esence des actionneurs \'electriques pr\`es du capteur.
+
+Le sujet pr\'ecise que ce signal se met sous la forme $v_2(t) = V_0 + A\sin(\omega_2 t)$. Son spectre en amplitude est donn\'e ci-dessous (figure B2).
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.9, every node/.style={scale=0.9}, font=\footnotesize]
+  % axes
+  \draw[->] (0,0) -- (9.3,0) node[right] {$f$ (\si{\hertz})};
+  \draw[->] (0,0) -- (0,3.1) node[above] {amplitude (V)};
+  % graduations horizontales : 0 a 2000 Hz, pas de 200
+  \foreach \i/\lab in {0/0,1/200,2/400,3/600,4/800,5/1000,6/1200,7/1400,8/1600,9/1800} {
+    \draw (\i*0.45,0) -- (\i*0.45,-0.08);
+  }
+  \foreach \i/\lab in {0/0,2/400,4/800,6/1200,8/1600} {
+    \node[below] at (\i*0.45,-0.08) {\lab};
+  }
+  \node[below] at (10*0.45,-0.08) {2000};
+  \draw (10*0.45,0) -- (10*0.45,-0.08);
+  % graduations verticales
+  \foreach \v/\lab in {0.5/{0{,}5},1/{1},1.5/{1{,}5},2/{2},2.5/{2{,}5}} {
+    \draw (0,\v*1.1) -- (-0.08,\v*1.1);
+    \node[left] at (-0.08,\v*1.1) {\lab};
+    \draw[dotted, gray] (0,\v*1.1) -- (9.1,\v*1.1);
+  }
+  % raie continue a f = 0 : 2 V
+  \draw[very thick, colExo] (0.04,0) -- (0.04,2.2);
+  \fill[colExo] (0.04,2.2) circle (2pt);
+  \node[colExo, right, font=\scriptsize] at (0.14,2.35) {\SI{2}{\volt} (continu, $f=0$)};
+  % raie a 900 Hz : 0,5 V   (900 Hz -> 4.5*0.45 = 2.025)
+  \draw[very thick, colExo] (2.025,0) -- (2.025,0.55);
+  \fill[colExo] (2.025,0.55) circle (2pt);
+  \node[colExo, above, font=\scriptsize] at (2.025,0.6) {\SI{0,5}{\volt}};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item En exploitant le spectre ci-dessus, d\'eterminer les valeurs num\'eriques de $V_0$, de $A$ et de $\omega_2$.
+  \item Identifier dans le signal $v_2(t)$ le \textbf{signal informatif} (proportionnel \`a la mesure de position angulaire) et le \textbf{signal perturbateur}. Justifier par la nature physique de la grandeur mesur\'ee.
+  \item En d\'eduire la nature du filtre \`a placer avant le convertisseur analogique/num\'erique, et conclure sur ce que doit imp\'erativement conserver ce filtre.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le spectre en amplitude ne comporte que \textbf{deux raies} :
+  \begin{itemize}[itemsep=1pt]
+    \item une raie \`a la fr\'equence \textbf{nulle}, d'amplitude \SI{2}{\volt} : c'est la \textbf{composante continue}, donc $\boldsymbol{V_0 = \SI{2}{\volt}}$ ;
+    \item une raie \`a la fr\'equence $f_2 = \SI{900}{\hertz}$, d'amplitude \SI{0,5}{\volt} : c'est l'amplitude de la composante sinuso\"idale, donc $\boldsymbol{A = \SI{0,5}{\volt}}$.
+  \end{itemize}
+  La pulsation associ\'ee s'en d\'eduit :
+  \[ \omega_2 = 2\pi f_2 = 2\pi\times 900 \approx \SI{5655}{\radian\per\second} \]
+  \emph{V\'erification par une seconde voie} : $\omega_2 = f_2/0{,}15915 = 900/0{,}15915 \approx 5655$, puisque $1/(2\pi) \approx 0{,}15915$. Le signal s'\'ecrit donc bien
+  \[ v_2(t) = 2 + 0{,}5\sin(2\pi\times 900\,t) \quad\text{(V)} \]
+  \item La grandeur mesur\'ee est la \textbf{position angulaire d'une porte de bus} : c'est une grandeur m\'ecanique \`a \'evolution \textbf{lente} (une porte s'ouvre en quelques centaines de millisecondes \`a quelques secondes), dont le spectre est donc concentr\'e en \textbf{tr\`es basse fr\'equence}.
+  \begin{itemize}[itemsep=1pt]
+    \item Le \textbf{signal informatif} est la composante \`a fr\'equence quasi nulle, $v_{21}(t) = V_0 = \SI{2}{\volt}$ : c'est elle qui porte l'image de la position angulaire.
+    \item Le \textbf{signal perturbateur} est la composante \`a \SI{900}{\hertz}, $v_{22}(t) = 0{,}5\sin(2\pi\times 900\,t)$. Sa fr\'equence, tr\`es sup\'erieure \`a la dynamique m\'ecanique de la porte, trahit une origine \'electrique : le sujet l'attribue \`a la proximit\'e des actionneurs \'electriques (couplage par rayonnement ou par la masse).
+  \end{itemize}
+  L'argument d\'ecisif n'est donc pas l'amplitude (le perturbateur est certes quatre fois plus petit) mais bien la \textbf{s\'eparation fr\'equentielle} entre les deux composantes.
+  \item Les deux composantes \'etant s\'epar\'ees en fr\'equence -- l'utile en bas, le parasite \`a \SI{900}{\hertz} -- un \textbf{filtre passe-bas} permet de conserver la premi\`ere et d'att\'enuer la seconde. Un passe-haut ou un passe-bande feraient exactement l'inverse.
+
+  \smallskip
+  \textbf{Conclusion.} Le filtre \`a ins\'erer est un \textbf{passe-bas}, et il doit imp\'erativement pr\'esenter un \textbf{gain statique unitaire} ($|H(0)| = 1$, soit \SI{0}{\deci\bel} en continu). C'est une exigence de la cha\^ine de mesure et non un d\'etail de trac\'e : toute att\'enuation de la composante continue fausserait directement la valeur de position angulaire transmise au convertisseur, donc la mesure elle-m\^eme. Le cahier des charges ne portera par cons\'equent que sur l'\textbf{att\'enuation \`a $\omega_2$} et sur la \textbf{rapidit\'e}, le gain en continu \'etant impos\'e \`a 1 par construction.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 2 -- 2026 E1, questions A2 et A3 (identification RL 1er ordre)
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 2 -- \difficulte{1} \hfill\normalfont\footnotesize 2026, admissibilit\'e \'epreuve 1 (option IE), questions A2 et A3}
+]
+\CAPETSHOW{
+L'induit de la machine \`a courant continu qui entra\^ine la porte du bus est mod\'elis\'e par une r\'esistance $R$ en s\'erie avec une inductance $L$ et une force contre-\'electromotrice $e(t)$. L'\'equation \'electrique de l'induit s'\'ecrit :
+\[ u(t) = R\,i(t) + L\,\frac{\mathrm{d}i(t)}{\mathrm{d}t} + e(t) \]
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.85, every node/.style={scale=0.85}]
+  \draw (0,0) to[open, v^<=$u(t)$] (0,2.6);
+  \draw (0,2.6) to[short, i=$i(t)$] (1.2,2.6);
+  \draw (1.2,2.6) to[R, l=$R$] (3.0,2.6);
+  \draw (3.0,2.6) to[cute inductor, l=$L$] (4.8,2.6);
+  \draw (4.8,2.6) to[battery1, l=$e(t)$] (4.8,0);
+  \draw (4.8,0) -- (0,0);
+\end{circuitikz}
+\end{center}
+
+La plaque signal\'etique de l'actionneur donne, en r\'egime nominal : tension nominale $U_n = \SI{200}{\volt}$, courant nominal $I_n = \SI{0,5}{\ampere}$, vitesse de rotation nominale $N_n = \SI{1800}{\tr\per\minute}$.
+
+Un essai est r\'ealis\'e \`a \textbf{rotor bloqu\'e} sous une tension r\'eduite $U = \SI{3,3}{\volt}$ appliqu\'ee en \'echelon \`a $t = 0$. L'\'evolution du courant absorb\'e $i(t)$ est alors r\'egie par une \'equation diff\'erentielle d'ordre 1 \`a coefficients constants, de constante de temps $\tau = L/R$. Les relev\'es sont donn\'es figure A2.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.9, every node/.style={scale=0.9}, font=\footnotesize]
+  % --- chronogramme u(t) ---
+  \draw[->] (0,0) -- (5.6,0) node[right] {$t$ (\si{\milli\second})};
+  \draw[->] (0,0) -- (0,1.6) node[above] {$u(t)$ (\si{\volt})};
+  \draw[very thick, colExo] (0,0) -- (0,1.15) -- (5.2,1.15);
+  \draw[dotted] (0,1.15) -- (-0.05,1.15);
+  \node[left] at (-0.05,1.15) {3{,}3};
+  \foreach \x/\lab in {0/0,0.85/5,2.55/15,5.1/30} {
+    \draw (\x,0) -- (\x,-0.08);
+    \node[below] at (\x,-0.08) {\lab};
+  }
+
+  % --- chronogramme i(t) ---
+  \begin{scope}[yshift=-3.4cm]
+    \draw[->] (0,0) -- (5.6,0) node[right] {$t$ (\si{\milli\second})};
+    \draw[->] (0,0) -- (0,1.9) node[above] {$i(t)$ (\si{\ampere})};
+    % exponentielle 1-exp(-t/tau) avec tau = 15.15 ms ; echelle : 30 ms = 5.1 cm ; 0,5 A = 1.4 cm
+    \draw[very thick, colExo] plot[domain=0:5.1, samples=60]
+      (\x, {1.4*(1-exp(-\x/2.576))});
+    \draw[dotted] (0,1.4) -- (5.3,1.4);
+    \node[left] at (-0.05,1.4) {0{,}5};
+    % reperage a t = tau
+    \draw[dotted] (2.576,0) -- (2.576,{1.4*0.632});
+    \draw[dotted] (0,{1.4*0.632}) -- (2.576,{1.4*0.632});
+    \node[left, font=\scriptsize] at (-0.05,{1.4*0.632}) {0{,}32};
+    \foreach \x/\lab in {0/0,0.85/5,2.55/15,5.1/30} {
+      \draw (\x,0) -- (\x,-0.08);
+      \node[below] at (\x,-0.08) {\lab};
+    }
+  \end{scope}
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Simplifier l'\'equation \'electrique dans le cadre de cet essai \`a rotor bloqu\'e, \textbf{une fois le r\'egime permanent atteint}. En d\'eduire la valeur de $R$.
+  \item D\'eterminer la valeur du courant qu'aurait absorb\'e l'actionneur en r\'egime permanent si cet essai \`a rotor bloqu\'e avait \'et\'e men\'e sous la \textbf{tension nominale} de \SI{200}{\volt}. Justifier alors le choix d'effectuer cet essai sous tension r\'eduite.
+  \item En exploitant la figure A2, d\'eterminer la valeur de l'inductance $L$.
+  \item L'induit se comporte, vis-\`a-vis du courant, comme un filtre passe-bas naturel. Donner sa pulsation de coupure $\omega_0$ et sa fr\'equence de coupure $f_0$ en retenant pour la suite les valeurs $R = \SI{6,6}{\ohm}$ et $L = \SI{100}{\milli\henry}$, puis conclure sur l'aptitude de cet induit \`a lisser un courant d\'ecoup\'e \`a \SI{1}{\kilo\hertz} par un hacheur.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \`A \textbf{rotor bloqu\'e}, la machine ne tourne pas : $\Omega = 0$, donc la force contre-\'electromotrice $e = K_e\,\Omega$ est \textbf{nulle}. En \textbf{r\'egime permanent}, le courant est \'etabli et constant : $\mathrm{d}i/\mathrm{d}t = 0$, le terme inductif dispara\^it. L'\'equation se r\'eduit \`a la seule loi d'Ohm :
+  \[ U = R\,I \qquad\Longrightarrow\qquad R = \frac{U}{I} = \frac{3{,}3}{0{,}5} = \boldsymbol{\SI{6,6}{\ohm}} \]
+  La valeur du plateau $I = \SI{0,5}{\ampere}$ est lue directement sur la figure A2.
+  \item Sous \SI{200}{\volt} et toujours \`a rotor bloqu\'e (donc toujours $e = 0$), le m\^eme raisonnement donne :
+  \[ I' = \frac{U_n}{R} = \frac{200}{6{,}6} \approx \SI{30,3}{\ampere} \]
+  Or le courant nominal de la machine vaut $I_n = \SI{0,5}{\ampere}$ :
+  \[ \frac{I'}{I_n} = \frac{30{,}3}{0{,}5} \approx 61 \]
+  Le courant atteindrait environ \textbf{61 fois} le courant nominal. Comme les pertes Joule varient en $RI^2$, la puissance dissip\'ee dans l'induit serait multipli\'ee par $61^2 \approx 3\,700$, soit $6{,}6\times 30{,}3^2 \approx \SI{6,1}{\kilo\watt} $ dans un induit dimensionn\'e pour $6{,}6\times 0{,}5^2 = \SI{1,65}{\watt}$.
+
+  C'est la raison du choix de la \textbf{tension r\'eduite} : \`a rotor bloqu\'e, la f.c.\'e.m. qui limite normalement le courant en fonctionnement dispara\^it, et seule la r\'esistance d'induit -- tr\`es faible -- s'oppose au courant. L'essai sous tension nominale d\'etruirait le bobinage en quelques instants. On choisit donc $U$ de telle sorte que le courant \'etabli soit de l'ordre du courant nominal, ce qui est exactement le cas ici ($\SI{0,5}{\ampere} = I_n$).
+  \item Le courant suit une exponentielle croissante $i(t) = I\left(1 - e^{-t/\tau}\right)$. La m\'ethode de lecture usuelle consiste \`a rep\'erer l'instant o\`u le courant atteint \textbf{\SI{63}{\percent}} de sa valeur finale :
+  \[ 0{,}63\times 0{,}5 \approx \SI{0,32}{\ampere} \qquad\text{atteint pour}\qquad t = \tau \approx \SI{15}{\milli\second} \]
+  (c'est la graduation interm\'ediaire port\'ee par la figure A2). On en d\'eduit :
+  \[ \tau = \frac{L}{R} \qquad\Longrightarrow\qquad L = R\,\tau = 6{,}6 \times 15\times 10^{-3} \approx \boldsymbol{\SI{99}{\milli\henry}} \approx \SI{100}{\milli\henry} \]
+  \emph{V\'erification par une seconde voie} : avec les valeurs retenues par le sujet pour la suite ($R = \SI{6,6}{\ohm}$, $L = \SI{100}{\milli\henry}$), on retrouve $\tau = 0{,}100/6{,}6 = \SI{15,2}{\milli\second}$, et le r\'egime est \'etabli \`a \SI{5}{\percent} pr\`es au bout de $3\tau \approx \SI{45}{\milli\second}$, ce qui est bien coh\'erent avec l'allure de la figure A2 (le courant n'a pas tout \`a fait atteint son plateau \`a \SI{30}{\milli\second}).
+  \item Vis-\`a-vis du courant, le dip\^ole $R$--$L$ soumis \`a une tension $u$ pr\'esente la fonction de transfert
+  \[ \frac{I(j\omega)}{U(j\omega)} = \frac{1}{R + jL\omega} = \frac{1/R}{1 + j\,\dfrac{\omega}{\omega_0}} \qquad\text{avec}\qquad \omega_0 = \frac{R}{L} = \frac{1}{\tau} \]
+  C'est bien la forme canonique d'un \textbf{passe-bas du premier ordre}. Num\'eriquement :
+  \[ \omega_0 = \frac{6{,}6}{0{,}100} = \SI{66}{\radian\per\second} \qquad f_0 = \frac{\omega_0}{2\pi} = \frac{66}{6{,}283} \approx \SI{10,5}{\hertz} \]
+
+  \smallskip
+  \textbf{Conclusion.} La coupure de cet induit se situe \`a environ \SI{10,5}{\hertz}. Un hacheur d\'ecoupant \`a \SI{1}{\kilo\hertz} travaille donc pr\`es de \textbf{cent fois au-dessus} de $f_0$ : l'att\'enuation apport\'ee par l'inductance propre de l'induit y atteint $-20\log_{10}(1000/10{,}5) \approx \SI{-39,6}{\deci\bel}$, soit un facteur voisin de \num{95}. L'ondulation de courant due au d\'ecoupage est ainsi r\'eduite de pr\`es de deux ordres de grandeur \emph{sans aucun composant de filtrage suppl\'ementaire}. C'est ce qui justifie, dans un variateur pour machine \`a courant continu, de \textbf{ne pas ajouter d'inductance de lissage} tant que la fr\'equence de d\'ecoupage reste tr\`es sup\'erieure \`a $R/(2\pi L)$ : l'actionneur assure lui-m\^eme la fonction de filtrage, et l'exigence de qualit\'e du courant se traduit directement en \textbf{exigence sur la fr\'equence de d\'ecoupage} du convertisseur.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 3 -- 2026 E1, question B2 (gabarit -> ordre du filtre)
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 3 -- \difficulte{2} \hfill\normalfont\footnotesize 2026, admissibilit\'e \'epreuve 1 (option IE), question B2}
+]
+\CAPETSHOW{
+On reprend la cha\^ine d'acquisition de l'exercice 1. Le signal d'entr\'ee du filtre vaut
+\[ v_2(t) = \underbrace{2}_{\text{informatif}} \;+\; \underbrace{0{,}5\sin(2\pi\times 900\,t)}_{\text{perturbateur, } \omega_2\,\approx\,5655\;\mathrm{rad/s}} \quad\text{(V)} \]
+Le filtre \`a mettre en place est caract\'eris\'e par sa fonction de transfert $H_{F}(j\omega) = \underline{V_3}(j\omega)/\underline{V_2}(j\omega)$ et doit respecter le cahier des charges suivant :
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Exigence} & \textbf{Crit\`ere} \\
+\midrule
+Facteur d'att\'enuation du signal perturbateur & $> 100$ \\
+Temps de r\'eponse \`a \SI{5}{\percent} & $< \SI{50}{\milli\second}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Le gabarit fr\'equentiel associ\'e est reproduit ci-dessous. On rappelle que le filtre doit conserver le gain unitaire en continu.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.9, every node/.style={scale=0.9}, font=\footnotesize]
+  \draw[->] (0,-3.4) -- (0,0.9) node[above] {$G = 20\log|H_{F}(j\omega)|$ (\si{\deci\bel})};
+  \draw[->] (0,0) -- (8.3,0) node[right] {$\log\omega$ \; (\si{\radian\per\second})};
+  % reperes verticaux
+  \draw[dashed] (4.2,0.6) -- (4.2,-3.4);
+  \node[below] at (4.2,-3.45) {$\omega_2$};
+  \draw[dashed] (7.0,0.6) -- (7.0,-3.4);
+  \node[below] at (7.0,-3.45) {$10\,\omega_2$};
+  % niveaux
+  \draw[dotted] (0,-0.35) -- (8.1,-0.35);
+  \node[left, font=\scriptsize] at (-0.05,-0.35) {$-3$};
+  \draw[dotted] (0,-2.8) -- (8.1,-2.8);
+  \node[left, font=\scriptsize] at (-0.05,-2.8) {$G_{min}$};
+  \node[left, font=\scriptsize] at (-0.05,0) {$0$};
+  % zone interdite haute (hachuree) au-dessus du gabarit, a droite de w2
+  \fill[colExo, opacity=0.13] (4.2,-2.8) rectangle (8.1,0.6);
+  \draw[colExo, thick] (4.2,-2.8) -- (8.1,-2.8);
+  \node[colExo, font=\scriptsize, align=center] at (5.9,-1.35) {zone interdite\\(att\'enuation\\insuffisante)};
+  \node[font=\scriptsize] at (2.0,-1.7) {bande passante};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item D\'eterminer la valeur du gain $G$ en \si{\deci\bel} que doit pr\'esenter le filtre \`a la pulsation $\omega_2$ pour respecter la premi\`ere exigence du cahier des charges. Placer le point $P_1$ correspondant sur le gabarit.
+  \item On envisage d'abord un filtre du \textbf{premier ordre} de gain statique unitaire. D\'eterminer la pulsation de coupure $\omega_0$ maximale admissible pour satisfaire l'exigence d'att\'enuation, puis le temps de r\'eponse \`a \SI{5}{\percent} qui en r\'esulte. Conclure.
+  \item On envisage maintenant un filtre du \textbf{second ordre} de gain statique unitaire et d'amortissement $m = 1$. Reprendre la m\^eme d\'emarche. On admettra que, pour $m = 1$, le temps de r\'eponse \`a \SI{5}{\percent} vaut $t_{r5\%} \approx 4{,}75/\omega_0$.
+  \item En d\'eduire \textbf{l'ordre et le type} du filtre \`a mettre en place, et conclure sur la nature du compromis impos\'e par ce cahier des charges.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le \guillemotleft~facteur d'att\'enuation~\guillemotright{} du signal perturbateur est le rapport entre son amplitude \`a l'entr\'ee et son amplitude \`a la sortie. L'exiger sup\'erieur \`a 100 revient \`a imposer :
+  \[ \frac{1}{|H_F(j\omega_2)|} > 100 \qquad\Longleftrightarrow\qquad |H_F(j\omega_2)| < \frac{1}{100} \]
+  En d\'ecibels :
+  \[ G(\omega_2) = 20\log_{10}|H_F(j\omega_2)| < 20\log_{10}\!\left(\frac{1}{100}\right) = -20\log_{10}(100) = \boldsymbol{\SI{-40}{\deci\bel}} \]
+  Le point $P_1$ se place donc \`a $(\omega_2 \approx \SI{5655}{\radian\per\second}\,;\,\SI{-40}{\deci\bel})$, sur la fronti\`ere de la zone interdite du gabarit. Retenir que \textbf{$\times 100$ en amplitude $\equiv$ \SI{40}{\deci\bel} d'att\'enuation} \'evite tout recalcul.
+  \item Pour un passe-bas du premier ordre de gain statique unitaire, $|H| = 1/\sqrt{1+(\omega/\omega_0)^2}$. L'exigence $|H(\omega_2)| \leq 1/100$ s'\'ecrit :
+  \[ 1 + \left(\frac{\omega_2}{\omega_0}\right)^2 \geq 100^2 \qquad\Longrightarrow\qquad \frac{\omega_2}{\omega_0} \geq \sqrt{100^2-1} \approx 100 \]
+  \[ \omega_0 \leq \frac{\omega_2}{\sqrt{9\,999}} = \frac{5\,655}{100{,}0} \approx \SI{56,6}{\radian\per\second} \]
+  Le temps de r\'eponse \`a \SI{5}{\percent} d'un premier ordre vaut $t_{r5\%} \approx 3\tau = 3/\omega_0$, et il est d'autant \textbf{plus long} que $\omega_0$ est \textbf{plus basse} :
+  \[ t_{r5\%} \geq \frac{3}{56{,}6} \approx \SI{53}{\milli\second} \]
+
+  \smallskip
+  \textbf{Le premier ordre est donc refus\'e} : \SI{53}{\milli\second} $>$ \SI{50}{\milli\second}. Les deux exigences se contredisent. Pour att\'enuer \num{100} fois avec une pente de seulement \SI{-20}{\deci\bel\per decade}, il faut placer la coupure pr\`es de deux d\'ecades sous $\omega_2$ -- et le filtre devient alors trop lent. \emph{L'\'echec se joue \`a \SI{3}{\milli\second} pr\`es} : c'est bien un calcul qu'il faut mener, pas une intuition.
+  \item Pour un second ordre de gain statique unitaire et d'amortissement $m = 1$, le d\'enominateur se factorise en $\left(1 + j\omega/\omega_0\right)^2$, donc :
+  \[ |H(\omega)| = \frac{1}{1 + (\omega/\omega_0)^2} \]
+  L'exigence $|H(\omega_2)| \leq 1/100$ devient :
+  \[ 1 + \left(\frac{\omega_2}{\omega_0}\right)^2 \geq 100 \qquad\Longrightarrow\qquad \omega_0 \leq \frac{\omega_2}{\sqrt{99}} = \frac{5\,655}{9{,}950} \approx \SI{568}{\radian\per\second} \]
+  Soit $f_0 \leq 568/(2\pi) \approx \SI{90}{\hertz}$. Le temps de r\'eponse correspondant vaut alors :
+  \[ t_{r5\%} \approx \frac{4{,}75}{\omega_0} = \frac{4{,}75}{568} \approx \SI{8,4}{\milli\second} \;<\; \SI{50}{\milli\second} \]
+
+  \smallskip
+  \textbf{Le second ordre convient}, et avec une marge confortable (facteur 6 sur la rapidit\'e).
+  \item La comparaison des deux ordres se r\'esume ainsi :
+  \begin{center}
+  \begin{tabular}{@{}lccc@{}}
+  \toprule
+  Ordre & Pente HF & $\omega_0$ max admissible & $t_{r5\%}$ obtenu \\
+  \midrule
+  1 & \SI{-20}{\deci\bel\per decade} & \SI{56,6}{\radian\per\second} & \SI{53}{\milli\second} \;(\textbf{refus\'e}) \\
+  2 ($m=1$) & \SI{-40}{\deci\bel\per decade} & \SI{568}{\radian\per\second} & \SI{8,4}{\milli\second} \;(\textbf{accept\'e}) \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  Il faut donc mettre en place un \textbf{filtre passe-bas du second ordre}, de gain statique unitaire.
+
+  \smallskip
+  \textbf{Conclusion.} Le cahier des charges impose un compromis classique entre \textbf{s\'electivit\'e} et \textbf{rapidit\'e}, et c'est ce compromis -- et non le seul gabarit fr\'equentiel -- qui fixe l'ordre du filtre. L'att\'enuation exig\'ee (\SI{40}{\deci\bel}) et la pente disponible par ordre (\SI{20}{\deci\bel\per decade}) donnent une borne inf\'erieure sur l'ordre ; la contrainte de temps de r\'eponse, elle, interdit de descendre $\omega_0$ trop bas. Augmenter l'ordre permet de \textbf{remonter $\omega_0$ d'une d\'ecade} ($56{,}6 \to \SI{568}{\radian\per\second}$) tout en conservant l'att\'enuation, donc de diviser le temps de r\'eponse par la m\^eme d\'ecade : c'est le raisonnement attendu, et il doit \^etre conduit \textbf{num\'eriquement dans les deux hypoth\`eses} avant de conclure.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 4 -- 2026 E1, questions B7 et B8 (cascade -> forme canonique)
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 4 -- \difficulte{2} \hfill\normalfont\footnotesize 2026, admissibilit\'e \'epreuve 1 (option IE), questions B7 et B8}
+]
+\CAPETSHOW{
+Afin de r\'epondre pleinement aux exigences \'etablies \`a l'exercice 3, la structure de filtre retenue par le constructeur est constitu\'ee de \textbf{deux cellules $RC$ mises en cascade}, dont les imp\'edances sont volontairement \'echelonn\'ees d'un facteur 10 d'un \'etage \`a l'autre (figure B4). La r\'esistance d'entr\'ee de l'\'etage qui suit le filtre est consid\'er\'ee infinie.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.9, every node/.style={scale=0.9}]
+  % entree
+  \draw (0,0) to[open, v^<=$\underline{V_2}$] (0,2.4);
+  % etage 1 : R puis C
+  \draw (0,2.4) to[R, l=$R$] (2.4,2.4);
+  \draw (2.4,2.4) to[C, l_=$C$] (2.4,0);
+  \node[circ] at (2.4,2.4) {};
+  % etage 2 : 10R puis C/10
+  \draw (2.4,2.4) to[R, l=$10R$] (5.2,2.4);
+  \draw (5.2,2.4) to[C, l_=$C/10$] (5.2,0);
+  \node[circ] at (5.2,2.4) {};
+  % masse commune
+  \draw (0,0) -- (6.6,0);
+  % sortie
+  \draw (5.2,2.4) -- (6.6,2.4);
+  \draw (6.6,2.4) to[open, v^>=$\underline{V_3}$] (6.6,0);
+  % point intermediaire
+  \node[above, font=\scriptsize] at (2.4,2.55) {$\underline{V_a}$};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Exprimer $\underline{V_3}$ en fonction de $\underline{V_a}$, $R$ et $C$. Pourquoi cette relation est-elle un simple diviseur de tension, alors que ce n'est pas le cas pour le premier \'etage ?
+  \item En \'ecrivant la loi des n\oe{}uds au point $\underline{V_a}$, montrer que
+  \[ \underline{V_a}(j\omega) = \frac{10\,\underline{V_2}(j\omega) + \underline{V_3}(j\omega)}{11 + 10\,jRC\omega} \]
+  \item En d\'eduire la fonction de transfert $H_{F2}(j\omega) = \underline{V_3}/\underline{V_2}$ et la mettre sous la forme canonique
+  \[ H_{F2}(j\omega) = \frac{H_0}{1 + 2m\,\dfrac{j\omega}{\omega_{02}} + \left(\dfrac{j\omega}{\omega_{02}}\right)^2} \]
+  Exprimer $H_0$, la pulsation propre $\omega_{02}$ et le param\`etre $m$ en fonction de $R$ et $C$.
+  \item Justifier, \`a partir de la seule valeur de $m$, si la r\'eponse indicielle de ce filtre pr\'esente ou non des oscillations. Conclure sur l'int\'er\^et de l'\'echelonnement d'un facteur 10 choisi par le constructeur.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item La r\'esistance d'entr\'ee de l'\'etage aval \'etant \textbf{infinie}, aucun courant ne sort par la borne $\underline{V_3}$ : tout le courant qui traverse $10R$ traverse ensuite $C/10$. Le second \'etage est donc un \textbf{diviseur de tension} au sens strict. Avec $\underline{Z}_{C/10} = 1/(j\,(C/10)\,\omega) = 10/(jC\omega)$ :
+  \[ \underline{V_3} = \underline{V_a}\,\frac{\underline{Z}_{C/10}}{10R + \underline{Z}_{C/10}} = \underline{V_a}\,\frac{10/(jC\omega)}{10R + 10/(jC\omega)} = \frac{\underline{V_a}}{1 + jRC\omega} \]
+  \emph{Remarquer que la constante de temps du second \'etage vaut $10R\times C/10 = RC$} : elle est \textbf{identique} \`a celle du premier.
+
+  En revanche, le premier \'etage n'est \textbf{pas} un diviseur de tension : le n\oe{}ud $\underline{V_a}$ d\'ebite un courant non nul dans la branche $10R$, en plus de celui qui traverse $C$. C'est tout le probl\`eme des cellules $RC$ cascad\'ees sans \'etage s\'eparateur -- le second \'etage \textbf{charge} le premier.
+  \item Loi des n\oe{}uds en $\underline{V_a}$ : le courant entrant par $R$ \'egale la somme des courants sortant par $C$ et par $10R$ :
+  \[ \frac{\underline{V_2} - \underline{V_a}}{R} = \underline{V_a}\,jC\omega + \frac{\underline{V_a} - \underline{V_3}}{10R} \]
+  On multiplie par $10R$ :
+  \[ 10\,\underline{V_2} - 10\,\underline{V_a} = 10\,jRC\omega\,\underline{V_a} + \underline{V_a} - \underline{V_3} \]
+  \[ 10\,\underline{V_2} + \underline{V_3} = \underline{V_a}\left(10 + 1 + 10\,jRC\omega\right) \]
+  \[ \boxed{\;\underline{V_a} = \frac{10\,\underline{V_2} + \underline{V_3}}{11 + 10\,jRC\omega}\;} \]
+  \item On pose $x = jRC\omega$ pour all\'eger. La question 1 donne $\underline{V_a} = (1+x)\,\underline{V_3}$. En reportant dans le r\'esultat de la question 2 :
+  \[ (1+x)\,\underline{V_3}\,(11 + 10x) = 10\,\underline{V_2} + \underline{V_3} \]
+  \[ \underline{V_3}\left[(1+x)(11+10x) - 1\right] = 10\,\underline{V_2} \]
+  On d\'eveloppe le crochet :
+  \[ (1+x)(11+10x) - 1 = 11 + 10x + 11x + 10x^2 - 1 = 10 + 21x + 10x^2 \]
+  D'o\`u :
+  \[ H_{F2} = \frac{\underline{V_3}}{\underline{V_2}} = \frac{10}{10 + 21x + 10x^2} = \frac{1}{1 + 2{,}1\,x + x^2} = \frac{1}{1 + 2{,}1\,jRC\omega + (jRC\omega)^2} \]
+  L'identification \`a la forme canonique se fait terme \`a terme :
+  \begin{itemize}[itemsep=1pt]
+    \item terme constant : $H_0 = \boldsymbol{1}$ (gain statique unitaire -- l'exigence de l'exercice 1 est bien respect\'ee) ;
+    \item terme du second degr\'e : $(jRC\omega)^2 = (j\omega/\omega_{02})^2$, donc $\boldsymbol{\omega_{02} = \dfrac{1}{RC}}$ ;
+    \item terme du premier degr\'e : $2{,}1\,jRC\omega = 2m\,\dfrac{j\omega}{\omega_{02}} = 2m\,jRC\omega$, donc $2m = 2{,}1$, soit $\boldsymbol{m = 1{,}05}$.
+  \end{itemize}
+  \item Le param\`etre vaut $m = 1{,}05 > 1$ : le filtre est \textbf{sur-amorti} (ap\'eriodique). La r\'eponse indicielle \textbf{ne pr\'esente donc aucune oscillation} ni aucun d\'epassement.
+
+  \emph{V\'erification par une seconde voie -- les p\^oles.} Le d\'enominateur $x^2 + 2{,}1x + 1$ a pour discriminant $\Delta = 2{,}1^2 - 4 = 0{,}41 > 0$, donc deux racines \textbf{r\'eelles} et distinctes :
+  \[ x_{1,2} = \frac{-2{,}1 \pm \sqrt{0{,}41}}{2} \approx -1{,}370 \;\text{ et }\; -0{,}730 \]
+  Deux p\^oles r\'eels n\'egatifs $\Rightarrow$ la r\'eponse est une somme de deux exponentielles d\'ecroissantes, sans terme oscillant : l'argument est ind\'ependant du premier et le confirme. Aucune r\'esonance non plus, puisque celle-ci exigerait $m < 1/\sqrt{2} \approx 0{,}707$.
+
+  \smallskip
+  \textbf{Conclusion.} L'\'echelonnement d'un facteur 10 entre les deux \'etages ($10R$ et $C/10$) n'est pas un choix d\'ecoratif : il conserve la constante de temps ($10R \times C/10 = RC$) tout en divisant par 10 le courant que le second \'etage pr\'el\`eve sur le premier, ce qui \textbf{approche le comportement de deux cellules isol\'ees} sans recourir \`a un amplificateur s\'eparateur. Le r\'esultat se lit dans la valeur de $m$ :
+  \begin{center}
+  \begin{tabular}{@{}lcc@{}}
+  \toprule
+  Structure & $m$ & R\'eponse indicielle \\
+  \midrule
+  Deux cellules $RC$ \emph{identiques} en cascade directe & $1{,}5$ & ap\'eriodique, lente \\
+  Cellules $R,C$ puis $10R,C/10$ (\textbf{choix du sujet}) & $\boldsymbol{1{,}05}$ & ap\'eriodique \\
+  Deux cellules parfaitement isol\'ees (suiveur interm\'ediaire) & $1$ & critique, la plus rapide \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  Le constructeur obtient donc, avec quatre composants passifs et \textbf{aucune alimentation}, un filtre \`a \SI{5}{\percent} du r\'egime critique : il satisfait \`a la fois le gabarit fr\'equentiel (pente \SI{-40}{\deci\bel\per decade}) et l'exigence de stabilit\'e du signal de mesure de position, pour laquelle tout d\'epassement se traduirait par une position angulaire transitoirement fausse transmise au calculateur.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 5 -- docTech -- 2026 E2, questions B13, B16 et B17
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 5 -- \difficulte{3} \hfill\normalfont\footnotesize 2026, admissibilit\'e \'epreuve 2 (option IE), questions B13, B16 et B17}
+]
+\CAPETSHOW{
+La temp\'erature de fonctionnement d'une pile \`a combustible doit \^etre maintenue en permanence \textbf{entre \SI{50}{\degreeCelsius} et \SI{60}{\degreeCelsius}}. L'asservissement est \textbf{num\'erique} : la temp\'erature est mesur\'ee par un capteur, conditionn\'ee, filtr\'ee par un \textbf{filtre anti-repliement} suivi d'un \'echantillonneur-bloqueur, puis convertie par un CAN avant traitement par le correcteur num\'erique.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.9, every node/.style={scale=0.9}, font=\scriptsize]
+  \node[draw, minimum width=1.6cm, minimum height=0.75cm, align=center] (cor) at (0,0) {Correcteur\\num\'erique};
+  \node[draw, minimum width=1.0cm, minimum height=0.75cm] (cna) at (2.3,0) {CNA};
+  \node[draw, minimum width=1.9cm, minimum height=0.75cm, align=center] (sys) at (5.1,0) {Syst\`eme de\\refroidissement};
+  \node[draw, minimum width=1.2cm, minimum height=0.75cm] (cap) at (5.1,-1.9) {Capteur};
+  \node[draw, minimum width=2.0cm, minimum height=0.75cm, align=center] (ar) at (2.3,-1.9) {Filtre anti-\\repliement + E/B};
+  \node[draw, minimum width=1.0cm, minimum height=0.75cm] (can) at (-0.2,-1.9) {CAN};
+  \node[draw, circle, inner sep=1pt] (som) at (-2.1,0) {$+$};
+
+  \draw[->] (-3.1,0) -- (som.west) node[midway,above]{$N_k$};
+  \draw[->] (som.east) -- (cor.west) node[midway,above]{$\varepsilon_k$};
+  \draw[->] (cor.east) -- (cna.west) node[midway,above]{$u_k$};
+  \draw[->] (cna.east) -- (sys.west) node[midway,above]{$u_C(t)$};
+  \draw[->] (sys.east) -- (6.6,0) node[right]{$T(t)$};
+  \draw (6.2,0) -- (6.2,-1.9) -- (cap.east);
+  \node[circ] at (6.2,0) {};
+  \draw[->] (cap.west) -- (ar.east) node[midway,above]{$u_R(t)$};
+  \draw[->] (ar.west) -- (can.east);
+  \draw[->] (can.west) -- (-2.1,-1.9) -- (som.south);
+  \node[below, font=\scriptsize] at (-1.2,-1.95) {$-$};
+\end{tikzpicture}
+\end{center}
+
+Le syst\`eme de refroidissement est mod\'elis\'e par un \textbf{premier ordre} de constante de temps $\tau = \SI{0,9}{\second}$ et de gain statique $K = \SI{4}{\degreeCelsius\per\volt}$. Le capteur de temp\'erature est assimil\'e \`a un gain $K_c = \SI[group-digits=integer]{0,0316}{\volt\per\degreeCelsius}$, et l'ensemble \{amplificateur + conditionneur\} d\'elivre une tension $v_A$ directement proportionnelle \`a la temp\'erature, \'evoluant sur une \textbf{plage de \SI{3}{\volt}}, avec $v_A = c\cdot T$ et $c = \SI[group-digits=integer]{0,0316}{\volt\per\degreeCelsius}$.
+
+Le constructeur d\'esire obtenir \textbf{au moins 10 \'echantillons au cours du r\'egime transitoire}. Le CAN retenu est le \textbf{ADS7029-Q1}.
+
+\begin{tcolorbox}[docTech, title={Document technique -- CAN ADS7029-Q1 (extrait, d'apr\`es la documentation constructeur Texas Instruments)}]
+\footnotesize
+\textbf{ADS7029-Q1} --- \emph{Small-Size, Low-Power, 8-Bit, 2-MSPS, SAR ADC}. Convertisseur \`a approximations successives (SAR) \`a r\'eseau capacitif, int\'egrant son propre circuit d'\'echantillonnage-blocage. Qualifi\'e automobile AEC-Q100.
+
+\begin{center}
+\begin{tabular}{@{}lc@{}}
+\toprule
+Param\`etre & Valeur \\
+\midrule
+R\'esolution & \textbf{8 bits} \\
+D\'ebit de conversion (\emph{throughput}) & \textbf{\SI{2}{MSPS}} (max) \\
+Plage d'alimentation analogique AVDD & \SI{2,35}{\volt} \`a \SI{3,6}{\volt} \\
+Plage d'alimentation num\'erique DVDD & \SI{1,65}{\volt} \`a \SI{3,6}{\volt} \\
+Plage de conversion (pleine \'echelle) & \SI{0}{\volt} \`a AVDD \\
+Consommation \`a \SI{2}{MSPS} sous \SI{3}{\volt} & \SI{1,11}{\milli\watt} (max) \\
+Consommation \`a \SI{1}{kSPS} sous \SI{3}{\volt} & $< \SI{1}{\micro\watt}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\emph{Quantification centr\'ee.} La caract\'eristique de transfert liant le mot binaire de sortie $N_{(2)}$ \`a la tension d'entr\'ee $V_E$ est une courbe en escalier. L'erreur de quantification associ\'ee, en dents de scie, est comprise entre $-q/2$ et $+q/2$, o\`u $q$ d\'esigne le quantum du convertisseur.
+\end{tcolorbox}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Relever} dans le document technique la r\'esolution $n$ du convertisseur et son d\'ebit de conversion maximal. En d\'eduire la grandeur pleine \'echelle utilis\'ee ici, le nombre de codes disponibles et le quantum $q$.
+  \item \textbf{D\'eterminer} la dur\'ee du r\'egime transitoire du syst\`eme de refroidissement (de $t = 0$ \`a $t_{R5\%}$). \'Etablir l'in\'egalit\'e que doit respecter la p\'eriode d'\'echantillonnage $T_e$, et en d\'eduire la fr\'equence d'\'echantillonnage minimale $f_{min}$.
+  \item La p\'eriode d'\'echantillonnage finalement retenue est $T_2 = \SI{0,25}{\second}$. \textbf{D\'eterminer} le temps de conversion maximal que doit respecter le convertisseur, puis \textbf{conclure} \`a partir du document technique sur la capacit\'e du CAN \`a convertir suffisamment rapidement.
+  \item \textbf{D\'efinir} le r\^ole du filtre anti-repliement. \textbf{Rappeler} le th\'eor\`eme de Shannon. En d\'eduire l'ordre de grandeur de la fr\'equence de coupure $f_c$ de ce filtre, suppos\'e parfait.
+  \item \textbf{D\'eterminer} l'erreur de quantification maximale, en d\'eduire l'erreur de mesure sur la temp\'erature $T$, puis \textbf{conclure} vis-\`a-vis de l'exigence de maintien entre \SI{50}{\degreeCelsius} et \SI{60}{\degreeCelsius}.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\textbf{\'Etape 1 --- Extraction des donn\'ees du document technique.}
+
+\begin{center}
+\begin{tabular}{@{}lcl@{}}
+\toprule
+Donn\'ee & Valeur relev\'ee & Provenance \\
+\midrule
+R\'esolution $n$ & \SI{8}{bits} & ligne \guillemotleft~R\'esolution~\guillemotright{} du tableau \\
+D\'ebit de conversion max & \SI{2}{MSPS} & ligne \guillemotleft~throughput~\guillemotright{} (et titre) \\
+Erreur de quantification & $\pm q/2$ & note \guillemotleft~quantification centr\'ee~\guillemotright{} \\
+\'Echantillonneur-bloqueur & int\'egr\'e & texte de description (SAR) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Le CAN est un \textbf{8 bits}, il dispose donc de $2^8 = \boldsymbol{256}$ codes. La pleine \'echelle n'est pas \`a lire dans la datasheet seule : celle-ci indique une plage de conversion de \SI{0}{\volt} \`a AVDD, et c'est \textbf{l'\'enonc\'e} qui fixe la plage effectivement balay\'ee par le conditionneur, soit $\mathrm{PE} = \SI{3}{\volt}$ (compatible avec AVDD $\in [2{,}35\,;3{,}6]$~V). Le quantum vaut :
+  \[ q = \frac{\mathrm{PE}}{2^n - 1} = \frac{3}{255} \approx \SI{11,8}{\milli\volt} \]
+  \emph{Convention}. Deux conventions coexistent et les sources divergent : $q = \mathrm{PE}/(2^n-1) = \SI{11,76}{\milli\volt}$ (nombre d'\emph{intervalles} entre les 256 codes) ou $q = \mathrm{PE}/2^n = \SI{11,72}{\milli\volt}$ (nombre de \emph{codes}). L'\'ecart est de \SI{0,4}{\percent} et ne change aucune conclusion ci-dessous ; on retient ici la premi\`ere, qui redonne exactement la sensibilit\'e de cha\^ine annonc\'ee par le sujet :
+  \[ S = \frac{\Delta G_N}{\Delta T} = \frac{c}{q} = \frac{0{,}0316}{3/255} \approx \SI{2,686}{\per\degreeCelsius} \]
+  (la seconde donnerait \SI{2,697}{\per\degreeCelsius}). \textbf{Indiquer la convention retenue} fait partie de la r\'eponse.
+  \item Le syst\`eme de refroidissement \'etant du \textbf{premier ordre}, son temps de r\'eponse \`a \SI{5}{\percent} vaut :
+  \[ t_{R5\%} \approx 3\,\tau = 3\times 0{,}9 = \SI{2,7}{\second} \]
+  Obtenir \textbf{au moins 10 \'echantillons} pendant ce transitoire impose :
+  \[ \frac{t_{R5\%}}{T_e} \geq 10 \qquad\Longleftrightarrow\qquad T_e \leq \frac{t_{R5\%}}{10} = \frac{2{,}7}{10} = \SI{0,27}{\second} \]
+  \[ f_{min} = \frac{1}{T_{e,max}} = \frac{1}{0{,}27} \approx \boldsymbol{\SI{3,7}{\hertz}} \]
+  On retiendra $f_e \geq \SI{3,7}{\hertz}$. La valeur constructeur $T_2 = \SI{0,25}{\second}$ ($f_e = \SI{4}{\hertz}$) respecte bien cette contrainte, avec $2{,}7/0{,}25 = 10{,}8$ \'echantillons dans le transitoire.
+  \item Toute la conversion doit \^etre termin\'ee avant l'\'echantillon suivant :
+  \[ T_{conv} \leq T_2 = \SI{0,25}{\second} \]
+  Le document technique donne un d\'ebit de \SI{2}{MSPS}, soit un temps de conversion de :
+  \[ T_{conv,\,ADS7029} = \frac{1}{2\times 10^{6}} = \SI{0,5}{\micro\second} \]
+  \[ \frac{T_2}{T_{conv}} = \frac{0{,}25}{0{,}5\times 10^{-6}} = \boldsymbol{5\times 10^{5}} \]
+  Le CAN est donc \textbf{500\,000 fois plus rapide} que n\'ecessaire : sa capacit\'e de conversion n'est en aucun cas le facteur limitant de cette cha\^ine. Le choix de ce composant ne se justifie manifestement pas par sa vitesse, mais par sa qualification automobile (AEC-Q100) et sa tr\`es faible consommation ($< \SI{1}{\micro\watt}$ \`a \SI{1}{kSPS}, r\'egime tr\`es proche des \SI{4}{\hertz} utilis\'es ici).
+  \item \textbf{R\^ole du filtre anti-repliement.} Il est plac\'e \textbf{en amont} de l'\'echantillonneur et \'elimine toutes les composantes spectrales du signal analogique dont la fr\'equence d\'epasse $f_e/2$. Sans lui, ces composantes ne seraient pas simplement perdues : l'\'echantillonnage les \textbf{replierait} dans la bande utile sous forme de fr\'equences fantaisistes (\emph{aliasing}), indiscernables du signal utile et donc \textbf{impossibles \`a \'eliminer par traitement num\'erique ult\'erieur}. C'est la raison pour laquelle ce filtre est n\'ecessairement \textbf{analogique}.
+
+  \textbf{Th\'eor\`eme de Shannon.} Un signal dont le spectre est born\'e par la fr\'equence $f_{max}$ n'est enti\`erement reconstructible \`a partir de ses \'echantillons que si la fr\'equence d'\'echantillonnage v\'erifie :
+  \[ f_e > 2\,f_{max} \]
+  \textbf{Fr\'equence de coupure.} En inversant la condition avec $f_e = 1/T_2 = \SI{4}{\hertz}$ :
+  \[ f_c \leq \frac{f_e}{2} = \frac{4}{2} = \boldsymbol{\SI{2}{\hertz}} \]
+  Ordre de grandeur parfaitement coh\'erent avec la physique du proc\'ed\'e : la temp\'erature d'une pile \`a combustible \'evolue avec une constante de temps de \SI{0,9}{\second}, donc \`a des fr\'equences tr\`es inf\'erieures \`a \SI{2}{\hertz} ($1/(2\pi\tau) \approx \SI{0,18}{\hertz}$). Le filtre anti-repliement n'ampute donc \textbf{aucune} information utile : il ne coupe que le bruit de mesure.
+  \item L'erreur de quantification maximale vaut la moiti\'e du quantum :
+  \[ \Delta V_{max} = \frac{q}{2} = \frac{11{,}8}{2} \approx \SI{5,9}{\milli\volt} \]
+  Rapport\'ee \`a la temp\'erature via la sensibilit\'e du conditionneur $c = \SI[group-digits=integer]{0,0316}{\volt\per\degreeCelsius}$ :
+  \[ \Delta T_{max} = \frac{q/2}{c} = \frac{5{,}9\times 10^{-3}}{0{,}0316} \approx \boldsymbol{\SI{0,19}{\degreeCelsius}} \]
+  \emph{V\'erification par une seconde voie} : $\Delta T_{max} = 1/(2S) = 1/(2\times 2{,}686) = \SI{0,186}{\degreeCelsius}$. Les deux voies concordent, et la convention alternative sur $q$ donnerait \SI{0,185}{\degreeCelsius} : la conclusion est insensible \`a ce choix.
+
+  \smallskip
+  \textbf{Conclusion.} L'exigence impose de maintenir la temp\'erature dans un intervalle de \SI{10}{\degreeCelsius} de large (\SIrange{50}{60}{\degreeCelsius}), autour d'une consigne \`a \SI{55}{\degreeCelsius} : la marge disponible de part et d'autre est donc de \SI{5}{\degreeCelsius}. L'incertitude introduite par la num\'erisation, \SI{0,19}{\degreeCelsius}, en repr\'esente moins de \SI{4}{\percent} : la r\'esolution de \textbf{8 bits est donc suffisante} et ne constitue pas le maillon faible de la cha\^ine de mesure. Le candidat doit conclure ici que le budget d'erreur restant (pr\'ecision du capteur, d\'erive de l'amplificateur, erreur statique de l'asservissement) dispose de la quasi-totalit\'e des \SI{5}{\degreeCelsius} de marge -- \textbf{c'est de ces postes-l\`a, et non de la quantification, qu'il faudra se pr\'eoccuper} pour garantir l'exigence.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+% =====================================================================
+% Exercice 6 -- 2023 EDE STI 2, question 17 (+ 2024 EDE ENE 1, B12)
+% =====================================================================
+\begin{tcolorbox}[exoBox,
+  title={Exercice 6 -- \difficulte{3} \hfill\normalfont\footnotesize 2023, \'epreuve \'ecrite disciplinaire appliqu\'ee, question 17}
+]
+\CAPETSHOW{
+Les ventilateurs d'une centrale de traitement d'air sont entra\^in\'es par des machines asynchrones triphas\'ees. La variation de vitesse est r\'ealis\'ee par un modulateur d'\'energie compos\'e d'un \textbf{pont redresseur triphas\'e \`a diodes PD3}, d'un \textbf{filtre $(L,C)$} et d'un \textbf{onduleur de tension triphas\'e command\'e en MLI}. Le r\'eseau d'alimentation est le r\'eseau triphas\'e $3\times\SI{400}{\volt}$ -- \SI{50}{\hertz}.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.9, every node/.style={scale=0.9}, font=\scriptsize]
+  \node[align=center] (res) at (-0.3,0) {R\'eseau\\$3\times\SI{400}{\volt}$\\\SI{50}{\hertz}};
+  \node[draw, minimum width=1.3cm, minimum height=1.0cm, align=center] (pd3) at (1.9,0) {PD3};
+  \node[draw, minimum width=1.3cm, minimum height=1.0cm, align=center] (flc) at (4.0,0) {filtre\\$(L,C)$};
+  \node[draw, minimum width=1.5cm, minimum height=1.0cm, align=center] (ond) at (6.3,0) {onduleur\\MLI};
+  \node[draw, circle, minimum size=0.95cm] (mas) at (8.6,0) {MAS};
+  \draw[->] (0.75,0) -- (pd3.west);
+  \draw[->] (pd3.east) -- (flc.west);
+  \draw[->] (flc.east) -- (ond.west);
+  \draw[->] (ond.east) -- (mas.west) node[midway,above]{$u_m(t)$};
+  \draw[->] (mas.east) -- (9.6,0) node[right]{ventil.};
+\end{tikzpicture}
+\end{center}
+
+La MLI d\'ecoupe les tensions statoriques \`a une fr\'equence de porteuse $f_p = \SI{6}{\kilo\hertz}$, alors que le fondamental utile est \`a $f = \SI{50}{\hertz}$. Le spectre de la tension $u_m(t)$ appliqu\'ee \`a la machine pr\'esente donc, outre son fondamental \`a \SI{50}{\hertz}, des familles de raies group\'ees autour de $f_p$ et de ses multiples.
+
+\emph{Donn\'ees d'exercice} (non fournies par les sujets d'origine, pos\'ees ici pour permettre l'application num\'erique) : chaque enroulement statorique est mod\'elis\'e par une r\'esistance $R_s = \SI{1,2}{\ohm}$ en s\'erie avec une inductance cyclique $L_s = \SI{28}{\milli\henry}$.
+
+\begin{center}
+\begin{circuitikz}[european, scale=0.9, every node/.style={scale=0.9}]
+  \draw (0,0) to[open, v^<=$u_m(t)$] (0,2.2);
+  \draw (0,2.2) to[short, i=$i_s(t)$] (1.2,2.2);
+  \draw (1.2,2.2) to[R, l=$R_s$] (3.2,2.2);
+  \draw (3.2,2.2) to[cute inductor, l=$L_s$] (5.4,2.2);
+  \draw (5.4,2.2) -- (5.4,0) -- (0,0);
+  \node[font=\scriptsize, below] at (2.7,-0.1) {mod\`ele d'un enroulement statorique};
+\end{circuitikz}
+\end{center}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Montrer que, vis-\`a-vis du courant statorique $i_s$, l'enroulement se comporte comme un \textbf{filtre passe-bas du premier ordre}. Donner l'expression puis la valeur num\'erique de sa fr\'equence de coupure $f_0$.
+  \item Calculer l'att\'enuation apport\'ee par cet enroulement, en \si{\deci\bel} puis en rapport d'amplitudes, pour le fondamental \`a \SI{50}{\hertz} d'une part, et pour la famille d'harmoniques centr\'ee sur $f_p = \SI{6}{\kilo\hertz}$ d'autre part.
+  \item En d\'eduire, \textbf{sans calcul suppl\'ementaire}, l'int\'er\^et de la commande MLI des tensions de sortie de l'onduleur sur les courants absorb\'es par la machine asynchrone.
+  \item Un filtre passe-bas additionnel est-il n\'ecessaire en sortie d'onduleur pour lisser les courants statoriques ? Conclure en reliant votre r\'eponse \`a une exigence de fonctionnement de la machine.
+\end{enumerate}
+
+}{
+\textbf{Corrig\'e.}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item L'enroulement soumis \`a la tension $\underline{U_m}$ absorbe le courant $\underline{I_s}$ tel que $\underline{U_m} = (R_s + jL_s\omega)\,\underline{I_s}$. L'admittance s'\'ecrit donc :
+  \[ \frac{\underline{I_s}}{\underline{U_m}} = \frac{1}{R_s + jL_s\omega} = \frac{1/R_s}{1 + j\,\dfrac{L_s\omega}{R_s}} = \frac{1/R_s}{1 + j\,\dfrac{\omega}{\omega_0}} \qquad\text{avec}\qquad \omega_0 = \frac{R_s}{L_s} \]
+  C'est exactement la \textbf{forme canonique d'un passe-bas du premier ordre}, de gain statique $1/R_s$. Num\'eriquement :
+  \[ \omega_0 = \frac{1{,}2}{28\times 10^{-3}} \approx \SI{42,9}{\radian\per\second} \qquad f_0 = \frac{\omega_0}{2\pi} = \frac{42{,}9}{6{,}283} \approx \boldsymbol{\SI{6,8}{\hertz}} \]
+  \emph{V\'erification par une seconde voie} : $f_0 = R_s/(2\pi L_s) = 1{,}2/(2\pi\times 0{,}028) = 1{,}2/0{,}1759 = \SI{6,82}{\hertz}$. Les deux voies concordent.
+  \item L'att\'enuation relative au gain statique vaut $|H_r(\omega)| = 1/\sqrt{1+(f/f_0)^2}$.
+  \begin{center}
+  \begin{tabular}{@{}lccc@{}}
+  \toprule
+  Composante & $f/f_0$ & $|H_r|$ & $G$ (\si{\deci\bel}) \\
+  \midrule
+  Fondamental \SI{50}{\hertz} & $50/6{,}82 = 7{,}33$ & $1/\sqrt{1+53{,}7} = 0{,}135$ & $\SI{-17,4}{\deci\bel}$ \\
+  Harmoniques \SI{6}{\kilo\hertz} & $6\,000/6{,}82 = 880$ & $1/\sqrt{1+7{,}74\times 10^{5}} \approx 1{,}14\times 10^{-3}$ & $\SI{-58,9}{\deci\bel}$ \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  Le rapport entre les deux att\'enuations est ce qui importe :
+  \[ \frac{|H_r(\SI{50}{\hertz})|}{|H_r(\SI{6}{\kilo\hertz})|} = \frac{0{,}135}{1{,}14\times 10^{-3}} \approx \boldsymbol{119} \qquad\text{soit}\qquad \SI{-17,4}{\deci\bel} - (\SI{-58,9}{\deci\bel}) = \SI{41,5}{\deci\bel} \]
+  \`A tension harmonique d'amplitude comparable, le courant harmonique \`a \SI{6}{\kilo\hertz} est donc environ \textbf{120 fois plus faible} que le courant fondamental. Les deux fr\'equences \'etant toutes deux tr\`es au-dessus de $f_0$, ce rapport se retrouve d'ailleurs directement par la pente asymptotique : $f_p/f = 6\,000/50 = 120$, et \SI{-20}{\deci\bel\per decade} sur $\log_{10}(120) = 2{,}08$ d\'ecades donne bien \SI{41,6}{\deci\bel}.
+  \item La MLI d\'eplace volontairement l'\'energie parasite \textbf{tr\`es haut en fr\'equence} (autour de $f_p$ et de ses multiples), l\`a o\`u l'enroulement, filtre passe-bas naturel, l'att\'enue le plus fortement. Le r\'esultat est qu'en d\'epit d'une tension $u_m(t)$ tr\`es d\'ecoup\'ee -- form\'ee de cr\'eneaux -- le courant absorb\'e est, lui, \textbf{quasiment sinuso\"idal}.
+
+  \smallskip
+  \textit{Corrig\'e officiel (rapport de jury CAPET 2023, question 17) : \guillemotleft\ Cette technique permet d'\'eliminer les premiers harmoniques des tensions statoriques. Les enroulements du moteur se comportant comme des filtres passe-bas, les \textbf{courants statoriques appel\'es sont quasiment sinuso\"idaux} (ce qui assure une rotation r\'eguli\`ere et sans \`a-coups et limite les \'echauffements). \guillemotright}
+  \item \textbf{Non} : aucun filtre additionnel n'est n\'ecessaire en sortie d'onduleur pour lisser les courants statoriques, puisque la machine assure elle-m\^eme cette fonction avec \SI{59}{\deci\bel} d'att\'enuation \`a la fr\'equence de d\'ecoupage. C'est d'ailleurs le principe de dimensionnement de tout variateur pour machine asynchrone : on choisit $f_p$ suffisamment grande devant $R_s/(2\pi L_s)$ pour que le filtrage soit gratuit.
+
+  \smallskip
+  \textit{Point de vigilance jury (rapport de jury CAPET 2024, corrig\'e de la question B12) : \guillemotleft\ On remarque que la mise en place de la MLI g\'en\`ere des harmoniques dans les hautes fr\'equences. La solution pour les \'eliminer est d'introduire un filtre passe bas (circuit R,L par exemple). \guillemotright} Il faut bien distinguer les deux points de la cha\^ine : \textbf{c\^ot\'e moteur}, l'inductance statorique suffit ; \textbf{c\^ot\'e r\'eseau} en revanche, ou pour ma\^itriser les perturbations conduites en mode commun, un filtre passe-bas rapport\'e reste n\'ecessaire, ce que le filtre $(L,C)$ du bus continu assure d\'ej\`a en partie.
+
+  \smallskip
+  \textbf{Conclusion.} L'exigence de fonctionnement qui commande tout ce raisonnement est la \textbf{qualit\'e du couple}. Le couple d'une machine asynchrone est construit \`a partir des courants statoriques : tout harmonique de courant y produit un \textbf{couple pulsatoire} -- vibrations, bruit acoustique, fatigue m\'ecanique de l'accouplement -- ainsi que des \textbf{pertes Joule suppl\'ementaires} (en $R_sI^2$, insensibles au fait que ce courant ne produise aucun travail utile) et des pertes fer major\'ees. Avec une att\'enuation de \SI{59}{\deci\bel} \`a \SI{6}{\kilo\hertz}, les harmoniques de courant sont ramen\'es sous le millipourcent du fondamental : le crit\`ere de \guillemotleft~rotation r\'eguli\`ere et sans \`a-coups~\guillemotright{} attendu pour l'entra\^inement des ventilateurs est satisfait \textbf{par le seul choix de la fr\'equence de porteuse}, sans aucun composant de filtrage ajout\'e.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\CAPETENDFILE

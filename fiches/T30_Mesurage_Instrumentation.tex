@@ -1,0 +1,362 @@
+% Audit de veracite des citations de rapport de jury - 2026-09-20
+% Bloc 4 : citation jury 2021 restituee au verbatim exact du Rapport_Jury_2021
+% (l.775) ; la liste d'instruments de TP qui y etait accolee provenait d'un
+% paragraphe administratif distinct et ne faisait pas partie du commentaire.
+% Citation jury 2024 (<< Shannon >>) supprimee : zero occurrence de Shannon
+% dans les 8 rapports 2018-2025, aucun remplacement pertinent.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ficheHeaders{T30}{Mesure et instrumentation}{colElec}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TETE
+% -----------------------------------------------------------------------
+
+\ficheEntete{T30}{Métrologie, instrumentation, schématisation}{colElec}%
+  {électrotechnique transversal - Mesure et schémas}%
+  {\textbf{Présence :} \textbf{12/13} sujets (2013-2026) - thème \emph{majeur}}%
+  {chaîne de mesure - CAN (quantum, Shannon) - capteurs courants - schémas électriques IEC - incertitudes - oscilloscope - multimètre - wattmètre}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+% -- 1.1 Chaene de mesure ---------------------------------------------
+\textbf{1.1 Chaîne de mesure - structure et paramètres}
+
+\smallskip
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\small, node distance=8mm]
+  \node[draw, align=center, minimum width=20mm, minimum height=9mm] (capt) {Capteur};
+  \node[draw, align=center, minimum width=24mm, minimum height=9mm, right=13mm of capt] (cond) {Conditionneur};
+  \node[draw, align=center, minimum width=16mm, minimum height=9mm, right=13mm of cond] (can) {CAN};
+  \node[align=center, left=13mm of capt] (gp) {Grandeur\\physique};
+  \node[align=center, right=13mm of can] (tn) {Traitement\\numérique};
+  \draw[->] (gp) -- (capt);
+  \draw[->] (capt) -- (cond);
+  \draw[->] (cond) -- (can);
+  \draw[->] (can) -- (tn);
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lll}
+\toprule
+\textbf{Paramètre} & \textbf{Définition} & \textbf{Unité} \\
+\midrule
+Sensibilité $S$ & $\Delta\text{Sortie} / \Delta\text{Entrée}$ & [sortie]/[entrée] \\
+Pleine échelle (PE) & Étendue maximale de mesure & [entrée] \\
+Résolution & Plus petite variation détectable & [entrée] \\
+Précision & Écart maximal valeur mesurée / valeur vraie & [entrée] \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textit{Exemple (2026 B11) :} sensibilité de la chaîne température = $2{,}684\,\mathrm{^\circ C^{-1}}$.
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.2 Convertisseur Analogique-Numerique ---------------------------
+\textbf{1.2 Convertisseur Analogique/Numérique (CAN)}
+
+\[
+  q = \frac{U_{PE}}{2^n - 1} \approx \frac{U_{PE}}{2^n}
+  \qquad \text{(quantum)}
+  \qquad
+  N = \text{round}\!\left(\frac{U \cdot 2^n}{U_{PE}}\right)
+  \quad \text{(mot numérique)}
+\]
+
+\textbf{Erreur de quantification maximale :} $\pm q/2$
+
+\textbf{Théorème de Shannon-Nyquist :}
+\[
+  f_e \geq 2\,f_{max}
+\]
+
+\textbf{Filtre anti-repliement :} doit couper toutes les fréquences $f > f_e/2$ \textbf{avant} l'échantillonnage.
+
+\textbf{Échantillonneur-bloqueur (E/B) d'ordre zéro :} maintient la valeur échantillonnée constante pendant $T_e = 1/f_e$.
+
+\textit{Source (2026 B13-B17) :} $T_e \leq t_{R5\%}/10$ (10 échantillons dans le régime transitoire).
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.3 Capteurs courants --------------------------------------------
+\textbf{1.3 Capteurs courants en ingénierie électrique}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{llll}
+\toprule
+\textbf{Capteur} & \textbf{Grandeur} & \textbf{Principe} & \textbf{Précision typ.} \\
+\midrule
+Thermocouple J & $-40^\circ\mathrm{C}$ à $750^\circ\mathrm{C}$ & Seebeck & $\pm 2{,}5^\circ\mathrm{C}$ \\
+Thermocouple T & $-200^\circ\mathrm{C}$ à $350^\circ\mathrm{C}$ & Seebeck & $\pm 1^\circ\mathrm{C}$ \\
+Pt100 / Pt1000 & Température & Résistance & $\pm 0{,}3^\circ\mathrm{C}$ \\
+Codeur incrémental & Position / vitesse & Optique & $0{,}15$ mm/imp. \\
+Codeur absolu & Position absolue & Gray & - \\
+Capteur pression & Pression & Piézorésistif & - \\
+Débitmètre EM & Débit & Faraday & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.4 Schemas electriques - normes IEC -----------------------------
+\textbf{1.4 Schémas électriques - normes IEC 61082 / CEI 60617}
+
+\begin{itemize}
+  \item \textbf{Convention :} alimentation + en haut, commun (neutre/0 V) en bas ; lecture gauche → droite
+  \item \textbf{État de repos :} contacts NO et NF représentés \textbf{hors tension, hors commande}
+  \item \textbf{Schéma unifilaire :} une ligne = tous les conducteurs d'un circuit triphasé
+  \item \textbf{Schéma développé :} chaque conducteur séparé ; utilisé pour la commande 24 V DC
+  \item \textbf{Schéma de commande :} logique de contacts + bobines (contacteurs, relais)
+\end{itemize}
+
+\medskip\hrule\vspace{4pt}
+
+% -- 1.5 Instruments de mesure -----------------------------------------
+\textbf{1.5 Instruments de mesure}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lll}
+\toprule
+\textbf{Instrument} & \textbf{Branchement} & \textbf{Mesure} \\
+\midrule
+Voltmètre & Parallèle ($R_{int}$ élevée) & Tension \\
+Ampèremètre & Série ($R_{int}$ faible) & Courant \\
+Ohmmètre & Circuit \textbf{hors tension} & Résistance \\
+Oscilloscope & Parallèle & $u(t)$, $f$, $\varphi$, forme d'onde \\
+Pince ampèremétrique & Sans coupure & Courant \\
+Wattmètre / analyseur & - & $P$ [W], $Q$ [VAR], $S$ [VA], $\cos\varphi$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Déphasage à l'oscilloscope :} $\varphi = 360^\circ \times \Delta t / T$
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE SYNTHETIQUE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthétique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{5.2cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{CAN}} \\
+$q = U_{PE}/2^n$ & Quantum & V \\
+$\varepsilon_{quant} = \pm q/2$ & Erreur max & V \\
+$N = \text{round}(U \cdot 2^n / U_{PE})$ & Mot numérique & - \\
+$f_e \geq 2\,f_{max}$ & Shannon & Hz \\
+$T_e \leq t_{R5\%}/10$ & Période d'éch. & s \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{5.2cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Métrologie}} \\
+$S = \Delta G_{out}/\Delta G_{in}$ & Sensibilité & - \\
+$u_B = a/\sqrt{3}$ & Incertitude B & - \\
+$U = k\,u_c$, $k=2$ ($95\,\%$) & Incertitude élargie & - \\
+\multicolumn{3}{@{}l}{\footnotesize\textit{Oscilloscope}} \\
+$f = 1/T$ & Fréquence & Hz \\
+$\varphi = 360^\circ \cdot \Delta t/T$ & Déphasage & $^\circ$ \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - extraites des sujets réels},
+]
+
+% -- QT1 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Sensibilité de la chaîne de mesure et mot numérique \hfill\normalfont\footnotesize E2 2026 (B11)}
+]
+\textbf{Énoncé.}
+La chaîne de mesure de température d'une pile à combustible comporte un capteur, un ensemble \{amplificateur + conditionneur\} délivrant $v_A = c \cdot T$ avec $c = 0{,}0316\,\mathrm{V\,^{\circ}C^{-1}}$ (plage de \SI{3}{\volt} pour la plage de mesure $-5$ à $90^\circ\mathrm{C}$), et un CAN 8 bits (ADS7029-Q1) de pleine échelle $U_{PE} = \SI{3}{\volt}$. Montrer que la sensibilité de la chaîne est $S = 2{,}684\,\mathrm{^{\circ}C^{-1}}$. En déduire le mot numérique $N_C$ correspondant à $T_C = 55^\circ\mathrm{C}$ (binaire et hexadécimal).
+
+\tcbline
+
+\textbf{Corrigé.} \textit{[corrigé reconstitué]}
+
+\textbf{Étape 1 — Quantum du CAN.} $q = U_{PE} / (2^{8} - 1) = 3/255 \approx \SI{11{,}76}{\milli\volt}$.
+
+\textbf{Étape 2 — Sensibilité.} $S = \dfrac{c}{q} = \dfrac{3/95}{3/255} = \dfrac{255}{95} \approx 2{,}684\,\mathrm{^{\circ}C^{-1}}$ \checkmark \quad (avec la valeur exacte $c = 3/95\,\mathrm{V\,^{\circ}C^{-1}}$, soit \SI{3}{\volt} pour $95^\circ\mathrm{C}$)
+
+\textbf{Étape 3 — Mot numérique pour $T_C = 55^\circ\mathrm{C}$.}
+\[
+  N_C = \text{round}(S \times T_C) = \text{round}(2{,}684 \times 55) = \text{round}(147{,}6) = 148_{10}
+\]
+$148_{10} = 1001\,0100_2 = \text{0x94}$
+
+\textbf{Conclusion.} Le codage obtenu $N_C = 148$ (0x94) est directement exploitable par l'automate de contrôle-commande de la pile : il reste dans la plage 8 bits (0 à 255), conforme au cahier des charges de conversion numérique.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT2 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Shannon et filtre anti-repliement \hfill\normalfont\footnotesize E2 2026 (B13-B17)}
+]
+\textbf{Énoncé.}
+Le régime transitoire de l'asservissement de température dure $t_{R5\%} = \SI{3{,}6}{\second}$. Le cahier des charges exige 10 échantillons dans ce régime. Déterminer $T_e$ max, $f_e$ min, puis la fréquence de coupure $f_c$ du filtre anti-repliement.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Période et fréquence d'échantillonnage.} $T_e \leq t_{R5\%}/10 = 3{,}6/10 = \SI{0{,}36}{\second}$ - $f_e \geq 1/T_e = \SI{2{,}78}{\hertz}$.
+
+\textbf{Étape 2 — Fréquence de coupure du filtre.} $f_c \leq f_e/2 = \SI{1{,}39}{\hertz}$ (théorème de Shannon).
+
+\textbf{Conclusion.} Le filtre anti-repliement réglé à $f_c \approx 1{,}39\,\mathrm{Hz}$ élimine les composantes fréquentielles au-delà de $f_e/2$ avant échantillonnage : ce réglage, combiné à $f_e \geq 2{,}78\,\mathrm{Hz}$, garantit une numérisation sans repliement spectral conforme au cahier des charges.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+% -- QT3 -------------------------------------------------------------
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Choix d'un capteur de température \hfill\normalfont\footnotesize E2 disciplinaire 2024 (D1)}
+]
+\textbf{Énoncé.}
+Pour une mesure de $-20^\circ\mathrm{C}$ à $40^\circ\mathrm{C}$ dans une installation frigorifique, choisir entre un thermocouple J ($-40^\circ\mathrm{C}$ à $750^\circ\mathrm{C}$, $\pm 2{,}5^\circ\mathrm{C}$) et un thermocouple T ($-200^\circ\mathrm{C}$ à $350^\circ\mathrm{C}$, $\pm 1^\circ\mathrm{C}$). Justifier.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 — Comparaison des deux capteurs.} Les deux sont adaptés à la plage de mesure. Le thermocouple \textbf{T} présente une précision meilleure ($\pm 1^\circ\mathrm{C}$ vs $\pm 2{,}5^\circ\mathrm{C}$) et convient mieux aux basses températures (jusqu'à $-200^\circ\mathrm{C}$).
+
+\textbf{Étape 2 — Confrontation au cahier des charges.} Si une erreur max $< 2^\circ\mathrm{C}$ est exigée, seul le type T la respecte.
+
+\textbf{Conclusion.} Le thermocouple T est le choix conforme au cahier des charges (plage et précision) ; le jury attend explicitement cette justification comparative appuyée sur les données constructeur, pas seulement l'énoncé du résultat.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs récurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+
+  \item \textbf{Schéma électrique : point noir majeur depuis 2018.} "La majorité des candidats ne semble pas maîtriser la conception d'un schéma électrique." Moyenne 4,8/20 en 2021. Maîtriser \textbf{schéma de puissance} + \textbf{schéma de commande} séparément.
+
+  \item \textbf{Voltmètre en parallèle, ampèremètre en série.} L'inversion détruit l'appareil ou fausse la mesure. Un ampèremètre en parallèle court-circuite la branche.
+
+  \item \textbf{Shannon : $f_e > 2\,f_{max}$, strictement.} $f_e = 2\,f_{max}$ est la limite théorique, non atteignable en pratique. Dans un calcul CAPET, écrire $f_e \geq 2\,f_{max}$ et commenter.
+
+  \item \textbf{Erreur de quantification $\neq$ précision totale.} La quantification est une source d'erreur parmi d'autres (non-linéarité, bruit, dérive thermique). Ne pas confondre résolution ($n$ bits) et précision totale.
+
+  \item \textbf{Thermocouple : compensation de soudure froide.} La f.é.m. Seebeck est très faible (quelques mV). L'amplificateur d'instrumentation et la compensation de la soudure de référence sont indispensables.
+
+  \item \textbf{Symboles IEC 60617} à utiliser (pas les symboles ANSI américains). Vérifier notamment les représentations des contacteurs, disjoncteurs et fusibles.
+
+\end{enumerate}
+
+\medskip
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+Rapport jury 2021 : «~Le jury s'interroge sur la faiblesse générale des candidats dans la réalisation de schémas électriques et conseille de consolider cet aspect en se familiarisant avec la documentation technique.~»
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  PIED - PRESENCE DANS LES SUJETS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colPresence,
+  title={Présence dans les sujets analysés (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Année} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+Schéma électrique   & - & - & $\checkmark$ & - & - & $\checkmark$ & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & - & - & - \\
+Chaîne mesure / CAN & - & - & - & - & - & - & $\checkmark$ & - & $\checkmark$ & - & - & $\checkmark$ & $\checkmark$ \\
+Capteurs / choix    & - & - & - & $\checkmark$ & - & - & - & - & - & - & $\checkmark$ & $\checkmark$ & - \\
+Oscilloscope / mesure & - & $\checkmark$ & - & - & $\checkmark$ & - & - & - & - & - & $\checkmark$ & - & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-thèmes fréquents :}
+schéma électrique puissance + commande (variateur) - chaîne de mesure + CAN (quantum, Shannon) - choix de capteur (thermocouple J vs T, codeur) - mesure à l'oscilloscope ($f$, $\varphi$, $T$) - filtre anti-repliement
+
+\medskip
+\textbf{Ordres de grandeur (repères rapides).}
+\begin{itemize}[leftmargin=1.3em]
+  \item Réseau BT FR : tension phase-neutre typique \SI{230}{\volt}, tension phase-phase typique \SI{400}{\volt}, fréquence \SI{50}{\hertz}.
+  \item Courants d'étude fréquents en sujet : de quelques \si{\ampere} à quelques dizaines de \si{\ampere}.
+  \item En conversion d'énergie, un rendement attendu reste généralement entre 0{,}8 et 0{,}98 selon la technologie.
+\end{itemize}
+
+\medskip
+\textbf{Synthèse express (à refaire sans support).}
+\begin{enumerate}[leftmargin=1.4em]
+  \item Poser les hypothèses du modèle et les conventions de signe.
+  \item Écrire 2 à 4 relations clés avec unités.
+  \item Réaliser un calcul numérique complet et vérifier l'ordre de grandeur.
+  \item Justifier le résultat par un argument technique de niveau CAPET.
+\end{enumerate}
+
+\end{tcolorbox}
+
+\CAPETENDFILE
