@@ -8,46 +8,95 @@ const JOUR_MS_VUE = 86400000;
 
 export function vueReviser(racine, data) {
   const progression = charger();
-  const file = fileDuJour(data.cards, progression, Date.now(), TAILLE_FILE);
 
-  if (file.length === 0) {
-    racine.innerHTML = `<div class="carte">
-      <p class="vedette">Rien à réviser pour l'instant.</p>
-      <p class="consigne">Toutes les cartes échues ont été vues. Revenez demain.</p>
-    </div>`;
-    return;
+  // État des filtres de révision
+  let themeSelectionne = null;
+  let melangerActif = false;
+
+  function construireFiltre() {
+    // Filtrer les cartes par thème si sélectionné
+    let cartesFiltrées = data.cards;
+    if (themeSelectionne) {
+      cartesFiltrées = data.cards.filter(c => c.theme === themeSelectionne);
+    }
+
+    // Générer la file du jour
+    let file = fileDuJour(cartesFiltrées, progression, Date.now(), TAILLE_FILE);
+
+    // Mélanger si demandé
+    if (melangerActif && file.length > 0) {
+      file = file.sort(() => Math.random() - 0.5);
+    }
+
+    return file;
   }
 
-  let i = 0;
-  let notees = 0;
-  const total = file.length;          // figé : les reprises ne le gonflent pas
-  const reprises = new Set();         // cartes ratées, rejouées en fin de file
+  function afficherFiltres() {
+    const themes = data.themes.map(t => t.code);
+    const boutonsTheme = themes
+      .map(t => `<button class="filtre-theme ${themeSelectionne === t ? 'actif' : ''}" data-theme="${t}">${t}</button>`)
+      .join('');
 
-  function afficher() {
-    if (i >= file.length) {
-      racine.innerHTML = `<div class="carte">
-        <p class="vedette">Session terminée</p>
-        <p class="consigne">${notees} carte(s) révisée(s).</p>
+    return `<div class="filtres-revision">
+      <div class="groupe-filtres">
+        <label>Thème :</label>
+        <div class="boutons-themes">
+          <button class="filtre-theme ${themeSelectionne === null ? 'actif' : ''}" data-theme="">Tous</button>
+          ${boutonsTheme}
+        </div>
+      </div>
+      <div class="groupe-options">
+        <label>
+          <input type="checkbox" id="melanger" ${melangerActif ? 'checked' : ''}>
+          Mélanger les cartes
+        </label>
+      </div>
+    </div>`;
+  }
+
+  function afficherEcranRevision() {
+    const file = construireFiltre();
+
+    if (file.length === 0) {
+      racine.innerHTML = afficherFiltres() + `<div class="carte">
+        <p class="vedette">Rien à réviser pour l'instant.</p>
+        <p class="consigne">Toutes les cartes échues ont été vues. Revenez demain.</p>
       </div>`;
+      attacherEcouteurs();
       return;
     }
-    const c = file[i];
-    const restantes = Math.max(0, file.length - i);
-    const rang = Math.min(i + 1, total);
-    const pourcent = Math.round((Math.min(i, total) / total) * 100);
 
-    racine.innerHTML = `
-      <div class="jauge" role="progressbar" aria-label="Avancement de la session"
-           aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${Math.min(i, total)}">
-        <i style="width:${pourcent}%"></i>
-      </div>
-      <p class="progression-file">
-        <span>${rang} / ${total}</span>
-        ${restantes > total - i ? '<span class="reprise">reprise</span>' : ""}
-      </p>
-      <div class="carte zone-swipe" id="zone-carte">${rendreRecto(c, data)}</div>
-      <div id="verso" hidden></div>
-      <div id="commandes"><button class="revelateur" id="reveler">Révéler</button></div>`;
+    let i = 0;
+    let notees = 0;
+    const total = file.length;          // figé : les reprises ne le gonflent pas
+    const reprises = new Set();         // cartes ratées, rejouées en fin de file
+
+    function afficher() {
+      if (i >= file.length) {
+        racine.innerHTML = afficherFiltres() + `<div class="carte">
+          <p class="vedette">Session terminée</p>
+          <p class="consigne">${notees} carte(s) révisée(s).</p>
+        </div>`;
+        attacherEcouteurs();
+        return;
+      }
+      const c = file[i];
+      const restantes = Math.max(0, file.length - i);
+      const rang = Math.min(i + 1, total);
+      const pourcent = Math.round((Math.min(i, total) / total) * 100);
+
+      racine.innerHTML = afficherFiltres() + `
+        <div class="jauge" role="progressbar" aria-label="Avancement de la session"
+             aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${Math.min(i, total)}">
+          <i style="width:${pourcent}%"></i>
+        </div>
+        <p class="progression-file">
+          <span>${rang} / ${total}</span>
+          ${restantes > total - i ? '<span class="reprise">reprise</span>' : ""}
+        </p>
+        <div class="carte zone-swipe" id="zone-carte">${rendreRecto(c, data)}</div>
+        <div id="verso" hidden></div>
+        <div id="commandes"><button class="revelateur" id="reveler">Révéler</button></div>`;
 
     document.getElementById("reveler").onclick = () => {
       const v = document.getElementById("verso");
@@ -122,10 +171,32 @@ export function vueReviser(racine, data) {
       });
 
       activerBalayage(document.getElementById("zone-carte"), appliquerNote);
+      attacherEcouteurs();
     };
+
+    afficher();
   }
 
-  afficher();
+  function attacherEcouteurs() {
+    // Filtres thème
+    document.querySelectorAll(".filtre-theme").forEach(btn => {
+      btn.addEventListener("click", () => {
+        themeSelectionne = btn.dataset.theme || null;
+        afficherEcranRevision();
+      });
+    });
+
+    // Checkbox mélange
+    const checkboxMelange = document.getElementById("melanger");
+    if (checkboxMelange) {
+      checkboxMelange.addEventListener("change", () => {
+        melangerActif = checkboxMelange.checked;
+        afficherEcranRevision();
+      });
+    }
+  }
+
+  afficherEcranRevision();
 }
 
 /* ─── Balayage ──────────────────────────────────────────────────────────

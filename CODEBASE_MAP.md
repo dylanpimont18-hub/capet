@@ -598,8 +598,12 @@ Rendu HTML des cartes, recto et verso, avec rendu KaTeX inline.
 - rendreRecto(c) / rendreVerso(c) — selon type (formule/piège/schema) et niveau
 
 ## app/js/views/reviser.js
-Écran de révision : file du jour, révélation, auto-notation.
+Écran de révision : file du jour, révélation, auto-notation. Filtrage par thème et mélange optionnel.
 - vueReviser(racine, data) — monte l'écran
+- themeSelectionne, melangerActif — état des filtres (nul = tous les thèmes, false = sans mélange)
+- afficherFiltres() — panneau de filtres avec boutons thèmes et checkbox mélange
+- construireFiltre() — applique le filtre par thème et le mélange optionnel à la file du jour
+- attacherEcouteurs() — attache les clics des boutons filtre et le changement de checkbox
 
 ## app/js/views/priorites.js
 Écran de priorisation fréquence × maîtrise.
@@ -635,6 +639,7 @@ Feuille de style unique de l'app. Direction Minimalism & Swiss Style, sombre par
 - échelle d'espacement `--e1`..`--e7` (rythme 4/8), deux durées de transition, une courbe
 - `.jauge`, `.zone-swipe`, `.indice-swipe` — progression de session et geste de balayage
 - `.sr-only` — visible des lecteurs d'écran, invisible à l'œil
+- `.filtres-revision`, `.filtre-theme`, `.groupe-options` — panneau de filtres thème et mélange (ajout 2026-09-23)
 
 ## tests/test_contraste.py
 Non-régression des contrastes WCAG de la feuille de style.
