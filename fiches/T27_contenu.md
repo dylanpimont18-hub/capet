@@ -96,6 +96,14 @@ $$K_{PV} = 10^{G_{dB}/20}$$
 
 *Exemple (corrigé 2023) :* Pour $M_\varphi = 45°$, $\omega_B = 7\,000$ rad·s$^{-1}$, gain à $\omega_B$ = $-59{,}4$ dB → $K_{PV} = 10^{59,4/20} = 933$.
 
+### 1.9 Robustesse
+
+*(complément du référentiel, 2026-11-10 — notion hors sujets 2013–2026 sauf mention)*
+
+**Perte de marge de phase due à un retard pur :**
+$$\Delta \varphi = \omega_{0dB} \, \tau$$
+- Valable avec Δφ en radians, ω_0dB étant la pulsation de coupure à 0 dB de la boucle ouverte
+
 ---
 
 ## 2. QUESTIONS TYPES
@@ -151,6 +159,8 @@ D'après les rapports de jury 2023, 2024, 2025 :
 - **Relation de récurrence** : erreur fréquente dans les approximations de la dérivée : $\dot{g}(kT_e) \approx (g_k - g_{k-1})/T_e$, pas $(g_{k+1} - g_k)/T_e$.
 - **Confusion BO / BF** : le diagramme de Bode tracé est celui de la **boucle ouverte** ; la stabilité de la boucle fermée s'en déduit.
 - **Cahier des charges** : toujours vérifier **toutes** les exigences (erreur, dépassement ET marge de phase).
+- **Gain limite pour une marge de phase imposée** : proposer une valeur de $K_C$ au hasard au lieu de la lire sur le Bode de la FTBO. On repère la pulsation où la phase vaut $-180° + M_\varphi$ visée ($-135°$ pour 45°), on y lit le gain $G$ en dB, puis $K_{C,lim} = 10^{-G/20}$ : un gain de $-30$ dB donne $K_{C,lim} \approx 31{,}6$. Source : rapport du jury 2026 du troisième concours (même sujet que l'E1 externe 2026), question C7 = question C6 du sujet externe.
+- **Réglage sans marge** : régler un correcteur exactement à la limite de stabilité. Sans marge, la moindre dérive de gain ou un retard non modélisé rend la boucle instable ; on vise couramment 45° de marge de phase et 6 à 10 dB de marge de gain.
 
 ---
 

@@ -19,6 +19,14 @@
 | Ondulation tension PD6 : $\delta U / \bar{U} = 4{,}2\ \%$ | Taux d'ondulation résiduelle (diodes) | Courant | P3 : $18{,}3\ \%$ ; PD2 : $48{,}2\ \%$ |
 | Redresseur commandé (thyristors) : $\bar{U}_\alpha = \bar{U}_0 \cos\alpha$ | Tension moyenne en fonction de l'angle d'amorçage $\alpha$ | Courant | Formule pour pont de Graëtz commandé |
 
+### 1.1 Lissage par condensateur
+
+*(complément du référentiel, 2026-11-10 — notion hors sujets 2013–2026 sauf mention)*
+
+**Ondulation de tension avec un condensateur de lissage :**
+$$\Delta u \approx \frac{I}{f_{ond} \, C}$$
+- Valable si l'ondulation reste faible devant la tension moyenne
+
 ---
 
 ## 2. QUESTIONS TYPES
@@ -131,6 +139,12 @@ $$f_{P,PD6} = \frac{\sqrt{6}}{\pi} \cdot \sin\!\left(\frac{\pi}{6}\right) = \fra
 5. **Angle d'amorçage $\alpha$ des thyristors** : ne pas confondre $\alpha$ rapport cyclique (hacheur) et $\alpha$ angle d'amorçage (thyristor/redresseur commandé). Dans les sujets récents, les redresseurs à diodes sont privilégiés mais les thyristors peuvent apparaître (2022 frein à courant de Foucault).
 
 6. **Courant efficace de la diode** : dans un P3, $I_{D,eff} = I_S/\sqrt{3}$ (chaque diode conduit $1/3$ de la période). Dans un PD6, $I_{D,eff} = I_{DC}/\sqrt{3}$ (chaque diode conduit $1/3$ également). Ne pas confondre avec la valeur moyenne.
+
+7. **Choisir une diode : chaque critère avec la bonne valeur** : comparer une valeur efficace à une valeur maximale, ou l'inverse, conduit à éliminer la mauvaise diode. La tension inverse se compare à la tension inverse crête et le courant au courant de la diode (ici efficace, $I_S/\sqrt{3}$), chacun majoré du coefficient de sécurité : $630 \times 1{,}5 = 945$ V et $5{,}77 \times 1{,}5 = 8{,}7$ A dans le sujet 2026. Source : rapport du jury 2026 du troisième concours (même sujet que l'E1 externe 2026), question E7, sans équivalent dans le sujet externe.
+
+8. **Puissance apparente d'un secondaire qui alimente un redresseur** : prendre $S = P$, ou une formule en $\cos\varphi$, alors que les courants ne sont pas sinusoïdaux. Au secondaire triphasé, $S = 3\,V_{eff}\,I_{D,eff}$ ; la puissance active est celle de la charge, $P = \langle u_S \rangle\, I_S$ ; pour le P3, $f_P = P/S = 3/(\pi\sqrt{2}) \approx 0{,}68$. Source : rapport du jury 2026 du troisième concours (même sujet que l'E1 externe 2026), question E8 et E9 = question E7 et E8 du sujet externe.
+
+9. **Fréquence d'ondulation** : prendre la fréquence du réseau pour dimensionner un condensateur de lissage. La fréquence de l'ondulation vaut 2f pour un PD2 et 6f pour un PD6 ; avec 50 Hz au lieu de 100 Hz, on double inutilement la capacité.
 
 ---
 

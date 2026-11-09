@@ -1,0 +1,348 @@
+% T31 - Télécommunications et RF - créée le 2026-11-10 (audit de couverture du référentiel).
+% Thème du référentiel quasi absent des sujets 2013-2026 : présence = MENTIONS
+% (fibre optique : E1 2014, E2 2018, E2 appl. 2024 et 2025 ; codage NRZ : E1 2026).
+% Une seule question réelle exploitable : E1 2014 Q38 (corrigé officiel E1_Corrige_2014).
+% QT2 et QT3 sont des exercices INÉDITS, marqués comme tels.
+% Bloc 4 : aucun commentaire de jury sur ces notions dans les rapports 2018-2026
+% (recherche fibre/antenne/ligne/modulation/dBm le 2026-11-10) : pas d'encadré de citation.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ficheHeaders{T31}{Télécoms et RF}{colElec}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TETE
+% -----------------------------------------------------------------------
+
+\ficheEntete{T31}{Télécommunications et RF - Transmission, lignes, antennes}{colElec}%
+  {électronique - Télécommunications et radiofréquences}%
+  {\textbf{Présence :} \textbf{4/13} sujets (2013-2026) - thème \emph{rare}, au programme}%
+  {bande de base NRZ/Manchester - modulations ASK/FSK/PSK/QAM - multiplexage - PLL - lignes et adaptation - fibre optique - antennes et bilan de liaison - exposition aux champs - instrumentation RF}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={1. Rappels de cours},
+]
+
+\textbf{1.1 Bande de base et modulations numériques}
+
+\smallskip
+En \textbf{bande de base}, les bits sont émis directement sous forme de niveaux. Un \textbf{symbole} de durée $T_s$ porte $\log_2 M$ bits ($M$ états) : la rapidité de modulation $R = 1/T_s$ s'exprime en \textbf{bauds}, le débit $D = R\log_2 M$ en bit/s (voir T25). Sur un canal idéal de bande $B$, on ne peut pas dépasser $R_{max} = 2B$ (critère de Nyquist).
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Code} & \textbf{Principe} & \textbf{Fondamental maximal} \\
+\midrule
+NRZ & niveau haut = 1, niveau bas = 0 & $D/2$ (suite 0101) ; pas d'horloge transmise \\
+Manchester & transition au milieu de chaque bit & $D$ ; horloge récupérable, bande doublée \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Pour transmettre sur un canal passe-bande, on module une porteuse :
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Modulation} & \textbf{Grandeur modulée} & \textbf{États} & \textbf{Usage} \\
+\midrule
+ASK / OOK & amplitude & 2 & télécommandes, RFID \\
+FSK & fréquence & 2 ou 4 & LoRa en mode FSK, modems (T25) \\
+BPSK / QPSK & phase & 2 / 4 & satellites, Wi-Fi (bas débit) \\
+QAM-16, 64\ldots & amplitude et phase & 16, 64\ldots & Wi-Fi, 4G/5G, TNT \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}[scale=1.0, font=\small]
+  \draw[->, thick] (-1.8,0) -- (1.9,0) node[right] {$I$};
+  \draw[->, thick] (0,-1.8) -- (0,1.9) node[above] {$Q$};
+  \draw[colElec!50, dashed] (0,0) circle (1.2);
+  \foreach \x/\y/\b in {0.85/0.85/00, -0.85/0.85/01, -0.85/-0.85/11, 0.85/-0.85/10} {
+    \fill[colElec] (\x,\y) circle (2.2pt);
+    \node[colElec!70!black] at (1.45*\x,1.45*\y) {\footnotesize\b};
+  }
+  \node[align=left, font=\footnotesize] at (3.6,0.9) {QPSK : 4 phases\\$\log_2 4 = 2$ bits/symbole};
+  \node[align=left, font=\footnotesize] at (3.6,-0.6) {codage de Gray :\\voisins = 1 bit d'écart};
+\end{tikzpicture}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+\textbf{1.2 Multiplexage et synthèse de fréquence}
+
+\smallskip
+\textbf{Multiplexage fréquentiel (FDM)} : $N$ voies de bande $B$ séparées par des bandes de garde $B_g$ occupent $B_{tot} = N B + (N-1) B_g$. Le multiplexage temporel (TDM) partage au contraire le temps (trames, intervalles).
+
+\textbf{Boucle à verrouillage de phase (PLL)} : un comparateur de phase asservit un oscillateur commandé en tension (VCO) pour que $f_{out}/N = f_{ref}/R$. On obtient $f_{out} = \frac{N}{R}f_{ref}$, réglable par pas de $f_{ref}/R$, avec la stabilité du \textbf{quartz} de référence (dérive en ppm : $\Delta f = f_0\,\delta\cdot 10^{-6}$).
+
+\medskip\hrule\vspace{4pt}
+
+\textbf{1.3 Propagation guidée : lignes et fibres optiques}
+
+\smallskip
+Une liaison est une \textbf{ligne} dès que sa longueur dépasse environ $\lambda/10$ : il faut alors tenir compte de la propagation. Une onde s'y propage à $v = c/\sqrt{\varepsilon_r}$ (environ $2\cdot 10^8$\,m/s dans un coaxial) et la ligne présente une impédance caractéristique $Z_c = \sqrt{L'/C'}$ (50\,$\Omega$ en RF, 75\,$\Omega$ en vidéo).
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Grandeur} & \textbf{Expression} & \textbf{Adaptation parfaite} \\
+\midrule
+Coefficient de réflexion & $\Gamma = \dfrac{Z_L - Z_c}{Z_L + Z_c}$ & $\Gamma = 0$ \\
+Rapport d'ondes stationnaires & $\mathrm{ROS} = \dfrac{1+|\Gamma|}{1-|\Gamma|}$ & $\mathrm{ROS} = 1$ \\
+Affaiblissement de réflexion & $\mathrm{RL} = -20\log|\Gamma|$ & $\mathrm{RL} \to \infty$ \\
+Puissance réfléchie & $P_r = |\Gamma|^2 P_i$ & $P_r = 0$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Fibre optique} : la lumière est guidée par réflexion totale dans le c\oe ur d'indice $n_1 > n_2$ (gaine). Ouverture numérique $\mathrm{ON} = \sin\theta_{max} = \sqrt{n_1^2 - n_2^2}$ ; vitesse $v = c/n_1$ (environ $2\cdot10^8$\,m/s pour $n_1 \approx 1{,}5$). Fibre \textbf{multimode} : courtes distances, dispersion modale ; \textbf{monomode} : longues distances, hauts débits. Atténuation typique : 0{,}2 à 3\,dB/km. Insensible aux perturbations électromagnétiques et isolante.
+
+\medskip\hrule\vspace{4pt}
+
+\textbf{1.4 Antennes, bilan de liaison, exposition, instrumentation RF}
+
+\smallskip
+Longueur d'onde $\lambda = c/f$. Dipôle demi-onde : $L \approx \lambda/2$, gain $2{,}15$\,dBi, impédance $\approx 73\,\Omega$ ; monopole quart d'onde sur plan de masse : $L \approx \lambda/4$. Une antenne se choisit par sa bande, son gain, son diagramme de rayonnement, sa polarisation et son impédance (adaptée à la ligne, ROS faible).
+
+\textbf{Bilan de liaison} en champ lointain (formule de Friis) : $P_r = P_e G_e G_r\left(\frac{\lambda}{4\pi d}\right)^2$, soit en décibels $P_r = P_e + G_e + G_r - A_{EL}$ avec $A_{EL} = 20\log\frac{4\pi d}{\lambda}$. La liaison fonctionne si $P_r$ dépasse la sensibilité du récepteur ; l'écart est la \textbf{marge}.
+
+\textbf{Exposition du public} : densité de puissance $S = \frac{P_e G_e}{4\pi d^2}$, champ $E = \frac{\sqrt{30 P_e G_e}}{d}$, avec $S = E^2/377$. Niveaux de référence (recommandation 1999/519/CE, décret 2002-775) : \SI{28}{V/m} de 10 à 400\,MHz, $1{,}375\sqrt{f_{MHz}}$\,V/m de 400 à 2\,000\,MHz (\SI{41}{V/m} à 900\,MHz), \SI{61}{V/m} au-delà de 2\,GHz. En basse fréquence (50\,Hz), on vérifie le champ magnétique (\SI{100}{\micro\tesla}) et le champ électrique (\SI{5}{kV/m}).
+
+\textbf{Instrumentation RF} : l'\textbf{analyseur de spectre} affiche la puissance (dBm) en fonction de la fréquence (réglages : bande, RBW, niveau de référence) ; l'\textbf{analyseur de réseau vectoriel} mesure les paramètres S ($S_{11} = \Gamma$ en réflexion, $S_{21}$ en transmission) ; l'\textbf{analyseur d'impédance} mesure $\underline{Z}(f)$ d'un composant ou d'une antenne.
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={2. Formulaire synthétique},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.3cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Transmission}} \\
+$R = 1/T_s$ & Rapidité & Bd \\
+$R_{max} = 2B$ & Nyquist & Bd \\
+$f_{NRZ} = D/2$ ; $f_{Manch} = D$ & Fondamental & Hz \\
+$B_{tot} = NB + (N-1)B_g$ & FDM & Hz \\
+$f_{out} = \frac{N}{R} f_{ref}$ & PLL & Hz \\
+$P_{dBm} = 10\log(P/1\,\mathrm{mW})$ & Puissance & dBm \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Lignes et fibres}} \\
+$v = c/\sqrt{\varepsilon_r}$ ; $v = c/n_1$ & Propagation & m/s \\
+$Z_c = \sqrt{L'/C'}$ & Ligne & $\Omega$ \\
+$\Gamma = (Z_L - Z_c)/(Z_L + Z_c)$ & Réflexion & - \\
+$\mathrm{ROS} = (1+|\Gamma|)/(1-|\Gamma|)$ & Désadaptation & - \\
+$\mathrm{ON} = \sqrt{n_1^2 - n_2^2}$ & Fibre & - \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.3cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Antennes et liaison}} \\
+$\lambda = c/f$ & Longueur d'onde & m \\
+$P_r = P_e G_e G_r (\lambda/4\pi d)^2$ & Friis & W \\
+$A_{EL} = 20\log(4\pi d/\lambda)$ & Espace libre & dB \\
+$P_r = P_e + G_e + G_r - A_{EL}$ & Bilan & dBm \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Exposition}} \\
+$S = P_e G_e/(4\pi d^2)$ & Densité & W/m$^2$ \\
+$E = \sqrt{30 P_e G_e}/d$ & Champ lointain & V/m \\
+$S = E^2/377$ & Onde plane & W/m$^2$ \\
+$E_{lim} = 1{,}375\sqrt{f_{MHz}}$ & 0{,}4--2\,GHz & V/m \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colElec,
+  title={3. Questions types - une issue d'un sujet réel, deux inédites},
+]
+
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Fibre optique ou paire torsadée \hfill\normalfont\footnotesize E1 commun 2014 (Q38)}
+]
+\textbf{Énoncé.}
+Un paquet de 256 octets parcourt une liaison de \SI{550}{m}. Avec la fibre optique, le débit vaut \SI{1}{Gbit/s} ; avec la paire torsadée, \SI{2}{Mbit/s}. Le corrigé officiel retient des vitesses de propagation de $3\cdot10^8$\,m/s (fibre) et $2{,}26\cdot10^8$\,m/s (cuivre). Déterminer la durée nécessaire pour recevoir le dernier octet dans chaque cas et comparer.
+
+\tcbline
+
+\textbf{Corrigé.} \textit{(d'après le corrigé officiel E1 2014)}
+
+\textbf{Étape 1 - Nombre de bits.} $N = 256 \times 8 = 2\,048$ bits.
+
+\textbf{Étape 2 - Fibre.} Durée d'émission plus durée de propagation :
+\[
+  t = \frac{N}{D} + \frac{d}{v} = \frac{2\,048}{10^9} + \frac{550}{3\cdot10^8}
+    = 2{,}05 + 1{,}83 = \mathbf{3{,}88\ \mu s}
+\]
+
+\textbf{Étape 3 - Paire torsadée.}
+\[
+  t = \frac{2\,048}{2\cdot10^6} + \frac{550}{2{,}26\cdot10^8}
+    = 1\,024 + 2{,}43\ \mu\mathrm{s} = \mathbf{1{,}026\ ms}
+\]
+
+\textbf{Point de vigilance.} Dans une fibre, la lumière va à $c/n_1 \approx 2\cdot10^8$\,m/s et non à $c$ : la propagation dure alors \SI{2,75}{\micro\second} et le total \SI{4,80}{\micro\second}. La conclusion est inchangée.
+
+\textbf{Conclusion.} La fibre délivre le paquet environ 260 fois plus vite. C'est le débit, donc la durée d'émission, qui fait la différence : la propagation ne pèse que quelques microsecondes dans les deux cas. La fibre est retenue pour respecter le temps de cycle du réseau.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Bilan de liaison radio à 868 MHz \hfill\normalfont\footnotesize exercice inédit}
+]
+\textbf{Énoncé.}
+Un capteur LoRa émet $P_e = 14$\,dBm à $f = 868$\,MHz vers une passerelle située à $d = 5$\,km. Les deux antennes sont des dipôles ($G = 2{,}15$\,dBi). La sensibilité du récepteur vaut $-137$\,dBm. (a) Calculer la puissance reçue en espace libre et la marge. (b) Calculer le champ électrique à 1\,m de l'émetteur et le comparer au niveau de référence.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 - Longueur d'onde et affaiblissement.}
+\[
+  \lambda = \frac{3\cdot10^8}{868\cdot10^6} = 0{,}346\ \mathrm{m}
+  \qquad
+  A_{EL} = 20\log\frac{4\pi\times 5\,000}{0{,}346} = \mathbf{105{,}2\ dB}
+\]
+
+\textbf{Étape 2 - Puissance reçue et marge.}
+\[
+  P_r = 14 + 2{,}15 + 2{,}15 - 105{,}2 = \mathbf{-86{,}9\ dBm}
+  \qquad
+  \text{marge} = -86{,}9 - (-137) = \mathbf{50\ dB}
+\]
+
+\textbf{Étape 3 - Champ à 1 m.} $P_e = 10^{1{,}4}$\,mW $= 25$\,mW et $G = 10^{0{,}215} = 1{,}64$ :
+\[
+  E = \frac{\sqrt{30 \times 0{,}025 \times 1{,}64}}{1} = \mathbf{1{,}1\ V/m}
+  \qquad
+  E_{lim} = 1{,}375\sqrt{868} = 40{,}5\ \mathrm{V/m}
+\]
+
+\textbf{Conclusion.} En espace libre, la marge de 50\,dB est très confortable ; en milieu urbain, les obstacles en consomment une grande partie, ce qui justifie les facteurs d'étalement élevés de LoRa. Le champ à 1\,m est environ 37 fois inférieur au niveau de référence : l'exposition est conforme.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Adaptation d'une antenne sur un coaxial 50 $\Omega$ \hfill\normalfont\footnotesize exercice inédit}
+]
+\textbf{Énoncé.}
+Un câble coaxial ($Z_c = 50\,\Omega$, $\varepsilon_r = 2{,}25$) de \SI{10}{m} alimente à \SI{100}{MHz} une antenne d'impédance $Z_L = 75\,\Omega$. L'émetteur fournit \SI{10}{W}. Faut-il traiter le câble comme une ligne ? Calculer $\Gamma$, le ROS, l'affaiblissement de réflexion et la puissance réfléchie.
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 - Ligne ou simple liaison ?}
+\[
+  v = \frac{3\cdot10^8}{\sqrt{2{,}25}} = 2\cdot10^8\ \mathrm{m/s}
+  \qquad
+  \lambda = \frac{v}{f} = 2\ \mathrm{m}
+  \qquad
+  \frac{\ell}{\lambda} = 5 \gg \frac{1}{10}
+\]
+Le câble est une ligne : l'adaptation compte.
+
+\textbf{Étape 2 - Réflexion.}
+\[
+  \Gamma = \frac{75 - 50}{75 + 50} = \mathbf{0{,}2}
+  \qquad
+  \mathrm{ROS} = \frac{1{,}2}{0{,}8} = \mathbf{1{,}5}
+  \qquad
+  \mathrm{RL} = -20\log 0{,}2 = \mathbf{14\ dB}
+\]
+
+\textbf{Étape 3 - Puissance réfléchie.} $P_r = |\Gamma|^2 P_i = 0{,}04 \times 10 = \mathbf{0{,}4\ W}$.
+
+\textbf{Conclusion.} 4\,\% de la puissance revient vers l'émetteur ; un ROS de 1{,}5 reste dans la limite usuelle (ROS $\le 2$). Pour l'annuler, on insère un adaptateur d'impédance (transformateur quart d'onde, réseau LC).
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Points de vigilance - erreurs classiques},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+  \item \textbf{Confondre dB et dBm.} Le dBm est une puissance absolue (référence 1\,mW), le dB un rapport. On ajoute des dB à des dBm ; additionner deux dBm n'a pas de sens.
+  \item \textbf{Confondre bauds et bit/s.} Les deux ne coïncident que pour $M = 2$ états ; en QPSK, 1\,000 bauds font 2\,000 bit/s.
+  \item \textbf{Utiliser $c$ dans un câble ou une fibre.} La vitesse vaut $c/\sqrt{\varepsilon_r}$ ou $c/n_1$, soit environ $2\cdot10^8$\,m/s.
+  \item \textbf{Oublier la durée d'émission.} La durée d'une transmission additionne $N/D$ (émission des bits) et $d/v$ (propagation) ; c'est souvent la première qui domine.
+  \item \textbf{Appliquer Friis en champ proche.} La formule suppose $d \gg \lambda$ et l'espace libre ; en intérieur, la marge doit être nettement plus grande.
+  \item \textbf{Comparer un champ à la mauvaise limite.} Le niveau de référence dépend de la fréquence (28, 41, 58 ou 61\,V/m).
+  \item \textbf{Négliger l'adaptation d'une ligne longue.} Au-delà de $\lambda/10$, une charge différente de $Z_c$ crée réflexions et ondes stationnaires.
+\end{enumerate}
+
+\medskip
+{\footnotesize\itshape Aucun rapport de jury 2018--2026 ne commente ces notions : les points ci-dessus sont des erreurs de méthode classiques, non des citations.}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  5. PRÉSENCE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colPresence,
+  title={Présence dans les sujets analysés (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Année} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+Épreuve commune & - & $\checkmark$ & - & - & - & - & - & - & - & - & - & $\checkmark$ & $\checkmark$ \\
+E2 discipl. IE  & - & - & - & - & - & $\checkmark$ & - & - & - & - & - & - & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-thèmes rencontrés :} fibre optique contre cuivre (2014, question 38 ; simples mentions en 2018, 2024, 2025) - codage NRZ (E1 2026, question D3). Les autres notions (antennes, lignes, PLL, exposition, instrumentation RF) sont au programme mais n'ont jamais été interrogées de 2013 à 2026.
+\end{tcolorbox}
+
+\CAPETENDFILE

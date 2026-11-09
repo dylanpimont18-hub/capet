@@ -123,6 +123,14 @@ Panneaux PV → Convertisseur DC/DC (MPPT, hacheur élévateur) → Bus DC → O
 - CV3 = onduleur (DC → AC pour alimentation des charges)
 - Source : E2_Disciplinaire_IE_2025 (Q14) et Rapport_Jury_2025 (Q14) : tableau des convertisseurs CV1–CV3
 
+### 1.6 Vitesse spécifique d'une éolienne
+
+*(complément du référentiel, 2026-11-10 — notion hors sujets 2013–2026 sauf mention)*
+
+**Vitesse spécifique d'une éolienne :**
+$$\lambda = \frac{\Omega \, R}{v}$$
+- Valable pour un rotor de rayon R tournant à Ω sous un vent de vitesse v
+
 ---
 
 ## 2. QUESTIONS TYPES (max 6)
@@ -220,6 +228,8 @@ Panneaux PV → Convertisseur DC/DC (MPPT, hacheur élévateur) → Bus DC → O
 6. **Unités de la puissance du vent** : $P \propto v^3$ — si la vitesse double, la puissance est multipliée par 8. Erreur fréquente : appliquer un facteur 2 au lieu de 8.
 
 7. **DFIG vs MAS classique** : la DFIG est une MAS à rotor bobiné dont le rotor est connecté au réseau via un convertisseur, permettant un fonctionnement à vitesse variable. Ne pas confondre avec une MAS à cage (rotor en court-circuit), utilisée à vitesse fixe ou semi-variable.
+
+8. **Limite de Betz** : prendre $C_p = 0{,}593$ pour une éolienne réelle. La limite de Betz est un maximum théorique ; une éolienne tripale atteint 0,4 à 0,5, et seulement autour de sa vitesse spécifique optimale.
 
 ---
 

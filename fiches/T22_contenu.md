@@ -59,6 +59,23 @@ La tension $v_A$ doit couvrir toute la plage d'entrée du CAN (ex. $[0{,}3 \text
 Exemple (2013, 12 bits, $V_{ref} = 10$ V) :
 $$q = \frac{10}{2^{12}-1} = 2{,}44 \text{ mV}, \quad N(4{,}5\text{ V}) = \frac{4{,}5}{2{,}44\times10^{-3}} = 1842_{10} = 732_{16}$$
 
+### 1.6 Structures de CAN et de CNA
+
+*(complément du référentiel, 2026-11-10 — notion hors sujets 2013–2026 sauf mention)*
+
+**Nombre de comparateurs d'un CAN flash à n bits :**
+$$N_{comp} = 2^n - 1$$
+
+**Durée de conversion d'un CAN à approximations successives :**
+$$t_{conv} \approx n \, T_{clk}$$
+- Valable hors temps d'acquisition, à raison d'un bit par période d'horloge
+
+**Tension mesurée par un CAN double rampe :**
+$$V_e = V_{ref} \, \frac{T_2}{T_1}$$
+
+**Tension de sortie d'un CNA à réseau R-2R :**
+$$\lvert V_s \rvert = V_{ref} \, \frac{N}{2^n}$$
+
 ---
 
 ## 2. QUESTIONS TYPES
@@ -114,6 +131,8 @@ $$q = \frac{10}{2^{12}-1} = 2{,}44 \text{ mV}, \quad N(4{,}5\text{ V}) = \frac{4
 - **Ne pas vérifier le temps de conversion** du CAN par rapport à la période d'échantillonnage (exigence 2026 : $T_c \leq T_e$).
 - **Confusion CAN/CNA** dans les boucles d'asservissement numérique : le CAN est en voie de mesure, le CNA est en voie de commande.
 - **Codage hexadécimal** : grouper 4 bits depuis le bit de poids faible, pas depuis le MSB.
+- **Choix d'une structure de CAN** : choisir un CAN flash pour une mesure lente et précise. Le flash est rapide mais limité en résolution ; pour une mesure lente et précise, on prend un sigma-delta ou un double rampe.
+- **Durée de conversion d'un SAR** : confondre la fréquence d'horloge d'un CAN à approximations successives et sa fréquence d'échantillonnage. Il lui faut environ n coups d'horloge par conversion, plus le temps d'acquisition.
 
 ---
 

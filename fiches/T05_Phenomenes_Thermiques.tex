@@ -121,6 +121,14 @@ Relation linéaire entre grandeur physique $T$ et courant $I_{out}$ :
 \]
 $4\,\text{mA} \leftrightarrow T_{min}$ ; $20\,\text{mA} \leftrightarrow T_{max}$ ; $\Delta I = 16\,\text{mA}$ sur toute la plage.
 
+\medskip\hrule\vspace{4pt}
+
+% Complément du référentiel - 2026-11-10 (sans TikZ : les ids de schémas restent stables)
+\textbf{1.5 Convection et rayonnement (complément)}
+
+\smallskip
+Flux convectif (loi de Newton) : $\Phi_{conv} = h\,S\,(T_s - T_a)$, avec $h \approx 5$ à \SI{25}{W.m^{-2}.K^{-1}} en convection naturelle et 25 à 250 en convection forcée. Flux rayonné (Stefan-Boltzmann) : $\Phi_{ray} = \varepsilon\,\sigma\,S\,(T_s^4 - T_a^4)$, températures en kelvins, $\sigma = 5{,}67\cdot10^{-8}$\,\si{W.m^{-2}.K^{-4}}, émissivité $\varepsilon$ de 0{,}05 (métal poli) à 0{,}95 (peinture mate). Pour un faible écart de température, on linéarise : $h_r \approx 4\,\varepsilon\,\sigma\,T_m^3$. Convection et rayonnement agissent en parallèle depuis la même surface : $R_{th} = 1/\big((h + h_r)\,S\big)$.
+
 \end{tcolorbox}
 
 % -----------------------------------------------------------------------

@@ -134,6 +134,14 @@ Triangle ($\Delta$) & $V_{enr} = V_{composee}$ & $V_{nom\,enr} = V_{composee}$ \
 \end{tabular}
 \end{center}
 
+\medskip\hrule\vspace{4pt}
+
+% Complément du référentiel - 2026-11-10 (sans TikZ : les ids de schémas restent stables)
+\textbf{1.5 Moteur pas à pas (complément)}
+
+\smallskip
+Le rotor avance d'un pas angulaire $\theta_p = 360^\circ/N_{pas}$ à chaque impulsion : la commande est en boucle ouverte, sans capteur. Pour un moteur à aimant à $m$ phases et $p$ paires de pôles, $N_{pas} = 2\,p\,m$ en pas entier (200 pas, soit 1{,}8\textdegree, pour un moteur hybride courant) ; le demi-pas double ce nombre, le micro-pas le multiplie davantage. La vitesse vaut $N = 60\,f_{imp}/N_{pas}$ (tr/min). Si la fréquence ou la charge est trop élevée, le moteur décroche et perd des pas sans que la commande le sache, contrairement à un servomoteur asservi.
+
 \end{tcolorbox}
 
 % -----------------------------------------------------------------------

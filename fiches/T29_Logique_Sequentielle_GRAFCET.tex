@@ -163,6 +163,14 @@ Format typique : 1 bit start + 8 bits data + 1 bit stop = \textbf{10 bits par ca
   \textit{Ex. (2023) : } \frac{71 \times 10}{115\,200} \approx \SI{6{,}16}{\milli\second}
 \]
 
+\medskip\hrule\vspace{4pt}
+
+% Complément du référentiel - 2026-11-10 (sans TikZ : les ids de schémas restent stables)
+\textbf{1.6 Machines de Moore et de Mealy (complément)}
+
+\smallskip
+Dans une machine de \textbf{Moore}, les sorties ne dépendent que de l'état ; dans une machine de \textbf{Mealy}, elles dépendent de l'état et des entrées (réaction plus rapide, mais sorties sensibles aux aléas des entrées). Une machine à $N$ états se code sur au moins $\lceil\log_2 N\rceil$ bascules en codage binaire, ou sur $N$ bascules en codage « one-hot ». Le diagramme d'états SysML (T32) et le GRAFCET décrivent le même type de comportement.
+
 \end{tcolorbox}
 
 % -----------------------------------------------------------------------

@@ -40,6 +40,21 @@
 - La vitesse mécanique $\Omega$ est directement liée à la fréquence des courants statoriques
 - Avantage : pas de décrochage possible contrairement à la machine synchrone classique
 
+### 1.1 Moteur pas à pas
+
+*(complément du référentiel, 2026-11-10 — notion hors sujets 2013–2026 sauf mention)*
+
+**Pas angulaire d'un moteur pas à pas :**
+$$\theta_p = \frac{360^\circ}{N_{pas}}$$
+
+**Nombre de pas par tour d'un moteur à aimant en pas entier :**
+$$N_{pas} = 2 \, p \, m$$
+- Valable en pas entier, avec m phases et p paires de pôles au rotor
+
+**Vitesse de rotation d'un moteur pas à pas :**
+$$N = \frac{60 \, f_{imp}}{N_{pas}}$$
+- Valable uniquement tant que le moteur ne décroche pas (aucun pas perdu)
+
 ---
 
 ## 2. QUESTIONS TYPES
@@ -168,6 +183,8 @@
 5. **La PMSM n'a pas de résistance rotorique** : contrairement à la MAS, la PMSM à aimants permanents n'a pas de pertes Joule au rotor (pas de courants rotoriques) → meilleur rendement.
 
 6. **Capteurs Hall** : utilisés dans les BLDC pour détecter la position du rotor à 6 positions par tour. Ne pas confondre avec un encodeur haute résolution (utilisé dans les servomoteurs de précision).
+
+7. **Boucle ouverte du moteur pas à pas** : supposer que la position commandée est toujours atteinte. Le moteur pas à pas n'a pas de capteur : un pas perdu (surcharge, accélération trop brutale) n'est jamais détecté, contrairement à un servomoteur.
 
 ---
 

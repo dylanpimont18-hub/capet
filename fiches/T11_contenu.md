@@ -173,6 +173,12 @@ $$P_{abs} = U \cdot I_a = R_a I_a^2 + E \cdot I_a = P_{joules} + P_{meca}$$
 
 6. **Hacheur 4Q nécessaire pour freinage récupératif** : un hacheur 1Q (rapport cyclique $0 \leq \alpha \leq 1$, tension toujours positive) ne permet pas la réversibilité. Le hacheur 4Q est indispensable si le couple ou la vitesse doivent changer de signe.
 
+7. **Bilan de puissance de la MCC : tout au point nominal** : calculer les pertes avec un courant ou une vitesse qui ne sont pas ceux du régime demandé fausse toutes les applications numériques. Au régime nominal : $P_A = U_n I_n$, pertes Joule $R I_n^2$, $P_{EM} = P_A - R I_n^2$, pertes fer et mécaniques $C_P \Omega_n$, $P_U = P_{EM} - C_P \Omega_n$ et $\eta = P_U / P_A$. Source : rapport du jury 2026 du troisième concours (même sujet que l'E1 externe 2026), question A7 = question A6 du sujet externe.
+
+8. **Point de fonctionnement = intersection de deux caractéristiques** : lire un point sur la seule caractéristique du moteur ne donne pas le point de fonctionnement. En régime permanent $C_U = C_R$ : le point est l'intersection de $C_U(N)$ (une droite par tension $U$) et de $C_R(N)$, et l'on relève $N$ et $C$ pour chaque tension. Source : rapport du jury 2026 du troisième concours (même sujet que l'E1 externe 2026), question A10 = question A9 du sujet externe.
+
+9. **Quadrants de la MCC et structure de conversion** : identifier les quadrants sans les traduire en signes de $U$ et de $I$ conduit à proposer un convertisseur incohérent. La tension $U$ est l'image de la vitesse et $I$ celle du couple : un fonctionnement moteur dans les deux sens de rotation occupe les quadrants 1 et 3, $U$ et $I$ changent de signe, il faut donc un hacheur 4 quadrants (pont en H). Source : rapport du jury 2026 du troisième concours (même sujet que l'E1 externe 2026), question A11 = question A10 du sujet externe.
+
 ---
 
 ## 6. CONNEXIONS AVEC D'AUTRES THÈMES

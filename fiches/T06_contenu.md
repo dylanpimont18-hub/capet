@@ -21,6 +21,28 @@
 | Couplage **Yd** : décalage $30°$ entre primaire et secondaire | Triphasé étoile-triangle | Courant | Utilisé pour redresseurs (harmoniques) |
 | $U_{s} = m \cdot U_{1}$ (sans charge) | Tension secondaire à vide | Base | Définition |
 
+### 1.1 Circuit magnétique et électromagnétisme
+
+*(complément du référentiel, 2026-11-10 — notion hors sujets 2013–2026 sauf mention)*
+
+**Théorème d'Ampère sur un circuit magnétique :**
+$$N \, I = H \, \ell$$
+- Valable si le champ H est uniforme le long de la ligne de champ moyenne de longueur ℓ
+
+**Réluctance d'un tronçon de circuit magnétique :**
+$$\mathcal{R} = \frac{\ell}{\mu_0 \, \mu_r \, S}$$
+
+**Loi d'Hopkinson :**
+$$N \, I = \mathcal{R} \, \Phi$$
+- Valable en régime linéaire, hors saturation du matériau
+
+**Loi de Faraday :**
+$$e = -N \, \frac{d\Phi}{dt}$$
+
+**Formule de Boucherot :**
+$$V_{eff} = 4{,}44 \, N \, f \, B_{max} \, S$$
+- Valable en régime sinusoïdal, avec B_max valeur crête de l'induction
+
 ---
 
 ## 2. QUESTIONS TYPES
@@ -108,6 +130,12 @@ Le cahier des charges impose $\bar{u}_s = 600\ \mathrm{V}$. Donner l'expression 
 5. **Rapport de transformation et redresseur** : le transformateur en amont d'un redresseur a un $m$ déterminé par la tension DC souhaitée, pas directement par le rapport réseau. Il faut d'abord calculer la tension secondaire AC nécessaire, puis en déduire $m$.
 
 6. **Décalage de phase couplage Yd** : le déphasage de $30°$ entre primaire et secondaire en couplage Yd est rarement demandé explicitement, mais peut être évoqué dans la justification du choix de couplage pour l'élimination d'harmoniques.
+
+7. **Boucherot et valeur efficace de B** : introduire une induction efficace dans la formule de Boucherot. La formule fait intervenir l'induction crête $B_{max}$, qui vaut $\sqrt{2}$ fois l'induction efficace.
+
+8. **Réluctance de l'entrefer** : négliger un entrefer de quelques dixièmes de millimètre. Avec une perméabilité relative du fer de 1 000 à 5 000, un entrefer de 0,5 mm peut présenter une réluctance supérieure à celle de tout le circuit en fer.
+
+9. **Saturation** : appliquer la loi d'Hopkinson au-delà du coude de saturation. La relation linéaire ne vaut que pour une induction inférieure à environ 1,2 à 1,5 T dans les tôles usuelles.
 
 ---
 

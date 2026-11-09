@@ -139,6 +139,8 @@
 
 6. **Entrelacement de bras** : l'ondulation se divise par $n$ **seulement si les $n$ bras sont déphasés de $T/n$**. Sans déphasage, l'ondulation s'additionne.
 
+7. **Deux quadrants et sens de rotation** : croire qu'un hacheur réversible en courant permet d'inverser le sens de rotation d'une MCC. Il inverse le courant, donc le couple (freinage récupératif), mais pas la tension ; inverser le sens de rotation demande un pont en H à quatre quadrants.
+
 ---
 
 ## 6. CONNEXIONS AVEC D'AUTRES THÈMES

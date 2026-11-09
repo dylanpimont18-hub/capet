@@ -166,6 +166,14 @@ Placé avant le CAN pour éliminer les composantes à $f > f_e/2$ :
   f_e \geq 2\,f_{max} \qquad \Rightarrow \qquad f_c \leq \frac{f_e}{2}
 \]
 
+\medskip\hrule\vspace{4pt}
+
+% Complément du référentiel - 2026-11-10 (sans TikZ : les ids de schémas restent stables)
+\textbf{1.7 Filtrage numérique (complément)}
+
+\smallskip
+Un filtre numérique calcule chaque échantillon de sortie $y_n$ à partir des échantillons d'entrée et, s'il est récursif, des sorties précédentes, à la période $T_e$. Filtre \textbf{RIF} (non récursif) : $y_n = \sum_{k=0}^{N-1} b_k x_{n-k}$, de fonction de transfert $H(z) = \sum_k b_k z^{-k}$, toujours stable ; la moyenne glissante en est le cas le plus simple. Filtre \textbf{RII} (récursif) : par exemple $y_n = a\,y_{n-1} + (1-a)\,x_n$ avec $a = \tau/(\tau + T_e)$, peu coûteux mais susceptible d'instabilité. La \textbf{synthèse} part d'un gabarit : on discrétise un filtre analogique (transformation bilinéaire $p = \frac{2}{T_e}\frac{1-z^{-1}}{1+z^{-1}}$) ou l'on calcule directement les coefficients $b_k$. Le théorème de Shannon s'applique : rien au-delà de $f_e/2$ ne peut être traité.
+
 \end{tcolorbox}
 
 % -----------------------------------------------------------------------

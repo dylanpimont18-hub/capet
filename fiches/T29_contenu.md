@@ -110,6 +110,14 @@
 - Sortie TOR marche/arrêt → bornes LI1/LI2 du variateur
 - Entrées TOR depuis le variateur : signal défaut (SD), disponible, etc.
 
+### 1.7 Machines de Moore et de Mealy
+
+*(complément du référentiel, 2026-11-10 — notion hors sujets 2013–2026 sauf mention)*
+
+**Nombre minimal de bascules pour coder N états :**
+$$n = \lceil \log_2 N \rceil$$
+- Valable en codage binaire ; un codage « one-hot » utilise N bascules
+
 ---
 
 ## 2. QUESTIONS TYPES
@@ -168,6 +176,7 @@ D'après les rapports de jury 2021, 2022, 2023 :
 - **Algorigramme** : structures « POUR » vs « TANT QUE » — ne pas utiliser de boucle FOR là où un WHILE suffit.
 - **Langage ST** : oublier le point-virgule en fin d'instruction ; confusion `:=` (affectation) et `=` (comparaison).
 - **Timer TON** : la sortie $Q$ n'est active que si l'entrée reste vraie pendant la durée $PT$.
+- **Moore et Mealy** : attribuer à une machine de Moore des sorties qui dépendent des entrées. Dans une machine de Moore, les sorties ne dépendent que de l'état ; si elles dépendent aussi des entrées, c'est une machine de Mealy.
 
 ---
 

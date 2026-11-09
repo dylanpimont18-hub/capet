@@ -189,6 +189,7 @@ D'après les rapports de jury 2018, 2021, 2022, 2023, 2024, 2025 :
 - **4–20 mA** : la valeur 0 mA signifie une coupure de câble (défaut), ce qui est un avantage par rapport à 0–10 V.
 - **Symboles IEC** : ne pas utiliser des symboles américains (ANSI) à la place des symboles européens (IEC 60617).
 - **Confusion voltmètre / ampèremètre** : un voltmètre en série protège la mesure mais la fausse ; un ampèremètre en parallèle peut détruire l'appareil.
+- **Schéma unifilaire ou multifilaire** : utiliser un schéma unifilaire pour décrire un câblage borne à borne. L'unifilaire représente plusieurs conducteurs par un seul trait et donne une vue d'ensemble ; le câblage se lit sur un schéma multifilaire, avec le repérage des bornes et des conducteurs.
 
 ---
 

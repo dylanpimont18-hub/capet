@@ -6,10 +6,9 @@ ne jamais l'éditer à la main dans `app/` (`cards.json`, `svg/`,
 `sw-assets.js` sont écrasés à chaque régénération et ne sont pas
 versionnés, voir plus bas).
 
-État courant (2026-09-21) : 574 cartes — 344 formules (191 en tableau
-Markdown, 153 en bloc `$$`), 199 pièges, 31 schémas — réparties sur 30
-thèmes, poids de 0,231 à 1,3. 31 SVG compilés depuis les fiches LaTeX
-(0 échec). KaTeX 0.16.9 vendored dans `app/vendor/katex/` (62 fichiers,
+État courant (2026-11-10) : 727 cartes — 421 formules, 272 pièges,
+34 schémas — réparties sur 33 thèmes, poids de 0,231 à 1,3. 34 SVG
+compilés depuis les fiches LaTeX (0 échec). KaTeX 0.16.9 vendored dans `app/vendor/katex/` (62 fichiers,
 dont les 20 polices `.woff2` précachées par le service worker). 66
 entrées dans le cache du service worker.
 

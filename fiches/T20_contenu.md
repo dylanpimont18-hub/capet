@@ -86,6 +86,26 @@ Placé avant le CAN pour respecter le théorème de Shannon : $f_e \geq 2 f_{max
 La fréquence de coupure du filtre anti-repliement parfait est :
 $$f_c = \frac{f_e}{2}$$
 
+### 1.10 Filtrage numérique
+
+*(complément du référentiel, 2026-11-10 — notion hors sujets 2013–2026 sauf mention)*
+
+**Filtre numérique à réponse impulsionnelle finie (RIF) :**
+$$y_n = \sum_{k=0}^{N-1} b_k \, x_{n-k}$$
+
+**Moyenne glissante sur N échantillons :**
+$$y_n = \frac{1}{N} \sum_{k=0}^{N-1} x_{n-k}$$
+
+**Filtre récursif du premier ordre (lissage exponentiel) :**
+$$y_n = a \, y_{n-1} + (1 - a) \, x_n$$
+- Valable avec a = τ/(τ + Te), en discrétisant un premier ordre de constante τ par la méthode d'Euler arrière
+
+**Fonction de transfert en z d'un filtre RIF :**
+$$H(z) = \sum_{k=0}^{N-1} b_k \, z^{-k}$$
+
+**Transformation bilinéaire :**
+$$p = \frac{2}{T_e} \, \frac{1 - z^{-1}}{1 + z^{-1}}$$
+
 ---
 
 ## 2. QUESTIONS TYPES (max 6)
@@ -138,6 +158,11 @@ $$f_c = \frac{f_e}{2}$$
 - **Temps de réponse et fréquence de coupure** : $t_{r5\%} \approx 3/(f_c \cdot 2\pi)$ — ne pas confondre les deux critères.
 - **Phase d'un filtre d'ordre 2** : elle peut dépasser $-180°$ à haute fréquence — important pour l'étude de la stabilité (T21).
 - **Filtre anti-repliement** : mal connu — ne pas confondre son rôle (filtrer avant le CAN) avec un filtre de reconstruction (après le CNA).
+- **Atténuation imposée → gain en dB → ordre du filtre** : raisonner sur un rapport linéaire sans passer en décibels empêche de choisir l'ordre du filtre. Diviser une composante par 100 correspond à $G = 20\log(1/100) = -40$ dB ; un filtre d'ordre $n$ chute de $20n$ dB par décade, donc $-40$ dB une décade après la coupure impose un ordre 2. Source : rapport du jury 2026 du troisième concours (même sujet que l'E1 externe 2026), question B2 = question B2 du sujet externe.
+- **Filtrer un signal composé : une lecture par composante** : appliquer un seul gain à tout le signal donne une sortie fausse. Chaque composante est lue à sa propre pulsation : amplitude multipliée par $H(\omega_k) = 10^{G(\omega_k)/20}$ et phase décalée de $\varphi(\omega_k)$ ; la composante continue est multipliée par $H(0)$. Source : rapport du jury 2026 du troisième concours (même sujet que l'E1 externe 2026), question B5 et B6 = question B5 et B6 du sujet externe.
+- **Stabilité d'un filtre numérique** : croire qu'un filtre numérique est toujours stable. Un RIF l'est toujours ; un RII, qui réinjecte ses sorties, peut diverger si ses pôles sortent du cercle unité.
+- **Retard unitaire** : lire $z^{-1}$ comme une dérivée. Il représente un retard d'une période d'échantillonnage : $z^{-1}X(z)$ correspond à $x_{n-1}$.
+- **Retard d'une moyenne glissante** : oublier le retard introduit par une moyenne glissante. Une moyenne sur N points retarde le signal d'environ $(N-1)/2$ périodes d'échantillonnage.
 
 ---
 

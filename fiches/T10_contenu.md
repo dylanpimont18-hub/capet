@@ -160,6 +160,8 @@
 
 7. **Unités mixtes** : les angles en degrés vs radians, les vitesses en tr·min$^{-1}$ vs rad·s$^{-1}$ sont une source d'erreurs classique. Toujours convertir avant application numérique.
 
+8. **Engrenage simple et passage rotation → translation** : confondre diamètre et rayon multiplie ou divise le résultat par deux. Pour deux roues dentées, $\Omega_2 / \Omega_1 = Z_1 / Z_2$ ; une roue de diamètre $d$ donne $v = \Omega \cdot d/2$, d'où $K_1 = \frac{Z_1}{Z_2} \cdot \frac{d}{2}$ en m/rad. Source : rapport du jury 2026 du troisième concours (même sujet que l'E1 externe 2026), question C3 = question C2 du sujet externe.
+
 ---
 
 ## 6. CONNEXIONS AVEC D'AUTRES THÈMES

@@ -1,0 +1,330 @@
+% T32 - Ingénierie système : analyse fonctionnelle, SysML, chaînes - créée le 2026-11-10.
+% Présence : 8/13 années 2013-2025 où un sujet mobilise SysML ou l'analyse fonctionnelle
+% (ibd, bdd, cas d'utilisation, diagramme d'états, exigences) - recherche sur les .md du corpus.
+% QT1 : E2 disciplinaire IE 2022, Q11-Q12 (corrigé officiel Rapport_Jury_2022.md l.208-222).
+% QT2 : E2 disciplinaire IE 2022, Q21-Q22 (corrigé officiel Rapport_Jury_2022.md l.287-296).
+% QT3 : exercice INÉDIT.
+% Citation Bloc 4 : Rapport_Jury_2018.md l.2875, rapport de l'épreuve « Étude d'un système »
+% option INGÉNIERIE INFORMATIQUE (l.2837) - attribution précisée dans l'encadré. Verbatim vérifié.
+\expandafter\ifx\csname CAPETINCLUDEMODE\endcsname\relax
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\def\CAPETBEGINFILE{\begin{document}}
+\def\CAPETENDFILE{\end{document}}
+\else
+\def\CAPETBEGINFILE{}
+\def\CAPETENDFILE{}
+\fi
+
+\ficheHeaders{T32}{Ingénierie système}{colAuto}
+
+\CAPETBEGINFILE
+
+% -----------------------------------------------------------------------
+%  BLOC EN-TETE
+% -----------------------------------------------------------------------
+
+\ficheEntete{T32}{Ingénierie système - Analyse fonctionnelle et SysML}{colAuto}%
+  {Ingénierie système - Modélisation et vérification}%
+  {\textbf{Présence :} \textbf{8/13} sujets (2013-2026) - thème \emph{fréquent}}%
+  {bête à cornes - pieuvre - FAST - SysML : exigences, cas d'utilisation, bdd, ibd, séquence, états - chaîne d'information - chaîne d'énergie - rendement global - vérification des exigences - MBSE}
+
+% -----------------------------------------------------------------------
+%  1. RAPPELS DE COURS
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colAuto,
+  title={1. Rappels de cours},
+]
+
+\textbf{1.1 Analyse fonctionnelle}
+
+\smallskip
+On part du \textbf{besoin}, jamais de la solution.
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{@{}p{3.2cm}p{11cm}@{}}
+\toprule
+\textbf{Outil} & \textbf{Ce qu'il exprime} \\
+\midrule
+Bête à cornes & À qui le produit rend-il service ? Sur quoi agit-il ? Dans quel but ? \\
+Diagramme pieuvre & Fonctions de service entre le produit et son milieu extérieur : principales (FP, relient deux éléments par le produit) et contraintes (FC) \\
+Cahier des charges fonctionnel & Chaque fonction reçoit des critères, des niveaux et une flexibilité \\
+FAST & Décomposition « pourquoi ? / comment ? » des fonctions techniques jusqu'aux solutions \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip\hrule\vspace{4pt}
+
+\textbf{1.2 SysML : neuf diagrammes, trois familles}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Famille} & \textbf{Diagramme} & \textbf{Question à laquelle il répond} \\
+\midrule
+Transverse & exigences (req) & Que doit garantir le système, et comment le vérifie-t-on ? \\
+Comportement & cas d'utilisation (uc) & Quels services rend-il, à quels acteurs ? \\
+ & séquence (sd) & Dans quel ordre les éléments échangent-ils leurs messages ? \\
+ & états (stm) & Quels états, et quels événements font changer d'état ? \\
+ & activité (act) & Quel enchaînement d'actions, avec quels flux ? \\
+Structure & définition de blocs (bdd) & De quels types de blocs est-il composé ? \\
+ & blocs internes (ibd) & Comment les parties sont-elles reliées (ports, flux) ? \\
+ & paramétrique (par) & Quelles équations lient les grandeurs ? \\
+ & paquetages (pkg) & Comment le modèle est-il organisé ? \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Relations à connaître.} Entre exigences : «contain», «deriveReqt», «refine» ; un bloc «satisfy» une exigence, un cas de test la «verify». Dans le bdd : composition (losange plein, la partie n'existe pas sans le tout), agrégation (losange vide), généralisation (flèche à triangle), avec des multiplicités (\texttt{1}, \texttt{0..1}, \texttt{1..*}). Dans l'ibd : parties, ports et flux orientés d'énergie, de matière ou d'information.
+
+\medskip\hrule\vspace{4pt}
+
+\textbf{1.3 Chaîne d'information et chaîne d'énergie}
+
+\begin{center}
+\begin{tikzpicture}[font=\footnotesize, node distance=2mm,
+  bloc/.style={draw=colAuto, fill=colAuto!10, rounded corners=2pt, minimum width=1.75cm, minimum height=0.75cm, align=center}]
+  \node[bloc] (acq) {Acquérir};
+  \node[bloc, right=6mm of acq] (tra) {Traiter};
+  \node[bloc, right=6mm of tra] (com) {Communiquer};
+  \draw[->, thick, colAuto] (acq) -- (tra);
+  \draw[->, thick, colAuto] (tra) -- (com);
+  \node[left=3mm of acq, align=right] (inf) {informations\\(capteurs)};
+  \draw[->] (inf) -- (acq);
+  \node[bloc, below=12mm of acq] (ali) {Alimenter};
+  \node[bloc, right=6mm of ali] (dis) {Distribuer};
+  \node[bloc, right=6mm of dis] (con) {Convertir};
+  \node[bloc, right=6mm of con] (tsm) {Transmettre};
+  \draw[->, thick, colMeca] (ali) -- (dis);
+  \draw[->, thick, colMeca] (dis) -- (con);
+  \draw[->, thick, colMeca] (con) -- (tsm);
+  \node[right=4mm of tsm, align=left] (agi) {Agir sur\\la matière};
+  \draw[->, thick, colMeca] (tsm) -- (agi);
+  \draw[->, dashed] (tra.south) -- node[right, font=\scriptsize] {ordres} (dis.north);
+  \node[above=1mm of tra, font=\scriptsize\itshape] {chaîne d'information};
+  \node[below=1mm of con, font=\scriptsize\itshape] {chaîne d'énergie};
+\end{tikzpicture}
+\end{center}
+
+Exemple : capteur, microcontrôleur, liaison CAN (information) ; batterie, onduleur, moteur, réducteur (énergie). Chaque étage de la chaîne d'énergie a un rendement : pour des étages en série, $\eta_g = \prod_i \eta_i$ et la puissance à fournir en amont vaut $P_a = P_u/\eta_g$.
+
+\medskip\hrule\vspace{4pt}
+
+\textbf{1.4 MBSE et vérification des exigences}
+
+\smallskip
+L'ingénierie système basée sur les modèles (\textbf{MBSE}) remplace les documents dispersés par un modèle SysML unique, d'où la \textbf{traçabilité} : exigence $\rightarrow$ bloc qui la satisfait $\rightarrow$ essai qui la vérifie. Le cycle en V associe chaque niveau de conception à un niveau de vérification (unitaire, intégration, validation).
+
+Vérifier une exigence, c'est comparer une valeur obtenue (calcul, simulation, mesure) à la valeur exigée et conclure, chiffre à l'appui : écart relatif $\varepsilon_r = |x - x_{exig}|/x_{exig}$, ou marge $M = (x_{lim} - x)/x_{lim}$ par rapport à une limite.
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  2. FORMULAIRE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colAuto,
+  title={2. Formulaire et aide-mémoire},
+]
+\small
+\begin{multicols}{2}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{4.2cm}ll@{}}
+\toprule
+\textbf{Formule} & \textbf{Usage} & \textbf{U.} \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Chaîne d'énergie}} \\
+$\eta_g = \prod_i \eta_i$ & Étages en série & - \\
+$P_a = P_u/\eta_g$ & Puissance amont & W \\
+$E = \sum_k P_k\,\Delta t_k$ & Profil de mission & J \\
+$\eta_h = H\,Q/(367\,P_1)$ & Pompe ($Q$ en m$^3$/h) & - \\
+\midrule
+\multicolumn{3}{@{}l}{\footnotesize\textit{Vérification}} \\
+$\varepsilon_r = |x - x_{exig}|/x_{exig}$ & Écart relatif & - \\
+$M = (x_{lim} - x)/x_{lim}$ & Marge & - \\
+\bottomrule
+\end{tabular}
+
+\columnbreak
+
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}p{3.6cm}p{4.2cm}@{}}
+\toprule
+\textbf{Notation SysML} & \textbf{Signification} \\
+\midrule
+losange plein & composition \\
+losange vide & agrégation \\
+flèche à triangle & généralisation \\
+«satisfy» & bloc $\rightarrow$ exigence \\
+«verify» & test $\rightarrow$ exigence \\
+«deriveReqt» & exigence dérivée \\
+\texttt{1..*} & multiplicité \\
+\bottomrule
+\end{tabular}
+\end{multicols}
+\normalsize
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  3. QUESTIONS TYPES
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colAuto,
+  title={3. Questions types - extraites des sujets réels (sauf QT3)},
+]
+
+\begin{tcolorbox}[questiontype,
+  title={QT1 - Vérifier les exigences d'un diagramme SysML \hfill\normalfont\footnotesize E2 disciplinaire IE 2022 (Q11-Q12)}
+]
+\textbf{Énoncé.}
+Une pompe de relevage débite $Q = \SI{36}{m^3/h}$ sous une hauteur $H = \SI{11,2}{m}$ ; elle absorbe $P_1 = \SI{2,8}{kW}$ électriques et fournit $P_2 = \SI{2,2}{kW}$ mécaniques. La question précédente a donné une hauteur d'aspiration $H_a = \SI{150}{mm}$. Le diagramme des exigences (DT3) impose : $H_a > \SI{100}{mm}$, rendement hydraulique $> 35\,\%$, rendement électrique $> 75\,\%$. Les exigences sont-elles satisfaites ?
+
+\tcbline
+
+\textbf{Corrigé.} \textit{(d'après le corrigé officiel, rapport 2022)}
+
+\textbf{Étape 1 - Rendement hydraulique} ($Q$ en m$^3$/h, $P_1$ en kW) :
+\[
+  \eta_h = \frac{H\,Q}{367\,P_1} = \frac{11{,}2 \times 36}{367 \times 2{,}8} = \mathbf{39{,}2\ \%}
+\]
+
+\textbf{Étape 2 - Rendement électrique du moteur.}
+\[
+  \eta_e = \frac{P_2}{P_1} = \frac{2{,}2}{2{,}8} = \mathbf{78{,}6\ \%}
+\]
+
+\textbf{Étape 3 - Confrontation exigence par exigence.}
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{llll}
+\toprule
+Exigence & Exigé & Obtenu & Marge \\
+\midrule
+Hauteur d'aspiration & $> 100$ mm & 150 mm & + 50 mm \\
+Rendement hydraulique & $> 35\,\%$ & 39{,}2\,\% & + 4{,}2 points \\
+Rendement électrique & $> 75\,\%$ & 78{,}6\,\% & + 3{,}6 points \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Conclusion.} Les trois exigences du diagramme SysML sont satisfaites ; les marges sur les rendements restent faibles (moins de 5 points), donc sensibles à l'usure de la pompe.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+\begin{tcolorbox}[questiontype,
+  title={QT2 - Qualifier une fonction et la placer dans un ibd \hfill\normalfont\footnotesize E2 disciplinaire IE 2022 (Q21-Q22)}
+]
+\textbf{Énoncé.}
+Un module Peltier fournit une tension continue de \SI{2}{V}. Un convertisseur doit en tirer les tensions continues de \SI{3,5}{V} et \SI{5}{V} qui alimentent un transmetteur ; aucune isolation galvanique n'est exigée. Qualifier fonctionnellement ce convertisseur, puis indiquer comment il apparaît dans le diagramme de blocs internes du système.
+
+\tcbline
+
+\textbf{Corrigé.} \textit{(d'après le corrigé officiel, rapport 2022)}
+
+\textbf{Étape 1 - Nature des grandeurs.} Entrée continue, sortie continue de tension plus élevée : conversion continu-continu élévatrice.
+
+\textbf{Étape 2 - Qualification.} C'est un convertisseur d'énergie électrique DC-DC, de type \textbf{hacheur parallèle (survolteur)}. Sans isolation exigée, une structure non isolée convient.
+
+\textbf{Étape 3 - Place dans l'ibd.} Le bloc porte la fonction \textbf{Convertir} ; il reçoit un flux d'énergie électrique continue (2\,V) du module Peltier et délivre un flux d'énergie électrique continue (3{,}5 et 5\,V) au transmetteur. Les flux sont orientés et typés \og énergie \fg{}.
+
+\textbf{Conclusion.} Nommer la fonction par un verbe à l'infinitif (convertir) et typer les flux sur l'ibd est exactement ce qui est attendu : la structure électronique précise (T07) vient ensuite.
+\end{tcolorbox}
+
+\vspace{4pt}
+
+\begin{tcolorbox}[questiontype,
+  title={QT3 - Rendement global et exigence de puissance \hfill\normalfont\footnotesize exercice inédit}
+]
+\textbf{Énoncé.}
+Chaîne d'énergie d'un bus électrique : batterie, onduleur ($\eta = 0{,}97$), moteur ($\eta = 0{,}94$), réducteur ($\eta = 0{,}96$). Exigence : la batterie ne doit pas fournir plus de \SI{180}{kW} quand la puissance aux roues vaut \SI{160}{kW}. L'exigence est-elle satisfaite ? Quel rendement minimal faudrait-il pour le moteur ?
+
+\tcbline
+
+\textbf{Corrigé.}
+
+\textbf{Étape 1 - Rendement global.}
+\[
+  \eta_g = 0{,}97 \times 0{,}94 \times 0{,}96 = \mathbf{0{,}875}
+\]
+
+\textbf{Étape 2 - Puissance batterie.}
+\[
+  P_a = \frac{P_u}{\eta_g} = \frac{160}{0{,}875} = \mathbf{182{,}8\ kW} > 180\ \mathrm{kW}
+  \qquad
+  \varepsilon_r = \frac{182{,}8 - 180}{180} = 1{,}6\ \%
+\]
+
+\textbf{Étape 3 - Rendement moteur nécessaire.} Il faut $\eta_g \geq 160/180 = 0{,}889$, donc
+\[
+  \eta_{mot} \geq \frac{0{,}889}{0{,}97 \times 0{,}96} = \mathbf{0{,}955}
+\]
+
+\textbf{Conclusion.} L'exigence n'est pas satisfaite (dépassement de 1{,}6\,\%). Un moteur à rendement d'au moins 95{,}5\,\% (machine synchrone à aimants plutôt qu'asynchrone, par exemple) permettrait de la respecter.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  4. ATTENTES DU JURY
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  jury,
+  title={4. Attentes du jury - Erreurs récurrentes et points de vigilance},
+]
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=5pt]
+  \item \textbf{Confondre bdd et ibd.} Le bdd définit les types de blocs et leurs relations ; l'ibd montre les parties d'un bloc, leurs ports et les flux.
+  \item \textbf{Inverser composition et agrégation.} Losange plein : la partie n'existe pas sans le tout ; losange vide : partie partageable ou amovible.
+  \item \textbf{Mélanger «satisfy» et «verify».} Un bloc satisfait une exigence, un cas de test la vérifie.
+  \item \textbf{Oublier de typer et d'orienter les flux d'un ibd.} Énergie, matière ou information : c'est ce que demandent les sujets (2022 Q22 ; épreuve commune 2023 Q53).
+  \item \textbf{Mettre une solution dans la bête à cornes ou la pieuvre.} Ces outils décrivent le besoin et les fonctions de service ; les solutions n'apparaissent que dans le FAST.
+  \item \textbf{Additionner des pertes en pourcentage.} Les rendements en série se multiplient : cinq étages à 0{,}9 donnent 0{,}59, pas 0{,}5.
+  \item \textbf{Conclure sans chiffrer.} Toute vérification d'exigence compare explicitement valeur obtenue et valeur exigée, avec l'écart ou la marge.
+\end{enumerate}
+
+\medskip
+% Rapport_Jury_2018.md l.2875 - épreuve « Étude d'un système », option ingénierie informatique (l.2837)
+\begin{tcolorbox}[
+  colback=colJuryFrame!12!colJury,
+  colframe=colJuryFrame,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  fontupper=\small\itshape
+]
+«~Le jury constate une maîtrise inégale du langage de modélisation SysML permettant la description du système étudié. Les principaux diagrammes de SysML et les notions associées (type de relation, cardinalité, etc.) doivent être connus des candidats.~»\\
+\upshape\footnotesize Rapport du jury 2018, épreuve « Étude d'un système, d'un procédé ou d'une organisation », option ingénierie informatique.
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+% -----------------------------------------------------------------------
+%  5. PRÉSENCE
+% -----------------------------------------------------------------------
+
+\begin{tcolorbox}[
+  ficheSection=colPresence,
+  title={Présence dans les sujets analysés (2013-2026)},
+]
+\begin{center}
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccccccc}
+\toprule
+\textbf{Année} & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 \\
+\midrule
+Épreuve commune & - & $\checkmark$ & - & - & $\checkmark$ & - & $\checkmark$ & - & $\checkmark$ & $\checkmark$ & $\checkmark$ & - & $\checkmark$ \\
+E2 discipl. IE  & - & - & - & - & $\checkmark$ & $\checkmark$ & - & - & $\checkmark$ & $\checkmark$ & - & - & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+\footnotesize\textbf{Sous-thèmes rencontrés :} blocs internes ibd (2014, 2021, 2022, 2023) - cas d'utilisation (2018, 2021, 2022) - diagramme d'états (2017, 2019, 2021) - exigences SysML (2022 ; diagramme d'exigences en E2 2026) - définition de blocs (2021) - diagramme de séquence (2014). Les chaînes d'information et d'énergie sont mobilisées dans presque tous les sujets.
+\end{tcolorbox}
+
+\CAPETENDFILE

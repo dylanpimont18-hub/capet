@@ -81,6 +81,24 @@ $$V_4 = V_3 + V_e \quad \text{(résultat par le théorème de Millman)}$$
 
 Permet de translater un signal pour l'adapter à la plage d'un CAN ou d'un transmetteur normalisé.
 
+### 1.11 Oscillateurs, isolation galvanique, amplificateur d'instrumentation
+
+*(complément du référentiel, 2026-11-10 — notion hors sujets 2013–2026 sauf mention)*
+
+**Période d'un astable à comparateur à hystérésis :**
+$$T = 2 \, R \, C \, \ln\left(1 + \frac{2 R_1}{R_2}\right)$$
+- Valable si la réaction positive impose V+ = Vs·R1/(R1 + R2) et si la sortie sature à ±Vsat
+
+**Fréquence d'un NE555 monté en astable :**
+$$f = \frac{1{,}44}{(R_A + 2 R_B) \, C}$$
+
+**Gain d'un amplificateur d'instrumentation à trois AOP :**
+$$G = \left(1 + \frac{2R}{R_G}\right) \frac{R_4}{R_3}$$
+- Valable avec un étage soustracteur de gain R4/R3, souvent égal à 1
+
+**Rapport de transfert en courant d'un optocoupleur :**
+$$CTR = \frac{I_C}{I_F}$$
+
 ---
 
 ## 2. QUESTIONS TYPES (max 6)
@@ -135,6 +153,10 @@ Permet de translater un signal pour l'adapter à la plage d'un CAN ou d'un trans
 - **Théorème de Millman** : méconnu de nombreux candidats ; savoir l'appliquer sur les nœuds à plusieurs admittances.
 - **Hystérésis** : confondre les seuils montant et descendant, ou inverser les rôles de $R_1$ et $R_2$.
 - **Conversion T/I** : ne pas comprendre pourquoi $I_s$ est indépendant de $R_{ana}$ (la boucle de contre-réaction maintient $\varepsilon = 0$).
+- **Adaptation de niveau dans les deux sens** : utiliser un pont diviseur pour passer d'un signal 3,3 V à une entrée 5 V. Un diviseur ne peut qu'abaisser une tension ; pour élever un niveau logique, il faut un transistor ou un translateur de niveau.
+- **Isolation galvanique** : relier les masses de part et d'autre d'un optocoupleur. L'isolation n'existe que si les deux circuits ont des alimentations et des masses séparées ; relier les masses l'annule.
+- **Amplificateur d'instrumentation** : le remplacer par un simple soustracteur à un AOP. Le soustracteur a une impédance d'entrée faible et un rejet du mode commun limité par l'appairage des résistances ; l'amplificateur d'instrumentation garde une impédance d'entrée très élevée.
+- **Fréquence d'un astable** : calculer la période d'un astable à AOP avec le seul produit RC. Les résistances de réaction fixent les seuils du comparateur et entrent dans le logarithme de la période.
 
 ---
 

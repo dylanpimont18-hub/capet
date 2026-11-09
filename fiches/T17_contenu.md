@@ -128,6 +128,14 @@ $$I = \frac{P}{U \cdot \cos\varphi} \quad \text{(monophasé)}$$
 
 - Source : E2_Sujet_2018 (DRS7) : tableau de compatibilité TT/TN-S/TN-C/IT
 
+### 1.7 Production et transport de l'énergie
+
+*(complément du référentiel, 2026-11-10 — notion hors sujets 2013–2026 sauf mention)*
+
+**Pertes Joule d'une ligne triphasée transportant une puissance P :**
+$$P_J = \frac{R \, P^2}{U^2 \cos^2\varphi}$$
+- Valable pour une ligne triphasée équilibrée de résistance R par phase, U étant la tension composée
+
 ---
 
 ## 2. QUESTIONS TYPES (max 6)
@@ -224,6 +232,10 @@ $$I = \frac{P}{U \cdot \cos\varphi} \quad \text{(monophasé)}$$
 6. **Sélectivité différentielle** : pour assurer la sélectivité, le rapport des sensibilités DDR amont/aval doit être $\geq 3$ (DDR aval 30 mA → DDR amont $\geq$ 90 mA, soit 300 mA). De plus, un DDR sélectif (type S, avec retard) peut être utilisé en amont.
 
 7. **Parafoudre en TN-C** : la protection en mode différentiel est impossible (N et PE confondus). Proposer uniquement mode commun. Erreur fréquente : proposer le même parafoudre qu'en TN-S.
+
+8. **Intérêt de la haute tension** : croire que les pertes en ligne diminuent proportionnellement à la tension. À puissance transportée donnée, les pertes Joule décroissent comme $1/U^2$ : doubler la tension divise les pertes par quatre.
+
+9. **Domaines de tension** : classer le réseau de distribution 20 kV en HTB. Le 20 kV appartient à la HTA (1 à 50 kV) ; la HTB commence au-delà de 50 kV.
 
 ---
 

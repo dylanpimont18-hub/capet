@@ -21,6 +21,22 @@
 | Effet Seebeck (thermocouple) | $e_{AB} = k_{Seebeck} \cdot (T_1 - T_2)$ | V |
 | PT100 (approximation linéaire) | $R(T) = 100 \cdot (1 + \alpha \cdot T)$ avec $\alpha \approx 3{,}85 \times 10^{-3}\,\text{K}^{-1}$ | Ω |
 
+### 1.1 Convection et rayonnement
+
+*(complément du référentiel, 2026-11-10 — notion hors sujets 2013–2026 sauf mention)*
+
+**Flux échangé par convection (loi de Newton) :**
+$$\Phi_{conv} = h \, S \, (T_s - T_a)$$
+- Valable si le coefficient h est supposé uniforme sur la surface S
+
+**Flux échangé par rayonnement (loi de Stefan-Boltzmann) :**
+$$\Phi_{ray} = \varepsilon \, \sigma \, S \, (T_s^4 - T_a^4)$$
+- Valable uniquement avec des températures exprimées en kelvins
+
+**Coefficient d'échange radiatif linéarisé :**
+$$h_r \approx 4 \, \varepsilon \, \sigma \, T_m^3$$
+- Valable si l'écart entre T_s et T_a est faible devant la température moyenne T_m
+
 ---
 
 ## 2. QUESTIONS TYPES
@@ -143,6 +159,12 @@ Le calcul du couple thermique équivalent ($C_{th}$) est bien connu en principe,
 5. **PT100 vs Thermocouple** : PT100 est un capteur résistif (mesure par pont de Wheatstone), adapté à $-200°\text{C}$ à $+850°\text{C}$ avec bonne précision. Le thermocouple a une plage plus étendue mais une sensibilité plus faible.
 
 6. **Confusion Peltier/Seebeck** : l'effet Peltier (courant → différence de température) est l'inverse de l'effet Seebeck (différence de température → tension). Le thermocouple exploite l'effet Seebeck.
+
+7. **Rayonnement en degrés Celsius** : appliquer la loi de Stefan-Boltzmann avec des températures en degrés Celsius. Les températures doivent être en kelvins, sinon le flux calculé n'a aucun sens.
+
+8. **Convection naturelle ou forcée** : garder le même coefficient h avec et sans ventilateur. Le coefficient passe d'environ 5 à 25 W·m⁻²·K⁻¹ en convection naturelle à 25 à 250 en convection forcée.
+
+9. **Échanges en parallèle** : additionner les résistances thermiques de convection et de rayonnement. Ces deux échanges partent de la même surface et se font en parallèle : ce sont les conductances $hS$ et $h_r S$ qui s'additionnent.
 
 ---
 

@@ -151,6 +151,8 @@ D'après les rapports de jury 2023, 2024, 2025 :
 - **Homogénéité** : confondre $K_e$ (V·s·rad$^{-1}$) et $K_c$ (N·m·A$^{-1}$) alors qu'ils sont numériquement égaux.
 - **Bode pour $K_C = 1$** : le jury demande souvent le diagramme pour $K_C = 1$ avant de chercher le $K_C$ optimal.
 - **Dépassement et amortissement** : la condition $D = 0$ implique $m \geq 1$, pas seulement $m = 1$.
+- **Constante de temps ≠ temps de réponse à 5 %** : confondre $\tau$ et $t_{r5\%}$ fausse l'identification d'un premier ordre, et tout ce qui en découle (par exemple $L = \tau R$). La constante $\tau$ se lit à l'intersection de la tangente à l'origine avec la valeur finale, ou à 63 % de la valeur finale ; pour un premier ordre, $t_{r5\%} \approx 3\tau$. Source : rapport du jury 2026 du troisième concours (même sujet que l'E1 externe 2026), question A4 = question A3 du sujet externe.
+- **Schéma-bloc parcouru à contre-sens** : remonter un bloc dans le sens opposé à sa flèche en multipliant par sa fonction de transfert donne une relation fausse. Un bloc impose $S = H \cdot E$ : pour exprimer l'entrée à partir de la sortie, on divise, $E = S / H$. Source : rapport du jury 2026 du troisième concours (même sujet que l'E1 externe 2026), question C4 = question C3 du sujet externe.
 
 ---
 

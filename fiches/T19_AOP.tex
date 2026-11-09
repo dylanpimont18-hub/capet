@@ -137,6 +137,20 @@ $I_s$ est indépendant de la charge $R_{ana}$ car la boucle de contre-réaction 
   V_{noeud} = \frac{\sum_k V_k/R_k}{\sum_k 1/R_k}
 \]
 
+\medskip\hrule\vspace{4pt}
+
+% Complément du référentiel - 2026-11-10 (sans TikZ : les ids de schémas restent stables)
+\textbf{1.5 Oscillateurs, isolation galvanique, adaptation de niveau (complément)}
+
+\smallskip
+\textbf{Astable à AOP} : un comparateur à hystérésis (seuils $\pm\beta V_{sat}$ avec $\beta = R_1/(R_1+R_2)$) charge et décharge $C$ à travers $R$ : $T = 2RC\ln(1 + 2R_1/R_2)$. Le circuit \textbf{NE555} en astable donne $f = 1{,}44/\big((R_A + 2R_B)\,C\big)$.
+
+\textbf{Amplificateur d'instrumentation} (trois AOP) : $G = (1 + 2R/R_G)\,R_4/R_3$, réglé par la seule résistance $R_G$ ; il amplifie une différence de tensions en rejetant le mode commun, avec une impédance d'entrée très élevée (pont de Wheatstone, thermocouple).
+
+\textbf{Isolation galvanique} : aucune liaison électrique entre deux circuits, aux masses séparées ; l'information passe par la lumière (optocoupleur, de rapport de transfert $CTR = I_C/I_F$), un champ magnétique (transformateur) ou électrique (isolateur capacitif). Elle protège les personnes et le matériel et supprime les boucles de masse.
+
+\textbf{Adaptation de niveau} : un pont diviseur abaisse une tension (tension de batterie ramenée vers un CAN, E2 2023 F2 ; 5\,V vers 3{,}3\,V) ; pour élever un niveau logique (3{,}3\,V vers 5\,V), il faut un transistor ou un translateur de niveau.
+
 \end{tcolorbox}
 
 % -----------------------------------------------------------------------

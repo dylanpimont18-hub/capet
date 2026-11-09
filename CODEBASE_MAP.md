@@ -24,7 +24,7 @@ Preamble LaTeX commun à toutes les fiches (et à la banque d'exercices) : packa
 - `docTech` — style tcolorbox neutre (gris) pour encadrer un extrait de document technique (plaque signalétique, datasheet) dans un exercice
 
 ## fiches/main.tex
-Point d'entree du manuel complet : page de couverture puis agregration des fiches T01 a T30 via `\include` sur les sources LaTeX.
+Point d'entree du manuel complet : page de couverture puis agregration des fiches T01 a T33 via `\include` sur les sources LaTeX (T31–T33 ajoutées le 2026-11-10 ; 146 pages, compilation vérifiée).
 - `\CAPETINCLUDEMODE` — active le mode inclusion des fiches pour Overleaf et compilation source unique
 - Page de garde : bloc "Usage cible" et signature de bas de couverture presentes (rendu complet harmonise avec Overleaf)
 
@@ -248,6 +248,18 @@ Fiche compilable T30 — Métrologie et instrumentation (chaîne capteur→condi
 - Correction d'une cellule de formulaire garbled : "Periode (&)" → "Période d'éch."
 - QT1-QT3 : ajout d'une étape "Conclusion" reliant chaque résultat à une exigence (règle `TEMPLATE_FICHE.md` Bloc 3)
 
+## Compléments du référentiel dans 13 fiches (2026-11-10)
+T05, T06, T07, T08, T12, T16, T17, T19, T20, T22, T27, T29 : un paragraphe `1.N … (complément)` ajouté à la **fin du bloc 1** du `.tex` (sans TikZ, pour garder les ids de schémas). Contenu : convection/rayonnement (T05), circuit magnétique, Hopkinson, Faraday, Boucherot (T06), hacheur 2 quadrants (T07), lissage par condensateur (T08), moteur pas à pas (T12), vitesse spécifique éolienne (T16), production et transport HTA/HTB (T17), astable, NE555, ampli d'instrumentation, optocoupleur, adaptation de niveau (T19), filtrage numérique RIF/RII (T20), structures de CAN/CNA (T22), robustesse et retard pur (T27), Moore/Mealy (T29). T30 : un piège seulement. Détail dans `docs/CAPET_SII_IE/AUDIT_REFERENTIEL_2026-11-09.md`.
+
+## fiches/T31_Telecommunications_RF.tex
+Fiche T31 créée le 2026-11-10 — télécoms et RF : bande de base NRZ/Manchester, modulations ASK/FSK/PSK/QAM (constellation QPSK en TikZ), multiplexage, PLL, lignes (Zc, Γ, ROS, RL), fibres, antennes, Friis, exposition aux champs, instrumentation RF. Domaine colElec. Présence 4/13 (mentions). QT1 réelle (E1 2014 Q38, vigilance v = c/n), QT2–QT3 inédites. Pas d'encadré jury (aucun commentaire dans les rapports).
+
+## fiches/T32_Ingenierie_Systeme_SysML.tex
+Fiche T32 créée le 2026-11-10 — analyse fonctionnelle (bête à cornes, pieuvre, FAST), 9 diagrammes SysML et leurs relations, chaînes d'information et d'énergie (TikZ), rendement global, MBSE, vérification des exigences. Domaine colAuto. Présence 8/13. QT1 et QT2 : E2 disciplinaire 2022 (Q11–12, Q21–22, corrigé officiel) ; QT3 inédite. Citation jury : RJ2018 l.2875 (option ingénierie informatique, attribution explicite).
+
+## fiches/T33_Informatique_Embarquee_Reseaux.tex
+Fiche T33 créée le 2026-11-10 — algorithmique, Python et C, opérations bit à bit, architecture µC (mémoires, timers, interruptions), FPGA/VHDL, UART (chronogramme TikZ), RS-232/485, I2C, SPI, Modbus, Ethernet industriel, IHM. Domaine colElec. Présence 11/13. QT : E1 2026 D10 (masque), E2 2023 E4–E8 (UART ; erreur d'unité du rapport signalée), E2 2025 Q4–Q5 (intégration et algorithme ; conversion du rapport signalée). Citation jury : RJ2018 l.158 (avant-propos).
+
 ## fiches/preamble.tex
 Preamble LaTeX commun : ajout des bibliothèques TikZ `positioning` et `arrows.meta` pour compatibilité des schémas (`>=Stealth`).
 - `\CAPETSHOW{enonce}{corrige}` — bascule de compilation pour `exercices/` : affiche la 1re branche par défaut, la 2e si `\CAPETCORRIGE` est défini avant l'`\input` (voir `.claude/skills/exercices-capet/SKILL.md`)
@@ -336,6 +348,11 @@ Skill projet : génération des exercices d'entraînement CAPET (mode file d'att
 
 ## fiches/T{nn}_contenu.md (T01–T30)
 Fichiers sources documentaires pour chaque fiche — formules, questions types, citations jury.
+- 2026-11-09 : 15 pièges ajoutés **en fin** de § 5 (T08 ×2, T10 ×1, T11 ×3, T20 ×2, T25 ×4, T26 ×2, T27 ×1), tirés des commentaires du rapport du jury 2026 (troisième concours) ; chacun cite sa question source (numéros rapport et sujet externe)
+- 2026-11-10 : `T31_contenu.md`, `T32_contenu.md`, `T33_contenu.md` créés (formules en tableau, source de chaque formule indiquée, pièges en puces) ; compléments du référentiel dans 13 fiches : 29 formules en **blocs `$$` en fin de § 1** (jamais en tableau, pour ne pas décaler les ids des blocs) et 24 pièges en fin de § 5
+
+## scripts/questions.json
+Questions rédigées des cartes formule, indexées par id (seul contenu de l'app hors fiches). 421 entrées au 2026-11-10 (77 ajoutées pour T31–T33 et les compléments) ; triées par id. `tests/test_questions.py` exige une question par formule.
 
 | Fichier | Thème |
 |---|---|
@@ -398,11 +415,11 @@ PDFs officiels organisés par année. Chaque sous-dossier `{doc_name}/` contient
 | 2019 | E1_Sujet, E2_Sujet, Rapport_Jury |
 | 2020 | E1_Sujet, E2_Sujet, Rapport_Jury |
 | 2021 | E1_Sujet, E2_Sujet, Rapport_Jury |
-| 2022 | E1_Sujet, Rapport_Jury *(E2 manquant dans ce dossier)* |
-| 2023 | E1_Sujet, Rapport_Jury *(E2 manquant dans ce dossier)* |
+| 2022 | E1_Sujet, E2_Appliquee_Commune, E2_Disciplinaire_IE, Rapport_Jury *(PDF E2 présents, vérifié le 2026-11-09)* |
+| 2023 | E1_Sujet, E2_Appliquee_Commune, E2_Disciplinaire_IE, Rapport_Jury *(idem)* |
 | 2024 | E1_Sujet, E2_Appliquee_Commune, E2_Disciplinaire_IE, Rapport_Jury |
 | 2025 | E1_Sujet, E2_Appliquee_Commune, E2_Disciplinaire_IE, Rapport_Jury |
-| 2026 | E1_Sujet, E2_Sujet_BAC3 |
+| 2026 | E1_Sujet, E2_Sujet_BAC3, Rapport_Jury_2026_3eConcours *(ajouté le 2026-11-09 — rapport du troisième concours, dont l'épreuve écrite = sujet E1 externe 2026 ; numérotation décalée, cf. `09_Sessions_2h/catalogue/2026_Hycity.md`)* |
 
 Fichiers `.md` présents dans ce dossier : 26 (2013–2023 partiels).
 
@@ -505,6 +522,24 @@ Même arborescence que `06_PDFs_Originaux/`. À utiliser comme source de référ
 ### 2026
 - `2026/E1_Sujet_2026/E1_Sujet_2026.md` — Épreuve commune E1 sujet (session en cours)
 - `2026/E2_Sujet_2026_BAC3/E2_Sujet_2026_BAC3.md` — Épreuve BAC3 (nouveau format 2026)
+- `2026/Rapport_Jury_2026_3eConcours/Rapport_Jury_2026_3eConcours.md` — Rapport jury 2026 du **troisième concours** (ajouté le 2026-11-09, extraction PyMuPDF et non Marker ; repères `<!-- p. N -->` ; équations du corrigé p. 7–21 mal linéarisées, à vérifier sur le PDF). Corrige l'E1 externe 2026 (même sujet). Constats du jury par question : l. 949–1163
+
+---
+
+## docs/CAPET_SII_IE/09_Sessions_2h/
+Révision de l'admissibilité par sessions de 2 h imprimées (extrait de sujet + DR + corrigé séparé). Créé le 2026-11-09.
+- `PROMPT_SESSIONS_2H.md` — prompt + cahier des charges à coller dans une autre conversation : formats Entraînement (95 + 20 min) et Examen (120 min), calibrage par temps de référence, pack de 6 documents, contraintes d'impression (DR à 100 %), corrigé officiel ou « NON OFFICIEL » vérifié, journal et choix de la session suivante par urgence = poids × (1 − maîtrise) ; annexes thèmes/poids, corpus, catalogue 2026
+- `catalogue/2026_Hycity.md` — décorticage des 3 documents 2026 : provenance (2 sujets déjà présents, identiques au md5 près), pages PDF par partie/DT/DR pour E1 et E2, thèmes, pages du corrigé RJ26, correspondance de numérotation externe ↔ troisième concours, point de vigilance RJ26 B9 (fréquence prise pour une pulsation), constats du jury avec n° de ligne, 5 sessions proposées
+- `packs/sessions.py` — spécification des 15 sessions (S01–S15), toutes avec corrigé officiel : sujet + pages, DT, DR, questions avec libellé LaTeX, thèmes, format (S04, S08, S12 en Examen), pages du corrigé et des commentaires du jury, correspondance de numérotation (sessions 2026), notes et points à vérifier. Sources : E1 2026 (RJ26) et épreuves disciplinaires IE 2022–2025, désormais entièrement utilisées (2022 : A = Q1–7, B = Q8–15, C = Q16–18, D = Q19–27, E = Q28–32)
+- `packs/build_packs.py` — génère `packs/pdf/` (ignoré par git, régénérable) : `00_PROGRAMME.pdf` + par session `Sxx_…_A_IMPRIMER.pdf` (fiche de route LaTeX, pages originales sujet/DT/DR via pypdf, grille d'auto-évaluation) et `Sxx_…_CORRIGE.pdf` (page de garde + pages officielles). Refuse une fiche ou une grille de plus d'une page
+  - `fiche_de_route(s, offsets)` — format, temps de référence, barème, contenu paginé, jalons, consignes
+  - `grille(s)` — une ligne par question, cases démarche/AN/unités, type d'erreur C/M/A/L/T
+  - `page_corrige(s, offsets)` — source, correspondance, points à vérifier, méthode de correction
+  - `jalons(s, debut, duree)` — heures de passage aux débuts de partie et aux quarts
+  - Lancement depuis la racine : `python docs/CAPET_SII_IE/09_Sessions_2h/packs/build_packs.py [dossier_de_travail]`
+
+## docs/CAPET_SII_IE/AUDIT_REFERENTIEL_2026-11-09.md
+Couverture du référentiel CAPET SII IE (liste fournie par l'utilisateur, 89 éléments) par fiches, exercices, cartes et sessions : 45 couverts, 24 partiels, 20 absents au 2026-11-09. Manques concentrés sur télécoms/RF, ingénierie système (SysML 11 sujets sur 25), informatique et réseaux industriels (algorithmique 17/25, Python 8/25, IHM 7/25). **Comblé le 2026-11-10** (section finale) : T31, T32, T33 et compléments dans 13 fiches ; restent les exercices et le manuel `manuel/`
 
 ---
 
@@ -541,6 +576,8 @@ suivante).
 - Tableau des 16 défauts trouvés en revue adverse et corrigés avant publication
 - Invariants de non-régression : 191 formules tableau, 153 formules bloc,
   199 pièges, 31 schémas — tout écart signale un parseur cassé
+  (2026-11-09 : 214 pièges après l'ajout volontaire de 15 pièges du rapport 2026 ;
+  2026-11-10 : 421 formules, 272 pièges, 34 schémas après T31–T33 et les compléments)
 
 ---
 
@@ -548,7 +585,7 @@ suivante).
 
 PWA hors-ligne de rappel actif générée depuis `fiches/`. Détail du principe,
 des sources d'extraction et des pièges dans `CLAUDE.md` et `app/README.md`.
-574 cartes (344 formules, 199 pièges, 31 schémas) sur 30 thèmes.
+727 cartes (421 formules, 272 pièges, 34 schémas) sur 33 thèmes (état 2026-11-10).
 
 ## scripts/parse_formules.py
 Extraction des cartes formule depuis les fiches Markdown (`T{nn}_contenu.md` § 1).

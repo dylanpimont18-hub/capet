@@ -32,13 +32,45 @@ docs/CAPET_Markdown-{timestamp}/CAPET_Markdown/  — résultat du dernier batch 
 
 ## État de la conversion (2026-06-29)
 
-- 41 PDFs disponibles (2013–2026)
+- 41 PDFs disponibles (2013–2026), + 1 le 2026-11-09 : `2026/Rapport_Jury_2026_3eConcours.pdf`
 - 26 fichiers `.md` déjà dans `06_PDFs_Originaux/` (2013–2023 partiels)
-- 41 fichiers `.md` dans le dernier batch Colab (couverture complète 2013–2026)
+- 41 fichiers `.md` dans le dernier batch Colab (couverture complète 2013–2026), + 1 le
+  2026-11-09 : `2026/Rapport_Jury_2026_3eConcours/…md` (extraction PyMuPDF, pas Marker)
+
+## Sessions de révision de 2 h (`docs/CAPET_SII_IE/09_Sessions_2h/`)
+
+Créé le 2026-11-09 pour réviser l'admissibilité par blocs de 2 h imprimés (extrait de sujet +
+documents réponses + corrigé séparé).
+
+- `PROMPT_SESSIONS_2H.md` — prompt et cahier des charges à coller dans une **autre**
+  conversation, qui génère les packs à imprimer à partir des PDF fournis
+- `catalogue/{année}_{support}.md` — décorticage d'un sujet : pages PDF de chaque partie, des
+  DT et des DR, thèmes T01–T30, pages du corrigé officiel, correspondance de numérotation,
+  constats du jury avec numéros de ligne. Seul `2026_Hycity.md` existe pour l'instant.
+- `packs/` — 15 sessions prêtes à imprimer (S01–S15), toutes avec corrigé **officiel** (E1 2026
+  + épreuves disciplinaires IE 2022–2025, désormais entièrement utilisées ; reste l'E2 2026,
+  sans corrigé officiel). Données dans `sessions.py`, génération par
+  `build_packs.py` vers `packs/pdf/` (ignoré par git). Les fichiers `E1_Sujet_2023/2024/2025.pdf`
+  sont des **doublons** de `E2_Disciplinaire_IE_{année}.pdf` (md5 identiques) : c'est l'épreuve
+  disciplinaire IE de 5 h, corrigée dans `Rapport_Jury_{année}`.
+
+## Couverture du référentiel (audit du 2026-11-09)
+
+`docs/CAPET_SII_IE/AUDIT_REFERENTIEL_2026-11-09.md` : sur 89 éléments du référentiel, 45 couverts,
+24 partiels, 20 absents au 2026-11-09. **Comblé le 2026-11-10** : trois fiches nouvelles (T31
+télécoms et RF, T32 ingénierie système et SysML, T33 informatique embarquée et réseaux) et des
+compléments dans 13 fiches (T05, T06, T07, T08, T12, T16, T17, T19, T20, T22, T27, T29, T30).
+Restent hors système : les exercices de ces notions et leur intégration au manuel `manuel/`.
+
+**Présence des fiches T31–T33** : nombre d'années 2013–2025 où un sujet *mentionne* la notion
+(mots-clés, termes ambigus exclus : « porteuse » désigne aussi la porteuse de MLI, « programme »
+le programme du concours). Ce n'est pas un nombre de questions. Leurs questions types inédites
+(T31 QT2–QT3, T32 QT3) sont marquées comme telles.
 
 ## Fiches de révision LaTeX (`fiches/`)
 
-30 fiches thématiques couvrant le programme complet CAPET SII IE, session 2026.
+33 fiches thématiques : T01–T30 construites sur les sujets 2013–2025, T31–T33 ajoutées le
+2026-11-10 pour couvrir le reste du référentiel.
 
 ```
 fiches/
@@ -54,8 +86,8 @@ fiches/
 | Domaine | Couleur LaTeX | Fiches |
 |---|---|---|
 | Électrotechnique | `colElec` (bleu) | T01–T17 |
-| Électronique | `colElec` | T18–T25 |
-| Automatique | `colAuto` (vert) | T26–T29 |
+| Électronique | `colElec` | T18–T25, T31 (télécoms et RF), T33 (informatique embarquée) |
+| Automatique | `colAuto` (vert) | T26–T29, T32 (ingénierie système) |
 | Mécanique | `colMeca` (orange) | T10 |
 | Thermique | `colTherm` (rouge) | T05 |
 
@@ -201,14 +233,28 @@ référence de sujet pour combler. Le séquentiel réellement interrogé passe p
 
 **Audit de véracité du 2026-09-20** : sur **68 citations** de rapport de jury présentes dans les
 30 fiches, **37 (54 %) étaient défectueuses**, dont **27 sans aucun support textuel** — inventées.
-Deux étaient attribuées à un « Rapport jury 2026 » **qui n'existe pas**.
+Deux étaient attribuées à un « Rapport jury 2026 » **qui n'existait pas** à la date de l'audit
+(le rapport 2026 du troisième concours, paru en septembre 2026, ne les contient pas non plus).
 
 ### Corpus réel des rapports
 
-Seuls **8 rapports** existent : **2018 à 2025**, dans
-`docs/CAPET_Markdown-.../06_PDFs_Originaux/{AAAA}/Rapport_Jury_{AAAA}/Rapport_Jury_{AAAA}.md`.
-**Il n'existe aucun rapport 2013–2017 ni 2026.** Toute citation attribuée à ces années est
-fabriquée par construction.
+**9 rapports** existent :
+
+- **2018 à 2025** (concours externe), dans
+  `docs/CAPET_Markdown-.../06_PDFs_Originaux/{AAAA}/Rapport_Jury_{AAAA}/Rapport_Jury_{AAAA}.md` ;
+- **2026, troisième concours** (ajouté le 2026-11-09), dans
+  `docs/CAPET_Markdown-.../06_PDFs_Originaux/2026/Rapport_Jury_2026_3eConcours/Rapport_Jury_2026_3eConcours.md`.
+
+**Il n'existe aucun rapport 2013–2017, ni de rapport 2026 du concours externe.** Toute citation
+attribuée à ces sources est fabriquée par construction.
+
+Le rapport 2026 du troisième concours corrige et commente une épreuve écrite dont le sujet est
+**celui de l'E1 externe 2026** (bus Hycity), mais avec 11 questions par partie au lieu de 10 :
+la numérotation est **décalée** (table de correspondance dans
+`docs/CAPET_SII_IE/09_Sessions_2h/catalogue/2026_Hycity.md`). Une citation « jury 2026 » doit
+donc préciser « troisième concours » et donner le numéro de question **du rapport**. Il ne dit
+rien de l'E2 externe 2026. Son `.md` est une extraction PyMuPDF : les équations du corrigé
+(p. 7–21) y sont mal linéarisées, il faut les vérifier sur le PDF.
 
 ### Règle
 
@@ -356,10 +402,19 @@ d'exercices du corpus, et aucun renvoi ne doit afficher « p. ?? ».
 
 PWA hors-ligne d'entraînement au rappel actif, créée le 2026-09-21.
 Trois types de cartes : **formule**, **piège** (conditions d'application),
-**schéma** (3 niveaux : reconnaissance / calcul / tracé). État courant :
-574 cartes (344 formules — 191 en tableau Markdown, 153 en bloc `$$` —, 199
-pièges, 31 schémas) sur 30 thèmes, poids de 0,231 à 1,3. Notice d'usage
-complète : `app/README.md`.
+**schéma** (3 niveaux : reconnaissance / calcul / tracé). État courant
+(2026-11-10) : 727 cartes (421 formules, 272 pièges, 34 schémas) sur
+33 thèmes, poids de 0,231 à 1,3. Notice d'usage complète : `app/README.md`.
+
+Ajouts du 2026-11-10 : T31–T33 (48 formules, 34 pièges, 3 schémas) et les compléments du
+référentiel dans 13 fiches (29 formules en blocs `$$` en fin de § 1, 24 pièges en fin de § 5,
+paragraphes sans TikZ en fin de bloc 1). 0 carte antérieure modifiée. Les 77 nouvelles
+formules ont leur question dans `scripts/questions.json`.
+
+Les 15 pièges ajoutés le 2026-11-09 (T08 p-007/008, T10 p-008, T11 p-007/008/009,
+T20 p-008/009, T25 p-007 à 010, T26 p-008/009, T27 p-008) viennent des commentaires du
+rapport du jury 2026 (troisième concours). Ils sont ajoutés **en fin** de § 5, donc aucun id
+existant n'a bougé (vérifié : 0 carte ancienne modifiée). Chacun cite sa question source.
 
 ### Principe : l'app est un artefact régénérable
 
@@ -374,9 +429,14 @@ dérivés : quiconque clone lance `python scripts/build_cards.py`.
 
 | Type de carte | Source | Volume |
 |---|---|---|
-| formule | `T{nn}_contenu.md` § 1 (tableau MD **et** blocs `$$`) | 344 |
-| piège | `T{nn}_contenu.md` § 5 « Lacunes et pièges » | 199 |
-| schéma | environnements TikZ des `T{nn}_*.tex` → SVG | 31 |
+| formule | `T{nn}_contenu.md` § 1 (tableau MD **et** blocs `$$`) | 421 |
+| piège | `T{nn}_contenu.md` § 5 « Lacunes et pièges » | 272 |
+| schéma | environnements TikZ des `T{nn}_*.tex` → SVG | 34 |
+
+⚠ **Ajouter une formule à une fiche existante** : en bloc `$$` à la **fin** de la § 1, jamais en
+ligne de tableau. Les formules en tableau sont numérotées avant les blocs : une ligne de tableau
+ajoutée décalerait l'identifiant de toutes les formules en bloc du thème, et leurs questions.
+Même logique pour les schémas : pas de TikZ inséré avant un TikZ existant.
 
 ⚠ La section `## 3. ATTENTES DU JURY` n'est **pas** extraite, et ne doit pas
 l'être : l'audit de véracité du 2026-09-20 a établi que 54 % des citations
