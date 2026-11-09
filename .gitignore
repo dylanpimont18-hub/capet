@@ -20,6 +20,7 @@ fiches/*.pdf
 exercices/*.pdf
 manuel/*.pdf
 manuel/pdf/
+docs/CAPET_SII_IE/09_Sessions_2h/packs/pdf/
 
 # App de révision — artefacts régénérables (cf. scripts/build_cards.py)
 app/svg/
