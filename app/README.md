@@ -99,13 +99,27 @@ inutiles (woff2 seul — Safari et Chrome n'utilisent que celui-là).
 
 ### Republier après une correction de fiche
 
-```bash
-python scripts/build_cards.py          # regenere cards.json + svg + sw-assets.js
-robocopy app ..\capet-revision /E /XD .git   # Windows ; rsync -a --exclude .git sous POSIX
-cd ../capet-revision
-rm -f vendor/katex/fonts/*.ttf vendor/katex/fonts/*.woff
-git add -A && git commit -m "maj du contenu" && git push
-```
+⚠ **Mise à jour du 2026-11-10 — ne plus recopier `app/`.** Depuis octobre 2026,
+`capet-revision` évolue de son côté : nouveaux écrans (Catégories, Sujets,
+Cours), `js/` et `css/` plus récents qu'ici, et un `cards.json` enrichi
+directement (règles des pièges, réponses des schémas, champ `forme`) au-delà
+de son `corrections/cartes.json`. Recopier `app/` ou régénérer son
+`cards.json` écraserait ce travail.
+
+Procédure correcte (appliquée le 2026-11-10, détail dans `README-app.md` de
+`capet-revision`) :
+
+1. `git pull` dans `capet-revision` avant tout ;
+2. `python scripts/build_cards.py` ici, pour obtenir les nouvelles cartes ;
+3. **fusionner** : partir du `cards.json` publié et n'y ajouter que les cartes
+   dont l'id est absent, en leur donnant les champs attendus par l'app publiée
+   (`forme` pour un piège ; `label`, `question`, `reponse` et un SVG copié sous
+   `svg/<id>.svg` pour un schéma) ; vérifier que les cartes publiées restent
+   identiques ;
+4. dans `capet-revision` : `python corrections/appliquer.py --verifier`
+   (attendu : 0 modification), `python scripts/indexer_cours.py` (ajoute les SVG
+   à `sw-cours.js`), `python scripts/version_cache.py` ;
+5. commit et push sur `main`.
 
 GitHub Pages redéploie en une à deux minutes.
 

@@ -663,6 +663,7 @@ Coquille de la PWA : en-têtes iOS (apple-mobile-web-app-*, sans quoi l'app inst
 
 ## app/README.md
 Notice d'usage de l'app : régénération du contenu, lancement local, tests, piège des ids positionnels, non-extraction du Bloc 4 jury, installation iPhone.
+- Publication (réécrite le 2026-11-10) : ne plus recopier `app/` vers `capet-revision`, qui a divergé ; fusionner les cartes nouvelles dans le `cards.json` publié, puis `corrections/appliquer.py --verifier`, `scripts/indexer_cours.py`, `scripts/version_cache.py` côté `capet-revision`
 
 ## tests/test_build_cards.py, test_build_svg.py, test_extract_tikz.py, test_parse_formules.py, test_parse_meta.py, test_parse_pieges.py
 74 tests pytest au total, couvrent les 6 modules de `scripts/` (parseurs, extraction TikZ, compilation SVG, orchestrateur).

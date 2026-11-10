@@ -416,6 +416,16 @@ T20 p-008/009, T25 p-007 à 010, T26 p-008/009, T27 p-008) viennent des commenta
 rapport du jury 2026 (troisième concours). Ils sont ajoutés **en fin** de § 5, donc aucun id
 existant n'a bougé (vérifié : 0 carte ancienne modifiée). Chacun cite sa question source.
 
+### ⚠ Publication : fusionner, ne jamais recopier `app/` (constat du 2026-11-10)
+
+Le dépôt publié `capet-revision` (GitHub Pages) a divergé de `app/` : ses écrans
+(Catégories, Sujets, Cours), son code et son `cards.json` sont plus récents, et ce dernier
+porte des enrichissements faits à la main (règles des pièges, réponses des schémas, `forme`)
+absents de son `corrections/cartes.json`. Recopier `app/` ou régénérer son `cards.json` les
+détruirait. Toujours `git pull` dans `capet-revision`, puis **fusionner** les seules cartes
+nouvelles (ids absents) dans le `cards.json` publié. Procédure complète : `app/README.md`,
+section « Publication sur GitHub Pages ».
+
 ### Principe : l'app est un artefact régénérable
 
 `app/cards.json` et `app/svg/` sont **générés** par `scripts/build_cards.py`
