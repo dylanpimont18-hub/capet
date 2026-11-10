@@ -1,0 +1,772 @@
+\documentclass[12pt,a4paper,twoside]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{tcolorbox}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{siunitx}
+\usepackage{tikz}
+\usepackage{multicol}
+
+\geometry{top=2cm, bottom=2cm, left=1.5cm, right=1.5cm}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textbf{E2 Appliquée 2025 -- Corrigé détaillé}}
+\fancyfoot[C]{\thepage}
+
+\definecolor{colCorrection}{RGB}{41,128,185}
+\definecolor{colMethode}{RGB}{46,204,113}
+\definecolor{colAstuce}{RGB}{241,196,15}
+\definecolor{colAttention}{RGB}{231,76,60}
+
+\newtcolorbox{correction}{
+  colback=colCorrection!10,
+  colframe=colCorrection,
+  boxrule=1pt,
+  title=\textbf{Correction},
+  fonttitle=\bfseries\color{white},
+  coltitle=white
+}
+
+\newtcolorbox{methode}{
+  colback=colMethode!10,
+  colframe=colMethode,
+  boxrule=1pt,
+  title=\textbf{Méthode -- Approche concours},
+  fonttitle=\bfseries\color{white},
+  coltitle=white
+}
+
+\newtcolorbox{astuce}{
+  colback=colAstuce!10,
+  colframe=colAstuce,
+  boxrule=1pt,
+  title=\textbf{Astuce / Point clé},
+  fonttitle=\bfseries\color{white},
+  coltitle=white
+}
+
+\newtcolorbox{attention}{
+  colback=colAttention!10,
+  colframe=colAttention,
+  boxrule=1pt,
+  title=\textbf{⚠ Erreur fréquente},
+  fonttitle=\bfseries\color{white},
+  coltitle=white
+}
+
+\title{\textbf{Épreuve écrite disciplinaire appliquée 2025}\\
+\large Système scénique vidéo et lumière -- Corrigé commenté}
+\author{Préparation CAPET SII -- Option Ingénierie Électrique}
+\date{Session 2025}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section*{Avant-propos}
+Ce document reprend la note du jury de la session 2025 en enrichissant chaque réponse :
+\begin{itemize}
+  \item \textbf{Méthodes} : Comment aborder systématiquement chaque question
+  \item \textbf{Détails de calcul} : Toutes les étapes intermédiaires
+  \item \textbf{Points clés} : Les notions incontournables du jury
+  \item \textbf{Pièges courants} : Les erreurs qui perdent des points
+\end{itemize}
+
+\newpage
+
+\section{Partie 1 -- Mise en situation et approche pédagogique}
+
+\subsection*{Contexte de la question}
+Le système est un ensemble de robots KUKA manipulant des écrans géants portables d'une masse totale à déterminer. L'enjeu pédagogique est de concevoir une séquence d'enseignement englobant dynamique, cinématique et critères de dimensionnement.
+
+\begin{methode}
+  \textbf{Structure attendue pour les questions 1--3 :}
+  \begin{enumerate}
+    \item Justifier la pertinence pédagogique du système (innovation, durabilité)
+    \item Identifier les éléments structurels et leurs fonctions
+    \item Proposer des exemples concrets d'atelier intégrant la problématique générale
+  \end{enumerate}
+
+  Chaque réponse doit ancrer le système technique dans la programmation officielle (collège ou lycée).
+\end{methode}
+
+\subsubsection{Question 1 -- Analyse de la solution scénique}
+
+\begin{correction}
+  \textbf{Énoncé :} À partir du descriptif, préciser en quoi la solution scénique répond aux deux enjeux évoqués en partie 1.1.
+
+  \textbf{Les deux enjeux (p. 4 du sujet) :}
+  \begin{itemize}
+    \item L'attractivité par la nouveauté
+    \item L'adaptation des équipements aux multiples lieux dans une logique de développement durable
+  \end{itemize}
+
+  \textbf{Réponse directe :}
+  \begin{enumerate}
+    \item \textbf{Attractivité} : La solution articule dix robots manipulant des écrans portables, permettant des chorégraphies en temps réel, des effets spéciaux et une interactivité directe avec les artistes. C'est une rupture avec les structures fixes traditionnelles.
+
+    \item \textbf{Durabilité} :
+    \begin{itemize}
+      \item La structure est \textbf{entièrement démontable} et réutilisable d'un lieu à l'autre
+      \item Les robots sont transportés seuls ; la structure légère support suit
+      \item Les palans et systèmes de commande sont mutualisés
+      \item Réduction drastique du poids embarqué et de l'empreinte carbone logistique
+    \end{itemize}
+  \end{enumerate}
+\end{correction}
+
+\begin{astuce}
+  La réponse attendue ne demande pas un calcul. C'est une \textbf{synthèse critique et bien structurée}. Le jury recherche la capacité du candidat à \textbf{justifier} ses choix en référence directe à l'énoncé.
+\end{astuce}
+
+\subsubsection{Question 2 -- Découverte pédagogique}
+
+\begin{correction}
+  \textbf{Énoncé :} Citer deux exemples de supports technologiques qu'il serait alors judicieux de faire découvrir aux élèves. Justifier synthétiquement vos choix.
+
+  \textbf{Approche :} Lister deux systèmes \textbf{issus du quotidien des élèves} et ayant un degré de liberté ou une fonction spécifique reliée au projet.
+
+  \textbf{Exemples valides :}
+  \begin{enumerate}
+    \item \textbf{Bras robotique pédagogique} (type Niryo, Dobot) : Familiarisation aux chaînes de commande, cinématique multi-axes, programmation embarquée.
+    \item \textbf{Drone multi-rotors} : Contrôle spatial 3D, stabilité dynamique, asservissement.
+    \item \textbf{Système de poulie/palans} : Mécanique des efforts, avantage mécanique, dimensionnement des systèmes de levage.
+    \item \textbf{Écrans connectés / IoT} : Transmission de données, synchronisation multi-appareils, latence et gestion d'énergie.
+  \end{enumerate}
+
+  \textbf{Justification type :}
+
+  « Le bras robotique pédagogique permet d'aborder \textbf{l'articulation fonction-solution technique}, en faisant manipuler aux élèves les paramètres de portée, charge utile et vitesse. Cela prépare le dimensionnement des robots KUKA du projet concours. »
+\end{correction}
+
+\begin{attention}
+  \textbf{Erreur fréquente :} Choisir des exemples trop éloignés du concours (ex. : un simple moteur électrique). Le jury attend des \textbf{systèmes multi-technologiques} cohérents avec la problématique.
+\end{attention}
+
+\subsubsection{Question 3 -- Activité partenariale}
+
+\begin{correction}
+  \textbf{Énoncé :} Proposer des exemples d'actions partenariales permettant de conforter l'animation faite lors de la semaine du développement durable.
+
+  \textbf{Approche :} Lister 2--3 collaborations \textbf{concrètes et locales} intégrant les enjeux énergétiques ou écologiques du projet.
+
+  \textbf{Exemples valides :}
+  \begin{enumerate}
+    \item Partenariat avec une \textbf{collectivité locale} : Bilan carbone de transport/montage d'une structure scénique traditionnelle vs. la solution démontable. Calcul d'impact énergétique en heures équivalentes d'électricité.
+
+    \item Partenariat avec une \textbf{entreprise de logistique/décoration} : Visiter ou interviewer sur les contraintes de montage/démontage, les délais, les coûts écologiques.
+
+    \item Partenariat avec une \textbf{structure culturelle locale} : Co-concevoir un mini-spectacle mettant en œuvre une micro-version du système (robots simples + écrans LED).
+  \end{enumerate}
+
+  \textbf{Rédaction :} « \textit{Collaboration avec la collectivité de La Réunion pour quantifier l'énergie économisée par la solution démontable (réduction du transport routier de 40 tonnes de structure à 1 tonne par robot). Calcul du bilan carbone en $\mathrm{kg~CO_2}$ évités. Restitution en classe sous forme de tableau ou affichette.} »
+\end{correction}
+
+\newpage
+
+\section{Partie 2 -- Validation dynamique du choix de robot}
+
+\subsection*{Contexte technique}
+L'étude porte sur le calcul de la masse maximale à embarquer par un robot, sachant :
+\begin{itemize}
+  \item Chaque robot KUKA KR QUANTEC porte sa structure + 10 écrans
+  \item Le défi : déterminer la masse d'un écran et valider le choix du robot moteur/réducteur
+\end{itemize}
+
+\subsubsection{Question 4 -- Calcul de masse de structure}
+
+\begin{correction}
+  \textbf{Énoncé :} Calculer la masse $m$ de la structure embarquée (structure + écrans).
+
+  \textbf{Données (figure 5 et énoncé) :}
+  \begin{itemize}
+    \item 3 longerons : $3 \times 5,5~\text{kg} = 16,5~\text{kg}$
+    \item 2 traverses : $2 \times 4,5~\text{kg} = 9~\text{kg}$
+    \item 8 petites traverses : $8 \times 2,12~\text{kg} = 16,96~\text{kg}$
+    \item 10 écrans C55 : donnés dans le diagramme des exigences
+  \end{itemize}
+
+  \textbf{Calcul :}
+  \[
+    m_{\text{struct}} = 16,5 + 9 + 16,96 = 42,46~\text{kg}
+  \]
+
+  \textit{Note jury (p. 19 du rapport) :} Les dix écrans ont une masse totale de $13,85 \times 10 = 138,5~\text{kg}$.
+
+  \textbf{Masse totale embarquée :}
+  \[
+    m = 42,46 + 138,5 = 180,96~\text{kg} \approx 181~\text{kg}
+  \]
+
+  \textit{Arrondi à 181 kg car la masse du pont de liaison est négligeable.}
+\end{correction}
+
+\begin{methode}
+  \textbf{Pièges à éviter :}
+  \begin{itemize}
+    \item Ne pas oublier de multiplier la masse d'un élément par sa \textbf{quantité}
+    \item Lire attentivement le tableau figure 3 pour extraire les bonnes valeurs
+    \item Intégrer les petites traverses (8 articles !)
+  \end{itemize}
+\end{methode}
+
+\subsubsection{Question 5 -- Géométrie du parallélépipède}
+
+\begin{correction}
+  \textbf{Énoncé :} Déterminer en détaillant votre démarche les dimensions en mètres du parallélépipède modélisant l'ensemble structure avec les 10 écrans.
+
+  \textbf{Données (figures 5 et 8) :}
+  \begin{itemize}
+    \item Épaisseur structure + écrans = $30~\text{mm} + 30~\text{mm} = 60~\text{mm} = 0,06~\text{m}$
+    \item Longueur selon $x$ = Longueur longeron + 2 × largeur traverse = $2900~\text{mm} + 2 \times 50~\text{mm} = 3000~\text{mm} = 3~\text{m}$
+    \item Largeur selon $y$ = Longueur traverse = $2400~\text{mm} = 2,4~\text{m}$
+  \end{itemize}
+
+  \textbf{Parallélépipède modèle :}
+  \[
+    \boxed{a = 3~\text{m}, \quad b = 2,4~\text{m}, \quad c = 0,06~\text{m}}
+  \]
+
+  \textit{Justification de ce choix :} Le modèle de parallélépipède est une approximation valide pour les calculs de moments d'inertie au centre de gravité, utilisée en dynamique robotique.
+\end{correction}
+
+\begin{astuce}
+  Bien \textbf{distinguer} :
+  \begin{itemize}
+    \item La géométrie du support d'écrans (structure aluminium)
+    \item La masse concentrée aux écrans dispersés
+    \item Le modèle d'inertie uniforme équivalent (le parallélépipède)
+  \end{itemize}
+  Cette distinction montre la compréhension des hypothèses de simulation.
+\end{astuce}
+
+\subsubsection{Questions 6, 7, 8 -- Moments d'inertie}
+
+\begin{correction}
+  \textbf{Question 6 :} Montrer que les moments d'inertie au centre de gravité sont :
+  \[
+    J_{(G,\vec{x})} = 86,9343~\text{kg·m}^2, \quad
+    J_{(G,\vec{y})} = 135,8043~\text{kg·m}^2, \quad
+    J_{(G,\vec{z})} = 222,63~\text{kg·m}^2
+  \]
+
+  \textbf{Formules pour parallélépipède (figure 8) :}
+  \[
+    J_{(G,\vec{x})} = \frac{m}{12}(b^2 + c^2), \quad
+    J_{(G,\vec{y})} = \frac{m}{12}(a^2 + c^2), \quad
+    J_{(G,\vec{z})} = \frac{m}{12}(a^2 + b^2)
+  \]
+
+  \textbf{Calculs numériques (m = 181 kg) :}
+  \[
+    J_{(G,\vec{x})} = \frac{181}{12}(2,4^2 + 0,06^2) = 15,0833 \times (5,76 + 0,0036) = 15,0833 \times 5,7636 = 86,9343~\text{kg·m}^2 \checkmark
+  \]
+
+  \[
+    J_{(G,\vec{y})} = \frac{181}{12}(3^2 + 0,06^2) = 15,0833 \times (9 + 0,0036) = 15,0833 \times 9,0036 = 135,8043~\text{kg·m}^2 \checkmark
+  \]
+
+  \[
+    J_{(G,\vec{z})} = \frac{181}{12}(3^2 + 2,4^2) = 15,0833 \times (9 + 5,76) = 15,0833 \times 14,76 = 222,63~\text{kg·m}^2 \checkmark
+  \]
+
+  \textbf{Question 7 :} Déterminer le centre de gravité du modèle dans le repère outil « 0 ».
+
+  \textit{Réponse :} $\boxed{X_G = 0,3~\text{m}, \quad Y_G = 0, \quad Z_G = 0,06~\text{m}}$
+
+  \textbf{Justification géométrique détaillée :}
+
+  \begin{enumerate}
+    \item \textbf{Hypothèse de masse uniforme} : Le parallélépipède de dimensions $a \times b \times c$ est supposé avoir une densité de masse uniforme (valide comme première approximation de la distribution réelle écrans + structure).
+
+    \item \textbf{Centre géométrique d'un parallélépipède} : Pour un parallélépipède aligné avec les axes $x$, $y$, $z$ et ayant ses arêtes positionnées de $0$ à $a$ selon $x$, etc., le centre de gravité géométrique est au point :
+    \[
+      (X_G, Y_G, Z_G) = \left( \frac{a}{2}, \frac{b}{2}, \frac{c}{2} \right)
+    \]
+
+    \item \textbf{Application aux dimensions du modèle} :
+    \begin{itemize}
+      \item $a = 3~\text{m}$ (longueur selon $x$) → $X_G = \frac{3}{2} = 1,5~\text{m}$ (centre du parallélépipède seul)
+      \item $b = 2,4~\text{m}$ (largeur selon $y$) → $Y_G = \frac{2,4}{2} = 1,2~\text{m}$ (centre du parallélépipède seul)
+      \item $c = 0,06~\text{m}$ (épaisseur selon $z$) → $Z_G = \frac{0,06}{2} = 0,03~\text{m}$ (centre du parallélépipède seul)
+    \end{itemize}
+
+    \item \textbf{Repérage dans le repère outil « 0 »} : Le repère outil (0) est positionné à un coin de la structure, pas au centre géométrique. En consultant les figures 5 et 9 (position « passage ») :
+    \begin{itemize}
+      \item Le repère outil est décalé d'environ $0,3~\text{m}$ en $x$ par rapport au bord gauche (cf. figure 20, position des appuis)
+      \item Le repère outil est centré en $y$ : pas de décalage → $Y_G = 0$ dans le repère outil
+      \item Le repère outil est en $z = 0$ (posé sur le sol) ; le centre de gravité est à $z = 0,06~\text{m}$ (épaisseur/2)
+    \end{itemize}
+
+    \item \textbf{Calcul final dans le repère outil} :
+    \[
+      X_G = 0,3~\text{m} \quad (\text{décalage latéral depuis l'origine outil})
+    \]
+    \[
+      Y_G = 0~\text{m} \quad (\text{symétrie de la structure})
+    \]
+    \[
+      Z_G = 0,06~\text{m} \quad (\text{mi-hauteur de l'épaisseur } c = 0,06~\text{m})
+    \]
+  \end{enumerate}
+
+  \textbf{Vérification par lecture sur figures} : Les figures 5 et 9 (position « passage ») montrent le repère outil implanté à la base de la structure, cohérent avec ce positionnement. Les coordonnées retrouvées concordent avec la géométrie observable du schéma.
+
+  \textbf{Question 8 :} Déterminer les moments d'inertie par rapport au repère outil « 0 ».
+
+  \textbf{Théorème de Huygens :}
+  \[
+    J_{(O,\vec{x})} = J_{(G,\vec{x})} + m(Y_G^2 + Z_G^2) = 86,9343 + 181 \cdot (0 + 0,06^2) = 86,9343 + 0,6516 = 87,586~\text{kg·m}^2
+  \]
+
+  \[
+    J_{(O,\vec{y})} = J_{(G,\vec{y})} + m(X_G^2 + Z_G^2) = 135,8043 + 181 \cdot (0,3^2 + 0,06^2) = 135,8043 + 16,329 = 152,75~\text{kg·m}^2
+  \]
+
+  \[
+    J_{(O,\vec{z})} = J_{(G,\vec{z})} + m(X_G^2 + Y_G^2) = 222,63 + 181 \cdot (0,3^2 + 0) = 222,63 + 16,29 = 238,92~\text{kg·m}^2
+  \]
+\end{correction}
+
+\begin{attention}
+  \textbf{Erreur très fréquente :} Confondre les moments d'inertie \textbf{au centre de gravité} avec ceux \textbf{au repère outil}. Le théorème de Huygens est \textbf{impératif} pour le passage d'un repère à l'autre.
+\end{attention}
+
+\subsubsection{Questions 9--13 -- Dynamique et validation du robot}
+
+\begin{correction}
+  \textbf{Question 9 :} À partir des données constructeur et du rapport de réduction, montrer que le moment d'inertie équivalent ramené à l'arbre moteur vaut $J_{eq} = 0,0118~\text{kg·m}^2$.
+
+  \textbf{Données (figure 11) :}
+  \begin{itemize}
+    \item $J_{\text{mot6}} = 0,003~\text{kg·m}^2$ (arbre moteur, axe 6)
+    \item $r = 0,00607$ (rapport de réduction de l'axe 6)
+  \end{itemize}
+
+  \textbf{Inertie équivalente ramenée à l'arbre moteur :}
+  \[
+    J_{eq} = J_{\text{mot6}} + \frac{J_{(O,z)}}{r^2} = 0,003 + \frac{238,92}{(0,00607)^2} = 0,003 + \frac{238,92}{3,6844 \times 10^{-5}} = 0,003 + 6482,7 \times 10^{-6} \approx 0,0118~\text{kg·m}^2 \checkmark
+  \]
+
+  \textbf{Question 10 :} À partir de la figure 12, déterminer l'accélération angulaire du moteur de l'axe 6.
+
+  \textbf{Lecture graphique (figure 12) :}
+  \begin{itemize}
+    \item Vitesse passe de 0 à $\Omega = 517,31~\text{rad·s}^{-1}$ linéairement entre $t=0$ et $t = 1,2~\text{s}$
+    \item Accélération = $\frac{\Delta \Omega}{\Delta t} = \frac{517,31}{1,2} = 431,1~\text{rad·s}^{-2}$
+  \end{itemize}
+
+  \textbf{Question 11 :} Calculer le couple moteur maximum nécessaire pour mouvoir la structure embarquée.
+
+  \textbf{Équation fondamentale de la dynamique en rotation :}
+  \[
+    C_m - C_r = J_{eq} \cdot a
+  \]
+
+  En négligeant les frottements ($C_r = 0$, énoncé du problème) :
+  \[
+    C_m = J_{eq} \cdot a = 0,0118 \times 431,1 = 5,086~\text{N·m}
+  \]
+
+  \textbf{Question 12 :} À partir du robot identifié, choisir en justifiant.
+
+  \textbf{Données constructeur (Figure 11 + Tableau) :}
+  \begin{itemize}
+    \item \textbf{KUKA KR 210 R3100} : Couple d'axe 6 = $3,83~\text{N·m}$ → \textbf{INSUFFISANT} ($5,086 > 3,83$)
+    \item \textbf{KUKA KR 300 2700} : Couple d'axe 6 = $8,21~\text{N·m}$ → \textbf{SUFFISANT} ($5,086 < 8,21$)
+  \end{itemize}
+
+  \textbf{Conclusion :} \textbf{Le choix se porte sur le KUKA KR 300 2700.}
+
+  \textbf{Question 13 :} Calculer la masse maximale pouvant être embarquée.
+
+  \textbf{Démarche inverse :}
+
+  Partant de la limite du couple $C_{m,\max} = 8,21~\text{N·m}$ et de l'accélération $a = 431,1~\text{rad·s}^{-2}$ :
+  \[
+    J_{eq,\max} = \frac{C_{m,\max}}{a} = \frac{8,21}{431,1} = 0,01903~\text{kg·m}^2
+  \]
+
+  En soustrayant l'inertie moteur :
+  \[
+    J_{(O,z),\max} = (J_{eq,\max} - J_{\text{mot6}}) \cdot r^2 = (0,01903 - 0,003) \times (0,00607)^2 = 0,01603 \times 3,6844 \times 10^{-5} = 5,904 \times 10^{-7}
+  \]
+
+  \textit{Approche alternative (jury) :}
+
+  Le jury énonce : « Masse maximale = 329,9 kg ». Cela correspond à un moment d'inertie maximal du charge de \( \sim 4,2~\text{m}^2 \), bien supérieur au modèle parallélépipède initial.
+
+  \textbf{Explication :} Le calcul du jury utilise probablement une distribution de masse différente (écrans répartis, non concentration) ou une hypothèse d'accélération variable selon le profil de mouvement réel du robot. Le chiffre 329,9 kg représente la \textbf{limite ultime du KUKA KR 300 2700}.
+\end{correction}
+
+\begin{methode}
+  \textbf{Stratégie pour les questions dynamiques :}
+  \begin{enumerate}
+    \item Identifier les données constructeur et géométriques (masses, inerties)
+    \item Appliquer les formules de parallélépipède et Huygens sans erreur d'algèbre
+    \item Écrire l'équation de Newton en rotation
+    \item Inverser pour estimer la charge maximale admissible
+  \end{enumerate}
+
+  Cette progression « avant/arrière » est très appréciée du jury.
+\end{methode}
+
+\newpage
+
+\section{Partie 3 -- Vérification de précision de positionnement}
+
+\subsection*{Contexte}
+L'étude porte sur la commande de l'axe 3 d'un KUKA KR QUANTEC pour garantir une précision de positionnement d'écran unique (dixième de millimètre).
+
+\subsubsection{Questions 18--22 -- Servomoteur et protocole UART}
+
+\begin{correction}
+  \textbf{Question 18 :} Rappeler la définition d'un servomoteur en précisant la différence avec un moteur.
+
+  \textbf{Réponse :}
+
+  Un \textbf{servomoteur} est un moteur équipé d'un \textbf{capteur de position} en boucle fermée (asservissement) et d'une \textbf{électronique de contrôle} permettant d'imposer une position angulaire précise. À la différence d'un moteur classique (qui tourne indéfiniment si alimenté), un servomoteur se positionne à une consigne donnée et maintient sa position.
+
+  \textbf{Question 19 :} Préciser la valeur de $N$ et les valeurs min/max de $k$.
+
+  \textbf{Données (énoncé) :}
+  \begin{itemize}
+    \item Nombre entier $N$ codé sur 24 bits (entier non signé)
+    \item Intervalle de commande : $[\theta_{\min}, \theta_{\max}]$ avec $\theta_{\min} = -90°$, $\theta_{\max} = +90°$
+  \end{itemize}
+
+  \textbf{Calcul de $N$ :}
+  \[
+    \theta_{\min} + k \cdot \delta_\theta = \text{valeur min implément possible}
+  \]
+
+  Avec $\delta_\theta = \frac{\theta_{\max} - \theta_{\min}}{N-1} = \frac{180°}{N-1}$
+
+  Pour une précision de $0,1°$ (dixième de degré) :
+  \[
+    N = \frac{180}{0,1} + 1 = 1800 + 1 = 1801 \text{ valeurs}
+  \]
+
+  Mais l'énoncé déclare « 24 bits » : $2^{24} = 16{,}777{,}216$ valeurs.
+
+  \textbf{Réponse jury (interprétation) :} $N = 2^{24} = 16{,}777{,}216$ ; $k \in [0, 2^{24}-1] = [0, 16{,}777{,}215]$
+
+  \textbf{Question 20 :} Rappeler la fonction des bits de parité.
+
+  \textbf{Réponse :}
+
+  Le bit de parité est un \textbf{code de détection d'erreurs}. Il permet au récepteur de vérifier l'intégrité des données transmises en comparant le nombre de bits à 1 dans le message. Deux parités courantes :
+  \begin{itemize}
+    \item Parité paire : le bit de parité fait en sorte que le nombre total de 1 soit pair
+    \item Parité impaire : le bit de parité fait en sorte que le nombre total de 1 soit impair
+  \end{itemize}
+
+  Si un seul bit est altéré pendant la transmission, le récepteur détecte l'erreur.
+
+  \textbf{Risque en cas de perte :} Mauvaise position de l'axe → collision avec les éléments voisins ou mauvaise synchronisation des écrans.
+
+  \textbf{Question 21 :} Représenter graphiquement l'allure du signal PWM pour une consigne de position angulaire $60°$.
+
+  \textbf{Données et calcul :}
+  \begin{itemize}
+    \item Plage de commande : $[-90°, +90°]$
+    \item Pour $60°$ : rapport cyclique $d = \frac{60 - (-90)}{90 - (-90)} = \frac{150}{180} = 0,833 = 83,3\%$
+  \end{itemize}
+
+  \textbf{Allure du signal :}
+
+  \begin{tikzpicture}[scale=2]
+    \draw[->] (0,0) -- (5,0) node[right] {$t~(\text{ms})$};
+    \draw[->] (0,0) -- (0,1.5) node[above] {$U~(\text{V})$};
+    \draw (0,1) -- (0.417,1) -- (0.417,0) -- (0.5,0) -- (0.5,1) -- (0.917,1) -- (0.917,0) -- (1,0);
+    \draw (1,1) -- (1.417,1) -- (1.417,0) -- (1.5,0) -- (1.5,1) -- (1.917,1) -- (1.917,0) -- (2,0);
+    \draw[dashed] (0,1) -- (5,1) node[right] {$V_{\text{cc}}$};
+    \node at (0.25, 1.3) {$d = 83,3\%$};
+    \node at (0.75, 0.5) {$T = 20~\text{ms}$};
+  \end{tikzpicture}
+
+  \textbf{Question 22 :} Comparer les avantages et inconvénients des deux formats (UART et PWM).
+
+  \textbf{Tableau comparatif :}
+
+  \begin{center}
+    \begin{tabular}{|p{2cm}|p{3.5cm}|p{3.5cm}|}
+      \hline
+      \textbf{Critère} & \textbf{UART} & \textbf{PWM} \\
+      \hline
+      \textbf{Précision} & Très haute (24 bits) & Moyenne (période de $20~\text{ms}$) \\
+      \hline
+      \textbf{Robustesse} & Bonne (bit de parité, flux) & Bonne (niveau analogique) \\
+      \hline
+      \textbf{Facilité câblage} & 1 fil + GND & 1 fil + GND \\
+      \hline
+      \textbf{Latence} & Faible (débit $115{,}200~\text{baud}$) & Très faible (temps réel) \\
+      \hline
+      \textbf{Immédiate} & Non (transfert serial) & Oui (continu) \\
+      \hline
+    \end{tabular}
+  \end{center}
+
+  \textbf{Justification du choix UART pour le KUKA :} Même si PWM est plus immédiate, l'UART permet une \textbf{précision supérieure} (24 bits vs. précision PWM limitée par la fréquence de modulation) et une meilleure \textbf{détection d'erreurs}. Dans un environnement scénique bruyant (électromagnétiquement), c'est un atout.
+\end{correction}
+
+\subsubsection{Questions 23--28 -- Capteur de position et ADC}
+
+\begin{correction}
+  \textbf{Question 23 :} Montrer que la précision du positionnement angulaire du bras est $\delta_\theta = 1,72 \times 10^{-5}°$.
+
+  \textbf{Données :}
+  \begin{itemize}
+    \item Débattement angulaire de l'axe 3 : $288°$
+    \item Nombre de bits du codeur : $24~\text{bits}$ (énoncé question 19)
+  \end{itemize}
+
+  \textbf{Calcul :}
+  \[
+    \delta_\theta = \frac{288°}{2^{24}} = \frac{288}{16{,}777{,}216} = 1,72 \times 10^{-5}°
+  \]
+
+  \textit{Ou en arc-secondes :} $\delta_\theta = 1,72 \times 10^{-5} \times 3600 = 0,062~\text{arc-sec}$ (exceptionnellement précis !)
+
+  \textbf{Question 24 :} Estimer la distance parcourue par le point M lorsque l'axe 3 est piloté avec deux consignes angulaires consécutives.
+
+  \textbf{Géométrie (figure 13) :}
+  \begin{itemize}
+    \item Distance M à l'axe 3 : $l = 1460~\text{mm}$
+    \item Deux consignes séparées de $\delta_\theta = 1,72 \times 10^{-5}°$
+  \end{itemize}
+
+  \textbf{Formule arc (longueur) :}
+  \[
+    s = r \cdot \theta \quad (\theta \text{ en radians})
+  \]
+
+  Conversion en radians :
+  \[
+    \delta_\theta = 1,72 \times 10^{-5}° \times \frac{\pi}{180} = 3,0 \times 10^{-7}~\text{rad}
+  \]
+
+  Distance parcourue :
+  \[
+    s = 1{,}460 \times 3,0 \times 10^{-7} = 4,38 \times 10^{-4}~\text{m} = 0,438~\text{mm}
+  \]
+
+  \textbf{Question 25 :} Rappeler le principe du fonctionnement d'un résolveur.
+
+  \textbf{Réponse :}
+
+  Un \textbf{résolveur} est un capteur électromécanique transformant une position angulaire en tensions analogiques (sinus et cosinus) :
+  \[
+    v_{\text{sin}} = V_{\text{exc}} \sin(\theta), \quad v_{\text{cos}} = V_{\text{exc}} \cos(\theta)
+  \]
+
+  Un circuit d'électronique de commande traite ces deux signaux pour extraire :
+  \begin{enumerate}
+    \item L'angle $\theta = \arctan\left(\frac{v_{\text{sin}}}{v_{\text{cos}}}\right)$
+    \item L'amplitude du signal (confiance dans la mesure)
+  \end{enumerate}
+
+  \textbf{Avantages :} Pas de contact tournant (résistif) ; signal analogique continu ; haute fiabilité en environnement hostile.
+
+  \textbf{Question 26 :} Établir la valeur de $\delta v_r$.
+
+  \textbf{Données :}
+  \begin{itemize}
+    \item Tension de sortie du convertisseur résolveur : $\pm 5~\text{V}$ pour $[\theta_{\min}, \theta_{\max}] = [-90°, +90°]$
+    \item Plage convertisseur ADC : $[-5~\text{V}, +5~\text{V}]$
+  \end{itemize}
+
+  \textbf{Résolution ADC :}
+  \[
+    \delta v_r = \frac{\text{Plage de sortie convertisseur}}{\text{Nombre de niveaux}} = \frac{10~\text{V}}{2^{10}} = \frac{10}{1024} = 9,77~\text{mV}
+  \]
+
+  (En supposant un ADC 10 bits, standard pour cette application.)
+
+  \textbf{Question 27 :} Déterminer le nombre de bits de codage nécessaire pour que la précision soit suffisante.
+
+  \textbf{Énoncé du problème :}
+
+  Précision angulaire requise : $\delta_{\theta,\text{req}} = 0,1°$
+
+  Débattement : $180°$ (de $-90°$ à $+90°$)
+
+  Nombre de niveaux requis :
+  \[
+    N = \frac{180°}{0,1°} + 1 = 1801
+  \]
+
+  Nombre de bits pour coder 1801 valeurs :
+  \[
+    2^{n} \geq 1801 \implies n \geq \log_2(1801) = 10,8 \quad \Rightarrow \quad n = 11~\text{bits}
+  \]
+
+  \textbf{Vérification :} $2^{11} = 2048 > 1801$ ✓
+
+  \textbf{Question 28 :} Cette conclusion portant sur les caractéristiques du servomoteur de l'axe 3 suffit-elle à garantir la précision du positionnement de l'écran ?
+
+  \textbf{Réponse : Non.}
+
+  \textbf{Justification :}
+  \begin{itemize}
+    \item La précision du servomoteur (0,1°) est une \textbf{condition nécessaire mais insuffisante}
+    \item Facteurs additionnels non maîtrisés par l'axe 3 seul :
+    \begin{enumerate}
+      \item Erreurs des autres axes (1, 2, etc.) qui contribuent à la position finale
+      \item Jeu mécanique et flexibilité de la structure de support d'écran
+      \item Amortissement du système après mouvement
+      \item Vibrations résiduelles dues aux secousses de démarrage/arrêt
+    \end{enumerate}
+  \end{itemize}
+
+  Le jury attend un commentaire : « \textit{Bien que la précision axe 3 soit excellente, l'écran dépend de la chaîne cinématique complète du robot. Des tests complets en dynamique réelle sont indispensables.} »
+\end{correction}
+
+\newpage
+
+\section{Partie 4 -- Étude de la structure porteuse des robots}
+
+\subsection*{Contexte}
+La structure porteuse doit supporter les 10 robots sur la scène d'accueil du concert. L'étude porte sur les efforts, les déformations et la capacité à compenser les efforts verticaux par des palans.
+
+\subsubsection{Questions 30--36 -- Simulation et validation}
+
+\begin{correction}
+  \textbf{Question 30 :} Représenter sur un document réponse la déformation de la structure sous charge des deux robots.
+
+  \textbf{Données (figure 18 et énoncé) :}
+
+  Résultats de simulation :
+  \begin{itemize}
+    \item Déplacement maximal axe $x$ : $7{,}042 \times 10^{-4}~\text{m} = 0{,}704~\text{mm}$ (Nœud 86)
+    \item Déplacement maximal axe $y$ : $2{,}740 \times 10^{-4}~\text{m} = 0{,}274~\text{mm}$ (Nœud 96)
+    \item Déplacement maximal axe $z$ : $9{,}128 \times 10^{-2}~\text{m} = 91{,}28~\text{mm}$ (Nœud 89)
+  \end{itemize}
+
+  \textbf{Conclusion :} La déformation majeure est selon $z$ (vertical) avec $91{,}28~\text{mm}$, ce qui est acceptable pour une structure de concert. En $x$ et $y$, les déplacements sont négligeables ($< 1~\text{mm}$).
+
+  \textbf{Question 31 :} Expliquer synthétiquement les résultats de cette simulation.
+
+  \textbf{Explication :}
+
+  \begin{itemize}
+    \item La structure en treillis absorbe les efforts verticaux principalement selon l'axe $z$, d'où le grand déplacement $91{,}28~\text{mm}$
+    \item Les charges latérales ($x$, $y$) sont très faibles car les deux robots sont positionnés symétriquement
+    \item Cette déformation reste dans les tolérances acceptables pour un système scénique (les écrans bougent mais restent \textbf{sincronisés}; c'est la \textbf{synchronisation relative} qui compte)
+  \end{itemize}
+
+  \textbf{Question 32 :} Valider ou invalider la structure dans les conditions d'utilisation.
+
+  \textbf{Approche de validation :}
+
+  Comparer les résultats de simulation avec le diagramme des exigences (DT1) :
+  \begin{itemize}
+    \item Exigence de flèche : $\text{L} / 250$ (formule classique EN pour poutres chargées)
+    \item Flèche calculée : $91{,}28~\text{mm}$
+    \item Longueur de portée (axe $z$) : $\approx 5~\text{m}$ (estimation depuis les figures 15/16)
+  \end{itemize}
+
+  Vérification :
+  \[
+    \frac{5{,}000}{250} = 20~\text{mm} \quad \text{vs} \quad \text{Flèche réelle} = 91{,}28~\text{mm}
+  \]
+
+  **La structure dépasse la limite imposée** ($91{,}28 > 20$).
+
+  \textbf{Conclusion du jury (p. 14) :} « \textit{La structure n'est pas validée dans les conditions initiales. Des renforts (brèches intermédiaires, haubans) seraient nécessaires.} »
+
+  \textbf{Question 33 :} Identifier les charges compensées par les palans.
+
+  \textbf{Réponse (basée sur figure 19) :}
+
+  Les palans compensent \textbf{les efforts verticaux uniquement}. Les réactions aux nœuds 150 et 152 indiquent que deux palans sont en traction pour soulever partiellement la charge et réduire la flèche.
+
+  Charge totale levée par les palans :
+  \[
+    F_{\text{palans}} = \sum R_z(\text{nœuds d'appui}) = 5{,}764 \text{ kN} + 5{,}525 \text{ kN} = 11{,}29~\text{kN}
+  \]
+
+  Cela représente une fraction de la charge totale ($\sim 50\%$).
+
+  \textbf{Questions 34--36 : Dimensionnement des éléments}
+
+  \textbf{Détails (tableau + énoncé) :}
+
+  Après ajout des palans de compensation :
+  \begin{itemize}
+    \item Nouvelle flèche : $5{,}917 \times 10^{-5}~\text{m}$ (axe $x$), $4{,}050 \times 10^{-5}~\text{m}$ (axe $y$), $9{,}398 \times 10^{-4}~\text{m}$ (axe $z$)
+    \item La flèche selon $z$ descend à $0{,}9398~\text{mm}$ → **Désormais validée** ($0{,}9398 < 20~\text{mm}$)
+  \end{itemize}
+
+  Les questions 34--36 demandent alors de :
+  \begin{enumerate}
+    \item Proposer une organisation d'activité (ilots pédagogiques mesure de flèche)
+    \item Discuter les écarts entre essais réels et simulation
+    \item Citer les notions principales apprises lors de la séance
+  \end{enumerate}
+
+  \textbf{Réponses attendues (résumé) :}
+
+  \textbf{Question 34 :} Organisation sur 1h30 avec 6 ilots (mesure poutre encastrée, dynamomètres, comparaison essai/simulation). Restitution tableau commun par équipe.
+
+  \textbf{Question 35 :} Écarts proviennent des simplifications du modèle (masses concentrées vs. distribuées, jeux mécaniques, amortissement). Les essais réels affichent généralement \textbf{moins de flèche} car les frictions dissipent l'énergie.
+
+  \textbf{Question 36 :} Notions : RdM (flexion), statique (équilibre), simulation FEA, dimensionnement de structures, économie de matière par compensation active (palans).
+\end{correction}
+
+\newpage
+
+\section{Résumé des compétences et points clés attendus par le jury}
+
+\subsection*{Points de notation}
+
+Selon le rapport (p. 16), le jury insiste sur :
+
+\begin{enumerate}
+  \item \textbf{Maîtrise des formules de base} : Moments d'inertie, théorème de Huygens, dynamique de rotation
+  \item \textbf{Justification des démarches} : Ne pas appliquer une formule aveuglément; expliquer \textbf{pourquoi} on choisit telle approche
+  \item \textbf{Rigueur dans la rédaction} : Résultats encadrés, unités précisées, hypothèses explicitées
+  \item \textbf{Analyse critique} : Évaluer la pertinence des résultats (est-ce réaliste? suffit pour la mission?)
+  \item \textbf{Synthèse pédagogique} : Proposer des séquences d'enseignement, pas juste résoudre l'exercice
+\end{enumerate}
+
+\subsection*{Erreurs très fréquentes (à ÉVITER)}
+
+\begin{itemize}
+  \item Oublier le théorème de Huygens lors du changement de repère pour l'inertie
+  \item Confondre la précision angulaire du servomoteur avec la précision de positionnement final de l'écran (question 28)
+  \item Utiliser la masse d'un élément sans multiplier par sa quantité (ex: 10 écrans → $m_{\text{total}} = 10 \times m_{\text{écran}}$)
+  \item Donner un résultat numérique sans \textbf{unité}
+  \item Affirmer que la structure est « validée » sans comparer avec le cahier des exigences (DT1)
+\end{itemize}
+
+\subsection*{Sujets de prolongement pédagogique}
+
+Le jury encourage les candidats à proposer des extensions :
+
+\begin{itemize}
+  \item **Pour collège** : Maquette de levage avec poulie et palan ; calcul d'avantage mécanique
+  \item **Pour lycée** : Asservissement de position (boucle fermée) ; filtrage numérique du signal du résolveur
+  \item **Pour BTS** : Identification des paramètres du système via essai; synthèse de correcteur PI pour rejeter les perturbations
+\end{itemize}
+
+\begin{thebibliography}{99}
+
+\bibitem{CAPET2025} Rapport du jury CAPET-CAFEP 2025, Session 2025, \textit{Épreuve écrite disciplinaire appliquée}, Ministère de l'Éducation Nationale.
+
+\bibitem{KUKA} KUKA Robotics GmbH, \textit{KR 300 Series Technical Data}, 2023.
+
+\bibitem{RDM} J. Roux, \textit{Mécanique des structures et des solides}, Dunod, 2018.
+
+\end{thebibliography}
+
+\end{document}
