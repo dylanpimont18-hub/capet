@@ -3,11 +3,30 @@
 
 export const CLE = "capet.progression.v1";
 
+// true seulement après un charger() qui a dû jeter un JSON corrompu (clé
+// non vide mais illisible). Distinct d'un simple stockage vide : l'appelant
+// (reglages.js) ne doit alerter que dans ce cas, pas à la première visite.
+let corrompuAuDernierChargement = false;
+export function futCorrompu() {
+  return corrompuAuDernierChargement;
+}
+
 export function charger() {
+  corrompuAuDernierChargement = false;
+  let brut;
   try {
-    const brut = localStorage.getItem(CLE);
-    return brut ? JSON.parse(brut) : {};
+    brut = localStorage.getItem(CLE);
   } catch {
+    return {}; // stockage indisponible (navigation privée) : pas une corruption
+  }
+  if (!brut) return {};
+  try {
+    return JSON.parse(brut);
+  } catch {
+    // Le JSON stocké existe mais n'est pas parsable (écriture interrompue,
+    // bug navigateur) : sans ce signal, l'utilisateur perd sa progression
+    // en silence — l'app se comporte comme à la toute première visite.
+    corrompuAuDernierChargement = true;
     return {};
   }
 }

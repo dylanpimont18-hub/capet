@@ -1,6 +1,12 @@
 // app/js/views/priorites.js
 import { charger } from "../store.js";
 import { echapper } from "../card-render.js";
+import { fileDuJour } from "../scheduler.js";
+
+// Date de l'écrit CAPET externe SII, session 2026 — à corriger si le
+// calendrier officiel Eduscol/SIAC publie une date différente.
+const DATE_ECRIT = new Date("2026-03-09T00:00:00");
+const JOUR_MS_P = 86400000;
 
 const SEUIL_REPET = 2;
 // 2,3 et non 2,4 : la facilité initiale VAUT 2,4, donc un unique « hésité »
@@ -49,9 +55,31 @@ function niveau(u) {
   return { mot: "Acquis", couleur: "var(--su)" };
 }
 
+// Jours restants avant l'écrit, et dette de révision (cartes en retard,
+// toutes échéances confondues — pas seulement la file du jour plafonnée à
+// 30). Sert de signal « on track / off track » directement actionnable pour
+// une échéance fixe, plutôt qu'un tableau de bord générique sans référence.
+function compteARebours(cartes, progression, maintenant = Date.now()) {
+  const jours = Math.ceil((DATE_ECRIT.getTime() - maintenant) / JOUR_MS_P);
+  const dette = fileDuJour(cartes, progression, maintenant, cartes.length)
+    .filter(c => {
+      const p = progression[c.id];
+      return p && Number.isFinite(p.du) && p.du <= maintenant;
+    }).length;
+  return { jours, dette };
+}
+
 export function vuePriorites(racine, data) {
-  const m = calculerMaitrise(data.cards, charger());
+  const progression = charger();
+  const m = calculerMaitrise(data.cards, progression);
   const themes = ordonnerThemes(data.themes, m);
+  const { jours, dette } = compteARebours(data.cards, progression);
+
+  const bandeauEcheance = jours > 0
+    ? `<p class="sous-titre">
+        <strong>${jours} jour${jours > 1 ? "s" : ""}</strong> avant l'écrit
+        · <strong>${dette}</strong> carte${dette > 1 ? "s" : ""} en retard</p>`
+    : "";
 
   // Trois colonnes seulement : à 390 px, six colonnes deviennent illisibles.
   // Les chiffres secondaires passent sous le titre, en petit corps.
@@ -80,6 +108,7 @@ export function vuePriorites(racine, data) {
     <div class="carte">
       <p class="consigne">Priorités</p>
       <p class="vedette">${prioritaires} thème${prioritaires > 1 ? "s" : ""} à travailler</p>
+      ${bandeauEcheance}
       <p class="sous-titre">Fréquence au concours croisée avec votre maîtrise.
         Les premiers de la liste tombent souvent et sont mal maîtrisés.</p>
       <table class="grille">

@@ -44,8 +44,25 @@ export function texteAvecMaths(s) {
     .join("");
 }
 
+// Le SVG est contraint à la largeur de la carte (max 640px) : sur un schéma
+// dense (diagramme de Bode annoté, schéma-bloc), les libellés fins
+// deviennent illisibles sur mobile sans un moyen d'agrandir. Le bouton
+// ouvre un plein écran géré par app.js (délégation d'événement globale,
+// voir attacherLoupe()) : rendreRecto()/rendreVerso() n'ont pas accès au
+// DOM global ni à un gestionnaire d'état de vue.
 function svg(chemin, alt) {
-  return `<div class="carte-svg"><img src="${echapper(chemin)}" alt="${echapper(alt)}" loading="lazy"></div>`;
+  const c = echapper(chemin);
+  const a = echapper(alt);
+  return `<div class="carte-svg">
+    <img src="${c}" alt="${a}" loading="lazy">
+    <button type="button" class="loupe-svg" data-svg="${c}" data-alt="${a}"
+            aria-label="Agrandir le schéma">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M11 8v6M8 11h6"/>
+      </svg>
+    </button>
+  </div>`;
 }
 
 // Le thème situe la question : « Rendement » seul est ambigu, « Rendement

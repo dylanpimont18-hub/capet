@@ -17,7 +17,7 @@ const CACHE = "capet-" + (self.CACHE_VERSION || "v1");
 const SOCLE = [
   "./", "./index.html", "./cards.json",
   "./css/style.css",
-  "./js/app.js", "./js/store.js", "./js/scheduler.js", "./js/card-render.js",
+  "./js/app.js", "./js/store.js", "./js/scheduler.js", "./js/card-render.js", "./js/rappel.js",
   "./js/views/reviser.js", "./js/views/priorites.js", "./js/views/reglages.js",
   "./vendor/katex/katex.min.js", "./vendor/katex/katex.min.css",
   "./manifest.webmanifest",
@@ -30,8 +30,27 @@ self.addEventListener("install", e => {
     caches.open(CACHE)
       // addAll échoue en bloc si un seul fichier manque : on tolère l'absence.
       .then(c => Promise.allSettled(SOCLE.map(u => c.add(u))))
-      .then(() => self.skipWaiting())
+      .then(() => {
+        // Première installation (aucun onglet piloté par un service worker
+        // précédent) : activer tout de suite, sans quoi certains
+        // navigateurs laissent le worker « waiting » jusqu'à fermeture de
+        // l'onglet. Une MISE À JOUR (un controller existe déjà) attend au
+        // contraire le geste explicite de l'utilisateur — voir le
+        // handler "message" ci-dessous et le bandeau dans app.js.
+        if (!self.clients.matchAll) return self.skipWaiting();
+        return self.clients.matchAll({ type: "window" }).then(clients => {
+          if (clients.length === 0) return self.skipWaiting();
+        });
+      })
   );
+});
+
+// app.js déclenche ce message depuis le bandeau « Nouvelle version
+// disponible », en réponse au clic sur « Recharger ». Sans ce geste,
+// activer une mise à jour en arrière-plan changerait le contenu servi sous
+// les pieds d'un onglet déjà ouvert.
+self.addEventListener("message", e => {
+  if (e.data && e.data.type === "activer") self.skipWaiting();
 });
 
 self.addEventListener("activate", e => {

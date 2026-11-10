@@ -35,6 +35,15 @@ export function noter(etat, note, maintenant = Date.now()) {
     e.repetitions += 1;
     e.intervalle = Math.max(1, Math.round(e.intervalle * 1.2));
     e.facilite = borner(e.facilite - 0.05);
+  } else if (note === "facile") {
+    // Saute les paliers 1j/3j d'amorçage : une carte déjà solide n'a pas
+    // besoin d'être revue dès le lendemain. Bonus de facilité doublé (+0.2)
+    // pour que l'intervalle s'allonge plus vite qu'après un simple « su ».
+    e.intervalle = e.repetitions === 0
+      ? 4
+      : Math.min(INTERVALLE_MAX, Math.round(Math.max(e.intervalle, 1) * e.facilite * 1.3));
+    e.repetitions += 1;
+    e.facilite = borner(e.facilite + 0.2);
   } else {
     // "su"
     if (e.repetitions === 0) e.intervalle = 1;
@@ -46,6 +55,20 @@ export function noter(etat, note, maintenant = Date.now()) {
 
   e.du = maintenant + e.intervalle * JOUR_MS;
   return e;
+}
+
+// Urgence d'UNE carte : fréquence au concours pondérée par l'éloignement à
+// la facilité maximale. Une carte jamais vue (facilite = init) ou déjà
+// ratée (facilite basse) pèse plus qu'une carte proche de FACILITE_MAX,
+// même à poids de thème égal. Sert à trier fileDuJour — ordonnerThemes()
+// (priorites.js) garde son agrégat par thème, qui répond à une question
+// différente (« quel thème travailler ? » vs « quelle carte réviser
+// maintenant ? »).
+export function urgenceCarte(carte, etat) {
+  const poids = carte.poids || 0;
+  if (!etat) return poids;
+  const eloignement = (FACILITE_MAX - etat.facilite) / (FACILITE_MAX - FACILITE_MIN);
+  return poids * (0.4 + 0.6 * Math.max(0, Math.min(1, eloignement)));
 }
 
 export function fileDuJour(cartes, progression, maintenant = Date.now(), taille = 30) {
@@ -63,9 +86,15 @@ export function fileDuJour(cartes, progression, maintenant = Date.now(), taille 
     else if (p.du <= maintenant) enRetard.push(c);
   }
 
-  const parPoids = (a, b) => (b.poids || 0) - (a.poids || 0);
-  enRetard.sort(parPoids);
-  nouvelles.sort(parPoids);
+  // Urgence par carte plutôt que par poids de thème seul : à poids égal,
+  // une carte déjà ratée (facilite basse) passe devant une carte proche de
+  // la maîtrise. Sans ça, une carte systématiquement ratée dans un thème à
+  // 90 % maîtrisé se noyait dans la moyenne du thème (voir priorites.js,
+  // qui répond à une question différente : quel thème, pas quelle carte).
+  const parUrgence = (a, b) =>
+    urgenceCarte(b, progression[b.id]) - urgenceCarte(a, progression[a.id]);
+  enRetard.sort(parUrgence);
+  nouvelles.sort(parUrgence);
 
   // Les cartes échues sont prioritaires, mais on garde des places pour les
   // cartes jamais vues : sinon, dès que 30 cartes sont échues, plus aucune

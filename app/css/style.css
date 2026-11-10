@@ -336,6 +336,7 @@ main {
 }
 
 .carte-svg {
+  position: relative;
   text-align: center;
   margin: var(--e4) 0;
   padding: var(--e4);
@@ -344,6 +345,59 @@ main {
   border: 1px solid var(--rule);
 }
 .carte-svg img { max-width: 100%; height: auto; }
+
+.loupe-svg {
+  position: absolute;
+  top: var(--e2);
+  right: var(--e2);
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--rule-fort);
+  border-radius: var(--rayon-sm);
+  background: var(--surface);
+  color: var(--ink-doux);
+  cursor: pointer;
+}
+.loupe-svg svg { width: 18px; height: 18px; }
+.loupe-svg:active { background: var(--surface-haut); }
+
+/* Plein écran : overflow:auto + touch-action:pinch-zoom laisse le
+   navigateur gérer le pincer-zoomer nativement, sans librairie JS. */
+.loupe-fond {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.86);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.loupe-cadre {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  touch-action: pinch-zoom;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--e5);
+}
+.loupe-cadre img { max-width: none; width: min(100%, 900px); height: auto; }
+#loupe-fermer {
+  position: absolute;
+  top: calc(var(--e4) + env(safe-area-inset-top));
+  right: var(--e4);
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface-haut);
+  color: var(--ink);
+  font-size: 18px;
+  cursor: pointer;
+}
 
 .latex-brut {
   font-family: ui-monospace, "SF Mono", SFMono-Regular, monospace;
@@ -408,9 +462,11 @@ main {
 .b-su     { border-color: var(--su);     color: var(--su); }
 .b-hesite { border-color: var(--hesite); color: var(--hesite); }
 .b-rate   { border-color: var(--rate);   color: var(--rate); }
+.b-facile { border-color: var(--accent); color: var(--accent); }
 .b-su:active     { background: var(--su-fond); }
 .b-hesite:active { background: var(--hesite-fond); }
 .b-rate:active   { background: var(--rate-fond); }
+.b-facile:active { background: var(--accent-sourd); }
 
 /* ─── Geste de balayage ────────────────────────────────────────────────── */
 .zone-swipe { touch-action: pan-y; will-change: transform; }
@@ -453,6 +509,38 @@ main {
   margin: 0;
 }
 .alerte-stockage svg { width: 20px; height: 20px; flex: 0 0 auto; margin-top: 1px; }
+
+/* ─── Bandeaux plein écran (maj du service worker, rappel de révision) ──── */
+.bandeau-maj, .bandeau-rappel {
+  position: fixed;
+  left: var(--e4);
+  right: var(--e4);
+  bottom: calc(70px + env(safe-area-inset-bottom));
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e3);
+  padding: var(--e3) var(--e4);
+  border-radius: var(--rayon-sm);
+  background: var(--surface-haut);
+  border: 1px solid var(--rule-fort);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  font-size: 14px;
+  color: var(--ink);
+}
+.bandeau-maj button, .bandeau-rappel button {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 0 var(--e4);
+  border: 0;
+  border-radius: var(--rayon-sm);
+  background: var(--accent);
+  color: var(--sur-accent);
+  font: 600 14px/1 inherit;
+  cursor: pointer;
+}
+.bandeau-rappel { border-color: var(--hesite); }
 
 /* ─── Barre de navigation ──────────────────────────────────────────────── */
 .barre-bas {
@@ -664,4 +752,8 @@ table.grille th.pct { font-weight: 600; }
   .vedette { font-size: 20px; }
   main { padding-left: var(--e3); padding-right: var(--e3); }
   .actions button { font-size: 14px; }
+  /* 4 boutons de notation (dont « Facile ») ne tiennent plus sur une seule
+     ligne sous 380 px sans tronquer les libellés : passage en grille 2x2. */
+  .actions { flex-wrap: wrap; }
+  .actions button { flex-basis: calc(50% - var(--e2) / 2); }
 }

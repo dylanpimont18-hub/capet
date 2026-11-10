@@ -107,6 +107,7 @@ export function vueReviser(racine, data) {
           <button class="b-rate"   data-n="rate">Raté</button>
           <button class="b-hesite" data-n="hesite">Hésité</button>
           <button class="b-su"     data-n="su">Su</button>
+          <button class="b-facile" data-n="facile">Facile</button>
         </div>`;
       // Une seule implémentation de la notation, appelée par les boutons ET
       // par le geste de balayage. Dupliquer cette logique la ferait diverger.
@@ -173,6 +174,7 @@ export function vueReviser(racine, data) {
       activerBalayage(document.getElementById("zone-carte"), appliquerNote);
       attacherEcouteurs();
     };
+    }
 
     afficher();
   }
