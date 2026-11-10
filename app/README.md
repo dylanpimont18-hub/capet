@@ -93,9 +93,11 @@ fiche (voir section précédente).
 L'app est publiée depuis un **second dépôt, public et dédié** :
 `dylanpimont18-hub/capet-revision` → https://dylanpimont18-hub.github.io/capet-revision/
 
-Ce dépôt-ci reste privé : il contient les PDF officiels, les fiches LaTeX et
-le pipeline. Seul le dossier `app/` est publié, allégé des polices KaTeX
-inutiles (woff2 seul — Safari et Chrome n'utilisent que celui-là).
+Ce dépôt de travail (`dylanpimont18-hub/capet`) est **public** lui aussi
+(vérifié le 2026-11-10) : il contient les PDF officiels, les fiches LaTeX et
+le pipeline. Seul le contenu de l'app est servi par GitHub Pages, depuis
+`capet-revision`, allégé des polices KaTeX inutiles (woff2 seul — Safari et
+Chrome n'utilisent que celui-là).
 
 ### Republier après une correction de fiche
 
