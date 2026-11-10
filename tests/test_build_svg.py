@@ -38,3 +38,12 @@ def test_hex_invalides_non_convertis():
 def test_reste_xml_bien_forme():
     import xml.etree.ElementTree as ET
     ET.fromstring(themify(SVG))  # ne doit pas lever
+
+def test_palette_terre_cuite():
+    # Report de la palette de l'app publiée (capet-revision 8ba1783).
+    src = "<svg xmlns='http://www.w3.org/2000/svg'><path fill='#1D4ED8' stroke='#15803d'/><path fill='#123456'/></svg>"
+    out = themify(src)
+    assert "var(--accent, #c0603a)" in out
+    assert "var(--su, #4b7536)" in out
+    assert "#123456" in out          # couleur hors palette : inchangée
+    assert themify(out).count("var(--accent") == 1   # idempotent

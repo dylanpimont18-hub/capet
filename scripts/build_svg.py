@@ -10,9 +10,15 @@ import shutil
 import subprocess
 import tempfile
 
+# `lmodern` est indispensable : sans lui, le texte en encodage T1 utilise les
+# polices EC, que dvisvgm doit faire générer par Metafont. Quand cette
+# génération échoue (constaté le 2026-11-10), dvisvgm écrit le SVG SANS les
+# glyphes du texte — seules les maths restent — et ne lève aucune erreur.
+# Latin Modern fournit des contours Type 1 : plus de Metafont, plus de texte perdu.
 PREAMBULE = r"""\documentclass[border=3pt,dvisvgm]{standalone}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage{lmodern}
 \usepackage{amsmath,amssymb}
 \usepackage{siunitx}
 \usepackage{xcolor}
@@ -33,6 +39,33 @@ PREAMBULE = r"""\documentclass[border=3pt,dvisvgm]{standalone}
 # hex valides : on n'autorise que 3 ou 6 zéros.
 _NOIR = re.compile(r"(fill|stroke)=(['\"])#(?:0{3}|0{6})\2")
 _BLANC = re.compile(r"(fill|stroke)=(['\"])#(?:fff|ffffff)\2", re.I)
+
+# Palette « terre cuite et bois » de l'app publiée (capet-revision, commit
+# 8ba1783 du 2026-10-13, qui demandait de reporter ici sa substitution) : les
+# couleurs de domaine codées en dur deviennent des variables CSS du thème,
+# toujours avec un repli. Bleus colElec -> accent ; teintes claires et gris ->
+# ink-faible ; vert colAuto -> sauge (su) ; orange colMeca -> accent.
+_PALETTE = {
+    "#1d4ed8": "var(--accent, #c0603a)",
+    "#143697": "var(--accent, #c0603a)",
+    "#143797": "var(--accent, #c0603a)",
+    "#839eea": "var(--ink-faible, #a89686)",
+    "#8ea7ec": "var(--ink-faible, #a89686)",
+    "#c0c0c0": "var(--ink-faible, #a89686)",
+    "#15803d": "var(--su, #4b7536)",
+    "#e8f3ec": "var(--su-fond, #e8f0df)",
+    "#c2410c": "var(--accent, #c0603a)",
+}
+_COULEUR = re.compile(r"(fill|stroke)=(['\"])(#[0-9a-fA-F]{6})\2")
+
+
+def appliquer_palette(svg: str) -> str:
+    """Remplace les couleurs de domaine par les variables du thème (idempotent)."""
+    return _COULEUR.sub(
+        lambda m: (f"{m.group(1)}={m.group(2)}{_PALETTE[m.group(3).lower()]}{m.group(2)}"
+                   if m.group(3).lower() in _PALETTE else m.group(0)),
+        svg,
+    )
 _BALISE_SVG = re.compile(r"(<svg\b[^>]*>)")
 
 # Feuille de style EMBARQUÉE dans le SVG. Indispensable : le SVG est chargé
@@ -66,6 +99,7 @@ def themify(svg: str) -> str:
     svg = _BLANC.sub(
         lambda m: f"{m.group(1)}={m.group(2)}var(--svg-bg,#fff){m.group(2)}", svg
     )
+    svg = appliquer_palette(svg)
     return _BALISE_SVG.sub(lambda m: m.group(1) + _STYLE, svg, count=1)
 
 
